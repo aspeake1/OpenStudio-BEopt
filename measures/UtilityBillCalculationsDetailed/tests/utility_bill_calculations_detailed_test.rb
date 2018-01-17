@@ -143,23 +143,24 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
   end
 =begin
-  def test_all_tariffs
+  def test_validate_all_tariffs
     require 'zip'
+    require 'parallel'
+    args_hash = {}
+    args_hash["tariff_label"] = "Custom Tariff"    
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
-      zip_file.each_with_index do |entry, i|
+      Parallel.each_with_index(zip_file, in_threads: 4) do |entry, i|
         next unless entry.file?
-        puts i, entry.name
-        args_hash = {}
-        args_hash["tariff_label"] = "Custom Tariff"
-        args_hash["custom_tariff"] = entry.name
-        args_hash["gas_fixed"] = "8.0"
-        args_hash["gas_rate"] = Constants.Auto
-        args_hash["oil_rate"] = Constants.Auto
-        args_hash["prop_rate"] = Constants.Auto
-        args_hash["pv_compensation_type"] = "Feed-In Tariff"
-        args_hash["pv_sellback_rate"] = "0.03"
-        args_hash["pv_tariff_rate"] = "0.12"
-        timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
+        puts "#{i} #{entry.name}"
+        args_hash["custom_tariff"] = entry.name        
         expected_num_del_objects = {}
         expected_num_new_objects = {}
         expected_values = {}

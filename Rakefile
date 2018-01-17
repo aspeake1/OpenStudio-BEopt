@@ -550,6 +550,7 @@ task :update_tariffs do
 end
 
 def get_tariff_json_files(tariffs_path)
+  require 'parallel'
 
   STDOUT.puts "Enter API Key:"
   api_key = STDIN.gets.strip
@@ -567,14 +568,15 @@ def get_tariff_json_files(tariffs_path)
   http.verify_mode = OpenSSL::SSL::VERIFY_NONE  
 
   rows = CSV.read("./resources/utilities.csv", {:encoding=>'ISO-8859-1'})
-  size = 0
-  progress = 0
-  rows.each_with_index do |row, i|
+  rows = rows[1..-1] # ignore header
+  interval = 1
+  report_at = interval
+  timestep = Time.now
+  num_parallel = 1 # FIXME: segfault when num_parallel > 1
+  Parallel.each_with_index(rows, in_threads: num_parallel) do |row, i|
 
-    size += 1
-    next if i == 0
     utility, eiaid, name, label = row
-    
+
     entry_path = File.join(tariffs_path, clean_filename("#{utility} - #{name}.json"))
     if not update
       if File.exists?(entry_path)
@@ -585,20 +587,20 @@ def get_tariff_json_files(tariffs_path)
 
     params = { 'version' => 3, 'format' => 'json', 'detail' => 'full', 'getpage' => label, 'api_key' => api_key }
     url.query = URI.encode_www_form(params)
-    request = Net::HTTP::Get.new(url.request_uri)
+    request = Net::HTTP::Get.new(url.request_uri)    
     response = http.request(request)
     response = JSON.parse(response.body, :symbolize_names=>true)
 
     if response.keys.include? :error
       puts "#{response[:error][:message]}."
       if response[:error][:message].include? "exceeded your rate limit"
-        return false
+        false
       end
       next
     end
-    
-    if response[:items].empty?
-      puts "Skipping #{entry_path}: empty response."
+
+    if response[:items].empty? or not valid_tariff(response[:items][0])
+      puts "Skipping #{entry_path}: invalid tariff."
       next
     end
 
@@ -613,17 +615,35 @@ def get_tariff_json_files(tariffs_path)
         f.write(response.to_json)
       end
     end
-    
-    new_progress = (size * 100) / rows.length
-    unless new_progress == progress
-      puts "Completed %3d%% ..." % [new_progress]
+
+    # Report out progress
+    if i.to_f * 100 / rows.length >= report_at
+      puts "INFO: Completed #{report_at}%; #{(Time.now - timestep).round}s"
+      report_at += interval
+      timestep = Time.now
     end
-    progress = new_progress
 
   end
   
   return true
 
+end
+
+def valid_tariff(tariff)
+  requireds = [:energyweekdayschedule, :energyweekendschedule, :energyratestructure]
+  requireds.each do |required|
+    unless tariff.keys.include? required
+      return false
+    end
+  end
+  tariff[:energyratestructure].each do |period|
+    period.each do |tier|
+      unless tier.keys.include? :rate
+        return false
+      end
+    end
+  end
+  return true
 end
 
 def clean_filename(name)

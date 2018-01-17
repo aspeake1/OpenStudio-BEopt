@@ -52,11 +52,9 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     tariffs = OpenStudio::StringVector.new
     tariffs << "Autoselect Tariff(s)"
     tariffs << "Custom Tariff"
-    CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).each_with_index do |row, i|
-      next if i == 0
-      utility = row[0]
-      name = row[2]
-      tariffs << clean_filename("#{utility} - #{name}")
+    zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
+    zip_file.listFiles.each do |zip_entry|
+      tariffs << zip_entry.to_s.chomp(".json")
     end
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("tariff_label", tariffs, true)
     arg.setDisplayName("Electricity: Tariff")
@@ -167,8 +165,6 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       return false
     end
     
-    require 'zip'
-    
     # Assign the user inputs to variables
     tariff_label = runner.getStringArgumentValue("tariff_label", user_arguments)
     custom_tariff = runner.getOptionalStringArgumentValue("custom_tariff", user_arguments)
@@ -231,9 +227,12 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       if File.exists?(File.expand_path(custom_tariff))
         tariff = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
       end
-    elsif tariff_label != "Autoselect Tariff(s)"      
-      Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
-        tariff = JSON.parse(zip_file.read("#{tariff_label}.json"), :symbolize_names=>true)[:items][0]
+    elsif tariff_label != "Autoselect Tariff(s)"
+      zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
+      zip_file.listFiles.each do |zip_entry|
+        next unless zip_entry.to_s == "#{tariff_label}.json"
+        zip_entry = zip_file.extractFile(zip_entry, ".")
+        tariff = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
       end
     else # autoselect tariff based on distance to simulation epw location
       weather_file = model.getSite.weatherFile.get
@@ -262,9 +261,9 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
         utilityid_to_nsrdbid.keys.each do |utilityid|
           eiaid_ixs = col.each_index.select{|i| col[i] == utilityid}
           eiaid_ixs.each do |ix|
-            utility = cols[0][ix].gsub("/", "_").gsub(",", " ").gsub(":", " ").gsub('"', "").gsub(">", "").gsub("<", "").gsub("*", "").strip
-            name = cols[2][ix].gsub("/", "_").gsub(",", " ").gsub(":", " ").gsub('"', "").gsub(">", "").gsub("<", "").gsub("*", "").strip
-            filename = "#{utility} - #{name}"
+            utility = cols[0][ix]
+            name = cols[2][ix]
+            filename = clean_filename("#{utility} - #{name}")
             if utilityid_to_filename.keys.include? utilityid
               utilityid_to_filename[utilityid] << filename
             else
@@ -276,9 +275,12 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       
       tariffs = []
       utilityid_to_filename.each do |utilityid, filenames|
-        filenames.each do |filename|    
-          Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
-            tariffs << JSON.parse(zip_file.read("#{filename}.json"), :symbolize_names=>true)[:items][0]
+        filenames.each do |filename|
+          zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
+          zip_file.listFiles.each do |zip_entry|
+            next unless zip_entry.to_s == "#{filename}.json"
+            zip_entry = zip_file.extractFile(zip_entry, ".")
+            tariffs << JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
           end
         end          
       end
@@ -377,13 +379,13 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
         consumed = consumed[0..1415] + consumed[1440..-1] # remove leap day
         produced = produced[0..1415] + produced[1440..-1] # remove leap day
       end
-      total_val = calculate_electricity_bills(consumed, produced, pv_compensation_type, pv_rate, tariff)
+      total_val = calculate_detailed_electricity_bills(consumed, produced, pv_compensation_type, pv_rate, tariff)
     end
     runner.registerValue(fuel, total_val)
     runner.registerInfo("Registering #{fuel} utility bills.")
   end
   
-  def calculate_electricity_bills(load, gen, pv_compensation_type, pv_rate, tariff)
+  def calculate_detailed_electricity_bills(load, gen, pv_compensation_type, pv_rate, tariff)
 
     if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
       unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")

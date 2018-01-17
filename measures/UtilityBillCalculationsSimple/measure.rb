@@ -307,13 +307,13 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
         consumed = consumed[0..1415] + consumed[1440..-1] # remove leap day
         produced = produced[0..1415] + produced[1440..-1] # remove leap day
       end
-      total_val = calculate_electricity_bills(consumed, produced, fixed, rate, pv_compensation_type, pv_rate)
+      total_val = calculate_simple_electricity_bills(consumed, produced, fixed, rate, pv_compensation_type, pv_rate)
     end
     runner.registerValue(fuel, total_val)
     runner.registerInfo("Registering #{fuel} utility bills.")
   end
   
-  def calculate_electricity_bills(load, gen, fixed, rate, pv_compensation_type, pv_rate)
+  def calculate_simple_electricity_bills(load, gen, fixed, rate, pv_compensation_type, pv_rate)
   
     if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
       unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
