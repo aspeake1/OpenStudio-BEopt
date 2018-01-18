@@ -128,7 +128,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>96, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>724-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
     _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
   end
   
@@ -312,12 +312,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     marginal_rates = {Constants.FuelTypeElectric=>args_hash["elec_rate"], Constants.FuelTypeGas=>args_hash["gas_rate"], Constants.FuelTypeOil=>args_hash["oil_rate"], Constants.FuelTypePropane=>args_hash["prop_rate"]}
     fixed_rates = {Constants.FuelTypeElectric=>args_hash["elec_fixed"].to_f, Constants.FuelTypeGas=>args_hash["gas_fixed"].to_f}
-    if args_hash["pv_compensation_type"] == "Net Metering"
-      pv_rate = args_hash["pv_sellback_rate"]
-    elsif args_hash["pv_compensation_type"] == "Feed-In Tariff"
-      pv_rate = args_hash["pv_tariff_rate"]
-    end
-    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], pv_rate)
+    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
 
     result = runner.result
     # show_output(result)

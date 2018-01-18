@@ -168,11 +168,6 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     pv_compensation_type = runner.getStringArgumentValue("pv_compensation_type", user_arguments)
     pv_sellback_rate = runner.getStringArgumentValue("pv_sellback_rate", user_arguments)
     pv_tariff_rate = runner.getStringArgumentValue("pv_tariff_rate", user_arguments)
-    if pv_compensation_type == "Net Metering"
-      pv_rate = pv_sellback_rate
-    elsif pv_compensation_type == "Feed-In Tariff"
-      pv_rate = pv_tariff_rate
-    end
     
     fixed_rates = {
                    Constants.FuelTypeElectric=>elec_fixed.to_f,
@@ -249,13 +244,13 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     end
     
     weather_file_state = model.getSite.weatherFile.get.stateProvinceRegion
-    calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_rate)
+    calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
 
     return true
  
   end
   
-  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_rate)
+  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
   
     if timeseries["ElectricityProduced:Facility"].empty?
       timeseries["ElectricityProduced:Facility"] = Array.new(timeseries["Electricity:Facility"].length, 0)
@@ -284,13 +279,13 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
           end
         end
         if fuel == Constants.FuelTypeElectric and not timeseries["Electricity:Facility"].empty?
-          report_output(runner, fuel, timeseries["Electricity:Facility"], marginal_rate.to_f, pv_compensation_type, pv_rate.to_f, fixed_rates[fuel], timeseries["ElectricityProduced:Facility"])
+          report_output(runner, fuel, timeseries["Electricity:Facility"], marginal_rate.to_f, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, fixed_rates[fuel], timeseries["ElectricityProduced:Facility"])
         elsif fuel == Constants.FuelTypeGas and not timeseries["Gas:Facility"].empty?
-          report_output(runner, fuel, timeseries["Gas:Facility"], marginal_rate.to_f, pv_compensation_type, pv_rate.to_f, fixed_rates[fuel])
+          report_output(runner, fuel, timeseries["Gas:Facility"], marginal_rate.to_f, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, fixed_rates[fuel])
         elsif fuel == Constants.FuelTypeOil and not timeseries["FuelOil#1:Facility"].empty?
-          report_output(runner, fuel, timeseries["FuelOil#1:Facility"], marginal_rate.to_f, pv_compensation_type, pv_rate.to_f)
+          report_output(runner, fuel, timeseries["FuelOil#1:Facility"], marginal_rate.to_f, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
         elsif fuel == Constants.FuelTypePropane and not timeseries["Propane:Facility"].empty?
-          report_output(runner, fuel, timeseries["Propane:Facility"], marginal_rate.to_f, pv_compensation_type, pv_rate.to_f)
+          report_output(runner, fuel, timeseries["Propane:Facility"], marginal_rate.to_f, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
         end
         break
       end
@@ -298,7 +293,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
   
   end
   
-  def report_output(runner, fuel, consumed, rate, pv_compensation_type, pv_rate, fixed=0, produced=nil)
+  def report_output(runner, fuel, consumed, rate, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, fixed=0, produced=nil)
     total_val = consumed.inject(0){ |sum, x| sum + x }
     if not fuel == Constants.FuelTypeElectric
       total_val = 12.0 * fixed + total_val * rate
@@ -307,13 +302,13 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
         consumed = consumed[0..1415] + consumed[1440..-1] # remove leap day
         produced = produced[0..1415] + produced[1440..-1] # remove leap day
       end
-      total_val = calculate_simple_electricity_bills(consumed, produced, fixed, rate, pv_compensation_type, pv_rate)
+      total_val = calculate_simple_electricity_bills(consumed, produced, fixed, rate, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
     end
     runner.registerValue(fuel, total_val)
     runner.registerInfo("Registering #{fuel} utility bills.")
   end
   
-  def calculate_simple_electricity_bills(load, gen, fixed, rate, pv_compensation_type, pv_rate)
+  def calculate_simple_electricity_bills(load, gen, ur_monthly_fixed_charge, ur_flat_buy_rate, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
   
     if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
       unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
@@ -322,22 +317,32 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
 
     require "#{File.dirname(__FILE__)}/resources/ssc_api"
   
-    # utilityrate3
-    p_data = SscApi.create_data_object
-    SscApi.set_number(p_data, "analysis_period", 1) # years
-    SscApi.set_array(p_data, "degradation", [0]) # annual energy degradation
+    analysis_period = 30 # years
+    degradation = [0] # annual energy degradation
+    system_use_lifetime_output = 0 # 0=hourly first year, 1=hourly lifetime
+    inflation_rate = 2.4 # %
+    ur_flat_sell_rate = 0
+    ur_nm_yearend_sell_rate = 0
+    if pv_compensation_type == "Net Metering"
+      ur_enable_net_metering = 1
+      ur_nm_yearend_sell_rate = pv_sellback_rate.to_f
+    elsif pv_compensation_type == "Feed-In Tariff"
+      ur_enable_net_metering = 0
+      ur_flat_sell_rate = pv_tariff_rate.to_f
+    end
+  
+   p_data = SscApi.create_data_object
+    SscApi.set_number(p_data, "analysis_period", analysis_period)
+    SscApi.set_array(p_data, "degradation", degradation)
     SscApi.set_array(p_data, "gen", gen) # system power generated, kW
     SscApi.set_array(p_data, "load", load) # electricity load, kW
-    SscApi.set_number(p_data, "system_use_lifetime_output", 0) # 0=hourly first year, 1=hourly lifetime
-    SscApi.set_number(p_data, "inflation_rate", 0) # TODO: assume what?
-    SscApi.set_number(p_data, "ur_enable_net_metering", 1)
-    SscApi.set_number(p_data, "ur_monthly_fixed_charge", fixed)
-    SscApi.set_number(p_data, "ur_flat_buy_rate", rate)
-    if pv_compensation_type == "Net Metering"
-      SscApi.set_number(p_data, "ur_nm_yearend_sell_rate", pv_rate)
-    elsif pv_compensation_type == "Feed-In Tariff"
-      SscApi.set_number(p_data, "ur_flat_sell_rate", pv_rate)
-    end
+    SscApi.set_number(p_data, "system_use_lifetime_output", system_use_lifetime_output)
+    SscApi.set_number(p_data, "inflation_rate", inflation_rate)
+    SscApi.set_number(p_data, "ur_flat_buy_rate", ur_flat_buy_rate)
+    SscApi.set_number(p_data, "ur_flat_sell_rate", ur_flat_sell_rate)
+    SscApi.set_number(p_data, "ur_enable_net_metering", ur_enable_net_metering)
+    SscApi.set_number(p_data, "ur_nm_yearend_sell_rate", ur_nm_yearend_sell_rate)
+    SscApi.set_number(p_data, "ur_monthly_fixed_charge", ur_monthly_fixed_charge)
     
     p_mod = SscApi.create_module("utilityrate3")
     SscApi.execute_module(p_mod, p_data)

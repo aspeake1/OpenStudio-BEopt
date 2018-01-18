@@ -636,13 +636,6 @@ def valid_tariff(tariff)
       return false
     end
   end
-  tariff[:energyratestructure].each do |period|
-    period.each do |tier|
-      unless tier.keys.include? :rate
-        return false
-      end
-    end
-  end
   return true
 end
 
