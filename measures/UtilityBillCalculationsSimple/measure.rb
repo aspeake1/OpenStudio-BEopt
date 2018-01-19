@@ -139,12 +139,12 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
   
   def outputs
     result = OpenStudio::Measure::OSOutputVector.new
-    result << OpenStudio::Measure::OSOutput.makeStringOutput("electricity")
     buildstock_outputs = [
-                          "natural_gas",
-                          "propane",
-                          "fuel_oil"
-                         ]    
+                          Constants.FuelTypeElectric,
+                          Constants.FuelTypeGas,
+                          Constants.FuelTypePropane,
+                          Constants.FuelTypeOil
+                         ]
     buildstock_outputs.each do |output|
         result << OpenStudio::Measure::OSOutput.makeDoubleOutput(output)
     end
