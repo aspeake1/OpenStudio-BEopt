@@ -332,148 +332,58 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
   
     fuels = {Constants.FuelTypeElectric=>"Electricity", Constants.FuelTypeGas=>"Natural gas", Constants.FuelTypeOil=>"Oil", Constants.FuelTypePropane=>"Propane"}
     fuels.each do |fuel, file|
+
       if fuel == Constants.FuelTypeElectric
-        report_output(runner, fuel, timeseries["Electricity:Facility"], nil, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, nil, timeseries["ElectricityProduced:Facility"], tariff)
+
+        if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
+          unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
+          unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"))
+        end
+        require "#{File.dirname(__FILE__)}/resources/ssc_api"
+        timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
+        timeseries["ElectricityProduced:Facility"] = UtilityBill.remove_leap_day(timeseries["ElectricityProduced:Facility"])
+        if UtilityBill.validate_tariff(tariff)
+          total_bill = UtilityBill.calculate_detailed_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
+          UtilityBill.report_output(runner, fuel, total_bill)
+        else
+          runner.registerWarning("Electric tariff does not contain any charges.")
+        end
+
       else    
         cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{file}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
         cols[0].each_with_index do |rate_state, i|
+
           unless HelperMethods.state_code_map(weather_file_state).nil?
             weather_file_state = HelperMethods.state_code_map(weather_file_state)
           end
           next unless rate_state == weather_file_state
+
           marginal_rate = marginal_rates[fuel]
           if marginal_rate == Constants.Auto
-            average_rate = cols[1][i].to_f
+            average_rate = cols[1][i].to_f            
+            marginal_rate = average_rate
             if [Constants.FuelTypeGas].include? fuel
               household_consumption = cols[2][i].to_f
               marginal_rate = average_rate - 12.0 * fixed_rates[fuel] / household_consumption
-            else
-              marginal_rate = average_rate
             end
+          else
+            marginal_rate = marginal_rate.to_f
           end
+
           if fuel == Constants.FuelTypeGas and not timeseries["Gas:Facility"].empty?
-            report_output(runner, fuel, timeseries["Gas:Facility"], marginal_rate.to_f, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, fixed_rates[fuel])
+            total_bill = UtilityBill.calculate_simple(timeseries["Gas:Facility"], fixed_rates[fuel], marginal_rate)
           elsif fuel == Constants.FuelTypeOil and not timeseries["FuelOil#1:Facility"].empty?
-            report_output(runner, fuel, timeseries["FuelOil#1:Facility"], marginal_rate.to_f, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
+            total_bill = UtilityBill.calculate_simple(timeseries["FuelOil#1:Facility"], 0, marginal_rate)
           elsif fuel == Constants.FuelTypePropane and not timeseries["Propane:Facility"].empty?
-            report_output(runner, fuel, timeseries["Propane:Facility"], marginal_rate.to_f, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
+            total_bill = UtilityBill.calculate_simple(timeseries["Propane:Facility"], 0, marginal_rate)
           end
-          break
+
+          unless total_bill.nil?
+            UtilityBill.report_output(runner, fuel, total_bill)
+          end
         end
       end
     end  
-  
-  end
-  
-  def report_output(runner, fuel, consumed, rate, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, fixed=0, produced=nil, tariff=nil)
-    total_val = consumed.inject(0){ |sum, x| sum + x }
-    if not fuel == Constants.FuelTypeElectric
-      total_val = 12.0 * fixed + total_val * rate
-    else
-      if consumed.length == 8784 # leap year
-        consumed = consumed[0..1415] + consumed[1440..-1] # remove leap day
-        produced = produced[0..1415] + produced[1440..-1] # remove leap day
-      end
-      total_val = calculate_detailed_electricity_bills(consumed, produced, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
-    end
-    runner.registerValue(fuel, total_val)
-    runner.registerInfo("Registering #{fuel} utility bills.")
-  end
-  
-  def calculate_detailed_electricity_bills(load, gen, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
-
-    if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
-      unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
-      unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"))
-    end
-
-    require "#{File.dirname(__FILE__)}/resources/ssc_api"
-    
-    analysis_period = 30 # years
-    degradation = [0] # annual energy degradation
-    system_use_lifetime_output = 0 # 0=hourly first year, 1=hourly lifetime
-    inflation_rate = 2.4 # %
-    ur_flat_buy_rate = 0 # FIXME: get from json?
-    ur_flat_sell_rate = 0
-    ur_nm_yearend_sell_rate = 0
-    if pv_compensation_type == "Net Metering"
-      ur_enable_net_metering = 1
-      ur_nm_yearend_sell_rate = pv_sellback_rate.to_f
-    elsif pv_compensation_type == "Feed-In Tariff"
-      ur_enable_net_metering = 0
-      ur_flat_sell_rate = pv_tariff_rate.to_f
-    end
-
-    p_data = SscApi.create_data_object
-    SscApi.set_number(p_data, "analysis_period", analysis_period)
-    SscApi.set_array(p_data, "degradation", degradation)
-    SscApi.set_array(p_data, "gen", gen) # system power generated, kW
-    SscApi.set_array(p_data, "load", load) # electricity load, kW
-    SscApi.set_number(p_data, "system_use_lifetime_output", system_use_lifetime_output)
-    SscApi.set_number(p_data, "inflation_rate", inflation_rate)
-    SscApi.set_number(p_data, "ur_flat_buy_rate", ur_flat_buy_rate)
-    SscApi.set_number(p_data, "ur_flat_sell_rate", ur_flat_sell_rate)
-    SscApi.set_number(p_data, "ur_enable_net_metering", ur_enable_net_metering)
-    SscApi.set_number(p_data, "ur_nm_yearend_sell_rate", ur_nm_yearend_sell_rate)
-
-    unless tariff[:fixedmonthlycharge].nil?
-      SscApi.set_number(p_data, "ur_monthly_fixed_charge", tariff[:fixedmonthlycharge]) # $
-    end
-    
-    SscApi.set_number(p_data, "ur_ec_enable", 1)
-    SscApi.set_matrix(p_data, "ur_ec_sched_weekday", Matrix.rows(tariff[:energyweekdayschedule]) + Matrix.rows(Array.new(12, Array.new(24, 1))))
-    SscApi.set_matrix(p_data, "ur_ec_sched_weekend", Matrix.rows(tariff[:energyweekendschedule]) + Matrix.rows(Array.new(12, Array.new(24, 1))))
-    tariff[:energyratestructure].each_with_index do |period, i|
-      period_num = i + 1
-      period.each_with_index do |tier, j|
-        tier_num = j + 1
-        rate = 0
-        unless tier[:rate].nil?
-          rate += tier[:rate]
-        end
-        unless tier[:adj].nil?
-          rate += tier[:adj]
-        end
-        SscApi.set_number(p_data, "ur_ec_p#{period_num}_t#{tier_num}_br", rate)
-        unless tier[:sell].nil?
-          SscApi.set_number(p_data, "ur_ec_p#{period_num}_t#{tier_num}_sr", tier[:sell])
-        end
-        max = 1000000000.0
-        unless tier[:max].nil?
-          max = tier[:max]
-        end
-        SscApi.set_number(p_data, "ur_ec_p#{period_num}_t#{tier_num}_ub", max)
-      end
-    end
-
-    unless tariff[:demandratestructure].nil?
-      SscApi.set_number(p_data, "ur_dc_enable", 1)
-      SscApi.set_matrix(p_data, "ur_dc_sched_weekday", Matrix.rows(tariff[:demandweekdayschedule]))
-      SscApi.set_matrix(p_data, "ur_dc_sched_weekend", Matrix.rows(tariff[:demandweekendschedule]))      
-      tariff[:demandratestructure].each_with_index do |period, i|
-        period_num = i + 1
-        period.each_with_index do |tier, j|
-          tier_num = j + 1
-          rate = tier[:rate]
-          unless tier[:adj].nil?
-            rate += tier[:adj]
-          end
-          SscApi.set_number(p_data, "ur_dc_p#{period_num}_t#{tier_num}_dc", rate)
-          max = 1000000000.0
-          unless tier[:max].nil?
-            max = tier[:max]
-          end
-          SscApi.set_number(p_data, "ur_dc_p#{period_num}_t#{tier_num}_ub", max)
-        end
-      end
-    end
-    
-    p_mod = SscApi.create_module("utilityrate3")
-    SscApi.execute_module(p_mod, p_data)
-
-    utility_bills = SscApi.get_array(p_data, "year1_monthly_utility_bill_w_sys")
-    
-    return utility_bills.inject(0){ |sum, x| sum + x }
   
   end
   

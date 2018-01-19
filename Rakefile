@@ -599,8 +599,8 @@ def get_tariff_json_files(tariffs_path)
       next
     end
 
-    if response[:items].empty? or not valid_tariff(response[:items][0])
-      puts "Skipping #{entry_path}: invalid tariff."
+    if response[:items].empty?
+      puts "Skipping #{entry_path}: empty tariff."
       next
     end
 
@@ -627,16 +627,6 @@ def get_tariff_json_files(tariffs_path)
   
   return true
 
-end
-
-def valid_tariff(tariff)
-  requireds = [:energyweekdayschedule, :energyweekendschedule, :energyratestructure]
-  requireds.each do |required|
-    unless tariff.keys.include? required
-      return false
-    end
-  end
-  return true
 end
 
 def clean_filename(name)

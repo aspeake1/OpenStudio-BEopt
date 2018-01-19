@@ -35,6 +35,24 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     _test_measure_functionality("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 3, 1)
   end
   
+  def test_calculations_invalid_tariff
+    args_hash = {}
+    args_hash["tariff_label"] = "Custom Tariff"
+    args_hash["custom_tariff"] = File.expand_path("../City of Linneus Missouri (Utility Company) - Electric Rate.json", __FILE__)
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = "Net Metering"
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4-1, 1)
+  end
+  
   def test_calculations_0kW_pv_net_metering_custom_tariff
     args_hash = {}
     args_hash["tariff_label"] = "Custom Tariff"
@@ -158,7 +176,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["pv_tariff_rate"] = "0.12"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
-      Parallel.each_with_index(zip_file, in_threads: 4) do |entry, i|
+      Parallel.each_with_index(zip_file, in_threads: 1) do |entry, i|
         next unless entry.file?
         puts "#{i} #{entry.name}"
         args_hash["custom_tariff"] = entry.name        
@@ -368,10 +386,13 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
 
-    result.stepValues.each do |arg|
-      next unless expected_values.keys.include? arg.name
-      assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.05)
-    end 
+    expected_values.keys.each do |fuel|
+      result.stepValues.each do |arg|
+        next unless fuel == arg.name
+        assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.05)
+      end
+    end
+
   end
   
   def get_timeseries(enduse_timeseries)
