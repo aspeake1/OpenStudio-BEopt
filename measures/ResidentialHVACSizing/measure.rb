@@ -2027,9 +2027,23 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
     unit_final.Heat_Capacity_Supp = 0
     
-    if hvac.HasFurnace or hvac.HasUnitHeater
+    if hvac.HasFurnace
         unit_final.Heat_Capacity = unit_final.Heat_Load
         unit_final.Heat_Airflow = calc_heat_cfm(unit_final.Heat_Capacity, mj8.acf, mj8.heat_setpoint, hvac.HtgSupplyAirTemp)
+        
+    elsif hvac.HasUnitHeater
+        unit_final.Heat_Capacity = unit_final.Heat_Load
+        
+        ratedCFMperTonHeating = get_unit_feature(runner, unit, Constants.SizingInfoHVACRatedCFMperTonHeating, 'string')
+        return nil if ratedCFMperTonHeating.nil?
+        ratedCFMperTonHeating = ratedCFMperTonHeating.to_f
+        if ratedCFMperTonHeating > 0
+            # Fixed airflow rate
+            unit_final.Heat_Airflow = UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","ton") * ratedCFMperTonHeating
+        else
+            # Autosized airflow rate
+            unit_final.Heat_Airflow = calc_heat_cfm(unit_final.Heat_Capacity, mj8.acf, mj8.heat_setpoint, hvac.HtgSupplyAirTemp)
+        end
 
     elsif hvac.HasAirSourceHeatPump
         
@@ -4038,14 +4052,20 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         htg_airflow = UnitConversions.convert([unit_final.Heat_Airflow, 0.00001].max,"cfm","m^3/s") # A value of 0 does not change from autosize
     
         # Unitary System
-        system.setSupplyAirFlowRateMethodDuringCoolingOperation("SupplyAirFlowRate")
-        system.setSupplyAirFlowRateDuringCoolingOperation(clg_airflow)
-        system.setSupplyAirFlowRateMethodDuringHeatingOperation("SupplyAirFlowRate")
-        system.setSupplyAirFlowRateDuringHeatingOperation(htg_airflow)
+        if system.isSupplyAirFlowRateDuringCoolingOperationAutosized
+            system.setSupplyAirFlowRateMethodDuringCoolingOperation("SupplyAirFlowRate")
+            system.setSupplyAirFlowRateDuringCoolingOperation(clg_airflow)
+        end
+        if system.isSupplyAirFlowRateDuringHeatingOperationAutosized
+            system.setSupplyAirFlowRateMethodDuringHeatingOperation("SupplyAirFlowRate")
+            system.setSupplyAirFlowRateDuringHeatingOperation(htg_airflow)
+        end
         
         # Fan
         fanonoff = system.supplyFan.get.to_FanOnOff.get
-        fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(unit_final.Fan_Airflow + 0.01,"cfm","m^3/s"))
+        if fanonoff.isMaximumFlowRateAutosized
+            fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(unit_final.Fan_Airflow + 0.01,"cfm","m^3/s"))
+        end
         
         if not air_loop.nil?
             # Air Loop

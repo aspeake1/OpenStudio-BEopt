@@ -1647,6 +1647,19 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_UnitHeater_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
   
+  def test_equip_unit_heater_fixedsize_with_fan
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 0.07669146,
+            'Coil:Heating:Fuel_Nominal Capacity {W}' => 8792.1321,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.07669146,
+                      }
+    _test_measure("SFD_HVACSizing_Equip_UnitHeater_Fixed_wFan.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end  
+  
   def test_equip_gas_furnace_autosize
     args_hash = {}
     args_hash["show_debug_info"] = true

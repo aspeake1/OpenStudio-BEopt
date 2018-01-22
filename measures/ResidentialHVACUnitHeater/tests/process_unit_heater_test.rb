@@ -9,7 +9,8 @@ class ProcessUnitHeaterTest < MiniTest::Test
   
   def test_new_construction_eff_0_78_gas_fan
     args_hash = {}
-    args_hash["fan_power"] = "0.3"
+    args_hash["fan_power"] = "0.7"
+    args_hash["airflow"] = "65.0"
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>1}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
@@ -202,8 +203,49 @@ class ProcessUnitHeaterTest < MiniTest::Test
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*2)
   end
+  
+  def test_error_fan_power_without_airflow
+    args_hash = {}
+    args_hash["fan_power"] = "0.7"
+    args_hash["airflow"] = "0.0"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "If Fan Power > 0, then Airflow Rate cannot be zero.")
+  end
 
   private
+  
+  def _test_error(osm_file_or_model, args_hash)
+    # create an instance of the measure
+    measure = ProcessUnitHeater.new
+
+    # create an instance of a runner
+    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
+
+    model = get_model(File.dirname(__FILE__), osm_file_or_model)
+
+    # get arguments
+    arguments = measure.arguments(model)
+    argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
+
+    # populate argument with specified hash value if specified
+    arguments.each do |arg|
+      temp_arg_var = arg.clone
+      if args_hash[arg.name]
+        assert(temp_arg_var.setValue(args_hash[arg.name]))
+      end
+      argument_map[arg.name] = temp_arg_var
+    end
+
+    # run the measure
+    measure.run(model, runner, argument_map)
+    result = runner.result
+
+    # assert that it didn't run
+    assert_equal("Fail", result.value.valueName)
+    assert(result.errors.size == 1)
+    
+    return result
+  end
   
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure

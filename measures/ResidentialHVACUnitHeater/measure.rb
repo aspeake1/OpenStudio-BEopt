@@ -62,6 +62,14 @@ class ProcessUnitHeater < OpenStudio::Measure::ModelMeasure
     fanpower.setDefaultValue(0.0)
     args << fanpower    
     
+    #make an argument for entering airflow rate
+    airflow = OpenStudio::Measure::OSArgument::makeDoubleArgument("airflow",true)
+    airflow.setDisplayName("Airflow Rate")
+    airflow.setUnits("cfm/ton")
+    airflow.setDescription("Fan airflow rate as a function of heating capacity. A value of 0 implies there is no fan.")
+    airflow.setDefaultValue(0.0)
+    args << airflow    
+    
     #make a string argument for heating output capacity
     heatercap = OpenStudio::Measure::OSArgument::makeStringArgument("capacity", true)
     heatercap.setDisplayName("Heating Capacity")
@@ -89,6 +97,12 @@ class ProcessUnitHeater < OpenStudio::Measure::ModelMeasure
       heaterOutputCapacity = UnitConversions.convert(heaterOutputCapacity.to_f,"kBtu/hr","Btu/hr")
     end
     heaterFanPower = runner.getDoubleArgumentValue("fan_power",user_arguments)
+    heaterAirflow = runner.getDoubleArgumentValue("airflow",user_arguments)
+    
+    if heaterFanPower > 0 and heaterAirflow == 0
+      runner.registerError("If Fan Power > 0, then Airflow Rate cannot be zero.")
+      return false
+    end
     
     # _processAirSystem
     
@@ -144,6 +158,7 @@ class ProcessUnitHeater < OpenStudio::Measure::ModelMeasure
             fan.setMotorEfficiency(1.0)
             fan.setMotorInAirstreamFraction(1.0)  
           end
+          
         
           # _processSystemAir
           
@@ -171,6 +186,8 @@ class ProcessUnitHeater < OpenStudio::Measure::ModelMeasure
         end
       
       end
+      
+      unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating, heaterAirflow.to_s)
       
     end
     
