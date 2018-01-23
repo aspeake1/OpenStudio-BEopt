@@ -480,17 +480,18 @@ class ResidentialLighting < OpenStudio::Measure::ModelMeasure
         
     end
     
-    # Common garage lighting (garages not associated with a unit)
-    common_garage_spaces = Geometry.get_garage_spaces(model.getSpaces, model)
-    common_gfa = Geometry.get_floor_area_from_spaces(common_garage_spaces)
+    # Garage lighting (garages not associated with a unit)
+    model_spaces = model.getSpaces
+    garage_spaces = Geometry.get_garage_spaces(model_spaces)
+    gfa = Geometry.get_floor_area_from_spaces(garage_spaces)
     if option_type == Constants.OptionTypeLightingEnergyUses
-        common_garage_ann = energy_use_garage
+        garage_ann = energy_use_garage
     elsif option_type == Constants.OptionTypeLightingFractions
-        common_bm_garage_e =  0.08 * common_gfa + 8 * units.size
-        common_garage_ann = (common_bm_garage_e * (((hw_inc * er_inc + (1 - bab_frac_inc) * bab_er_inc) + (hw_cfl * er_cfl - bab_frac_cfl * bab_er_cfl) + (hw_led * er_led - bab_frac_led * bab_er_led) + (hw_lfl * er_lfl - bab_frac_lfl * bab_er_lfl)) * smrt_replace_f * 0.9 + 0.1))
+        common_bm_garage_e =  0.08 * gfa + 8 * units.size
+        garage_ann = (common_bm_garage_e * (((hw_inc * er_inc + (1 - bab_frac_inc) * bab_er_inc) + (hw_cfl * er_cfl - bab_frac_cfl * bab_er_cfl) + (hw_led * er_led - bab_frac_led * bab_er_led) + (hw_lfl * er_lfl - bab_frac_lfl * bab_er_lfl)) * smrt_replace_f * 0.9 + 0.1))
     end
     
-    common_garage_spaces.each do |garage_space|
+    garage_spaces.each do |garage_space|
         space_obj_name = "#{Constants.ObjectNameLighting} #{garage_space.name.to_s}"
     
         if sch.nil?
@@ -501,7 +502,7 @@ class ResidentialLighting < OpenStudio::Measure::ModelMeasure
             end
         end
         
-        space_ltg_ann = common_garage_ann * UnitConversions.convert(garage_space.floorArea, "m^2", "ft^2") / common_gfa
+        space_ltg_ann = garage_ann * UnitConversions.convert(garage_space.floorArea, "m^2", "ft^2") / gfa
         space_design_level = sch.calcDesignLevel(sch_max*space_ltg_ann)
     
         # Add lighting
@@ -525,7 +526,7 @@ class ResidentialLighting < OpenStudio::Measure::ModelMeasure
     if option_type == Constants.OptionTypeLightingEnergyUses
         outside_ann = energy_use_exterior
     elsif option_type == Constants.OptionTypeLightingFractions
-        total_ffa = Geometry.get_finished_floor_area_from_spaces(model.getSpaces, true, runner)
+        total_ffa = Geometry.get_finished_floor_area_from_spaces(model_spaces, true, runner)
         bm_outside_e = 0.145 * total_ffa
         outside_ann = (bm_outside_e * (((hw_inc * er_inc + (1 - bab_frac_inc) * bab_er_inc) + (hw_cfl * er_cfl - bab_frac_cfl * bab_er_cfl) + (hw_led * er_led - bab_frac_led * bab_er_led) + (hw_lfl * er_lfl - bab_frac_lfl * bab_er_lfl)) * smrt_replace_f * 0.9 + 0.1))
     end

@@ -40,7 +40,7 @@ class ResidentialClothesDryer < OpenStudio::Measure::ModelMeasure
     cd_mult.setDefaultValue(1)
     args << cd_mult
 
-       #Make a string argument for 24 weekday schedule values
+    #Make a string argument for 24 weekday schedule values
     cd_weekday_sch = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_sch")
     cd_weekday_sch.setDisplayName("Weekday schedule")
     cd_weekday_sch.setDescription("Specify the 24-hour weekday schedule.")
@@ -54,24 +54,28 @@ class ResidentialClothesDryer < OpenStudio::Measure::ModelMeasure
     cd_weekend_sch.setDefaultValue("0.010, 0.006, 0.004, 0.002, 0.004, 0.006, 0.016, 0.032, 0.048, 0.068, 0.078, 0.081, 0.074, 0.067, 0.057, 0.061, 0.055, 0.054, 0.051, 0.051, 0.052, 0.054, 0.044, 0.024")
     args << cd_weekend_sch
 
-      #Make a string argument for 12 monthly schedule values
+    #Make a string argument for 12 monthly schedule values
     cd_monthly_sch = OpenStudio::Measure::OSArgument::makeStringArgument("monthly_sch", true)
     cd_monthly_sch.setDisplayName("Month schedule")
     cd_monthly_sch.setDescription("Specify the 12-month schedule.")
     cd_monthly_sch.setDefaultValue("1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0")
     args << cd_monthly_sch
 
-    #make a choice argument for space
-    space_args = OpenStudio::StringVector.new
-    space_args << Constants.Auto
+    #make a choice argument for location
+    location_args = OpenStudio::StringVector.new
+    location_args << Constants.Auto
     model.getSpaces.each do |space|
-        space_args << space.name.to_s
+        location_args << "Space: #{space.name}"
     end
-    space = OpenStudio::Measure::OSArgument::makeChoiceArgument("space", space_args, true)
-    space.setDisplayName("Location")
-    space.setDescription("Select the space where the cooking range is located. '#{Constants.Auto}' will choose the lowest above-grade finished space available (e.g., first story living space), or a below-grade finished space as last resort. For multifamily buildings, '#{Constants.Auto}' will choose a space for each unit of the building.")
-    space.setDefaultValue(Constants.Auto)
-    args << space
+    model.getSpaceTypes.each do |spaceType|
+        next if not spaceType.standardsSpaceType.is_initialized
+        location_args << "Space Type: #{spaceType.standardsSpaceType.get}"
+    end
+    location = OpenStudio::Measure::OSArgument::makeChoiceArgument("location", location_args, true)
+    location.setDisplayName("Location")
+    location.setDescription("Specify the space or space type. '#{Constants.Auto}' will try to automatically choose an appropriate space.")
+    location.setDefaultValue(Constants.Auto)
+    args << location
     
     return args
   end #end the arguments method
@@ -91,7 +95,7 @@ class ResidentialClothesDryer < OpenStudio::Measure::ModelMeasure
     weekday_sch = runner.getStringArgumentValue("weekday_sch",user_arguments)
     weekend_sch = runner.getStringArgumentValue("weekend_sch",user_arguments)
     monthly_sch = runner.getStringArgumentValue("monthly_sch",user_arguments)
-    space_r = runner.getStringArgumentValue("space",user_arguments)
+    location = runner.getStringArgumentValue("location",user_arguments)
     
     #Check for valid inputs
     if cef <= 0
@@ -109,15 +113,28 @@ class ResidentialClothesDryer < OpenStudio::Measure::ModelMeasure
         return false
     end
     
+    # Remove all existing objects
+    obj_name = Constants.ObjectNameClothesDryer(nil)
+    model.getSpaces.each do |space|
+        ClothesDryer.remove_existing(runner, space, obj_name)
+    end
+    
+    location_hierarchy = [[Constants.SpaceTypeLaundryRoom, nil], 
+                          [Constants.SpaceTypeLiving, "space_is_above_grade"], 
+                          [Constants.SpaceTypeLiving, "space_is_below_grade"], 
+                          [Constants.SpaceTypeUnfinishedBasement, nil], 
+                          [Constants.SpaceTypeGarage, nil]]
+    
     tot_ann_e = 0
     msgs = []
     sch = nil
     units.each_with_index do |unit, unit_index|
     
         # Get space
-        space = Geometry.get_space_from_string(unit.spaces, space_r)
-        if space.nil? and unit_index == 0 and space_r != Constants.Auto
-            space = Geometry.get_space_from_string(Geometry.get_common_spaces(model), space_r)
+        space = Geometry.get_space_from_location(unit.spaces, location, location_hierarchy)
+        if space.nil? and unit_index == 0 and location.start_with?("Space: ")
+            # Look once for user-specified space in common spaces
+            space = Geometry.get_space_from_location(Geometry.get_common_spaces(model), location, location_hierarchy)
         end
         next if space.nil?
         

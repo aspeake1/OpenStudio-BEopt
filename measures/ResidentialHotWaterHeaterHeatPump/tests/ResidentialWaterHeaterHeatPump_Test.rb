@@ -132,7 +132,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
   
     def test_new_construction_50_living
         args_hash = {}
-        args_hash["location"] = Constants.LivingZone
+        args_hash["location"] = "Space: living space"
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16, "ScheduleConstant"=>7, "ScheduleRuleset"=>7}
         expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
@@ -503,8 +503,8 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         
         # assert that it ran correctly
         assert_equal("Success", result.value.valueName)
-        assert(result.info.size == num_infos)
-        assert(result.warnings.size == num_warnings)
+        assert_equal(num_infos, result.info.size)
+        assert_equal(num_warnings, result.warnings.size)
         assert(result.finalCondition.is_initialized)
         
         # get the final objects in the model

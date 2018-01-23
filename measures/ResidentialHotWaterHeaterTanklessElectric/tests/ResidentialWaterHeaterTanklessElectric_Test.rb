@@ -69,7 +69,7 @@ class ResidentialHotWaterHeaterTanklessElectricTest < MiniTest::Test
     
   def test_new_construction_standard_living
     args_hash = {}
-    args_hash["location"] = Constants.LivingZone
+    args_hash["location"] = "Space: living space"
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
     expected_values = {"InputCapacity"=>100000000.0, "ThermalEfficiency"=>0.911, "Setpoint"=>125}
@@ -287,7 +287,7 @@ class ResidentialHotWaterHeaterTanklessElectricTest < MiniTest::Test
   def test_single_family_attached_new_construction_living_zone
     num_units = 4
     args_hash = {}
-    args_hash["location"] = Constants.LivingZone
+    args_hash["location"] = "Space: living space"
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
     expected_values = {"InputCapacity"=>100000000.0, "ThermalEfficiency"=>0.911, "Setpoint"=>125}
@@ -380,8 +380,8 @@ class ResidentialHotWaterHeaterTanklessElectricTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert(result.info.size == num_infos)
-    assert(result.warnings.size == num_warnings)
+    assert_equal(num_infos, result.info.size)
+    assert_equal(num_warnings, result.warnings.size)
     assert(result.finalCondition.is_initialized)
     
     # get the final objects in the model
