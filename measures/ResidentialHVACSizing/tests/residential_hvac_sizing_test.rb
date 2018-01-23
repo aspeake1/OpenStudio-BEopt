@@ -54,7 +54,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             "SuppHeat_Capacity"=>["Unit 1 Final Results","Heat Capacity Supp"],
             "Cool_AirFlowRate"=>["Unit 1 Final Results","Cool Airflow"],
             "Heat_AirFlowRate"=>["Unit 1 Final Results","Heat Airflow"],
-            "Fan_AirFlowRate"=>["Unit 1 Final Results","Fan Airflow"],
             "Dehumid_WaterRemoval_Auto"=>["Unit 1 Final Results","Dehumid WaterRemoval"]
            }
   end
@@ -119,7 +118,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_FB_GRG_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -176,7 +174,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 41587,
             'Cool_AirFlowRate' => 738,
             'Heat_AirFlowRate' => 560,
-            'Fan_AirFlowRate' => 738,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_FB_GRG_FA_ASHP_DuctsInFB.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -233,7 +230,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_UB_GRG_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -290,7 +286,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 46460,
             'Cool_AirFlowRate' => 680,
             'Heat_AirFlowRate' => 516,
-            'Fan_AirFlowRate' => 680,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_UB_GRG_FA_ASHP_DuctsInUB.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -348,7 +343,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -406,7 +400,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 45319,
             'Cool_AirFlowRate' => 679,
             'Heat_AirFlowRate' => 515,
-            'Fan_AirFlowRate' => 679,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA_ASHP_DuctsInCS.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -464,7 +457,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 38521,
             'Cool_AirFlowRate' => 631,
             'Heat_AirFlowRate' => 478,
-            'Fan_AirFlowRate' => 631,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA_ASHP_DuctsInLiv.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -521,7 +513,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 80320,
             'Cool_AirFlowRate' => 1145,
             'Heat_AirFlowRate' => 869,
-            'Fan_AirFlowRate' => 1145,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA_ASHP_DuctsInGRG.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -578,7 +569,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_S_GRG_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -635,7 +625,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Vented.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -692,7 +681,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Unvented_InsRoof.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -749,7 +737,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Unvented_NoOverhangs_NoIntShading_NoMechVent.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -806,7 +793,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Unvented_NoOverhangs_NoIntShading_SupplyMechVent.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -863,7 +849,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Unvented_NoOverhangs_NoIntShading_ERV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -920,7 +905,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Unvented_NoOverhangs_NoIntShading_HRV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -977,7 +961,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Vented_Atlanta_ExtFinDark.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -1034,7 +1017,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Vented_LosAngeles.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -1091,7 +1073,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 0,
             'Cool_AirFlowRate' => 0,
             'Heat_AirFlowRate' => 0,
-            'Fan_AirFlowRate' => 0,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_PB_UA_Vented.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -1148,7 +1129,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 41478,
             'Cool_AirFlowRate' => 664,
             'Heat_AirFlowRate' => 503,
-            'Fan_AirFlowRate' => 664,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_PB_UA_Vented_ASHP_DuctsInPB.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -1205,7 +1185,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             'SuppHeat_Capacity' => 42640,
             'Cool_AirFlowRate' => 1315,
             'Heat_AirFlowRate' => 997,
-            'Fan_AirFlowRate' => 1315,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_PB_UA_Vented_ASHP_DuctsInUA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -1680,6 +1659,44 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.07669146,
                       }
     _test_measure("SFD_HVACSizing_Equip_UnitHeater_Fixed_wFan.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end  
+  
+  def test_equip_unit_heater_ac_one_speed_autosize
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 0.547225600243,
+            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Cooling Operation {m3/s}' => 0.547225600243,
+            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 0.610228,
+            'Coil:Heating:Fuel_Nominal Capacity {W}' => 12012.1,
+            'Coil:Cooling:DX:SingleSpeed_Rated Total Cooling Capacity {W}' => 8172.77025244,
+            'Coil:Cooling:DX:SingleSpeed_Rated Air Flow Rate {m3/s}' => 0.423414437383,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.610228+0.547225600243,
+            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.482,
+            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.056,
+                      }
+    _test_measure("SFD_HVACSizing_Equip_UnitHeater_AC1_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end  
+
+  def test_equip_unit_heater_ac_one_speed_fixedsize
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 0.547225600243,
+            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Cooling Operation {m3/s}' => 0.547225600243,
+            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 0.446462,
+            'Coil:Heating:Fuel_Nominal Capacity {W}' => 8792.1321,
+            'Coil:Cooling:DX:SingleSpeed_Rated Total Cooling Capacity {W}' => 17586.0,
+            'Coil:Cooling:DX:SingleSpeed_Rated Air Flow Rate {m3/s}' => 0.91109453292,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.446462+0.547225600243,
+            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.462,
+            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.076,
+                      }
+    _test_measure("SFD_HVACSizing_Equip_UnitHeater_AC1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
   
   def test_equip_gas_furnace_autosize
