@@ -488,6 +488,18 @@ class Geometry
         return false
     end
     
+    def self.get_model_locations(model)
+        locations = []
+        model.getSpaces.each do |space|
+            locations << Constants.LocationSpace(space.name)
+        end
+        model.getSpaceTypes.each do |spaceType|
+            next if not spaceType.standardsSpaceType.is_initialized
+            locations << Constants.LocationSpaceType(spaceType.standardsSpaceType.get)
+        end
+        return locations
+    end
+    
     def self.get_space_from_location(spaces, location, location_hierarchy)
         if location == Constants.Auto
             location_hierarchy.each do |space_type, constraint_method|
@@ -500,14 +512,14 @@ class Geometry
                     return space
                 end
             end
-        elsif location.start_with? "Space: "
-            location = location.gsub("Space: ","")
+        elsif location.start_with? Constants.LocationSpace
+            location = location.gsub(Constants.LocationSpace,"")
             spaces.each do |space|
               next if space.name.to_s != location
               return space
             end
-        elsif location.start_with? "Space Type: "
-            location = location.gsub("Space Type: ","")
+        elsif location.start_with? Constants.LocationSpaceType
+            location = location.gsub(Constants.LocationSpaceType,"")
             spaces.each do |space|
                 next if not space.spaceType.is_initialized
                 next if not space.spaceType.get.standardsSpaceType.is_initialized

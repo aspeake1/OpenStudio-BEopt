@@ -263,6 +263,12 @@ class Constants
   def self.LocationExterior
     return 'exterior'
   end
+  def self.LocationSpace(space_name=nil)
+    return "Space: #{space_name}"
+  end
+  def self.LocationSpaceType(space_type_name=nil)
+    return "Space Type: #{space_type_name}"
+  end
   def self.MaterialCopper
     return 'copper'
   end

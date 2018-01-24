@@ -63,12 +63,8 @@ class ResidentialRefrigerator < OpenStudio::Measure::ModelMeasure
     #make a choice argument for location
     location_args = OpenStudio::StringVector.new
     location_args << Constants.Auto
-    model.getSpaces.each do |space|
-        location_args << "Space: #{space.name}"
-    end
-    model.getSpaceTypes.each do |spaceType|
-        next if not spaceType.standardsSpaceType.is_initialized
-        location_args << "Space Type: #{spaceType.standardsSpaceType.get}"
+    Geometry.get_model_locations(model).each do |loc|
+        location_args << loc
     end
     location = OpenStudio::Measure::OSArgument::makeChoiceArgument("location", location_args, true)
     location.setDisplayName("Location")
