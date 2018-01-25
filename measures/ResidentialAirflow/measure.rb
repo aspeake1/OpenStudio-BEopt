@@ -1084,7 +1084,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       duct_lk_exhaust_fan_equiv = "#{obj_name_ducts} lk exh fan equiv".gsub(" ","_")
       cfis_t_sum_open = "#{obj_name_ducts} cfis_t_sum_open".gsub(" ","_")
       cfis_on_for_hour = "#{obj_name_ducts} cfis_on_for_hour".gsub(" ","_")
-      cfis_f_damper_open = "#{obj_name_ducts} cfis_f_damper_open".gsub(" ","_")
+      cfis_f_damper_open = "#{obj_name_ducts} cfis_f_open".gsub(" ","_")
+      max_supply_fan_mfr = "#{obj_name_ducts} max_supply_fan_mfr".gsub(" ","_")
     
       model.getEnergyManagementSystemGlobalVariables.each do |ems_global_var|
         next unless [air_handler_mfr, fan_rtf, air_handler_vfr, air_handler_tout, return_air_t, air_handler_wout, return_air_w, air_handler_t, air_handler_w, supply_sensible_lkage_to_living, supply_latent_lkage_to_living, supply_duct_conduction_to_living, supply_duct_conduction_to_air_handler, return_duct_conduction_to_plenum, return_duct_conduction_to_air_handler, supply_sensible_lkage_to_air_handler, supply_latent_lkage_to_air_handler, return_sensible_lkage, return_latent_lkage, living_to_air_handler_flow_rate, air_handler_to_living_flow_rate, duct_lk_supply_fan_equiv, duct_lk_exhaust_fan_equiv].include? ems_global_var.name.to_s
@@ -1666,13 +1667,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
           duct_lkage_program.addLine("Set #{zone_mixing_living_to_ah_actuator.name} = #{living_to_air_handler_flow_rate}")
         else
           
-          #if sim.hasAirConditioner or sim.hasHeatPump:                                
-          #    cfis_vent_mode_airflow = max(unit.supply.fanspeed_ratio) * unit.supply.Fan_AirFlowRate * vent.MechVentCFISAirflowFraction
-          #else:
-          #    cfis_vent_mode_airflow = unit.supply.Fan_AirFlowRate * vent.MechVentCFISAirflowFraction
-          cfis_vent_mode_airflow = 500.0 # FIXME
-          
-          system, clg_coil, htg_coil, air_loop = HVAC.get_unitary_system(model, runner, unit.living_zone)
+          system, clg_coil, htg_coil, air_loop = HVAC.get_unitary_system_air_loop(model, runner, unit.living_zone)
           clg_coil = HVAC.get_coil_from_hvac_component(clg_coil)
           cfis_fan_power = clg_coil.ratedEvaporatorFanPowerPerVolumeFlowRate.get / UnitConversions.convert(1.0,"m^3/s","cfm") # W/cfm
           
@@ -1690,14 +1685,15 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
           duct_lkage_program.addLine("Set dl_12 = #{living_to_air_handler_flow_rate}")
           
           duct_lkage_program.addLine("If #{cfis_on_for_hour}")
-          duct_lkage_program.addLine("   Set AH_VFR = (1.0 - #{fan_rtf_sensor.name})*#{cfis_f_damper_open}*#{UnitConversions.convert(cfis_vent_mode_airflow, 'cfm', 'm^3/s')}")
+          duct_lkage_program.addLine("   Set cfis_m3s = (#{max_supply_fan_mfr} / 1.16097654) * #{mech_vent.MechVentCFISAirflowFraction}")      # Density of 1.16097654 was back calculated using E+ results
+          duct_lkage_program.addLine("   Set AH_VFR = (1.0 - #{fan_rtf_sensor.name})*#{cfis_f_damper_open}*cfis_m3s")
           duct_lkage_program.addLine("   Set rho_in = (@RhoAirFnPbTdbW Tin Win Pbar)")
-          duct_lkage_program.addLine("   Set AH_MFR = AH_VFR * rho_in")
+          duct_lkage_program.addLine("   Set #{air_handler_mfr_sensor.name} = AH_VFR * rho_in")
           duct_lkage_program.addLine("   Set Fan_RTF = (1.0 - #{fan_rtf_sensor.name})*#{cfis_f_damper_open}")
-          duct_lkage_program.addLine("   Set AH_Tout = #{return_air_t_sensor.name}") 
-          duct_lkage_program.addLine("   Set AH_Wout = #{return_air_w_sensor.name}") 
-          duct_lkage_program.addLine("   Set RA_T = #{return_air_t_sensor.name}") 
-          duct_lkage_program.addLine("   Set RA_W = #{return_air_w_sensor.name}")
+          duct_lkage_program.addLine("   Set #{air_handler_tout_sensor.name} = #{return_air_t_sensor.name}") 
+          duct_lkage_program.addLine("   Set #{air_handler_wout_sensor.name} = #{return_air_w_sensor.name}") 
+          duct_lkage_program.addLine("   Set #{return_air_t_sensor.name} = #{return_air_t_sensor.name}") 
+          duct_lkage_program.addLine("   Set #{return_air_w_sensor.name} = #{return_air_w_sensor.name}")
           
           duct_lkage_program.addLine("   Run #{duct_lkage_subroutine.name}")
           
@@ -1855,6 +1851,10 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, cfis_t_sum_open) # Sums the time during an hour the CFIS damper has been open
         ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, cfis_on_for_hour) # Flag to open the CFIS damper for the remainder of the hour
         ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, cfis_f_damper_open) # Fraction of timestep the CFIS damper is open. Used by infiltration and duct leakage programs
+        
+        ems_int_var = OpenStudio::Model::EnergyManagementSystemInternalVariable.new(model, max_supply_fan_mfr)
+        ems_int_var.setInternalDataIndexKeyName("Supply Fan")
+        ems_int_var.setInternalDataType("Fan Maximum Mass Flow Rate")
       end
       
       # Programs
@@ -1868,7 +1868,6 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       infil_program.addLine("Set z_m = #{UnitConversions.convert(wind_speed.height,"ft","m")}")
       infil_program.addLine("Set z_s = #{UnitConversions.convert(unit.living.height,"ft","m")}")
       infil_program.addLine("Set f_t = (((s_m/z_m)^p_m)*((z_s/s_s)^p_s))")
-      infil_program.addLine("Set #{building_unit.name.to_s.gsub("unit", "u").gsub(" ","_")}_VwindL = (f_t*#{vwind_sensor.name})")
       
       if unit.living.inf_method == @infMethodASHRAE
         if unit.living.SLA > 0
@@ -1917,7 +1916,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         infil_program.addLine("  EndIf")
         infil_program.addLine("  Set QWHV = #{cfis_f_damper_open}*CFIS_Q_duct")
         infil_program.addLine("  Set #{cfis_t_sum_open} = #{cfis_t_sum_open} + #{cfis_f_damper_open}*(ZoneTimeStep*60)")
-        infil_program.addLine("  Set #{whole_house_fan_actuator.name} = #{cfis_fan_power * cfis_vent_mode_airflow} * #{cfis_f_damper_open}*(1-Fan_RTF)")
+        infil_program.addLine("  Set cfis_cfm = (#{max_supply_fan_mfr} / 1.16097654) * #{mech_vent.MechVentCFISAirflowFraction} * #{UnitConversions.convert(1.0,'m^3/s','cfm')}")      # Density of 1.16097654 was back calculated using E+ results
+        infil_program.addLine("  Set #{whole_house_fan_actuator.name} = #{cfis_fan_power} * cfis_cfm * #{cfis_f_damper_open}*(1-Fan_RTF)")
         infil_program.addLine("Else")
         infil_program.addLine(" If (#{cfis_t_sum_open} + (Fan_RTF*ZoneTimeStep*60)) > CFIS_t_min_hr_open")
         # Damper is only open for a portion of this time step to achieve target minutes per hour
@@ -2020,13 +2020,6 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         cfis_program.addLine("Set #{duct_lk_exhaust_fan_equiv} = 0")
         cfis_program.addLine("Set #{cfis_f_damper_open} = 0")
       end
-      
-      # EMS Output Variables
-      
-      ems_output_var = OpenStudio::Model::EnergyManagementSystemOutputVariable.new(model, "#{building_unit.name.to_s.gsub("unit", "u").gsub(" ","_")}_VwindL")
-      ems_output_var.setName(obj_name_infil + " loc w spd")
-      ems_output_var.setEMSProgramOrSubroutineName(infil_program)
-      ems_output_var.setUnits("m/s")
       
       # Program Calling Manager
       

@@ -133,6 +133,9 @@ def check_unused_ems_variable(model)
         (model.getEnergyManagementSystemSensors + model.getEnergyManagementSystemActuators + model.getEnergyManagementSystemPrograms + model.getEnergyManagementSystemOutputVariables + model.getEnergyManagementSystemSubroutines + model.getEnergyManagementSystemGlobalVariables).each do |ems|
           count += ems.to_s.scan(/(?=#{var})/).count
         end
+        if count <= 1
+          puts "Unused EMS variable: #{var}"
+        end
         assert(count > 1)
       end
     end

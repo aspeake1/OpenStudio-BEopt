@@ -495,6 +495,12 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         # check that no lines exceed 100 characters
         model.to_s.each_line do |line|
           next unless line.strip.start_with?("Set", "If", "Else", "EndIf")
+          if line.include? '!-' # Remove comments
+            line.slice!(0..(line.index('!-')-1))
+          end
+          if line.length > 100
+            puts "#{line} #{line.length}"
+          end
           assert(line.length <= 100)
         end
         
