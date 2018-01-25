@@ -1065,7 +1065,7 @@ class Geometry
         end
         return true
     end
-   
+    
     def self.get_closest_neighbor_distance(model)
         house_points = []
         neighbor_points = []

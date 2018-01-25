@@ -13,14 +13,6 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "Starting model is not empty.")
   end  
 
-  def test_argument_error_crawl_height_invalid
-    args_hash = {}
-    args_hash["foundation_type"] = Constants.CrawlFoundationType
-    args_hash["foundation_height"] = 0
-    result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "The crawlspace height can be set between 1.5 and 5 ft.")
-  end
-  
   def test_argument_error_aspect_ratio_invalid
     args_hash = {}
     args_hash["unit_aspect_ratio"] = -1.0
@@ -33,6 +25,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     args_hash["num_floors"] = 2
     args_hash["num_units"] = 4
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
+    args_hash["foundation_height"] = 8.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>92, "ThermalZone"=>2*4+1, "Space"=>(2+1)*4+1}
     expected_values = {"FinishedFloorArea"=>900*4, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>300*4, "UnfinishedAtticHeight"=>3.06, "UnfinishedAtticFloorArea"=>300*4, "BuildingHeight"=>8+8+8+3.06}
@@ -45,6 +38,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     args_hash["num_units"] = 4
     args_hash["has_rear_units"] = "true"
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType    
+    args_hash["foundation_height"] = 8.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>88, "ThermalZone"=>2*4+1, "Space"=>(2+1)*4+1}
     expected_values = {"FinishedFloorArea"=>900*4, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>300*4, "UnfinishedAtticHeight"=>3.06, "UnfinishedAtticFloorArea"=>300*4, "BuildingHeight"=>8+8+8+3.06}
@@ -55,6 +49,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_units"] = 4
     args_hash["foundation_type"] = Constants.UnfinishedBasementFoundationType
+    args_hash["foundation_height"] = 8.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>62, "ThermalZone"=>4+1+1, "Space"=>4+1+1}
     expected_values = {"FinishedFloorArea"=>900*4, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>900*4, "UnfinishedAtticHeight"=>5.30, "UnfinishedAtticFloorArea"=>900*4, "BuildingHeight"=>8+8+5.30}

@@ -15,16 +15,16 @@ class ProcessConstructionsUninsulatedSurfacesTest < MiniTest::Test
   def test_slabs_below_unfinished_space
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"LayerRValue"=>176.1+0.3048/1.731+0.1016/1.3114056+0.0889/0.442+0.0127/0.1154577+0.1397/0.705245751, "LayerDensity"=>1842.3+2242.8+82.842+512.64+67.492, "LayerSpecificHeat"=>418.7+837.4+1212.158+1214.23+1211.596, "LayerIndex"=>0+1+2+0+1, "SurfacesWithConstructions"=>9}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_values = {"SurfacesWithConstructions"=>9}
     _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
 
   def test_roofs_above_unfinished_space
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>8, "Construction"=>5}
-    expected_values = {"LayerRValue"=>176.1+0.0889/0.393+0.0889/2.910+0.1016/1.311+0.0127/0.115+0.1397/0.557+0.1397/0.606+0.3048/1.730, "LayerDensity"=>83.026+57.456+512.590+2242.584+67.684+1842.123+67.684, "LayerSpecificHeat"=>418.68+1210.925+1210.259+1211.616+1210.925+1214.172+837.36, "LayerIndex"=>0+1+2+0+1, "SurfacesWithConstructions"=>15}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>6, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_values = {"SurfacesWithConstructions"=>15}
     _test_measure("SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end    
 
@@ -225,11 +225,22 @@ class ProcessConstructionsUninsulatedSurfacesTest < MiniTest::Test
             end
         end
     end
-    assert_in_epsilon(expected_values["LayerRValue"], actual_values["LayerRValue"], 0.01)
-    assert_in_epsilon(expected_values["LayerDensity"], actual_values["LayerDensity"], 0.01)
-    assert_in_epsilon(expected_values["LayerSpecificHeat"], actual_values["LayerSpecificHeat"], 0.01)
-    assert_in_epsilon(expected_values["LayerIndex"], actual_values["LayerIndex"], 0.01)
-    assert_in_epsilon(expected_values["SurfacesWithConstructions"], actual_values["SurfacesWithConstructions"], 0.01)
+    
+    if not expected_values["LayerRValue"].nil?
+        assert_in_epsilon(expected_values["LayerRValue"], actual_values["LayerRValue"], 0.01)
+    end
+    if not expected_values["LayerDensity"].nil?
+        assert_in_epsilon(expected_values["LayerDensity"], actual_values["LayerDensity"], 0.01)
+    end
+    if not expected_values["LayerSpecificHeat"].nil?
+        assert_in_epsilon(expected_values["LayerSpecificHeat"], actual_values["LayerSpecificHeat"], 0.01)
+    end
+    if not expected_values["LayerIndex"].nil?
+        assert_equal(expected_values["LayerIndex"], actual_values["LayerIndex"])
+    end
+    if not expected_values["SurfacesWithConstructions"].nil?
+        assert_equal(expected_values["SurfacesWithConstructions"], actual_values["SurfacesWithConstructions"])
+    end
     
     return model
   end

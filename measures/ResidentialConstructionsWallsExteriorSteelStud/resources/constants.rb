@@ -38,9 +38,6 @@ class Constants
   def self.MixedUseT
     return 110 # F
   end
-  def self.MinimumBasementHeight
-    return 7 # ft
-  end
   def self.MonthNumDays
     return [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
   end
@@ -951,12 +948,6 @@ class Constants
     end
     return "#{property}#{s_obj}"
   end
-  def self.SizingInfoBasementWallInsulationHeight(surface) # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s, surface)
-  end
-  def self.SizingInfoBasementWallRvalue(surface) # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s, surface)
-  end
   def self.SizingInfoCMUWallFurringInsRvalue(surface) # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s, surface)
   end
@@ -1076,12 +1067,6 @@ class Constants
   end
   def self.SizingInfoSlabRvalue(surface) # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s, surface)
-  end
-  def self.SizingInfoSpaceCeilingInsulated(space) # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s, space)
-  end
-  def self.SizingInfoSpaceWallsInsulated(space) # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s, space)
   end
   def self.SizingInfoStudWallCavityRvalue(surface) # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s, surface)

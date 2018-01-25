@@ -141,14 +141,6 @@ class ProcessConstructionsFoundationsFloorsPierBeam < OpenStudio::Measure::Model
         return false
     end
     
-    # Store info for HVAC Sizing measure
-    model.getBuildingUnits.each do |unit|
-        spaces.each do |space|
-            unit.setFeature(Constants.SizingInfoSpaceWallsInsulated(space), false)
-            unit.setFeature(Constants.SizingInfoSpaceCeilingInsulated(space), (pbCeilingCavityInsRvalueNominal > 0))
-        end
-    end
-    
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)
     

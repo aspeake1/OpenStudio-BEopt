@@ -5,6 +5,7 @@ require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
+require "#{File.dirname(__FILE__)}/resources/kiva"
 
 #start the measure
 class ProcessConstructionsUninsulatedSurfaces < OpenStudio::Measure::ModelMeasure
@@ -174,12 +175,19 @@ class ProcessConstructionsUninsulatedSurfaces < OpenStudio::Measure::ModelMeasur
         # Define construction
         slab = Construction.new([1.0])
         slab.add_layer(Material.Concrete4in, true)
-        slab.add_layer(Material.Soil12in, true)
-        slab.add_layer(SimpleMaterial.Adiabatic, true)
         
         # Create and assign construction to surfaces
         if not slab.create_and_assign_constructions(slab_surfaces, runner, model, name="GrndUninsUnfinFloor")
             return false
+        end
+        
+        # Create Kiva foundation
+        foundation = Kiva.create_slab_foundation(model, 0, 0, 0, 0, 0, 0)
+
+        # Assign surfaces to Kiva foundation
+        slab_surfaces.each do |slab_surface|
+            slab_surface.setAdjacentFoundation(foundation)
+            slab_surface.createSurfacePropertyExposedFoundationPerimeter("ExposedPerimeterFraction", 1.0)
         end
     end
     

@@ -795,14 +795,6 @@ class Construction
 
     end
 
-    def self.get_basement_conduction_factor(bsmtWallInsulationHeight, bsmtWallInsulRvalue)
-        if bsmtWallInsulationHeight == 4
-            return (1.689 / (0.430 + bsmtWallInsulRvalue) ** 0.164)
-        else
-            return (2.494 / (1.673 + bsmtWallInsulRvalue) ** 0.488)
-        end
-    end
-    
     def self.get_constructions_from_surfaces(surfaces)
         constructions = []
         surfaces.each do |surface|

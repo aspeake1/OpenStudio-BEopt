@@ -98,9 +98,9 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
 
     #make an argument for crawlspace height
     foundation_height = OpenStudio::Measure::OSArgument::makeDoubleArgument("foundation_height",true)
-    foundation_height.setDisplayName("Crawlspace Height")
+    foundation_height.setDisplayName("Foundation Height")
     foundation_height.setUnits("ft")
-    foundation_height.setDescription("The height of the crawlspace walls.")
+    foundation_height.setDescription("The height of the foundation (e.g., 3ft for crawlspace, 8ft for basement).")
     foundation_height.setDefaultValue(3.0)
     args << foundation_height    
     
@@ -187,17 +187,11 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     
     if foundation_type == Constants.SlabFoundationType
       foundation_height = 0.0
-    elsif foundation_type == Constants.UnfinishedBasementFoundationType or foundation_type == Constants.FinishedBasementFoundationType
-      foundation_height = 8.0
     end    
     
     # error checking
     if model.getSpaces.size > 0
       runner.registerError("Starting model is not empty.")
-      return false
-    end
-    if foundation_type == Constants.CrawlFoundationType and ( foundation_height < 1.5 or foundation_height > 5.0 )
-      runner.registerError("The crawlspace height can be set between 1.5 and 5 ft.")
       return false
     end
     if num_units == 1 and has_rear_units

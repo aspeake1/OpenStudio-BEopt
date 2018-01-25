@@ -5,6 +5,7 @@ require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
+require "#{File.dirname(__FILE__)}/resources/kiva"
 
 #start the measure
 class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measure::ModelMeasure
@@ -20,7 +21,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
   end
   
   def modeler_description
-    return "Calculates and assigns material layer properties of constructions for: 1) walls between below-grade finished space and ground, and 2) floors below below-grade finished space. Below-grade spaces are assumed to be basements (and not crawlspaces) if the space height is greater than or equal to #{Constants.MinimumBasementHeight.to_s} ft."
+    return "Calculates and assigns material layer properties of constructions for: 1) walls between below-grade finished space and ground, and 2) floors below below-grade finished space."
   end   
   
   #define the arguments that the user will input
@@ -213,108 +214,41 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
         return false
     end
-
-    # Get geometry values
-    fbFloorArea = Geometry.get_floor_area_from_spaces(spaces)
-    if exposed_perim == Constants.Auto
-        fbExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true)
-    else
-        fbExtPerimeter = exposed_perim.to_f
-    end
-    fbExtWallArea = fbExtPerimeter * Geometry.spaces_avg_height(spaces)
     
+    
+    
+    # Calculate interior wall R-value
+    int_wall_Rvalue = calc_wall_r_value(runner, fbsmtWallCavityDepth, fbsmtWallCavityInsRvalueInstalled, 
+                                                fbsmtWallCavityInsFillsCavity, fbsmtWallFramingFactor, 
+                                                fbsmtWallInstallGrade, fbsmtWallContInsRvalue, 
+                                                fbsmtWallContInsThickness)
+    puts "int_wall_Rvalue #{UnitConversions.convert(int_wall_Rvalue,'hr*ft^2*f/btu','m^2*k/w')}"
+    if int_wall_Rvalue.nil?
+        return false
+    end
+    
+    # Create Kiva foundation
+    basement_height = Geometry.spaces_avg_height(spaces)
+    foundation = Kiva.create_crawl_or_basement_foundation(model, int_wall_Rvalue, basement_height, 
+                                                                 fbsmtWallContInsRvalue, fbsmtWallInsHeight)
+
     # -------------------------------
     # Process the basement walls
     # -------------------------------
     
     if not wall_surfaces.empty?
-        # Define materials
-        mat_framing = nil
-        mat_cavity = nil
-        mat_grap = nil
-        mat_rigid = nil
-        if fbsmtWallCavityDepth > 0
-            if fbsmtWallCavityInsRvalueInstalled > 0
-                if fbsmtWallCavityInsFillsCavity
-                    # Insulation
-                    mat_cavity = Material.new(name=nil, thick_in=fbsmtWallCavityDepth, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=fbsmtWallCavityDepth / fbsmtWallCavityInsRvalueInstalled)
-                else
-                    # Insulation plus air gap when insulation thickness < cavity depth
-                    mat_cavity = Material.new(name=nil, thick_in=fbsmtWallCavityDepth, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=fbsmtWallCavityDepth / (fbsmtWallCavityInsRvalueInstalled + Gas.AirGapRvalue))
-                end
-            else
-                # Empty cavity
-                mat_cavity = Material.AirCavityClosed(fbsmtWallCavityDepth)
-            end
-            mat_framing = Material.new(name=nil, thick_in=fbsmtWallCavityDepth, mat_base=BaseMaterial.Wood)
-            mat_gap = Material.AirCavityClosed(fbsmtWallCavityDepth)
-        end
-        if fbsmtWallContInsThickness > 0
-            mat_rigid = Material.new(name=nil, thick_in=fbsmtWallContInsThickness, mat_base=BaseMaterial.InsulationRigid, k_in=fbsmtWallContInsThickness / fbsmtWallContInsRvalue)
-        end
-
-        # Set paths
-        gapFactor = Construction.get_wall_gap_factor(fbsmtWallInstallGrade, fbsmtWallFramingFactor, fbsmtWallCavityInsRvalueInstalled)
-        path_fracs = [fbsmtWallFramingFactor, 1 - fbsmtWallFramingFactor - gapFactor, gapFactor]
-        
-        # Define construction (only used to calculate assembly R-value)
-        fbsmt_wall = Construction.new(path_fracs)
-        fbsmt_wall.add_layer(Material.AirFilmVertical, false)
-        fbsmt_wall.add_layer(Material.DefaultWallMass, false)
-        if not mat_framing.nil? and not mat_cavity.nil? and not mat_gap.nil?
-            fbsmt_wall.add_layer([mat_framing, mat_cavity, mat_gap], false)
-        end
-        if fbsmtWallCavityInsRvalueInstalled > 0 or fbsmtWallContInsRvalue > 0
-            # For foundation walls, only add OSB if there is wall insulation.
-            fbsmt_wall.add_layer(Material.DefaultWallSheathing, false)
-        end
-        if not mat_rigid.nil?
-            fbsmt_wall.add_layer(mat_rigid, false)
-        end
-
-        overall_wall_Rvalue = fbsmt_wall.assembly_rvalue(runner)
-        if overall_wall_Rvalue.nil?
-            return false
-        end
-        
-        # Calculate fictitious layer behind finished basement wall to achieve equivalent R-value. See Winkelmann article.
-        conduction_factor = Construction.get_basement_conduction_factor(fbsmtWallInsHeight, overall_wall_Rvalue)
-        if fbExtPerimeter > 0
-            fb_effective_Rvalue = fbExtWallArea / (conduction_factor * fbExtPerimeter) # hr*ft^2*F/Btu
-        else
-            fb_effective_Rvalue = 1000.0 # hr*ft^2*F/Btu
-        end
-        mat_fic_insul_layer = nil
-        if fbsmtWallContInsRvalue > 0 and fbsmtWallInsHeight == 8 # Insulation of 4ft height inside a 8ft basement is modeled completely in the fictitious layer
-            thick_in = fbsmtWallContInsRvalue*BaseMaterial.InsulationRigid.k_in
-            mat_fic_insul_layer = Material.new(name="FBaseWallIns", thick_in=thick_in, mat_base=BaseMaterial.InsulationRigid)
-            insul_layer_rvalue = fbsmtWallContInsRvalue
-        else
-            insul_layer_rvalue = 0
-        end
-        fb_US_Rvalue = Material.Concrete8in.rvalue + Material.AirFilmVertical.rvalue + insul_layer_rvalue + Material.DefaultWallMass.rvalue
-        fb_fictitious_Rvalue = fb_effective_Rvalue - Material.Soil12in.rvalue - fb_US_Rvalue
-        mat_fic_wall = nil
-        if fb_fictitious_Rvalue > 0
-            mat_fic_wall = SimpleMaterial.new(name="FBaseWall-FicR", rvalue=fb_fictitious_Rvalue)
-        end
-        
-        # Define actual construction
-        fic_fbsmt_wall = Construction.new([1])
-        fic_fbsmt_wall.add_layer(Material.AirFilmVertical, false)
-        fic_fbsmt_wall.add_layer(Material.DefaultWallMass, false) # thermal mass added in separate measure
-        if not mat_fic_insul_layer.nil?
-            fic_fbsmt_wall.add_layer(mat_fic_insul_layer, true)
-        end
-        fic_fbsmt_wall.add_layer(Material.Concrete8in, true)
-        fic_fbsmt_wall.add_layer(Material.Soil12in, true)
-        if not mat_fic_wall.nil?
-            fic_fbsmt_wall.add_layer(mat_fic_wall, true)
-        end
+        # Define construction
+        fbsmt_wall = Construction.new([1])
+        fbsmt_wall.add_layer(Material.Concrete8in, true)
 
         # Create and assign construction to surfaces
-        if not fic_fbsmt_wall.create_and_assign_constructions(wall_surfaces, runner, model, name="GrndInsFinWall")
+        if not fbsmt_wall.create_and_assign_constructions(wall_surfaces, runner, model, name="GrndInsFinWall")
             return false
+        end
+        
+        # Assign surfaces to Kiva foundation
+        wall_surfaces.each do |wall_surface|
+            wall_surface.setAdjacentFoundation(foundation)
         end
     end
 
@@ -323,49 +257,29 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
     # -------------------------------
     
     if not floor_surfaces.empty? and not wall_surfaces.empty?
-        fb_total_ua = fbExtWallArea / fb_effective_Rvalue # Btu/hr*F
-        fb_wall_Rvalue = fb_US_Rvalue + Material.Soil12in.rvalue
-        fb_wall_UA = fbExtWallArea / fb_wall_Rvalue
-
-        # Fictitious layer below basement floor to achieve equivalent R-value. See Winklemann article.
-        if fb_fictitious_Rvalue < 0 # Not enough cond through walls, need to add in floor conduction
-            fb_floor_Rvalue = fbFloorArea / (fb_total_ua - fb_wall_UA) - Material.Soil12in.rvalue - Material.Concrete4in.rvalue # hr*ft^2*F/Btu (assumes basement floor is a 4-in concrete slab)
-        else
-            fb_floor_Rvalue = 1000.0 # hr*ft^2*F/Btu
-        end
-        
-        # Define materials
-        mat_fic_floor = SimpleMaterial.new(name="FBaseFloor-FicR", rvalue=fb_floor_Rvalue)
-
         # Define construction
-        fb_floor = Construction.new([1.0])
-        fb_floor.add_layer(Material.Concrete4in, true)
-        fb_floor.add_layer(Material.Soil12in, true)
-        fb_floor.add_layer(mat_fic_floor, true)
+        fbsmt_floor = Construction.new([1.0])
+        fbsmt_floor.add_layer(Material.Concrete4in, true)
         
         # Create and assign construction to surfaces
-        if not fb_floor.create_and_assign_constructions(floor_surfaces, runner, model, name="GrndUninsFinBFloor")
+        if not fbsmt_floor.create_and_assign_constructions(floor_surfaces, runner, model, name="GrndUninsFinBFloor")
             return false
+        end
+        
+        # Exposed perimeter
+        if exposed_perim == Constants.Auto
+            fbExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true)
+        else
+            fbExtPerimeter = exposed_perim.to_f
+        end
+    
+        # Assign surfaces to Kiva foundation
+        floor_surfaces.each do |floor_surface|
+            floor_surface.setAdjacentFoundation(foundation)
+            floor_surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(fbExtPerimeter,"ft","m"))
         end
     end
     
-    # Store info for HVAC Sizing measure
-    model.getBuildingUnits.each do |unit|
-        spaces.each do |space|
-            unit.setFeature(Constants.SizingInfoSpaceWallsInsulated(space), ((fbsmtWallCavityDepth > 0 and fbsmtWallCavityInsRvalueInstalled > 0) or (fbsmtWallContInsThickness > 0 and fbsmtWallContInsRvalue > 0)))
-            unit.setFeature(Constants.SizingInfoSpaceCeilingInsulated(space), false)
-        end
-    end
-    if not wall_surfaces.empty?
-        wall_surfaces.each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoBasementWallInsulationHeight(surface), fbsmtWallInsHeight)
-                unit.setFeature(Constants.SizingInfoBasementWallRvalue(surface), overall_wall_Rvalue)
-            end
-        end
-    end
-
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)
     
@@ -391,6 +305,52 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
     end
     return wall_surfaces, floor_surfaces, spaces
   end
+  
+  def calc_wall_r_value(runner, cavityDepth, cavityInsRvalue, cavityInsFillsCavity,
+                        framingFactor, installGrade, contInsRvalue, contInsThickness)
+    # Define materials
+    mat_framing = nil
+    mat_cavity = nil
+    mat_gap = nil
+    mat_rigid = nil
+    if cavityDepth > 0
+        if cavityInsRvalue > 0
+            if cavityInsFillsCavity
+                # Insulation
+                mat_cavity = Material.new(name=nil, thick_in=cavityDepth, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=cavityDepth / cavityInsRvalue)
+            else
+                # Insulation plus air gap when insulation thickness < cavity depth
+                mat_cavity = Material.new(name=nil, thick_in=cavityDepth, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=cavityDepth / (cavityInsRvalue + Gas.AirGapRvalue))
+            end
+        else
+            # Empty cavity
+            mat_cavity = Material.AirCavityClosed(cavityDepth)
+        end
+        mat_framing = Material.new(name=nil, thick_in=cavityDepth, mat_base=BaseMaterial.Wood)
+        mat_gap = Material.AirCavityClosed(cavityDepth)
+    end
+    if contInsRvalue > 0 and contInsThickness > 0
+        mat_rigid = Material.new(name=nil, thick_in=contInsThickness, mat_base=BaseMaterial.InsulationRigid, k_in=contInsThickness / contInsRvalue)
+    end
+
+    # Set paths
+    gapFactor = Construction.get_wall_gap_factor(installGrade, framingFactor, cavityInsRvalue)
+    path_fracs = [framingFactor, 1 - framingFactor - gapFactor, gapFactor]
+    
+    # Define construction (only used to calculate assembly R-value)
+    fbsmt_wall = Construction.new(path_fracs)
+    fbsmt_wall.add_layer(Material.DefaultWallMass, false)
+    if not mat_framing.nil? and not mat_cavity.nil? and not mat_gap.nil?
+        fbsmt_wall.add_layer(Material.AirFilmVertical, false)
+        fbsmt_wall.add_layer([mat_framing, mat_cavity, mat_gap], false)
+    end
+    if not mat_rigid.nil?
+        fbsmt_wall.add_layer(mat_rigid, false)
+    end
+
+    return fbsmt_wall.assembly_rvalue(runner) - contInsRvalue
+  end
+
 
 end #end the measure
 

@@ -4,6 +4,7 @@
 require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
+require "#{File.dirname(__FILE__)}/resources/kiva"
 
 #start the measure
 class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeasure
@@ -125,8 +126,8 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
     exposed_perim.setUnits("ft")
     exposed_perim.setDescription("Total length of the slab's perimeter that is on the exterior of the building's footprint.")
     exposed_perim.setDefaultValue(Constants.Auto)
-    args << exposed_perim    
-
+    args << exposed_perim
+    
     return args
   end #end the arguments method
 
@@ -242,6 +243,18 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
         return false
     end
     
+    # Create Kiva foundation
+    slabMassThick = UnitConversions.convert(slabMassThickIn, "in", "ft")
+    foundation = Kiva.create_slab_foundation(model, slabPerimeterRvalue, slabPerimeterInsWidth, 
+                                                    slabGapRvalue, slabMassThick, 
+                                                    slabExtRvalue, slabExtInsDepth)
+                                                    
+    # Assign surfaces to Kiva foundation
+    surfaces.each do |surface|
+        surface.setAdjacentFoundation(foundation)
+        surface.createSurfacePropertyExposedFoundationPerimeter("ExposedPerimeterFraction", 1.0)
+    end
+    
     # Get geometry values
     slabArea = Geometry.calculate_total_area_from_surfaces(surfaces)
     if exposed_perim == Constants.Auto
@@ -251,13 +264,29 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
     end
     
     # Process the slab
-
+    
     # Define materials
-    slabCarpetPerimeterConduction, slabBarePerimeterConduction, slabHasWholeInsulation = SlabPerimeterConductancesByType(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabExtRvalue, slabWholeInsRvalue, slabExtInsDepth)
+    mat_whole_ins = nil
+    if slabWholeInsRvalue > 0
+        thick_in = slabWholeInsRvalue*BaseMaterial.InsulationRigid.k_in
+        mat_whole_ins = Material.new(name='WholeSlabIns', thick_in=thick_in, mat_base=BaseMaterial.InsulationRigid)
+    end
     mat_slab = Material.new(name='SlabMass', thick_in=slabMassThickIn, mat_base=nil, k_in=slabMassCond, rho=slabMassDens, cp=slabMassSpecHeat)
-
-    # Models one floor surface with an equivalent carpented/bare material (Better alternative
-    # to having two floors with twice the total area, compensated by thinning mass thickness.)
+    
+    # Define construction
+    slab = Construction.new([1.0])
+    if not mat_whole_ins.nil?
+        slab.add_layer(mat_whole_ins, true)
+    end
+    slab.add_layer(mat_slab, true)
+    
+    # Create and assign construction to surfaces
+    if not slab.create_and_assign_constructions(surfaces, runner, model, name="Slab")
+        return false
+    end
+    
+    # Store info for HVAC Sizing measure
+    slabCarpetPerimeterConduction, slabBarePerimeterConduction = SlabPerimeterConductancesByType(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabExtRvalue, slabWholeInsRvalue, slabExtInsDepth)
     carpetFloorFraction = Material.CoveringBare.rvalue/Material.CoveringBare(floorFraction=1.0).rvalue
     slab_perimeter_conduction = slabCarpetPerimeterConduction * carpetFloorFraction + slabBarePerimeterConduction * (1 - carpetFloorFraction)
 
@@ -266,38 +295,7 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
     else
         effective_slab_Rvalue = 1000.0 # hr*ft^2*F/Btu
     end
-
-    slab_Rvalue = mat_slab.rvalue + Material.AirFilmFlatReduced.rvalue + Material.Soil12in.rvalue + Material.DefaultFloorCovering.rvalue
-    fictitious_slab_Rvalue = effective_slab_Rvalue - slab_Rvalue
-
-    if fictitious_slab_Rvalue <= 0
-        runner.registerWarning("The slab foundation thickness will be automatically reduced to avoid simulation errors, but overall R-value will remain the same.")
-        slab_factor = effective_slab_Rvalue / slab_Rvalue
-        mat_slab.thick_in = mat_slab.thick_in * slab_factor
-    end
-
-    mat_fic = nil
-    if fictitious_slab_Rvalue > 0
-        # Fictitious layer below slab to achieve equivalent R-value. See Winkelmann article.
-        mat_fic = Material.new(name="Mat-Fic-Slab", thick_in=1.0, mat_base=nil, k_in=1.0/fictitious_slab_Rvalue, rho=2.5, cp=0.29)
-    end
-
-    # Define construction
-    slab = Construction.new([1.0])
-    slab.add_layer(Material.AirFilmFlatReduced, false)
-    slab.add_layer(Material.DefaultFloorCovering, false) # floor covering added in separate measure
-    slab.add_layer(mat_slab, true)
-    slab.add_layer(Material.Soil12in, true)
-    if not mat_fic.nil?
-        slab.add_layer(mat_fic, true)
-    end
     
-    # Create and assign construction to surfaces
-    if not slab.create_and_assign_constructions(surfaces, runner, model, name="Slab")
-        return false
-    end
-    
-    # Store info for HVAC Sizing measure
     surfaces.each do |surface|
         model.getBuildingUnits.each do |unit|
             next if unit.spaces.size == 0
@@ -307,7 +305,7 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
     
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)
-
+    
     return true
  
   end #end the run method
@@ -316,7 +314,6 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
     slabWidth = 28 # Width (shorter dimension) of slab, feet, to match Winkelmann analysis.
     slabLength = 55 # Longer dimension of slab, feet, to match Winkelmann analysis.
     soilConductivity = 1
-    slabHasWholeInsulation = false
     if slabPerimeterRvalue > 0
         slabCarpetPerimeterConduction = PerimeterSlabInsulation(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabWidth, slabLength, 1, soilConductivity)
         slabBarePerimeterConduction = PerimeterSlabInsulation(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabWidth, slabLength, 0, soilConductivity)
@@ -324,7 +321,6 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
         slabCarpetPerimeterConduction = ExteriorSlabInsulation(slabExtInsDepth, slabExtRvalue, 1)
         slabBarePerimeterConduction = ExteriorSlabInsulation(slabExtInsDepth, slabExtRvalue, 0)
     elsif slabWholeInsRvalue > 0
-        slabHasWholeInsulation = true
         slabCarpetPerimeterConduction = FullSlabInsulation(slabWholeInsRvalue, slabGapRvalue, slabWidth, slabLength, 1, soilConductivity)
         slabBarePerimeterConduction = FullSlabInsulation(slabWholeInsRvalue, slabGapRvalue, slabWidth, slabLength, 0, soilConductivity)
     else
@@ -332,7 +328,7 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
         slabBarePerimeterConduction = FullSlabInsulation(0, 0, slabWidth, slabLength, 0, soilConductivity)
     end
     
-    return slabCarpetPerimeterConduction, slabBarePerimeterConduction, slabHasWholeInsulation
+    return slabCarpetPerimeterConduction, slabBarePerimeterConduction
     
   end
   

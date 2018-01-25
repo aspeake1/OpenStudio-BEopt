@@ -1040,10 +1040,30 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         
     # Foundation walls
     Geometry.get_spaces_below_grade_exterior_walls(thermal_zone.spaces).each do |wall|
-        wall_rvalue = wall_ins_height = get_unit_feature(runner, unit, Constants.SizingInfoBasementWallRvalue(wall), 'double')
-        return nil if wall_rvalue.nil?
-        wall_ins_height = get_unit_feature(runner, unit, Constants.SizingInfoBasementWallInsulationHeight(wall), 'double')
-        return nil if wall_ins_height.nil?
+    
+        # Get wall insulation R-value/height from Kiva:Foundation object
+        if not wall.adjacentFoundation.is_initialized
+            runner.registerError("Could not get foundation object for wall '#{wall.name.to_s}'.")
+            return nil
+        end
+        foundation = wall.adjacentFoundation.get
+
+        wall_rvalue = 0.0
+        wall_ins_height = 0.0
+        if foundation.interiorVerticalInsulationMaterial.is_initialized
+            int_mat = foundation.interiorVerticalInsulationMaterial.get
+            k = UnitConversions.convert(int_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
+            thick = UnitConversions.convert(int_mat.thickness,"m","ft")
+            wall_rvalue += k*thick
+            wall_ins_height = UnitConversions.convert(foundation.interiorVerticalInsulationDepth.get,"m","ft")
+        end
+        if foundation.exteriorVerticalInsulationMaterial.is_initialized
+            ext_mat = foundation.exteriorVerticalInsulationMaterial.get
+            k = UnitConversions.convert(ext_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
+            thick = UnitConversions.convert(ext_mat.thickness,"m","ft")
+            wall_rvalue += k*thick
+            wall_ins_height = UnitConversions.convert(foundation.exteriorVerticalInsulationDepth.get,"m","ft")
+        end
         
         k_soil = UnitConversions.convert(BaseMaterial.Soil.k_in,"in","ft")
         ins_wall_ufactor = 1.0 / wall_rvalue
@@ -1522,11 +1542,41 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     if ducts.Has and ducts.NotInLiving
         # dse_Fregain values comes from MJ8 pg 204 and Walker (1998) "Technical background for default 
         # values used for forced air systems in proposed ASHRAE Std. 152"
+        
+        walls_insulated = nil
+        ceiling_insulated = nil
+        if Geometry.is_unfinished_basement(ducts.LocationSpace) or Geometry.is_finished_basement(ducts.LocationSpace) or Geometry.is_crawl(ducts.LocationSpace) or Geometry.is_pier_beam(ducts.LocationSpace)
+            
+            # Check if walls insulated via Kiva:Foundation object
+            walls_insulated = false
+            foundation = nil
+            ducts.LocationSpace.surfaces.each do |surface|
+                next if surface.surfaceType.downcase != "floor"
+                next if not surface.adjacentFoundation.is_initialized
+                foundation = surface.adjacentFoundation.get
+            end
+            if foundation.nil?
+                runner.registerError("Could not get foundation object for space '#{ducts.LocationSpace.name.to_s}'.")
+                return nil
+            end
+            if foundation.interiorVerticalInsulationMaterial.is_initialized or foundation.exteriorVerticalInsulationMaterial.is_initialized
+                walls_insulated = true
+            end
+            
+            # Check if ceilings insulated
+            ceilings_insulated = false
+            ceiling_ufactor = nil
+            ducts.LocationSpace.surfaces.each do |surface|
+                next if surface.surfaceType.downcase != "roofceiling"
+                ceiling_ufactor = Construction.get_surface_ufactor(runner, surface, surface.surfaceType)
+            end
+            return nil if ceiling_ufactor.nil?
+            if ceiling_ufactor > FIXME
+                ceilings_insulated = true
+            end
+        end
+        
         if Geometry.is_unfinished_basement(ducts.LocationSpace) or Geometry.is_finished_basement(ducts.LocationSpace)
-
-            walls_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceWallsInsulated(ducts.LocationSpace), 'boolean')
-            ceiling_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceCeilingInsulated(ducts.LocationSpace), 'boolean')
-            return nil if walls_insulated.nil? or ceiling_insulated.nil?
 
             infiltration_cfm = get_unit_feature(runner, unit, Constants.SizingInfoZoneInfiltrationCFM(ducts.LocationSpace.thermalZone.get), 'double', false)
             infiltration_cfm = 0 if infiltration_cfm.nil?
@@ -1559,10 +1609,6 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             
         elsif Geometry.is_crawl(ducts.LocationSpace) or Geometry.is_pier_beam(ducts.LocationSpace)
             
-            walls_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceWallsInsulated(ducts.LocationSpace), 'boolean')
-            ceiling_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceCeilingInsulated(ducts.LocationSpace), 'boolean')
-            return nil if walls_insulated.nil? or ceiling_insulated.nil?
-
             infiltration_cfm = get_unit_feature(runner, unit, Constants.SizingInfoZoneInfiltrationCFM(ducts.LocationSpace.thermalZone.get), 'double', false)
             infiltration_cfm = 0 if infiltration_cfm.nil?
             

@@ -5,6 +5,7 @@ require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
+require "#{File.dirname(__FILE__)}/resources/kiva"
 
 #start the measure
 class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::ModelMeasure
@@ -20,7 +21,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
   end
   
   def modeler_description
-    return "Calculates and assigns material layer properties of constructions for: 1) ceilings above below-grade unfinished space, 2) walls between below-grade unfinished space and ground, and 3) floors below below-grade unfinished space. Below-grade spaces are assumed to be crawlspaces (and not basements) if the space height is less than #{Constants.MinimumBasementHeight.to_s} ft."
+    return "Calculates and assigns material layer properties of constructions for: 1) ceilings above below-grade unfinished space, 2) walls between below-grade unfinished space and ground, and 3) floors below below-grade unfinished space."
   end    
   
   #define the arguments that the user will input
@@ -166,59 +167,27 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
         return false
     end
     
-    # Get geometry values
-    csHeight = Geometry.spaces_avg_height(spaces)
-    csFloorArea = Geometry.get_floor_area_from_spaces(spaces)
-    if exposed_perim == Constants.Auto
-        csExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true)
-    else
-        csExtPerimeter = exposed_perim.to_f
-    end
-    csExtWallArea = csExtPerimeter * Geometry.spaces_avg_height(spaces)
-
+    # Create Kiva foundation
+    crawl_height = Geometry.spaces_avg_height(spaces)
+    foundation = Kiva.create_crawl_or_basement_foundation(model, 0, 0, crawlWallContInsRvalueNominal, crawl_height)
+    
     # -------------------------------
     # Process the crawl walls
     # -------------------------------
     
     if not wall_surfaces.empty?
-        # Calculate fictitious layer behind finished basement wall to achieve equivalent R-value. See Winkelmann article.
-        # Interpolate/extrapolate between 2ft and 4ft conduction factors based on actual space height:
-        crawlspace_conduction2 = 1.120 / (0.237 + crawlWallContInsRvalueNominal) ** 0.099
-        crawlspace_conduction4 = 1.126 / (0.621 + crawlWallContInsRvalueNominal) ** 0.269
-        crawlspace_conduction = crawlspace_conduction2 + (crawlspace_conduction4 - crawlspace_conduction2) * (csHeight - 2) / (4 - 2)
-        if csExtPerimeter > 0
-            crawlspace_effective_Rvalue = csExtWallArea / (crawlspace_conduction * csExtPerimeter) # hr*ft^2*F/Btu
-        else
-            crawlspace_effective_Rvalue = 1000.0 # hr*ft^2*F/Btu
-        end
-        crawlspace_US_Rvalue = Material.Concrete8in.rvalue + Material.AirFilmVertical.rvalue + crawlWallContInsRvalueNominal
-        crawlspace_fictitious_Rvalue = crawlspace_effective_Rvalue - Material.Soil12in.rvalue - crawlspace_US_Rvalue
-
-        # Define materials
-        mat_ins = nil
-        if crawlWallContInsThickness > 0 and crawlWallContInsRvalueNominal > 0
-            mat_ins = Material.new(name="CWallIns", thick_in=crawlWallContInsThickness, mat_base=BaseMaterial.InsulationRigid, k_in=crawlWallContInsThickness / crawlWallContInsRvalueNominal)
-        end
-        mat_fic_wall = nil
-        if crawlspace_fictitious_Rvalue > 0
-            mat_fic_wall = SimpleMaterial.new(name="CWall-FicR", rvalue=crawlspace_fictitious_Rvalue)
-        end
-        
         # Define construction
         cs_wall = Construction.new([1.0])
-        if not mat_ins.nil?
-            cs_wall.add_layer(mat_ins, true)
-        end
         cs_wall.add_layer(Material.Concrete8in, true)
-        cs_wall.add_layer(Material.Soil12in, true)
-        if not mat_fic_wall.nil?
-            cs_wall.add_layer(mat_fic_wall, true)
-        end
-        cs_wall.add_layer(Material.AirFilmVertical, false)
         
         # Create and assign construction to surfaces
         if not cs_wall.create_and_assign_constructions(wall_surfaces, runner, model, name="GrndInsUnfinCSWall")
             return false
+        end
+        
+        # Assign surfaces to Kiva foundation
+        wall_surfaces.each do |wall_surface|
+            wall_surface.setAdjacentFoundation(foundation)
         end
     end
     
@@ -227,28 +196,26 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
     # -------------------------------
     
     if not floor_surfaces.empty? and not wall_surfaces.empty?
-        crawlspace_total_UA = csExtWallArea / crawlspace_effective_Rvalue # Btu/hr*F
-        crawlspace_wall_Rvalue = crawlspace_US_Rvalue + Material.Soil12in.rvalue
-        crawlspace_wall_UA = csExtWallArea / crawlspace_wall_Rvalue
-        
-        # Fictitious layer below crawlspace floor to achieve equivalent R-value. See Winklemann article.
-        if crawlspace_fictitious_Rvalue < 0 # Not enough cond through walls, need to add in floor conduction
-            crawlspace_floor_Rvalue = csFloorArea / (crawlspace_total_UA - crawlspace_wall_UA) - Material.Soil12in.rvalue # hr*ft^2*F/Btu (assumes crawlspace floor is dirt with no concrete slab)
-        else
-            crawlspace_floor_Rvalue = 1000.0 # hr*ft^2*F/Btu
-        end
-        
-        # Define materials
-        mat_fic_floor = SimpleMaterial.new(name="CFloor-FicR", rvalue=crawlspace_floor_Rvalue)
-        
         # Define construction
         cs_floor = Construction.new([1.0])
-        cs_floor.add_layer(Material.Soil12in, true)
-        cs_floor.add_layer(mat_fic_floor, true)
+        cs_floor.add_layer(Material.Concrete4in, true)
         
         # Create and assign construction to surfaces
         if not cs_floor.create_and_assign_constructions(floor_surfaces, runner, model, name="GrndUninsUnfinCSFloor")
             return false
+        end
+        
+        # Exposed perimeter
+        if exposed_perim == Constants.Auto
+            csExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true)
+        else
+            csExtPerimeter = exposed_perim.to_f
+        end
+        
+        # Assign surfaces to Kiva foundation
+        floor_surfaces.each do |floor_surface|
+            floor_surface.setAdjacentFoundation(foundation)
+            floor_surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(csExtPerimeter,"ft","m"))
         end
     end
 
@@ -286,17 +253,9 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
         end
     end
 
-    # Store info for HVAC Sizing measure
-    model.getBuildingUnits.each do |unit|
-        spaces.each do |space|
-            unit.setFeature(Constants.SizingInfoSpaceWallsInsulated(space), (crawlWallContInsThickness > 0 and crawlWallContInsRvalueNominal > 0))
-            unit.setFeature(Constants.SizingInfoSpaceCeilingInsulated(space), (crawlCeilingCavityInsRvalueNominal > 0))
-        end
-    end
-    
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)
-
+    
     return true
 
   end #end the run method
