@@ -112,7 +112,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinishedTest < MiniTest::Test
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"WallRValue"=>0.079+2.72+0.88, "WallDepth"=>2.44+2.44, "SurfacesWithConstructions"=>5}
+    expected_values = {"WallRValue"=>0.079+1.79+0.88, "WallDepth"=>2.44+2.44, "SurfacesWithConstructions"=>5}
     _test_measure(osm_geo_finished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
