@@ -581,7 +581,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
           end
         end
       end
-
+      
       m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
       m[0,3] = 0
       m[1,3] = 0
@@ -739,6 +739,12 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         surface.adjacentSurface.get.remove
         surface.remove
       end
+    end
+    
+    # set foundation outside boundary condition to Kiva "foundation"
+    model.getSurfaces.each do |surface|
+        next if surface.outsideBoundaryCondition.downcase != "ground"
+        surface.setOutsideBoundaryCondition("Foundation")
     end
     
     # Store building unit information

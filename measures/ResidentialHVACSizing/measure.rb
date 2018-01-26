@@ -1037,37 +1037,18 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         zone_loads.Heat_Walls += wall_ufactor * UnitConversions.convert(wall.netArea,"m^2","ft^2") * (mj8.heat_setpoint - mj8.heat_design_temps[adjacent_space])
         zone_loads.Dehumid_Walls += wall_ufactor * UnitConversions.convert(wall.netArea,"m^2","ft^2") * (mj8.cool_setpoint - mj8.dehum_design_temps[adjacent_space])
     end
-        
+    
     # Foundation walls
     Geometry.get_spaces_below_grade_exterior_walls(thermal_zone.spaces).each do |wall|
     
-        # Get wall insulation R-value/height from Kiva:Foundation object
-        if not wall.adjacentFoundation.is_initialized
-            runner.registerError("Could not get foundation object for wall '#{wall.name.to_s}'.")
+        wall_ins_rvalue, wall_ins_height, wall_constr_rvalue = get_foundation_wall_insulation_props(runner, wall)
+        if wall_ins_rvalue.nil? or wall_ins_height.nil? or wall_constr_rvalue.nil?
             return nil
-        end
-        foundation = wall.adjacentFoundation.get
-
-        wall_rvalue = 0.0
-        wall_ins_height = 0.0
-        if foundation.interiorVerticalInsulationMaterial.is_initialized
-            int_mat = foundation.interiorVerticalInsulationMaterial.get
-            k = UnitConversions.convert(int_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
-            thick = UnitConversions.convert(int_mat.thickness,"m","ft")
-            wall_rvalue += k*thick
-            wall_ins_height = UnitConversions.convert(foundation.interiorVerticalInsulationDepth.get,"m","ft")
-        end
-        if foundation.exteriorVerticalInsulationMaterial.is_initialized
-            ext_mat = foundation.exteriorVerticalInsulationMaterial.get
-            k = UnitConversions.convert(ext_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
-            thick = UnitConversions.convert(ext_mat.thickness,"m","ft")
-            wall_rvalue += k*thick
-            wall_ins_height = UnitConversions.convert(foundation.exteriorVerticalInsulationDepth.get,"m","ft")
         end
         
         k_soil = UnitConversions.convert(BaseMaterial.Soil.k_in,"in","ft")
-        ins_wall_ufactor = 1.0 / wall_rvalue
-        unins_wall_ufactor = 1.0 / (Material.Concrete8in.rvalue + Material.AirFilmVertical.rvalue)
+        ins_wall_ufactor = 1.0 / (wall_constr_rvalue + wall_ins_rvalue + Material.AirFilmVertical.rvalue)
+        unins_wall_ufactor = 1.0 / (wall_constr_rvalue + Material.AirFilmVertical.rvalue)
         above_grade_height = Geometry.space_height(wall.space.get) - Geometry.surface_height(wall)
         
         # Calculated based on Manual J 8th Ed. procedure in section A12-4 (15% decrease due to soil thermal storage)
@@ -1543,40 +1524,10 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         # dse_Fregain values comes from MJ8 pg 204 and Walker (1998) "Technical background for default 
         # values used for forced air systems in proposed ASHRAE Std. 152"
         
-        walls_insulated = nil
-        ceiling_insulated = nil
-        if Geometry.is_unfinished_basement(ducts.LocationSpace) or Geometry.is_finished_basement(ducts.LocationSpace) or Geometry.is_crawl(ducts.LocationSpace) or Geometry.is_pier_beam(ducts.LocationSpace)
-            
-            # Check if walls insulated via Kiva:Foundation object
-            walls_insulated = false
-            foundation = nil
-            ducts.LocationSpace.surfaces.each do |surface|
-                next if surface.surfaceType.downcase != "floor"
-                next if not surface.adjacentFoundation.is_initialized
-                foundation = surface.adjacentFoundation.get
-            end
-            if foundation.nil?
-                runner.registerError("Could not get foundation object for space '#{ducts.LocationSpace.name.to_s}'.")
-                return nil
-            end
-            if foundation.interiorVerticalInsulationMaterial.is_initialized or foundation.exteriorVerticalInsulationMaterial.is_initialized
-                walls_insulated = true
-            end
-            
-            # Check if ceilings insulated
-            ceilings_insulated = false
-            ceiling_ufactor = nil
-            ducts.LocationSpace.surfaces.each do |surface|
-                next if surface.surfaceType.downcase != "roofceiling"
-                ceiling_ufactor = Construction.get_surface_ufactor(runner, surface, surface.surfaceType)
-            end
-            return nil if ceiling_ufactor.nil?
-            if ceiling_ufactor > FIXME
-                ceilings_insulated = true
-            end
-        end
-        
         if Geometry.is_unfinished_basement(ducts.LocationSpace) or Geometry.is_finished_basement(ducts.LocationSpace)
+        
+            walls_insulated, ceiling_insulated = get_foundation_walls_ceilings_insulated(runner, ducts.LocationSpace)
+            return nil if walls_insulated.nil? or ceiling_insulated.nil?
 
             infiltration_cfm = get_unit_feature(runner, unit, Constants.SizingInfoZoneInfiltrationCFM(ducts.LocationSpace.thermalZone.get), 'double', false)
             infiltration_cfm = 0 if infiltration_cfm.nil?
@@ -1608,6 +1559,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             end
             
         elsif Geometry.is_crawl(ducts.LocationSpace) or Geometry.is_pier_beam(ducts.LocationSpace)
+            
+            walls_insulated, ceiling_insulated = get_foundation_walls_ceilings_insulated(runner, ducts.LocationSpace)
+            return nil if walls_insulated.nil? or ceiling_insulated.nil?
             
             infiltration_cfm = get_unit_feature(runner, unit, Constants.SizingInfoZoneInfiltrationCFM(ducts.LocationSpace.thermalZone.get), 'double', false)
             infiltration_cfm = 0 if infiltration_cfm.nil?
@@ -3471,18 +3425,18 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     # Calculate new value for Tattic based on updated duct losses
     sum_uat = -coolingLoad_Ducts_Sens
     attic_UAs.each do |ua_type, ua|
-        if ua_type == 'outdoors' or ua_type == 'infil'
+        if ua_type == "outdoors" or ua_type == "infil"
             sum_uat += ua * t_solair
-        elsif ua_type == 'surface' # adjacent to finished
+        elsif ua_type == "surface" # adjacent to finished
             sum_uat += ua * cool_setpoint
-        elsif ua_type == 'total' or ua_type == 'ground'
+        elsif ua_type == "total" or ua_type == "foundation"
             # skip
         else
-            runner.registerError("Unexpected outside boundary condition: '#{obc}'.")
+            runner.registerError("Unexpected ua_type: '#{ua_type}'.")
             return nil
         end
     end
-    t_attic_iter = sum_uat / attic_UAs['total']
+    t_attic_iter = sum_uat / attic_UAs["total"]
     t_attic_iter = [t_attic_iter, t_solair].min # Prevent attic from being hotter than T_solair
     t_attic_iter = [t_attic_iter, cool_setpoint].max # Prevent attic from being colder than cool_setpoint
     return t_attic_iter
@@ -3525,16 +3479,27 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         return nil
     end
   
-    space_UAs = {'ground'=>0, 'outdoors'=>0, 'surface'=>0}
+    space_UAs = {"foundation"=>0, "outdoors"=>0, "surface"=>0}
     
     # Surface UAs
     space.surfaces.each do |surface|
-        ufactor = Construction.get_surface_ufactor(runner, surface, surface.surfaceType)
-        return nil if ufactor.nil?
+        obc = surface.outsideBoundaryCondition.downcase
+        
+        if obc == "foundation" and surface.surfaceType.downcase == "wall"
+            wall_ins_rvalue, wall_ins_height, wall_constr_rvalue = get_foundation_wall_insulation_props(runner, surface)
+            if wall_ins_rvalue.nil? or wall_ins_height.nil? or wall_constr_rvalue.nil?
+                return nil
+            end
+            ufactor = 1.0 / (wall_ins_rvalue + wall_constr_rvalue)
+        elsif obc == "foundation" and surface.surfaceType.downcase == "floor"
+            next
+        else
+            ufactor = Construction.get_surface_ufactor(runner, surface, surface.surfaceType)
+            return nil if ufactor.nil?
+        end
         
         # Exclude surfaces adjacent to unfinished space
-        obc = surface.outsideBoundaryCondition.downcase
-        next if not ['ground','outdoors'].include?(obc) and not Geometry.is_interzonal_surface(surface)
+        next if not ["foundation","outdoors"].include?(obc) and not Geometry.is_interzonal_surface(surface)
         
         space_UAs[obc] += ufactor * UnitConversions.convert(surface.netArea,"m^2","ft^2")
     end
@@ -3543,14 +3508,14 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     infiltration_cfm = get_unit_feature(runner, unit, Constants.SizingInfoZoneInfiltrationCFM(space.thermalZone.get), 'double', false)
     infiltration_cfm = 0 if infiltration_cfm.nil?
     outside_air_density = UnitConversions.convert(weather.header.LocalPressure,"atm","Btu/ft^3") / (Gas.Air.r * (weather.data.AnnualAvgDrybulb + 460.0))
-    space_UAs['infil'] = infiltration_cfm * outside_air_density * Gas.Air.cp * UnitConversions.convert(1.0,"hr","min")
+    space_UAs["infil"] = infiltration_cfm * outside_air_density * Gas.Air.cp * UnitConversions.convert(1.0,"hr","min")
     
     # Total UA
     total_UA = 0.0
     space_UAs.each do |ua_type, ua|
         total_UA += ua
     end
-    space_UAs['total'] = total_UA
+    space_UAs["total"] = total_UA
     return space_UAs
   end
   
@@ -3564,20 +3529,20 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
         sum_uat = 0
         space_UAs.each do |ua_type, ua|
-            if ua_type == 'ground'
+            if ua_type == "foundation"
                 sum_uat += ua * ground_db
-            elsif ua_type == 'outdoors' or ua_type == 'infil'
+            elsif ua_type == "outdoors" or ua_type == "infil"
                 sum_uat += ua * design_db
-            elsif ua_type == 'surface' # adjacent to finished
+            elsif ua_type == "surface" # adjacent to finished
                 sum_uat += ua * finished_design_temp
-            elsif ua_type == 'total'
+            elsif ua_type == "total"
                 # skip
             else
                 runner.registerError("Unexpected space ua type: '#{ua_type}'.")
                 return nil
             end
         end
-        design_temp = sum_uat / space_UAs['total']
+        design_temp = sum_uat / space_UAs["total"]
         
     else
     
@@ -3598,11 +3563,11 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         ua_finished = 0
         ua_outside = 0
         space_UAs.each do |ua_type, ua|
-            if ua_type == 'outdoors' or ua_type == 'infil'
+            if ua_type == "outdoors" or ua_type == "infil"
                 ua_outside += ua
-            elsif ua_type == 'surface' # adjacent to finished
+            elsif ua_type == "surface" # adjacent to finished
                 ua_finished += ua
-            elsif ua_type == 'total' or ua_type == 'ground'
+            elsif ua_type == "total" or ua_type == "foundation"
                 # skip
             else
                 runner.registerError("Unexpected space ua type: '#{ua_type}'.")
@@ -4078,6 +4043,73 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         end
     end
     return gfnc_coeff
+  end
+  
+  def get_foundation_walls_ceilings_insulated(runner, space)
+    # Check if walls insulated via Kiva:Foundation object
+    walls_insulated = false
+    space.surfaces.each do |surface|
+        next if surface.surfaceType.downcase != "wall"
+        next if not surface.adjacentFoundation.is_initialized
+        wall_ins_rvalue, wall_ins_height, wall_constr_rvalue = get_foundation_wall_insulation_props(runner, surface)
+        if wall_ins_rvalue.nil? or wall_ins_height.nil? or wall_constr_rvalue.nil?
+            return nil
+        end
+        wall_rvalue = wall_ins_rvalue + wall_constr_rvalue
+        if wall_rvalue >= 3.0
+            walls_insulated = true
+        end
+        break
+    end
+    
+    # Check if ceilings insulated
+    ceilings_insulated = false
+    ceiling_ufactor = nil
+    space.surfaces.each do |surface|
+        next if surface.surfaceType.downcase != "roofceiling"
+        ceiling_ufactor = Construction.get_surface_ufactor(runner, surface, surface.surfaceType)
+    end
+    return nil if ceiling_ufactor.nil?
+    ceiling_rvalue = 1.0 / UnitConversions.convert(ceiling_ufactor, 'm^2*k/w', 'hr*ft^2*f/btu')
+    if ceiling_rvalue >= 3.0
+        ceilings_insulated = true
+    end
+    
+    return walls_insulated, ceilings_insulated
+  end
+  
+  def get_foundation_wall_insulation_props(runner, surface)
+    if surface.surfaceType.downcase != "wall"
+        return nil
+    end
+  
+    # Get wall insulation R-value/height from Kiva:Foundation object
+    if not surface.adjacentFoundation.is_initialized
+        runner.registerError("Could not get foundation object for wall '#{surface.name.to_s}'.")
+        return nil
+    end
+    foundation = surface.adjacentFoundation.get
+    
+    wall_ins_rvalue = 0.0
+    wall_ins_height = 0.0
+    if foundation.interiorVerticalInsulationMaterial.is_initialized
+        int_mat = foundation.interiorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+        k = UnitConversions.convert(int_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
+        thick = UnitConversions.convert(int_mat.thickness,"m","ft")
+        wall_ins_rvalue += thick/k
+        wall_ins_height = UnitConversions.convert(foundation.interiorVerticalInsulationDepth.get,"m","ft").round
+    end
+    if foundation.exteriorVerticalInsulationMaterial.is_initialized
+        ext_mat = foundation.exteriorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+        k = UnitConversions.convert(ext_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
+        thick = UnitConversions.convert(ext_mat.thickness,"m","ft")
+        wall_ins_rvalue += thick/k
+        wall_ins_height = UnitConversions.convert(foundation.exteriorVerticalInsulationDepth.get,"m","ft").round
+    end
+    
+    wall_constr_rvalue = Construction.get_surface_ufactor(runner, surface, surface.surfaceType)
+    
+    return wall_ins_rvalue, wall_ins_height, wall_constr_rvalue
   end
   
   def get_unit_feature(runner, unit, feature, datatype, register_error=true)

@@ -660,7 +660,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           surfaces = space.surfaces
           surfaces.each do |surface|
             next if surface.surfaceType.downcase != "wall"
-            surface.setOutsideBoundaryCondition("Ground")
+            surface.setOutsideBoundaryCondition("Foundation")
           end
         end
       end
@@ -791,6 +791,12 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       next unless surface.outsideBoundaryCondition.downcase == "surface"
       next if surface.adjacentSurface.is_initialized
       surface.setOutsideBoundaryCondition("Adiabatic")
+    end
+    
+    # set foundation outside boundary condition to Kiva "foundation"
+    model.getSurfaces.each do |surface|
+        next if surface.outsideBoundaryCondition.downcase != "ground"
+        surface.setOutsideBoundaryCondition("Foundation")
     end
     
     # Store number of units

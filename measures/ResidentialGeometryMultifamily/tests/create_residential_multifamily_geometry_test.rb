@@ -317,6 +317,11 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     assert_in_epsilon(expected_values["FinishedFloorArea"], actual_values["FinishedFloorArea"], 0.01)
     assert_in_epsilon(expected_values["BuildingHeight"], Geometry.get_height_of_spaces(new_spaces), 0.01)
     
+    # Ensure no surfaces adjacent to "ground" (should be Kiva "foundation")
+    model.getSurfaces.each do |surface|
+      refute_equal(surface.outsideBoundaryCondition.downcase, "ground")
+    end
+    
     return model
   end  
   

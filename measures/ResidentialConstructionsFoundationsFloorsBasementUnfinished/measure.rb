@@ -137,7 +137,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinished < OpenStudio::Meas
     ceil_joist_height.setDisplayName("Ceiling Joist Height")
     ceil_joist_height.setUnits("in")
     ceil_joist_height.setDescription("Height of the joist member.")
-    ceil_joist_height.setDefaultValue("9.25")
+    ceil_joist_height.setDefaultValue(9.25)
     args << ceil_joist_height    
     
     #make a string argument for exposed perimeter
@@ -348,11 +348,11 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinished < OpenStudio::Meas
     spaces.each do |space|
         space.surfaces.each do |surface|
             # Wall between below-grade unfinished space and ground
-            if surface.surfaceType.downcase == "wall" and surface.outsideBoundaryCondition.downcase == "ground"
+            if surface.surfaceType.downcase == "wall" and surface.outsideBoundaryCondition.downcase == "foundation"
                 wall_surfaces << surface
             end
             # Floor below below-grade unfinished space
-            if surface.surfaceType.downcase == "floor" and surface.outsideBoundaryCondition.downcase == "ground"
+            if surface.surfaceType.downcase == "floor" and surface.outsideBoundaryCondition.downcase == "foundation"
                 floor_surfaces << surface
             end
             # Ceiling above below-grade unfinished space and below finished space

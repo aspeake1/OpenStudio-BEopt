@@ -222,7 +222,6 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
                                                 fbsmtWallCavityInsFillsCavity, fbsmtWallFramingFactor, 
                                                 fbsmtWallInstallGrade, fbsmtWallContInsRvalue, 
                                                 fbsmtWallContInsThickness)
-    puts "int_wall_Rvalue #{UnitConversions.convert(int_wall_Rvalue,'hr*ft^2*f/btu','m^2*k/w')}"
     if int_wall_Rvalue.nil?
         return false
     end
@@ -294,11 +293,11 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
     spaces.each do |space|
         space.surfaces.each do |surface|
             # Wall between below-grade finished space and ground
-            if surface.surfaceType.downcase == "wall" and surface.outsideBoundaryCondition.downcase == "ground"
+            if surface.surfaceType.downcase == "wall" and surface.outsideBoundaryCondition.downcase == "foundation"
                 wall_surfaces << surface
             end
             # Floor below below-grade finished space
-            if surface.surfaceType.downcase == "floor" and surface.outsideBoundaryCondition.downcase == "ground"
+            if surface.surfaceType.downcase == "floor" and surface.outsideBoundaryCondition.downcase == "foundation"
                 floor_surfaces << surface
             end
         end

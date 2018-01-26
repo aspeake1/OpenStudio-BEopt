@@ -445,7 +445,7 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
         next if Geometry.space_is_below_grade(space)
         space.surfaces.each do |surface|
             next if surface.surfaceType.downcase != "floor"
-            next if surface.outsideBoundaryCondition.downcase != "ground"
+            next if surface.outsideBoundaryCondition.downcase != "foundation"
             surfaces << surface
         end
     end

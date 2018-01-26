@@ -305,7 +305,7 @@ class ProcessConstructionsUninsulatedSurfaces < OpenStudio::Measure::ModelMeasur
         space.surfaces.each do |surface|
             next if surface.construction.is_initialized
             next if surface.surfaceType.downcase != "floor"
-            next if surface.outsideBoundaryCondition.downcase != "ground"
+            next if surface.outsideBoundaryCondition.downcase != "foundation"
             # Floors between above-grade unfinished space and ground
             slab_surfaces << surface
         end

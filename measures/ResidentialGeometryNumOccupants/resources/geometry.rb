@@ -518,7 +518,7 @@ class Geometry
     def self.space_is_below_grade(space)
         space.surfaces.each do |surface|
             next if surface.surfaceType.downcase != "wall"
-            if surface.isGroundSurface
+            if surface.outsideBoundaryCondition.downcase == "foundation"
                 return true
             end
         end
@@ -654,7 +654,7 @@ class Geometry
             end
             space.surfaces.each do |surface|
                 next if surface.surfaceType.downcase != "wall"
-                next if surface.isGroundSurface
+                next if surface.outsideBoundaryCondition.downcase == "foundation"
                 wall_area += UnitConversions.convert(surface.grossArea * mult, "m^2", "ft^2")
             end
         end
@@ -671,7 +671,7 @@ class Geometry
             space.surfaces.each do |surface|
                 next if surface.surfaceType.downcase != "wall"
                 next if surface.outsideBoundaryCondition.downcase != "outdoors"
-                next if surface.isGroundSurface
+                next if surface.outsideBoundaryCondition.downcase == "foundation"
                 next unless self.space_is_finished(surface.space.get)
                 wall_area += UnitConversions.convert(surface.grossArea * mult, "m^2", "ft^2")
             end
@@ -1131,7 +1131,7 @@ class Geometry
             space.surfaces.each do |surface|
                 next if above_grade_ground_floors.include?(surface)
                 next if surface.surfaceType.downcase != "floor"
-                next if surface.outsideBoundaryCondition.downcase != "ground"
+                next if surface.outsideBoundaryCondition.downcase != "foundation"
                 above_grade_ground_floors << surface
             end
         end
@@ -1187,7 +1187,7 @@ class Geometry
             space.surfaces.each do |surface|
                 next if below_grade_exterior_walls.include?(surface)
                 next if surface.surfaceType.downcase != "wall"
-                next if surface.outsideBoundaryCondition.downcase != "ground"
+                next if surface.outsideBoundaryCondition.downcase != "foundation"
                 below_grade_exterior_walls << surface
             end
         end
@@ -1202,7 +1202,7 @@ class Geometry
             space.surfaces.each do |surface|
                 next if below_grade_exterior_floors.include?(surface)
                 next if surface.surfaceType.downcase != "floor"
-                next if surface.outsideBoundaryCondition.downcase != "ground"
+                next if surface.outsideBoundaryCondition.downcase != "foundation"
                 below_grade_exterior_floors << surface
             end
         end
