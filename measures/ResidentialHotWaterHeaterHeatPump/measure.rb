@@ -349,7 +349,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
 
         units.each do |unit|
 
-            obj_name_hpwh = Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit", "u")).gsub("|","_")
+            obj_name_hpwh = Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit ", "")).gsub("|","_")
 
             unit_num = Geometry.get_unit_number(model, unit, runner)
 

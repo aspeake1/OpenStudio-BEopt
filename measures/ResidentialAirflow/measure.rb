@@ -132,7 +132,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       @MechVentSensibleEfficiency = mechVentSensibleEfficiency
       @MechVentASHRAEStandard = mechVentASHRAEStandard
       @MechVentCFISOpenTime = mechVentCFISOpenTime
-      @mechVentCFISAirflowFraction = mechVentCFISAirflowFraction
+      @MechVentCFISAirflowFraction = mechVentCFISAirflowFraction
     end
     attr_accessor(:MechVentType, :MechVentInfilCredit, :MechVentTotalEfficiency, :MechVentFractionOfASHRAE, :MechVentHouseFanPower, :MechVentSensibleEfficiency, :MechVentASHRAEStandard, :MechVentBathroomExhaust, :MechVentRangeHoodExhaust, :MechVentSpotFanPower, :bath_exhaust_operation, :range_hood_exhaust_operation, :clothes_dryer_exhaust_operation, :ashrae_vent_rate, :num_vent_fans, :percent_fan_heat_to_space, :whole_house_vent_rate, :bathroom_hour_avg_exhaust, :range_hood_hour_avg_exhaust, :clothes_dryer_hour_avg_exhaust, :max_power, :base_vent_rate, :max_vent_rate, :MechVentApparentSensibleEffectiveness, :MechVentHXCoreSensibleEffectiveness, :MechVentLatentEffectiveness, :hourly_energy_schedule, :hourly_schedule, :average_vent_fan_eff, :MechVentCFISOpenTime, :MechVentCFISAirflowFraction, :MechVentCFISOutdoorAirflow)
   end
@@ -693,6 +693,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     infil = Infiltration.new(infiltrationLivingSpaceACH50, infiltrationShelterCoefficient, infiltrationGarageACH50)
     wind_speed = WindSpeed.new
     mech_vent = MechanicalVentilation.new(mechVentType, mechVentInfilCredit, mechVentTotalEfficiency, mechVentFractionOfASHRAE, mechVentHouseFanPower, mechVentSensibleEfficiency, mechVentASHRAEStandard, mechVentCFISOpenTime, mechVentCFISAirflowFraction)
+    
     building = Building.new
     nat_vent = NaturalVentilation.new(natVentHtgSsnSetpointOffset, natVentClgSsnSetpointOffset, natVentOvlpSsnSetpointOffset, natVentHeatingSeason, natVentCoolingSeason, natVentOverlapSeason, natVentNumberWeekdays, natVentNumberWeekendDays, natVentFractionWindowsOpen, natVentFractionWindowAreaOpen, natVentMaxOAHumidityRatio, natVentMaxOARelativeHumidity)
     schedules = Schedules.new
@@ -909,11 +910,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
     units.each do |building_unit|
 
-      obj_name_airflow = Constants.ObjectNameAirflow(building_unit.name.to_s.gsub("unit", "u")).gsub("|","_")
-      obj_name_infil = Constants.ObjectNameInfiltration(building_unit.name.to_s.gsub("unit", "u")).gsub("|","_")
-      obj_name_natvent = Constants.ObjectNameNaturalVentilation(building_unit.name.to_s.gsub("unit", "u")).gsub("|","_")
-      obj_name_mechvent = Constants.ObjectNameMechanicalVentilation(building_unit.name.to_s.gsub("unit", "u")).gsub("|","_")
-      obj_name_ducts = Constants.ObjectNameDucts(building_unit.name.to_s.gsub("unit", "u")).gsub("|","_")
+      obj_name_airflow = Constants.ObjectNameAirflow(building_unit.name.to_s.gsub("unit ", "")).gsub("|","_")
+      obj_name_infil = Constants.ObjectNameInfiltration(building_unit.name.to_s.gsub("unit ", "")).gsub("|","_")
+      obj_name_natvent = Constants.ObjectNameNaturalVentilation(building_unit.name.to_s.gsub("unit ", "")).gsub("|","_")
+      obj_name_mechvent = Constants.ObjectNameMechanicalVentilation(building_unit.name.to_s.gsub("unit ", "")).gsub("|","_")
+      obj_name_ducts = Constants.ObjectNameDucts(building_unit.name.to_s.gsub("unit ", "")).gsub("|","_")
     
       unit = Unit.new
       unit.num_bedrooms, unit.num_bathrooms = Geometry.get_unit_beds_baths(model, building_unit, runner)
@@ -942,158 +943,126 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         return false
       end
       
-      # Remove existing airflow
+      # Remove existing EMS
       
-      model.getEnergyManagementSystemProgramCallingManagers.each do |program_calling_manager|
-        next unless program_calling_manager.name.to_s == obj_name_airflow + " program calling manager"
-        program_calling_manager.remove
+      obj_name_airflow_underscore = obj_name_airflow.gsub(" ","_")
+      obj_name_natvent_underscore = obj_name_natvent.gsub(" ","_")
+      obj_name_infil_underscore = obj_name_infil.gsub(" ","_")
+      obj_name_ducts_underscore = obj_name_ducts.gsub(" ","_")
+      
+      model.getEnergyManagementSystemProgramCallingManagers.each do |pcm|
+        if (pcm.name.to_s.start_with? obj_name_airflow or 
+            pcm.name.to_s.start_with? obj_name_natvent or 
+            pcm.name.to_s.start_with? obj_name_infil or 
+            pcm.name.to_s.start_with? obj_name_ducts)
+          pcm.remove
+        end
       end
-      
-      # Remove existing infiltration  
       
       model.getEnergyManagementSystemSensors.each do |sensor|
-        next unless ["#{obj_name_airflow} tt", "#{obj_name_airflow} tin", "#{obj_name_natvent} pb", "#{obj_name_natvent} phiin", "#{obj_name_natvent} wt", "#{obj_name_airflow} vw", "#{obj_name_infil} wh sch", "#{obj_name_infil} range sch", "#{obj_name_infil} bath sch", "#{obj_name_infil} clothes dryer sch", "#{obj_name_natvent} nva", "#{obj_name_natvent} sp"].map{|x| "#{x} s".gsub(" ","_")}.include? sensor.name.to_s
-        sensor.remove
+        if (sensor.name.to_s.start_with? obj_name_airflow_underscore or 
+            sensor.name.to_s.start_with? obj_name_natvent_underscore or 
+            sensor.name.to_s.start_with? obj_name_infil_underscore or 
+            sensor.name.to_s.start_with? obj_name_ducts_underscore)
+          sensor.remove
+        end
       end
       
       model.getEnergyManagementSystemActuators.each do |actuator|
-        next unless [obj_name_infil + " flow"].map{|x| "#{x} act".gsub(" ","_")}.include? actuator.name.to_s or [obj_name_natvent + " flow"].map{|x| "#{x} act".gsub(" ","_")}.include? actuator.name.to_s
-        actuatedComponent = actuator.actuatedComponent
-        if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
-          actuatedComponent = actuatedComponent.get
+        if (actuator.name.to_s.start_with? obj_name_airflow_underscore or 
+            actuator.name.to_s.start_with? obj_name_natvent_underscore or 
+            actuator.name.to_s.start_with? obj_name_infil_underscore or
+            actuator.name.to_s.start_with? obj_name_ducts_underscore)
+          actuatedComponent = actuator.actuatedComponent
+          if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
+            actuatedComponent = actuatedComponent.get
+          end
+          if actuatedComponent.to_ElectricEquipment.is_initialized
+            actuatedComponent.to_ElectricEquipment.get.electricEquipmentDefinition.remove
+          elsif actuatedComponent.to_OtherEquipment.is_initialized
+            actuatedComponent.to_OtherEquipment.get.otherEquipmentDefinition.remove
+          else
+            actuatedComponent.remove
+          end
+          actuator.remove
         end
-        actuatedComponent.remove
-        actuator.remove      
       end      
       
-      model.getEnergyManagementSystemActuators.each do |actuator|
-        next unless [obj_name_infil + " house exh", obj_name_infil + " range hood", obj_name_infil + " bath exh"].map{|x| "#{x} fan load equip act".gsub(" ","_")}.include? actuator.name.to_s
-        actuatedComponent = actuator.actuatedComponent
-        if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
-          actuatedComponent = actuatedComponent.get
-        end
-        actuatedComponent.to_ElectricEquipment.get.electricEquipmentDefinition.remove
-        actuator.remove
-      end
-      
-      model.getScheduleRulesets.each do |schedule|
-        next unless schedule.name.to_s == obj_name_infil + " bath exhaust schedule" or schedule.name.to_s == obj_name_infil + " clothes dryer exhaust schedule" or schedule.name.to_s == obj_name_infil + " range hood schedule"
-        schedule.remove
-      end
-      
       model.getEnergyManagementSystemPrograms.each do |program|
-        next unless program.name.to_s == "#{obj_name_infil} program".gsub(" ","_")
-        program.remove
+        if (program.name.to_s.start_with? obj_name_airflow_underscore or 
+            program.name.to_s.start_with? obj_name_natvent_underscore or 
+            program.name.to_s.start_with? obj_name_infil_underscore or
+            program.name.to_s.start_with? obj_name_ducts_underscore)
+          program.remove            
+        end
       end
       
       model.getEnergyManagementSystemOutputVariables.each do |output_var|
-        next unless output_var.name.to_s == "#{obj_name_infil} loc w spd"
-        output_var.remove      
+        if (output_var.name.to_s.start_with? obj_name_airflow or 
+            output_var.name.to_s.start_with? obj_name_natvent or 
+            output_var.name.to_s.start_with? obj_name_infil or
+            output_var.name.to_s.start_with? obj_name_ducts)
+          output_var.remove            
+        end
+      end
+      
+      model.getEnergyManagementSystemSubroutines.each do |subroutine|
+        if (subroutine.name.to_s.start_with? obj_name_airflow_underscore or 
+            subroutine.name.to_s.start_with? obj_name_natvent_underscore or 
+            subroutine.name.to_s.start_with? obj_name_infil_underscore or
+            subroutine.name.to_s.start_with? obj_name_ducts_underscore)
+          subroutine.remove            
+        end
+      end
+      
+      model.getEnergyManagementSystemGlobalVariables.each do |ems_global_var|
+        if (ems_global_var.name.to_s.start_with? obj_name_airflow_underscore or 
+            ems_global_var.name.to_s.start_with? obj_name_natvent_underscore or 
+            ems_global_var.name.to_s.start_with? obj_name_infil_underscore or
+            ems_global_var.name.to_s.start_with? obj_name_ducts_underscore)
+          ems_global_var.remove            
+        end
+      end
+      
+      model.getEnergyManagementSystemInternalVariables.each do |ems_internal_var|
+        if (ems_internal_var.name.to_s.start_with? obj_name_airflow_underscore or 
+            ems_internal_var.name.to_s.start_with? obj_name_natvent_underscore or 
+            ems_internal_var.name.to_s.start_with? obj_name_infil_underscore or
+            ems_internal_var.name.to_s.start_with? obj_name_ducts_underscore)
+          ems_internal_var.remove            
+        end
+      end
+      
+      # Remove existing infiltration
+      
+      model.getScheduleRulesets.each do |schedule|
+        next unless schedule.name.to_s.start_with? obj_name_infil
+        schedule.remove
       end
       
       # Remove existing natural ventilation
       
-      model.getEnergyManagementSystemPrograms.each do |program|
-        next unless program.name.to_s == "#{obj_name_natvent} program".gsub(" ","_")
-        program.remove
-      end
-      
       model.getScheduleRulesets.each do |schedule|
-        next unless schedule.name.to_s == obj_name_natvent + " temp schedule" or schedule.name.to_s == obj_name_natvent + " avail schedule"
+        next unless schedule.name.to_s.start_with? obj_name_natvent
         schedule.remove
       end
       
       # Remove existing mechanical ventilation
     
       model.getZoneHVACEnergyRecoveryVentilators.each do |erv|
-        next unless erv.name.to_s == obj_name_mechvent + " erv"
+        next unless erv.name.to_s.start_with? obj_name_mechvent
         erv.remove
       end
     
       model.getScheduleRulesets.each do |schedule|
-        next unless schedule.name.to_s == obj_name_mechvent + " energy schedule" or schedule.name.to_s == obj_name_mechvent + " schedule"
+        next unless schedule.name.to_s.start_with? obj_name_mechvent
         schedule.remove
       end
     
       # Remove existing ducts   
       
-      air_handler_mfr = "#{obj_name_ducts} ah mfr".gsub(" ","_")
-      fan_rtf = "#{obj_name_ducts} fan rtf".gsub(" ","_")
-      air_handler_vfr = "#{obj_name_ducts} ah vfr".gsub(" ","_")
-      air_handler_tout = "#{obj_name_ducts} ah tt".gsub(" ","_")
-      return_air_t = "#{obj_name_ducts} ret air t".gsub(" ","_")
-      air_handler_wout = "#{obj_name_ducts} ah wt".gsub(" ","_")
-      return_air_w = "#{obj_name_ducts} ret air w".gsub(" ","_")
-      air_handler_t = "#{obj_name_ducts} ah t".gsub(" ","_")
-      air_handler_w = "#{obj_name_ducts} ah w".gsub(" ","_")       
-      
-      model.getEnergyManagementSystemSensors.each do |sensor|
-        next unless [air_handler_mfr, fan_rtf, air_handler_vfr, air_handler_tout, return_air_t, air_handler_wout, return_air_w, air_handler_t, air_handler_w].map{|x| "#{x}_s"}.include? sensor.name.to_s
-        sensor.remove
-      end   
-      
-      air_handler_to_living_flow_rate = "#{obj_name_ducts} ah to liv".gsub(" ","_")
-      living_to_air_handler_flow_rate = "#{obj_name_ducts} liv to ah".gsub(" ","_")
-      model.getEnergyManagementSystemActuators.each do |actuator|
-        next unless [air_handler_to_living_flow_rate, living_to_air_handler_flow_rate].map{|x| "#{x} mix act".gsub(" ","_")}.include? actuator.name.to_s
-        actuatedComponent = actuator.actuatedComponent
-        if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
-          actuatedComponent = actuatedComponent.get
-        end
-        actuatedComponent.remove
-        actuator.remove
-      end
-      
-      model.getEnergyManagementSystemSubroutines.each do |subroutine|
-        next unless subroutine.name.to_s == "#{obj_name_ducts} lk subrout".gsub(" ","_")
-        subroutine.remove
-      end
-    
-      supply_sensible_lkage_to_living = "#{obj_name_ducts} sup s lk to lv".gsub(" ","_")
-      supply_latent_lkage_to_living = "#{obj_name_ducts} sup lat lk to lv".gsub(" ","_")
-      supply_duct_conduction_to_living = "#{obj_name_ducts} sup d cn to lv".gsub(" ","_")
-      supply_duct_conduction_to_air_handler = "#{obj_name_ducts} sup d cn to ah".gsub(" ","_")
-      return_duct_conduction_to_plenum = "#{obj_name_ducts} ret d cn to pl".gsub(" ","_")
-      return_duct_conduction_to_air_handler = "#{obj_name_ducts} ret d cn to ah".gsub(" ","_")
-      supply_sensible_lkage_to_air_handler = "#{obj_name_ducts} sup s lk to ah".gsub(" ","_")
-      supply_latent_lkage_to_air_handler = "#{obj_name_ducts} sup lat lk to ah".gsub(" ","_")
-      return_sensible_lkage = "#{obj_name_ducts} ret s lk".gsub(" ","_")
-      return_latent_lkage = "#{obj_name_ducts} ret lat lk".gsub(" ","_")
-      
-      model.getEnergyManagementSystemActuators.each do |actuator|
-        next unless [supply_sensible_lkage_to_living, supply_latent_lkage_to_living, supply_duct_conduction_to_living, supply_duct_conduction_to_air_handler, return_duct_conduction_to_plenum, return_duct_conduction_to_air_handler, supply_sensible_lkage_to_air_handler, supply_latent_lkage_to_air_handler, return_sensible_lkage, return_latent_lkage].map{|x| "#{x} equip act".gsub(" ","_")}.include? actuator.name.to_s
-        actuatedComponent = actuator.actuatedComponent
-        if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
-          actuatedComponent = actuatedComponent.get
-        end
-        actuatedComponent.to_OtherEquipment.get.otherEquipmentDefinition.remove
-        actuator.remove
-      end
-    
-      model.getEnergyManagementSystemPrograms.each do |program|
-        next unless program.name.to_s == "#{obj_name_ducts} program".gsub(" ","_")
-        program.remove
-      end
-      
-      model.getEnergyManagementSystemProgramCallingManagers.each do |program_calling_manager|
-        next unless program_calling_manager.name.to_s == obj_name_ducts + " program calling manager"
-        program_calling_manager.remove
-      end
-      
-      duct_lk_supply_fan_equiv = "#{obj_name_ducts} lk sup fan equiv".gsub(" ","_")
-      duct_lk_exhaust_fan_equiv = "#{obj_name_ducts} lk exh fan equiv".gsub(" ","_")
-      cfis_t_sum_open = "#{obj_name_ducts} cfis_t_sum_open".gsub(" ","_")
-      cfis_on_for_hour = "#{obj_name_ducts} cfis_on_for_hour".gsub(" ","_")
-      cfis_f_damper_open = "#{obj_name_ducts} cfis_f_open".gsub(" ","_")
-      max_supply_fan_mfr = "#{obj_name_ducts} max_supply_fan_mfr".gsub(" ","_")
-    
-      model.getEnergyManagementSystemGlobalVariables.each do |ems_global_var|
-        next unless [air_handler_mfr, fan_rtf, air_handler_vfr, air_handler_tout, return_air_t, air_handler_wout, return_air_w, air_handler_t, air_handler_w, supply_sensible_lkage_to_living, supply_latent_lkage_to_living, supply_duct_conduction_to_living, supply_duct_conduction_to_air_handler, return_duct_conduction_to_plenum, return_duct_conduction_to_air_handler, supply_sensible_lkage_to_air_handler, supply_latent_lkage_to_air_handler, return_sensible_lkage, return_latent_lkage, living_to_air_handler_flow_rate, air_handler_to_living_flow_rate, duct_lk_supply_fan_equiv, duct_lk_exhaust_fan_equiv].include? ems_global_var.name.to_s
-        ems_global_var.remove
-      end
-
       model.getThermalZones.each do |thermal_zone|
-        next unless thermal_zone.name.to_s == obj_name_ducts + " dist system eff zone" or thermal_zone.name.to_s == obj_name_ducts + " ret air zone"
+        next unless thermal_zone.name.to_s.start_with? obj_name_ducts
         thermal_zone.spaces.each do |space|
           space.surfaces.each do |surface|
             if surface.surfacePropertyConvectionCoefficients.is_initialized
@@ -1346,406 +1315,20 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         
       end
       
-      if not ducts.duct_location_name == unit.living_zone.name.to_s and not ducts.duct_location_name == "none" and ducts.has_forced_air_equipment
+      # Global variables
       
-        # Other equipment objects to cancel out the supply air leakage directly into the return plenum   
-        
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(supply_sensible_lkage_to_living + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(unit.living_zone.spaces[0])
-        supply_sensible_lkage_to_living_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        supply_sensible_lkage_to_living_actuator.setName("#{other_equip.name} act")
-        
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(supply_latent_lkage_to_living + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(unit.living_zone.spaces[0])
-        supply_latent_lkage_to_living_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        supply_latent_lkage_to_living_actuator.setName("#{other_equip.name} act")        
-        
-        # Supply duct conduction load added to the living space
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(supply_duct_conduction_to_living + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(unit.living_zone.spaces[0])
-        supply_duct_conduction_to_living_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        supply_duct_conduction_to_living_actuator.setName("#{other_equip.name} act")
-        
-        # Supply duct conduction impact on the air handler zone.
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(supply_duct_conduction_to_air_handler + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(ducts.duct_location_zone.spaces[0])
-        supply_duct_conduction_to_air_handler_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        supply_duct_conduction_to_air_handler_actuator.setName("#{other_equip.name} act")
-        
-        # Return duct conduction load added to the return plenum zone
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(return_duct_conduction_to_plenum + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
-        return_duct_conduction_to_plenum_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        return_duct_conduction_to_plenum_actuator.setName("#{other_equip.name} act")
+      duct_lk_supply_fan_equiv_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} lk sup fan equiv".gsub(" ","_"))
+      duct_lk_return_fan_equiv_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} lk ret fan equiv".gsub(" ","_"))
       
-        # Return duct conduction impact on the air handler zone.
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(return_duct_conduction_to_air_handler + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(ducts.duct_location_zone.spaces[0])
-        return_duct_conduction_to_air_handler_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        return_duct_conduction_to_air_handler_actuator.setName("#{other_equip.name} act")
-        
-        # Supply duct sensible leakage impact on the air handler zone.
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(supply_sensible_lkage_to_air_handler + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(ducts.duct_location_zone.spaces[0])
-        supply_sensible_lkage_to_air_handler_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        supply_sensible_lkage_to_air_handler_actuator.setName("#{other_equip.name} act")
-        
-        # Supply duct latent leakage impact on the air handler zone.
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(supply_latent_lkage_to_air_handler + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(ducts.duct_location_zone.spaces[0])
-        supply_latent_lkage_to_air_handler_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        supply_latent_lkage_to_air_handler_actuator.setName("#{other_equip.name} act")
-      
-        # Return duct sensible leakage impact on the return plenum
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(return_sensible_lkage + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
-        return_sensible_lkage_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        return_sensible_lkage_actuator.setName("#{other_equip.name} act")
-        
-        # Return duct latent leakage impact on the return plenum
-        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-        other_equip_def.setName(return_latent_lkage + " equip")
-        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
-        other_equip.setName(other_equip_def.name.to_s)
-        other_equip.setFuelType("None")
-        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
-        return_latent_lkage_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
-        return_latent_lkage_actuator.setName("#{other_equip.name} act")
-      
-        # Two objects are required to model the air exchange between the air handler zone and the living space since
-        # ZoneMixing objects can not account for direction of air flow (both are controlled by EMS)
-
-        # Accounts for lks from the AH zone to the Living zone
-        
-        zone_mixing_ah_to_living = OpenStudio::Model::ZoneMixing.new(unit.living_zone)
-        zone_mixing_ah_to_living.setName(air_handler_to_living_flow_rate + " mix")
-        zone_mixing_ah_to_living.setSourceZone(ducts.duct_location_zone)
-        zone_mixing_ah_to_living_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(zone_mixing_ah_to_living, "ZoneMixing", "Air Exchange Flow Rate")
-        zone_mixing_ah_to_living_actuator.setName("#{zone_mixing_ah_to_living.name} act")
-
-        zone_mixing_living_to_ah = OpenStudio::Model::ZoneMixing.new(ducts.duct_location_zone)
-        zone_mixing_living_to_ah.setName(living_to_air_handler_flow_rate + " mix")
-        zone_mixing_living_to_ah.setSourceZone(unit.living_zone)
-        zone_mixing_living_to_ah_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(zone_mixing_living_to_ah, "ZoneMixing", "Air Exchange Flow Rate")
-        zone_mixing_living_to_ah_actuator.setName("#{zone_mixing_living_to_ah.name} act")      
-      
-        # Sensors
-        
-        air_handler_mfr_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_mass_flow_rate_output_var)
-        air_handler_mfr_sensor.setName(air_handler_mfr + " s")
-        air_handler_mfr_sensor.setKeyName(air_demand_inlet_node.name.to_s)        
-    
-        fan_rtf_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, fan_runtime_fraction_output_var)
-        fan_rtf_sensor.setName(fan_rtf + " s")
-        fan_rtf_sensor.setKeyName(supply_fan.name.to_s)
-
-        air_handler_vfr_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_current_density_volume_flow_rate_output_var)
-        air_handler_vfr_sensor.setName(air_handler_vfr + " s")
-        air_handler_vfr_sensor.setKeyName(air_demand_inlet_node.name.to_s)
-        
-        air_handler_tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_temp_output_var)
-        air_handler_tout_sensor.setName(air_handler_tout + " s")
-        air_handler_tout_sensor.setKeyName(air_demand_inlet_node.name.to_s)        
-        
-        if not living_zone_return_air_node.nil?
-          return_air_t_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_temp_output_var)
-          return_air_t_sensor.setName(return_air_t + " s")
-          return_air_t_sensor.setKeyName(living_zone_return_air_node.name.to_s)
-        else
-          return_air_t_sensor = tin_sensor
-        end
-        
-        air_handler_wout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_humidity_ratio_output_var)
-        air_handler_wout_sensor.setName(air_handler_wout + " s")
-        air_handler_wout_sensor.setKeyName(air_demand_inlet_node.name.to_s)        
-        
-        if not living_zone_return_air_node.nil?
-          return_air_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_humidity_ratio_output_var)
-          return_air_w_sensor.setName(return_air_w + " s")
-          return_air_w_sensor.setKeyName(living_zone_return_air_node.name.to_s)
-        else
-          return_air_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_humidity_ratio_output_var)
-          return_air_w_sensor.setName(return_air_w + " s")
-          return_air_w_sensor.setKeyName(unit.living_zone.name.to_s)
-        end
-    
-        air_handler_t_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_air_temp_output_var)
-        air_handler_t_sensor.setName(air_handler_t + " s")
-        air_handler_t_sensor.setKeyName(ducts.duct_location_name)        
-
-        air_handler_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_humidity_ratio_output_var)
-        air_handler_w_sensor.setName(air_handler_w + " s")
-        air_handler_w_sensor.setKeyName(ducts.duct_location_name)
-        
-        # Global Variables
-        
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, air_handler_mfr)        
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, fan_rtf)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, air_handler_vfr)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, air_handler_tout)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, return_air_t)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, air_handler_wout)        
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, return_air_w)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, air_handler_t)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, air_handler_w)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, supply_sensible_lkage_to_living)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, supply_latent_lkage_to_living)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, supply_duct_conduction_to_living)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, supply_duct_conduction_to_air_handler)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, return_duct_conduction_to_plenum)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, return_duct_conduction_to_air_handler)        
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, supply_sensible_lkage_to_air_handler)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, supply_latent_lkage_to_air_handler)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, return_sensible_lkage)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, return_latent_lkage)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, living_to_air_handler_flow_rate)
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, air_handler_to_living_flow_rate)        
-
-        # Subroutine
-        
-        duct_lkage_subroutine = OpenStudio::Model::EnergyManagementSystemSubroutine.new(model)
-        duct_lkage_subroutine.setName("#{obj_name_ducts} lk subrout")
-        duct_lkage_subroutine.addLine("Set f_sup = #{ducts.supply_duct_loss}")
-        duct_lkage_subroutine.addLine("Set f_ret = #{ducts.return_duct_loss}")
-        duct_lkage_subroutine.addLine("Set f_OA = #{ducts.frac_oa * ducts.total_duct_unbalance}")
-        duct_lkage_subroutine.addLine("Set oafrate = f_OA * #{air_handler_vfr_sensor.name}")
-        duct_lkage_subroutine.addLine("Set suplkfrate = f_sup * #{air_handler_vfr_sensor.name}")
-        duct_lkage_subroutine.addLine("Set retlkfrate = f_ret * #{air_handler_vfr_sensor.name}")
-        
-        if ducts.return_duct_loss > ducts.supply_duct_loss
-          # Supply air flow rate is greater than return flow rate
-          # Living zone is pressurized in this case      
-          duct_lkage_subroutine.addLine("Set #{living_to_air_handler_flow_rate} = (@Abs (retlkfrate-suplkfrate-oafrate))")
-          duct_lkage_subroutine.addLine("Set #{air_handler_to_living_flow_rate} = 0")
-          duct_lkage_subroutine.addLine("Set #{duct_lk_supply_fan_equiv} = oafrate")
-          duct_lkage_subroutine.addLine("Set #{duct_lk_exhaust_fan_equiv} = 0")
-        else
-          # Living zone is depressurized in this case
-          duct_lkage_subroutine.addLine("Set #{air_handler_to_living_flow_rate} = (@Abs (suplkfrate-retlkfrate-oafrate))")
-          duct_lkage_subroutine.addLine("Set #{living_to_air_handler_flow_rate} = 0")
-          duct_lkage_subroutine.addLine("Set #{duct_lk_supply_fan_equiv} = 0")
-          duct_lkage_subroutine.addLine("Set #{duct_lk_exhaust_fan_equiv} = oafrate")
-        end        
-      
-        if ducts.ducts_not_in_living
-          duct_lkage_subroutine.addLine("If #{air_handler_mfr_sensor.name}>0")
-          duct_lkage_subroutine.addLine("Set h_SA = (@HFnTdbW #{air_handler_tout_sensor.name} #{air_handler_wout_sensor.name})")
-          duct_lkage_subroutine.addLine("Set h_AHZone = (@HFnTdbW #{air_handler_t_sensor.name} #{air_handler_w_sensor.name})")
-          duct_lkage_subroutine.addLine("Set h_RA = (@HFnTdbW #{return_air_t_sensor.name} #{return_air_w_sensor.name})")
-          duct_lkage_subroutine.addLine("Set h_fg = (@HfgAirFnWTdb #{air_handler_wout_sensor.name} #{air_handler_tout_sensor.name})")
-          duct_lkage_subroutine.addLine("Set SALeakageQtot = f_sup * #{air_handler_mfr_sensor.name}*(h_RA - h_SA)")          
-          duct_lkage_subroutine.addLine("Set temp1 = h_fg*(#{return_air_w_sensor.name}-#{air_handler_wout_sensor.name})")
-          duct_lkage_subroutine.addLine("Set #{supply_latent_lkage_to_living} = f_sup*#{air_handler_mfr_sensor.name}*temp1")
-          duct_lkage_subroutine.addLine("Set #{supply_sensible_lkage_to_living} = SALeakageQtot-#{supply_latent_lkage_to_living}")
-          duct_lkage_subroutine.addLine("Set eTm = (#{fan_rtf_sensor.name}/(#{air_handler_mfr_sensor.name}*1006.0))*#{UnitConversions.convert(ducts.unconditioned_duct_ua,"Btu/(hr*F)","W/K").round(3)}")
-          duct_lkage_subroutine.addLine("Set eTm = 0-eTm")
-          duct_lkage_subroutine.addLine("If eTm<-1000")
-          duct_lkage_subroutine.addLine("Set tsup = #{air_handler_t_sensor.name}")
-          duct_lkage_subroutine.addLine("Else")
-          duct_lkage_subroutine.addLine("Set temp4 = #{air_handler_t_sensor.name}")
-          duct_lkage_subroutine.addLine("Set tsup = temp4+((#{air_handler_tout_sensor.name}-#{air_handler_t_sensor.name})*(@Exp eTm))")
-          duct_lkage_subroutine.addLine("EndIf")
-          duct_lkage_subroutine.addLine("Set temp5 = tsup-#{air_handler_tout_sensor.name}")
-          duct_lkage_subroutine.addLine("Set #{supply_duct_conduction_to_living} = #{air_handler_mfr_sensor.name}*1006.0*temp5")
-          duct_lkage_subroutine.addLine("Set #{supply_duct_conduction_to_air_handler} = 0-#{supply_duct_conduction_to_living}")
-          duct_lkage_subroutine.addLine("Set eTm = (#{fan_rtf_sensor.name}/(#{air_handler_mfr_sensor.name}*1006.0))*#{UnitConversions.convert(ducts.return_duct_ua,"Btu/(hr*F)","W/K").round(3)}")
-          duct_lkage_subroutine.addLine("Set eTm = 0-eTm")
-          duct_lkage_subroutine.addLine("If eTm<-1000")
-          duct_lkage_subroutine.addLine("Set tret = #{air_handler_t_sensor.name}")
-          duct_lkage_subroutine.addLine("Else")
-          duct_lkage_subroutine.addLine("Set temp6 = #{air_handler_t_sensor.name}")
-          duct_lkage_subroutine.addLine("Set tret = temp6+((#{return_air_t_sensor.name}-#{air_handler_t_sensor.name})*(@Exp eTm))")
-          duct_lkage_subroutine.addLine("EndIf")
-          duct_lkage_subroutine.addLine("Set temp7 = tret-#{return_air_t_sensor.name}")
-          duct_lkage_subroutine.addLine("Set #{return_duct_conduction_to_plenum} = #{air_handler_mfr_sensor.name}*1006.0*temp7")
-          duct_lkage_subroutine.addLine("Set #{return_duct_conduction_to_air_handler} = 0-#{return_duct_conduction_to_plenum}")
-          duct_lkage_subroutine.addLine("Set #{return_latent_lkage} = 0")
-          duct_lkage_subroutine.addLine("Set temp2 = (#{air_handler_t_sensor.name}-#{return_air_t_sensor.name})")
-          duct_lkage_subroutine.addLine("Set #{return_sensible_lkage} = f_ret*#{air_handler_mfr_sensor.name}*1006.0*temp2")
-          duct_lkage_subroutine.addLine("Set QtotLeakToAHZn = f_sup*#{air_handler_mfr_sensor.name}*(h_SA-h_AHZone)")
-          duct_lkage_subroutine.addLine("Set temp3 = (#{air_handler_wout_sensor.name}-#{air_handler_w_sensor.name})")
-          duct_lkage_subroutine.addLine("Set #{supply_latent_lkage_to_air_handler} = f_sup*#{air_handler_mfr_sensor.name}*h_fg*temp3")
-          duct_lkage_subroutine.addLine("Set #{supply_sensible_lkage_to_air_handler} = QtotLeakToAHZn-#{supply_latent_lkage_to_air_handler}")
-          duct_lkage_subroutine.addLine("Else")
-          duct_lkage_subroutine.addLine("Set #{supply_latent_lkage_to_living} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_sensible_lkage_to_living} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_duct_conduction_to_living} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_duct_conduction_to_air_handler} = 0")
-          duct_lkage_subroutine.addLine("Set #{return_duct_conduction_to_plenum} = 0")
-          duct_lkage_subroutine.addLine("Set #{return_duct_conduction_to_air_handler} = 0")
-          duct_lkage_subroutine.addLine("Set #{return_latent_lkage} = 0")
-          duct_lkage_subroutine.addLine("Set #{return_sensible_lkage} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_latent_lkage_to_air_handler} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_sensible_lkage_to_air_handler} = 0")
-          duct_lkage_subroutine.addLine("EndIf")
-        else
-          duct_lkage_subroutine.addLine("Set #{supply_latent_lkage_to_living} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_sensible_lkage_to_living} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_duct_conduction_to_living} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_duct_conduction_to_air_handler} = 0")
-          duct_lkage_subroutine.addLine("Set #{return_duct_conduction_to_plenum} = 0")
-          duct_lkage_subroutine.addLine("Set #{return_duct_conduction_to_air_handler} = 0")
-          duct_lkage_subroutine.addLine("Set #{return_latent_lkage} = 0")
-          duct_lkage_subroutine.addLine("Set #{return_sensible_lkage} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_latent_lkage_to_air_handler} = 0")
-          duct_lkage_subroutine.addLine("Set #{supply_sensible_lkage_to_air_handler} = 0")
-        end      
-      
-        # Program     
-        
-        duct_lkage_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
-        duct_lkage_program.setName(obj_name_ducts + " program")
-        duct_lkage_program.addLine("Set #{air_handler_mfr} = #{air_handler_mfr_sensor.name}")
-        duct_lkage_program.addLine("Set #{fan_rtf} = #{fan_rtf_sensor.name}")
-        duct_lkage_program.addLine("Set #{air_handler_vfr} = #{air_handler_vfr_sensor.name}")
-        duct_lkage_program.addLine("Set #{air_handler_tout} = #{air_handler_tout_sensor.name}")
-        duct_lkage_program.addLine("Set #{air_handler_wout} = #{air_handler_wout_sensor.name}")
-        duct_lkage_program.addLine("Set #{return_air_t} = #{return_air_t_sensor.name}")
-        duct_lkage_program.addLine("Set #{return_air_w} = #{return_air_w_sensor.name}")
-        duct_lkage_program.addLine("Set #{air_handler_t} = #{air_handler_t_sensor.name}")
-        duct_lkage_program.addLine("Set #{air_handler_w} = #{air_handler_w_sensor.name}")
-        duct_lkage_program.addLine("Run #{duct_lkage_subroutine.name}")
-        
-        if mech_vent.MechVentType != Constants.VentTypeCFIS
-          duct_lkage_program.addLine("Set #{supply_sensible_lkage_to_living_actuator.name} = #{supply_sensible_lkage_to_living}")
-          duct_lkage_program.addLine("Set #{supply_latent_lkage_to_living_actuator.name} = #{supply_latent_lkage_to_living}")
-          duct_lkage_program.addLine("Set #{supply_duct_conduction_to_living_actuator.name} = #{supply_duct_conduction_to_living}")
-          duct_lkage_program.addLine("Set #{supply_duct_conduction_to_air_handler_actuator.name} = #{supply_duct_conduction_to_air_handler}")
-          duct_lkage_program.addLine("Set #{supply_sensible_lkage_to_air_handler_actuator.name} = #{supply_sensible_lkage_to_air_handler}")
-          duct_lkage_program.addLine("Set #{supply_latent_lkage_to_air_handler_actuator.name} = #{supply_latent_lkage_to_air_handler}")
-          duct_lkage_program.addLine("Set #{return_sensible_lkage_actuator.name} = #{return_sensible_lkage}")
-          duct_lkage_program.addLine("Set #{return_latent_lkage_actuator.name} = #{return_latent_lkage}")
-          duct_lkage_program.addLine("Set #{return_duct_conduction_to_plenum_actuator.name} = #{return_duct_conduction_to_plenum}")
-          duct_lkage_program.addLine("Set #{return_duct_conduction_to_air_handler_actuator.name} = #{return_duct_conduction_to_air_handler}")
-          duct_lkage_program.addLine("Set #{zone_mixing_ah_to_living_actuator.name} = #{air_handler_to_living_flow_rate}")
-          duct_lkage_program.addLine("Set #{zone_mixing_living_to_ah_actuator.name} = #{living_to_air_handler_flow_rate}")
-        else
-          
-          system, clg_coil, htg_coil, air_loop = HVAC.get_unitary_system_air_loop(model, runner, unit.living_zone)
-          clg_coil = HVAC.get_coil_from_hvac_component(clg_coil)
-          cfis_fan_power = clg_coil.ratedEvaporatorFanPowerPerVolumeFlowRate.get / UnitConversions.convert(1.0,"m^3/s","cfm") # W/cfm
-          
-          duct_lkage_program.addLine("Set dl_1 = #{supply_sensible_lkage_to_living}")
-          duct_lkage_program.addLine("Set dl_2 = #{supply_latent_lkage_to_living}")
-          duct_lkage_program.addLine("Set dl_3 = #{supply_duct_conduction_to_living}")
-          duct_lkage_program.addLine("Set dl_4 = #{supply_duct_conduction_to_air_handler}")
-          duct_lkage_program.addLine("Set dl_5 = #{supply_sensible_lkage_to_air_handler}")
-          duct_lkage_program.addLine("Set dl_6 = #{supply_latent_lkage_to_air_handler}")
-          duct_lkage_program.addLine("Set dl_7 = #{return_sensible_lkage}")
-          duct_lkage_program.addLine("Set dl_8 = #{return_latent_lkage}")
-          duct_lkage_program.addLine("Set dl_9 = #{return_duct_conduction_to_plenum}")
-          duct_lkage_program.addLine("Set dl_10 = #{return_duct_conduction_to_air_handler}")
-          duct_lkage_program.addLine("Set dl_11 = #{air_handler_to_living_flow_rate}")
-          duct_lkage_program.addLine("Set dl_12 = #{living_to_air_handler_flow_rate}")
-          
-          duct_lkage_program.addLine("If #{cfis_on_for_hour}")
-          duct_lkage_program.addLine("   Set cfis_m3s = (#{max_supply_fan_mfr} / 1.16097654) * #{mech_vent.MechVentCFISAirflowFraction}")      # Density of 1.16097654 was back calculated using E+ results
-          duct_lkage_program.addLine("   Set AH_VFR = (1.0 - #{fan_rtf_sensor.name})*#{cfis_f_damper_open}*cfis_m3s")
-          duct_lkage_program.addLine("   Set rho_in = (@RhoAirFnPbTdbW Tin Win Pbar)")
-          duct_lkage_program.addLine("   Set #{air_handler_mfr_sensor.name} = AH_VFR * rho_in")
-          duct_lkage_program.addLine("   Set Fan_RTF = (1.0 - #{fan_rtf_sensor.name})*#{cfis_f_damper_open}")
-          duct_lkage_program.addLine("   Set #{air_handler_tout_sensor.name} = #{return_air_t_sensor.name}") 
-          duct_lkage_program.addLine("   Set #{air_handler_wout_sensor.name} = #{return_air_w_sensor.name}") 
-          duct_lkage_program.addLine("   Set #{return_air_t_sensor.name} = #{return_air_t_sensor.name}") 
-          duct_lkage_program.addLine("   Set #{return_air_w_sensor.name} = #{return_air_w_sensor.name}")
-          
-          duct_lkage_program.addLine("   Run #{duct_lkage_subroutine.name}")
-          
-          duct_lkage_program.addLine("   Set #{supply_sensible_lkage_to_living_actuator.name} = #{supply_sensible_lkage_to_living} + dl_1")
-          duct_lkage_program.addLine("   Set #{supply_latent_lkage_to_living_actuator.name} = #{supply_latent_lkage_to_living} + dl_2")
-          duct_lkage_program.addLine("   Set #{supply_duct_conduction_to_living_actuator.name} = #{supply_duct_conduction_to_living} + dl_3")
-          duct_lkage_program.addLine("   Set #{supply_duct_conduction_to_air_handler_actuator.name} = #{supply_duct_conduction_to_air_handler} + dl_4")
-          duct_lkage_program.addLine("   Set #{supply_sensible_lkage_to_air_handler_actuator.name} = #{supply_sensible_lkage_to_air_handler} + dl_5")
-          duct_lkage_program.addLine("   Set #{supply_latent_lkage_to_air_handler_actuator.name} = #{supply_latent_lkage_to_air_handler} + dl_6")
-          duct_lkage_program.addLine("   Set #{return_sensible_lkage_actuator.name} = #{return_sensible_lkage} + dl_7")
-          duct_lkage_program.addLine("   Set #{return_latent_lkage_actuator.name} = #{return_latent_lkage} + dl_8")
-          duct_lkage_program.addLine("   Set #{return_duct_conduction_to_plenum_actuator.name} = #{return_duct_conduction_to_plenum} + dl_9")
-          duct_lkage_program.addLine("   Set #{return_duct_conduction_to_air_handler_actuator.name} = #{return_duct_conduction_to_air_handler} + dl_10")
-          duct_lkage_program.addLine("   Set #{zone_mixing_ah_to_living_actuator.name} = #{air_handler_to_living_flow_rate} + dl_11")
-          duct_lkage_program.addLine("   Set #{zone_mixing_living_to_ah_actuator.name} = #{living_to_air_handler_flow_rate} + dl_12")
-      
-          duct_lkage_program.addLine("Else")
-          duct_lkage_program.addLine("   Set #{supply_sensible_lkage_to_living_actuator.name} = dl_1")
-          duct_lkage_program.addLine("   Set #{supply_latent_lkage_to_living_actuator.name} = dl_2")
-          duct_lkage_program.addLine("   Set #{supply_duct_conduction_to_living_actuator.name} = dl_3")
-          duct_lkage_program.addLine("   Set #{supply_duct_conduction_to_air_handler_actuator.name} = dl_4")
-          duct_lkage_program.addLine("   Set #{supply_sensible_lkage_to_air_handler_actuator.name} = dl_5")
-          duct_lkage_program.addLine("   Set #{supply_latent_lkage_to_air_handler_actuator.name} = dl_6")
-          duct_lkage_program.addLine("   Set #{return_sensible_lkage_actuator.name} = dl_7")
-          duct_lkage_program.addLine("   Set #{return_latent_lkage_actuator.name} = dl_8")
-          duct_lkage_program.addLine("   Set #{return_duct_conduction_to_plenum_actuator.name} = dl_9")
-          duct_lkage_program.addLine("   Set #{return_duct_conduction_to_air_handler_actuator.name} = dl_10")
-          duct_lkage_program.addLine("   Set #{zone_mixing_ah_to_living_actuator.name} = dl_11")
-          duct_lkage_program.addLine("   Set #{zone_mixing_living_to_ah_actuator.name} = dl_12")
-          duct_lkage_program.addLine("EndIf")
-        end
-                
-      else # no ducts
-      
-        # Program
-        
-        duct_lkage_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
-        duct_lkage_program.setName(obj_name_ducts + " program")
-        duct_lkage_program.addLine("Set #{duct_lk_supply_fan_equiv} = 0")
-        duct_lkage_program.addLine("Set #{duct_lk_exhaust_fan_equiv} = 0")
-            
-      end # end has ducts loop
-    
       # Sensors
-    
-      tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_outdoor_air_drybulb_temp_output_var)
-      tout_sensor.setName("#{obj_name_airflow} tt s")
-      tout_sensor.setKeyName(unit.living_zone.name.to_s)
       
       tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_temp_output_var)
       tin_sensor.setName("#{obj_name_airflow} tin s")
       tin_sensor.setKeyName(unit.living_zone.name.to_s)
+
+      tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_outdoor_air_drybulb_temp_output_var)
+      tout_sensor.setName("#{obj_name_airflow} tt s")
+      tout_sensor.setKeyName(unit.living_zone.name.to_s)
       
       pbar_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, outdoor_air_barometric_pressure_output_var)
       pbar_sensor.setName("#{obj_name_natvent} pb s")      
@@ -1754,6 +1337,10 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       phiin_sensor.setName("#{obj_name_natvent} phiin s")
       phiin_sensor.setKeyName(unit.living_zone.name.to_s)
 
+      win_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_humidity_ratio_output_var)
+      win_sensor.setName("#{obj_name_natvent} win s")
+      win_sensor.setKeyName(unit.living_zone.name.to_s)
+        
       wout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, outdoor_air_humidity_ratio_output_var)
       wout_sensor.setName("#{obj_name_natvent} wt s")
    
@@ -1784,6 +1371,408 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       nvsp_sensor.setName("#{obj_name_natvent} sp s")
       nvsp_sensor.setKeyName(schedules.NatVentTemp.schedule.name.to_s)
       
+      if not ducts.duct_location_name == unit.living_zone.name.to_s and not ducts.duct_location_name == "none" and ducts.has_forced_air_equipment
+      
+        # Other equipment objects to cancel out the supply air leakage directly into the return plenum   
+        
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} sup s lk to lv equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        other_equip.setSpace(unit.living_zone.spaces[0])
+        supply_sens_lkage_to_liv_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        supply_sens_lkage_to_liv_actuator.setName("#{other_equip.name} act")
+        
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} sup lat lk to lv equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        other_equip.setSpace(unit.living_zone.spaces[0])
+        supply_lat_lkage_to_liv_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        supply_lat_lkage_to_liv_actuator.setName("#{other_equip.name} act")        
+        
+        # Supply duct conduction load added to the living space
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} sup d cn to lv equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        other_equip.setSpace(unit.living_zone.spaces[0])
+        supply_duct_cond_to_liv_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        supply_duct_cond_to_liv_actuator.setName("#{other_equip.name} act")
+        
+        # Supply duct conduction impact on the air handler zone.
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} sup d cn to ah equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        other_equip.setSpace(ducts.duct_location_zone.spaces[0])
+        supply_duct_cond_to_ah_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        supply_duct_cond_to_ah_actuator.setName("#{other_equip.name} act")
+        
+        # Return duct conduction load added to the return plenum zone
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} ret d cn to pl equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
+        return_duct_cond_to_plenum_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        return_duct_cond_to_plenum_actuator.setName("#{other_equip.name} act")
+      
+        # Return duct conduction impact on the air handler zone.
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} ret d cn to ah equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        other_equip.setSpace(ducts.duct_location_zone.spaces[0])
+        return_duct_cond_to_ah_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        return_duct_cond_to_ah_actuator.setName("#{other_equip.name} act")
+        
+        # Supply duct sensible leakage impact on the air handler zone.
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} sup s lk to ah equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        other_equip.setSpace(ducts.duct_location_zone.spaces[0])
+        supply_sens_lkage_to_ah_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        supply_sens_lkage_to_ah_actuator.setName("#{other_equip.name} act")
+        
+        # Supply duct latent leakage impact on the air handler zone.
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} sup lat lk to ah equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        other_equip.setSpace(ducts.duct_location_zone.spaces[0])
+        supply_lat_lkage_to_ah_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        supply_lat_lkage_to_ah_actuator.setName("#{other_equip.name} act")
+      
+        # Return duct sensible leakage impact on the return plenum
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} ret s lk equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
+        return_sens_lkage_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        return_sens_lkage_actuator.setName("#{other_equip.name} act")
+        
+        # Return duct latent leakage impact on the return plenum
+        other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
+        other_equip_def.setName("#{obj_name_ducts} ret lat lk equip")
+        other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
+        other_equip.setName(other_equip_def.name.to_s)
+        other_equip.setFuelType("None")
+        other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
+        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
+        return_lat_lkage_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
+        return_lat_lkage_actuator.setName("#{other_equip.name} act")
+      
+        # Two objects are required to model the air exchange between the air handler zone and the living space since
+        # ZoneMixing objects can not account for direction of air flow (both are controlled by EMS)
+
+        # Accounts for lks from the AH zone to the Living zone
+        
+        zone_mixing_ah_to_living = OpenStudio::Model::ZoneMixing.new(unit.living_zone)
+        zone_mixing_ah_to_living.setName("#{obj_name_ducts} ah to liv mix")
+        zone_mixing_ah_to_living.setSourceZone(ducts.duct_location_zone)
+        liv_to_ah_flow_rate_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(zone_mixing_ah_to_living, "ZoneMixing", "Air Exchange Flow Rate")
+        liv_to_ah_flow_rate_actuator.setName("#{zone_mixing_ah_to_living.name} act")
+
+        zone_mixing_living_to_ah = OpenStudio::Model::ZoneMixing.new(ducts.duct_location_zone)
+        zone_mixing_living_to_ah.setName("#{obj_name_ducts} liv to ah mix")
+        zone_mixing_living_to_ah.setSourceZone(unit.living_zone)
+        liv_to_ah_flow_rate_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(zone_mixing_living_to_ah, "ZoneMixing", "Air Exchange Flow Rate")
+        liv_to_ah_flow_rate_actuator.setName("#{zone_mixing_living_to_ah.name} act")      
+      
+        # Sensors
+        
+        ah_mfr_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_mass_flow_rate_output_var)
+        ah_mfr_sensor.setName("#{obj_name_ducts} ah mfr s")
+        ah_mfr_sensor.setKeyName(air_demand_inlet_node.name.to_s)        
+    
+        fan_rtf_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, fan_runtime_fraction_output_var)
+        fan_rtf_sensor.setName("#{obj_name_ducts} fan rtf s")
+        fan_rtf_sensor.setKeyName(supply_fan.name.to_s)
+
+        ah_vfr_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_current_density_volume_flow_rate_output_var)
+        ah_vfr_sensor.setName("#{obj_name_ducts} ah vfr s")
+        ah_vfr_sensor.setKeyName(air_demand_inlet_node.name.to_s)
+        
+        ah_tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_temp_output_var)
+        ah_tout_sensor.setName("#{obj_name_ducts} ah tt s")
+        ah_tout_sensor.setKeyName(air_demand_inlet_node.name.to_s)        
+        
+        if not living_zone_return_air_node.nil?
+          ra_t_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_temp_output_var)
+          ra_t_sensor.setName("#{obj_name_ducts} ra t s")
+          ra_t_sensor.setKeyName(living_zone_return_air_node.name.to_s)
+        else
+          ra_t_sensor = tin_sensor
+        end
+        
+        ah_wout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_humidity_ratio_output_var)
+        ah_wout_sensor.setName("#{obj_name_ducts} ah wt s")
+        ah_wout_sensor.setKeyName(air_demand_inlet_node.name.to_s)        
+        
+        if not living_zone_return_air_node.nil?
+          ra_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_humidity_ratio_output_var)
+          ra_w_sensor.setName("#{obj_name_ducts} ra w s")
+          ra_w_sensor.setKeyName(living_zone_return_air_node.name.to_s)
+        else
+          ra_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_humidity_ratio_output_var)
+          ra_w_sensor.setName("#{obj_name_ducts} ra w s")
+          ra_w_sensor.setKeyName(unit.living_zone.name.to_s)
+        end
+    
+        ah_t_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_air_temp_output_var)
+        ah_t_sensor.setName("#{obj_name_ducts} ah t s")
+        ah_t_sensor.setKeyName(ducts.duct_location_name)        
+
+        ah_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_humidity_ratio_output_var)
+        ah_w_sensor.setName("#{obj_name_ducts} ah w s")
+        ah_w_sensor.setKeyName(ducts.duct_location_name)
+        
+        # Global Variables
+        
+        ah_mfr_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ah mfr".gsub(" ","_"))
+        fan_rtf_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} fan rtf".gsub(" ","_"))
+        ah_vfr_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ah vfr".gsub(" ","_"))
+        ah_tout_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ah tt".gsub(" ","_"))
+        ra_t_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ra t".gsub(" ","_"))
+        ah_wout_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ah wt".gsub(" ","_"))
+        ra_w_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ra w".gsub(" ","_"))
+        ah_t_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ah t".gsub(" ","_"))
+        ah_w_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ah w".gsub(" ","_"))
+        
+        supply_sens_lkage_to_liv_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} sup s lk to lv".gsub(" ","_"))
+        supply_lat_lkage_to_liv_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} sup lat lk to lv".gsub(" ","_"))
+        supply_duct_cond_to_liv_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} sup d cn to lv".gsub(" ","_"))
+        supply_duct_cond_to_ah_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} sup d cn to ah".gsub(" ","_"))
+        return_duct_cond_to_plenum_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ret d cn to pl".gsub(" ","_"))
+        return_duct_cond_to_ah_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ret d cn to ah".gsub(" ","_"))
+        supply_sens_lkage_to_ah_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} sup s lk to ah".gsub(" ","_"))
+        supply_lat_lkage_to_ah_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} sup lat lk to ah".gsub(" ","_"))
+        return_sens_lkage_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ret s lk".gsub(" ","_"))
+        return_lat_lkage_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ret lat lk".gsub(" ","_"))
+        liv_to_ah_flow_rate_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} liv to ah".gsub(" ","_"))
+        ah_to_liv_flow_rate_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} ah to liv".gsub(" ","_")) 
+
+        if mech_vent.MechVentType == Constants.VentTypeCFIS
+          cfis_t_sum_open_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} cfis t sum open".gsub(" ","_")) # Sums the time during an hour the CFIS damper has been open
+          cfis_on_for_hour_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} cfis on for hour".gsub(" ","_")) # Flag to open the CFIS damper for the remainder of the hour
+          cfis_f_damper_open_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, "#{obj_name_ducts} cfis_f_open".gsub(" ","_")) # Fraction of timestep the CFIS damper is open. Used by infiltration and duct leakage programs
+          
+          max_supply_fan_mfr = OpenStudio::Model::EnergyManagementSystemInternalVariable.new(model, "Fan Maximum Mass Flow Rate")
+          max_supply_fan_mfr.setName("#{obj_name_ducts} max_supply_fan_mfr".gsub(" ","_"))
+          max_supply_fan_mfr.setInternalDataIndexKeyName(supply_fan.name.to_s)
+        end
+
+        # Subroutine
+        
+        duct_lkage_subroutine = OpenStudio::Model::EnergyManagementSystemSubroutine.new(model)
+        duct_lkage_subroutine.setName("#{obj_name_ducts} lk subrout")
+        duct_lkage_subroutine.addLine("Set f_sup = #{ducts.supply_duct_loss}")
+        duct_lkage_subroutine.addLine("Set f_ret = #{ducts.return_duct_loss}")
+        duct_lkage_subroutine.addLine("Set f_OA = #{ducts.frac_oa * ducts.total_duct_unbalance}")
+        duct_lkage_subroutine.addLine("Set oafrate = f_OA * #{ah_vfr_var.name}")
+        duct_lkage_subroutine.addLine("Set suplkfrate = f_sup * #{ah_vfr_var.name}")
+        duct_lkage_subroutine.addLine("Set retlkfrate = f_ret * #{ah_vfr_var.name}")
+        
+        if ducts.return_duct_loss > ducts.supply_duct_loss
+          # Supply air flow rate is greater than return flow rate
+          # Living zone is pressurized in this case      
+          duct_lkage_subroutine.addLine("Set #{liv_to_ah_flow_rate_var.name} = (@Abs (retlkfrate-suplkfrate-oafrate))")
+          duct_lkage_subroutine.addLine("Set #{ah_to_liv_flow_rate_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{duct_lk_supply_fan_equiv_var.name} = oafrate")
+          duct_lkage_subroutine.addLine("Set #{duct_lk_return_fan_equiv_var.name} = 0")
+        else
+          # Living zone is depressurized in this case
+          duct_lkage_subroutine.addLine("Set #{ah_to_liv_flow_rate_var.name} = (@Abs (suplkfrate-retlkfrate-oafrate))")
+          duct_lkage_subroutine.addLine("Set #{liv_to_ah_flow_rate_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{duct_lk_supply_fan_equiv_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{duct_lk_return_fan_equiv_var.name} = oafrate")
+        end        
+      
+        if ducts.ducts_not_in_living
+          duct_lkage_subroutine.addLine("If #{ah_mfr_var.name}>0")
+          duct_lkage_subroutine.addLine("Set h_SA = (@HFnTdbW #{ah_tout_var.name} #{ah_wout_var.name})")
+          duct_lkage_subroutine.addLine("Set h_AHZone = (@HFnTdbW #{ah_t_var.name} #{ah_w_var.name})")
+          duct_lkage_subroutine.addLine("Set h_RA = (@HFnTdbW #{ra_t_var.name} #{ra_w_var.name})")
+          duct_lkage_subroutine.addLine("Set h_fg = (@HfgAirFnWTdb #{ah_wout_var.name} #{ah_tout_var.name})")
+          duct_lkage_subroutine.addLine("Set SALeakageQtot = f_sup * #{ah_mfr_var.name}*(h_RA - h_SA)")          
+          duct_lkage_subroutine.addLine("Set temp1 = h_fg*(#{ra_w_var.name}-#{ah_wout_var.name})")
+          duct_lkage_subroutine.addLine("Set #{supply_lat_lkage_to_liv_var.name} = f_sup*#{ah_mfr_var.name}*temp1")
+          duct_lkage_subroutine.addLine("Set #{supply_sens_lkage_to_liv_var.name} = SALeakageQtot-#{supply_lat_lkage_to_liv_var.name}")
+          duct_lkage_subroutine.addLine("Set eTm = (#{fan_rtf_var.name}/(#{ah_mfr_var.name}*1006.0))*#{UnitConversions.convert(ducts.unconditioned_duct_ua,"Btu/(hr*F)","W/K").round(3)}")
+          duct_lkage_subroutine.addLine("Set eTm = 0-eTm")
+          duct_lkage_subroutine.addLine("If eTm<-1000")
+          duct_lkage_subroutine.addLine("Set tsup = #{ah_t_var.name}")
+          duct_lkage_subroutine.addLine("Else")
+          duct_lkage_subroutine.addLine("Set temp4 = #{ah_t_var.name}")
+          duct_lkage_subroutine.addLine("Set tsup = temp4+((#{ah_tout_var.name}-#{ah_t_var.name})*(@Exp eTm))")
+          duct_lkage_subroutine.addLine("EndIf")
+          duct_lkage_subroutine.addLine("Set temp5 = tsup-#{ah_tout_var.name}")
+          duct_lkage_subroutine.addLine("Set #{supply_duct_cond_to_liv_var.name} = #{ah_mfr_var.name}*1006.0*temp5")
+          duct_lkage_subroutine.addLine("Set #{supply_duct_cond_to_ah_var.name} = 0-#{supply_duct_cond_to_liv_var.name}")
+          duct_lkage_subroutine.addLine("Set eTm = (#{fan_rtf_var.name}/(#{ah_mfr_var.name}*1006.0))*#{UnitConversions.convert(ducts.return_duct_ua,"Btu/(hr*F)","W/K").round(3)}")
+          duct_lkage_subroutine.addLine("Set eTm = 0-eTm")
+          duct_lkage_subroutine.addLine("If eTm<-1000")
+          duct_lkage_subroutine.addLine("Set tret = #{ah_t_var.name}")
+          duct_lkage_subroutine.addLine("Else")
+          duct_lkage_subroutine.addLine("Set temp6 = #{ah_t_var.name}")
+          duct_lkage_subroutine.addLine("Set tret = temp6+((#{ra_t_var.name}-#{ah_t_var.name})*(@Exp eTm))")
+          duct_lkage_subroutine.addLine("EndIf")
+          duct_lkage_subroutine.addLine("Set temp7 = tret-#{ra_t_var.name}")
+          duct_lkage_subroutine.addLine("Set #{return_duct_cond_to_plenum_var.name} = #{ah_mfr_var.name}*1006.0*temp7")
+          duct_lkage_subroutine.addLine("Set #{return_duct_cond_to_ah_var.name} = 0-#{return_duct_cond_to_plenum_var.name}")
+          duct_lkage_subroutine.addLine("Set #{return_lat_lkage_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set temp2 = (#{ah_t_var.name}-#{ra_t_var.name})")
+          duct_lkage_subroutine.addLine("Set #{return_sens_lkage_var.name} = f_ret*#{ah_mfr_var.name}*1006.0*temp2")
+          duct_lkage_subroutine.addLine("Set QtotLeakToAHZn = f_sup*#{ah_mfr_var.name}*(h_SA-h_AHZone)")
+          duct_lkage_subroutine.addLine("Set temp3 = (#{ah_wout_var.name}-#{ah_w_var.name})")
+          duct_lkage_subroutine.addLine("Set #{supply_lat_lkage_to_ah_var.name} = f_sup*#{ah_mfr_var.name}*h_fg*temp3")
+          duct_lkage_subroutine.addLine("Set #{supply_sens_lkage_to_ah_var.name} = QtotLeakToAHZn-#{supply_lat_lkage_to_ah_var.name}")
+          duct_lkage_subroutine.addLine("Else")
+          duct_lkage_subroutine.addLine("Set #{supply_lat_lkage_to_liv_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_sens_lkage_to_liv_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_duct_cond_to_liv_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_duct_cond_to_ah_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{return_duct_cond_to_plenum_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{return_duct_cond_to_ah_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{return_lat_lkage_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{return_sens_lkage_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_lat_lkage_to_ah_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_sens_lkage_to_ah_var.name} = 0")
+          duct_lkage_subroutine.addLine("EndIf")
+        else
+          duct_lkage_subroutine.addLine("Set #{supply_lat_lkage_to_liv_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_sens_lkage_to_liv_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_duct_cond_to_liv_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_duct_cond_to_ah_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{return_duct_cond_to_plenum_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{return_duct_cond_to_ah_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{return_lat_lkage_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{return_sens_lkage_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_lat_lkage_to_ah_var.name} = 0")
+          duct_lkage_subroutine.addLine("Set #{supply_sens_lkage_to_ah_var.name} = 0")
+        end      
+      
+        # Program     
+        
+        duct_lkage_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
+        duct_lkage_program.setName(obj_name_ducts + " program")
+        duct_lkage_program.addLine("Set #{ah_mfr_var.name} = #{ah_mfr_sensor.name}")
+        duct_lkage_program.addLine("Set #{fan_rtf_var.name} = #{fan_rtf_sensor.name}")
+        duct_lkage_program.addLine("Set #{ah_vfr_var.name} = #{ah_vfr_sensor.name}")
+        duct_lkage_program.addLine("Set #{ah_tout_var.name} = #{ah_tout_sensor.name}")
+        duct_lkage_program.addLine("Set #{ah_wout_var.name} = #{ah_wout_sensor.name}")
+        duct_lkage_program.addLine("Set #{ra_t_var.name} = #{ra_t_sensor.name}")
+        duct_lkage_program.addLine("Set #{ra_w_var.name} = #{ra_w_sensor.name}")
+        duct_lkage_program.addLine("Set #{ah_t_var.name} = #{ah_t_sensor.name}")
+        duct_lkage_program.addLine("Set #{ah_w_var.name} = #{ah_w_sensor.name}")
+        duct_lkage_program.addLine("Run #{duct_lkage_subroutine.name}")
+        
+        if mech_vent.MechVentType != Constants.VentTypeCFIS
+          duct_lkage_program.addLine("Set #{supply_sens_lkage_to_liv_actuator.name} = #{supply_sens_lkage_to_liv_var.name}")
+          duct_lkage_program.addLine("Set #{supply_lat_lkage_to_liv_actuator.name} = #{supply_lat_lkage_to_liv_var.name}")
+          duct_lkage_program.addLine("Set #{supply_duct_cond_to_liv_actuator.name} = #{supply_duct_cond_to_liv_var.name}")
+          duct_lkage_program.addLine("Set #{supply_duct_cond_to_ah_actuator.name} = #{supply_duct_cond_to_ah_var.name}")
+          duct_lkage_program.addLine("Set #{supply_sens_lkage_to_ah_actuator.name} = #{supply_sens_lkage_to_ah_var.name}")
+          duct_lkage_program.addLine("Set #{supply_lat_lkage_to_ah_actuator.name} = #{supply_lat_lkage_to_ah_var.name}")
+          duct_lkage_program.addLine("Set #{return_sens_lkage_actuator.name} = #{return_sens_lkage_var.name}")
+          duct_lkage_program.addLine("Set #{return_lat_lkage_actuator.name} = #{return_lat_lkage_var.name}")
+          duct_lkage_program.addLine("Set #{return_duct_cond_to_plenum_actuator.name} = #{return_duct_cond_to_plenum_var.name}")
+          duct_lkage_program.addLine("Set #{return_duct_cond_to_ah_actuator.name} = #{return_duct_cond_to_ah_var.name}")
+          duct_lkage_program.addLine("Set #{liv_to_ah_flow_rate_actuator.name} = #{ah_to_liv_flow_rate_var.name}")
+          duct_lkage_program.addLine("Set #{liv_to_ah_flow_rate_actuator.name} = #{liv_to_ah_flow_rate_var.name}")
+        else
+          
+          system, clg_coil, htg_coil, air_loop = HVAC.get_unitary_system_air_loop(model, runner, unit.living_zone)
+          clg_coil = HVAC.get_coil_from_hvac_component(clg_coil)
+          cfis_fan_power = clg_coil.ratedEvaporatorFanPowerPerVolumeFlowRate.get / UnitConversions.convert(1.0,"m^3/s","cfm") # W/cfm
+          
+          duct_lkage_program.addLine("Set dl_1 = #{supply_sens_lkage_to_liv_var.name}")
+          duct_lkage_program.addLine("Set dl_2 = #{supply_lat_lkage_to_liv_var.name}")
+          duct_lkage_program.addLine("Set dl_3 = #{supply_duct_cond_to_liv_var.name}")
+          duct_lkage_program.addLine("Set dl_4 = #{supply_duct_cond_to_ah_var.name}")
+          duct_lkage_program.addLine("Set dl_5 = #{supply_sens_lkage_to_ah_var.name}")
+          duct_lkage_program.addLine("Set dl_6 = #{supply_lat_lkage_to_ah_var.name}")
+          duct_lkage_program.addLine("Set dl_7 = #{return_sens_lkage_var.name}")
+          duct_lkage_program.addLine("Set dl_8 = #{return_lat_lkage_var.name}")
+          duct_lkage_program.addLine("Set dl_9 = #{return_duct_cond_to_plenum_var.name}")
+          duct_lkage_program.addLine("Set dl_10 = #{return_duct_cond_to_ah_var.name}")
+          duct_lkage_program.addLine("Set dl_11 = #{ah_to_liv_flow_rate_var.name}")
+          duct_lkage_program.addLine("Set dl_12 = #{liv_to_ah_flow_rate_var.name}")
+          
+          duct_lkage_program.addLine("If #{cfis_on_for_hour_var.name}")
+          duct_lkage_program.addLine("   Set cfis_m3s = (#{max_supply_fan_mfr.name} / 1.16097654) * #{mech_vent.MechVentCFISAirflowFraction}")      # Density of 1.16097654 was back calculated using E+ results
+          duct_lkage_program.addLine("   Set #{ah_vfr_var.name} = (1.0 - #{fan_rtf_sensor.name})*#{cfis_f_damper_open_var.name}*cfis_m3s")
+          duct_lkage_program.addLine("   Set rho_in = (@RhoAirFnPbTdbW #{tin_sensor.name} #{win_sensor.name} #{pbar_sensor.name})")
+          duct_lkage_program.addLine("   Set #{ah_mfr_var.name} = #{ah_vfr_sensor.name} * rho_in")
+          duct_lkage_program.addLine("   Set #{fan_rtf_var.name} = (1.0 - #{fan_rtf_sensor.name})*#{cfis_f_damper_open_var.name}")
+          duct_lkage_program.addLine("   Set #{ah_tout_var.name} = #{ra_t_sensor.name}") 
+          duct_lkage_program.addLine("   Set #{ah_wout_var.name} = #{ra_w_sensor.name}") 
+          duct_lkage_program.addLine("   Set #{ra_t_var.name} = #{ra_t_sensor.name}") 
+          duct_lkage_program.addLine("   Set #{ra_w_var.name} = #{ra_w_sensor.name}")
+          
+          duct_lkage_program.addLine("   Run #{duct_lkage_subroutine.name}")
+          
+          duct_lkage_program.addLine("   Set #{supply_sens_lkage_to_liv_actuator.name} = #{supply_sens_lkage_to_liv_var.name} + dl_1")
+          duct_lkage_program.addLine("   Set #{supply_lat_lkage_to_liv_actuator.name} = #{supply_lat_lkage_to_liv_var.name} + dl_2")
+          duct_lkage_program.addLine("   Set #{supply_duct_cond_to_liv_actuator.name} = #{supply_duct_cond_to_liv_var.name} + dl_3")
+          duct_lkage_program.addLine("   Set #{supply_duct_cond_to_ah_actuator.name} = #{supply_duct_cond_to_ah_var.name} + dl_4")
+          duct_lkage_program.addLine("   Set #{supply_sens_lkage_to_ah_actuator.name} = #{supply_sens_lkage_to_ah_var.name} + dl_5")
+          duct_lkage_program.addLine("   Set #{supply_lat_lkage_to_ah_actuator.name} = #{supply_lat_lkage_to_ah_var.name} + dl_6")
+          duct_lkage_program.addLine("   Set #{return_sens_lkage_actuator.name} = #{return_sens_lkage_var.name} + dl_7")
+          duct_lkage_program.addLine("   Set #{return_lat_lkage_actuator.name} = #{return_lat_lkage_var.name} + dl_8")
+          duct_lkage_program.addLine("   Set #{return_duct_cond_to_plenum_actuator.name} = #{return_duct_cond_to_plenum_var.name} + dl_9")
+          duct_lkage_program.addLine("   Set #{return_duct_cond_to_ah_actuator.name} = #{return_duct_cond_to_ah_var.name} + dl_10")
+          duct_lkage_program.addLine("   Set #{liv_to_ah_flow_rate_actuator.name} = #{ah_to_liv_flow_rate_var.name} + dl_11")
+          duct_lkage_program.addLine("   Set #{liv_to_ah_flow_rate_actuator.name} = #{liv_to_ah_flow_rate_var.name} + dl_12")
+      
+          duct_lkage_program.addLine("Else")
+          duct_lkage_program.addLine("   Set #{supply_sens_lkage_to_liv_actuator.name} = dl_1")
+          duct_lkage_program.addLine("   Set #{supply_lat_lkage_to_liv_actuator.name} = dl_2")
+          duct_lkage_program.addLine("   Set #{supply_duct_cond_to_liv_actuator.name} = dl_3")
+          duct_lkage_program.addLine("   Set #{supply_duct_cond_to_ah_actuator.name} = dl_4")
+          duct_lkage_program.addLine("   Set #{supply_sens_lkage_to_ah_actuator.name} = dl_5")
+          duct_lkage_program.addLine("   Set #{supply_lat_lkage_to_ah_actuator.name} = dl_6")
+          duct_lkage_program.addLine("   Set #{return_sens_lkage_actuator.name} = dl_7")
+          duct_lkage_program.addLine("   Set #{return_lat_lkage_actuator.name} = dl_8")
+          duct_lkage_program.addLine("   Set #{return_duct_cond_to_plenum_actuator.name} = dl_9")
+          duct_lkage_program.addLine("   Set #{return_duct_cond_to_ah_actuator.name} = dl_10")
+          duct_lkage_program.addLine("   Set #{liv_to_ah_flow_rate_actuator.name} = dl_11")
+          duct_lkage_program.addLine("   Set #{liv_to_ah_flow_rate_actuator.name} = dl_12")
+          duct_lkage_program.addLine("EndIf")
+        end
+                
+      else # no ducts
+      
+        # Program
+        
+        duct_lkage_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
+        duct_lkage_program.setName(obj_name_ducts + " program")
+        duct_lkage_program.addLine("Set #{duct_lk_supply_fan_equiv_var.name} = 0")
+        duct_lkage_program.addLine("Set #{duct_lk_return_fan_equiv_var.name} = 0")
+            
+      end # end has ducts loop
+    
       # Actuators
       
       infil_flow = OpenStudio::Model::SpaceInfiltrationDesignFlowRate.new(model)
@@ -1801,9 +1790,9 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       natvent_flow_actuator.setName("#{natvent_flow.name} act")
 
       equip_def = OpenStudio::Model::ElectricEquipmentDefinition.new(model)
-      equip_def.setName(obj_name_infil + " house exh fan load equip")
+      equip_def.setName(obj_name_infil + " house fan")
       equip = OpenStudio::Model::ElectricEquipment.new(equip_def)
-      equip.setName(obj_name_infil + " house exh fan load equip")
+      equip.setName(obj_name_infil + " house fan")
       equip.setSpace(unit.living_zone.spaces[0])
       equip_def.setFractionRadiant(0)
       equip_def.setFractionLatent(0)
@@ -1815,9 +1804,9 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       whole_house_fan_actuator.setName("#{equip.name} act")        
       
       equip_def = OpenStudio::Model::ElectricEquipmentDefinition.new(model)
-      equip_def.setName(obj_name_infil + " range hood fan load equip")
+      equip_def.setName(obj_name_infil + " range fan")
       equip = OpenStudio::Model::ElectricEquipment.new(equip_def)
-      equip.setName(obj_name_infil + " range hood fan load equip")
+      equip.setName(obj_name_infil + " range fan")
       equip.setSpace(unit.living_zone.spaces[0])
       equip_def.setFractionRadiant(0)
       equip_def.setFractionLatent(0)
@@ -1829,9 +1818,9 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       range_hood_fan_actuator.setName("#{equip.name} act")           
       
       equip_def = OpenStudio::Model::ElectricEquipmentDefinition.new(model)
-      equip_def.setName(obj_name_infil + " bath exh fan load equip")
+      equip_def.setName(obj_name_infil + " bath fan")
       equip = OpenStudio::Model::ElectricEquipment.new(equip_def)
-      equip.setName(obj_name_infil + " bath exh fan load equip")
+      equip.setName(obj_name_infil + " bath fan")
       equip.setSpace(unit.living_zone.spaces[0])
       equip_def.setFractionRadiant(0)
       equip_def.setFractionLatent(0)
@@ -1842,35 +1831,20 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       bath_exhaust_fan_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(equip, "ElectricEquipment", "Electric Power Level")
       bath_exhaust_fan_actuator.setName("#{equip.name} act")
       
-      # Global Variables
-      
-      ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, duct_lk_supply_fan_equiv)
-      ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, duct_lk_exhaust_fan_equiv)
-      
-      if mech_vent.MechVentType == Constants.VentTypeCFIS
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, cfis_t_sum_open) # Sums the time during an hour the CFIS damper has been open
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, cfis_on_for_hour) # Flag to open the CFIS damper for the remainder of the hour
-        ems_global_var = OpenStudio::Model::EnergyManagementSystemGlobalVariable.new(model, cfis_f_damper_open) # Fraction of timestep the CFIS damper is open. Used by infiltration and duct leakage programs
-        
-        ems_int_var = OpenStudio::Model::EnergyManagementSystemInternalVariable.new(model, max_supply_fan_mfr)
-        ems_int_var.setInternalDataIndexKeyName("Supply Fan")
-        ems_int_var.setInternalDataType("Fan Maximum Mass Flow Rate")
-      end
-      
       # Programs
 
       infil_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
       infil_program.setName(obj_name_infil + " program")
-      infil_program.addLine("Set p_m = #{wind_speed.ashrae_terrain_exponent}")
-      infil_program.addLine("Set p_s = #{wind_speed.ashrae_site_terrain_exponent}")
-      infil_program.addLine("Set s_m = #{wind_speed.ashrae_terrain_thickness}")
-      infil_program.addLine("Set s_s = #{wind_speed.ashrae_site_terrain_thickness}")
-      infil_program.addLine("Set z_m = #{UnitConversions.convert(wind_speed.height,"ft","m")}")
-      infil_program.addLine("Set z_s = #{UnitConversions.convert(unit.living.height,"ft","m")}")
-      infil_program.addLine("Set f_t = (((s_m/z_m)^p_m)*((z_s/s_s)^p_s))")
       
       if unit.living.inf_method == @infMethodASHRAE
         if unit.living.SLA > 0
+          infil_program.addLine("Set p_m = #{wind_speed.ashrae_terrain_exponent}")
+          infil_program.addLine("Set p_s = #{wind_speed.ashrae_site_terrain_exponent}")
+          infil_program.addLine("Set s_m = #{wind_speed.ashrae_terrain_thickness}")
+          infil_program.addLine("Set s_s = #{wind_speed.ashrae_site_terrain_thickness}")
+          infil_program.addLine("Set z_m = #{UnitConversions.convert(wind_speed.height,"ft","m")}")
+          infil_program.addLine("Set z_s = #{UnitConversions.convert(unit.living.height,"ft","m")}")
+          infil_program.addLine("Set f_t = (((s_m/z_m)^p_m)*((z_s/s_s)^p_s))")
           infil_program.addLine("Set Tdiff = #{tin_sensor.name}-#{tout_sensor.name}")
           infil_program.addLine("Set dT = @Abs Tdiff")
           infil_program.addLine("Set c = #{((UnitConversions.convert(infil.C_i,"cfm","m^3/s") / (UnitConversions.convert(1.0,"inH2O","Pa") ** infil.n_i))).round(4)}")
@@ -1892,43 +1866,43 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       infil_program.addLine("Set QWHV = #{wh_sch_sensor.name}*#{UnitConversions.convert(mech_vent.whole_house_vent_rate,"cfm","m^3/s").round(4)}")
       
       if mech_vent.MechVentType == Constants.VentTypeCFIS
-        infil_program.addLine("Set Fan_RTF = #{fan_rtf_sensor.name}")
+        infil_program.addLine("Set #{fan_rtf_var.name} = #{fan_rtf_sensor.name}")
         
         infil_program.addLine("If @ABS(Minute - ZoneTimeStep*60) < 0.1")
-        infil_program.addLine("Set #{cfis_t_sum_open} = 0") # New hour, time on summation re-initializes to 0
-        infil_program.addLine("Set #{cfis_on_for_hour} = 0")
+        infil_program.addLine("Set #{cfis_t_sum_open_var.name} = 0") # New hour, time on summation re-initializes to 0
+        infil_program.addLine("Set #{cfis_on_for_hour_var.name} = 0")
         infil_program.addLine("EndIf")
                     
         infil_program.addLine("Set CFIS_t_min_hr_open = #{mech_vent.MechVentCFISOpenTime}") # minutes per hour the CFIS damper is open
         infil_program.addLine("Set CFIS_Q_duct = #{UnitConversions.convert(mech_vent.MechVentCFISOutdoorAirflow, 'cfm', 'm^3/s')}")
-        infil_program.addLine("Set #{cfis_f_damper_open} = 0") # fraction of the timestep the CFIS damper is open
+        infil_program.addLine("Set #{cfis_f_damper_open_var.name} = 0") # fraction of the timestep the CFIS damper is open
 
-        infil_program.addLine("If #{cfis_t_sum_open} < CFIS_t_min_hr_open")
-        infil_program.addLine(" Set CFIS_t_fan_on = 60 - (CFIS_t_min_hr_open - #{cfis_t_sum_open})") # minute at which the blower needs to turn on to meet the ventilation requirements
-        infil_program.addLine(" If ((Minute+0.00001) >= CFIS_t_fan_on) || #{cfis_on_for_hour}")
+        infil_program.addLine("If #{cfis_t_sum_open_var.name} < CFIS_t_min_hr_open")
+        infil_program.addLine(" Set CFIS_t_fan_on = 60 - (CFIS_t_min_hr_open - #{cfis_t_sum_open_var.name})") # minute at which the blower needs to turn on to meet the ventilation requirements
+        infil_program.addLine(" If ((Minute+0.00001) >= CFIS_t_fan_on) || #{cfis_on_for_hour_var.name}")
           
         # Supply fan needs to run for remainder of hour to achieve target minutes per hour of operation
-        infil_program.addLine("  If #{cfis_on_for_hour}")
-        infil_program.addLine("   Set #{cfis_f_damper_open} = 1")
+        infil_program.addLine("  If #{cfis_on_for_hour_var.name}")
+        infil_program.addLine("   Set #{cfis_f_damper_open_var.name} = 1")
         infil_program.addLine("  Else")
-        infil_program.addLine("   Set #{cfis_f_damper_open} = (@Mod (60.0-CFIS_t_fan_on) (60.0*ZoneTimeStep)) / (60.0*ZoneTimeStep)") # calculates the portion of the current timestep the CFIS damper needs to be open
-        infil_program.addLine("   Set #{cfis_on_for_hour} = 1") # CFIS damper will need to open for all the remaining timesteps in this hour
+        infil_program.addLine("   Set #{cfis_f_damper_open_var.name} = (@Mod (60.0-CFIS_t_fan_on) (60.0*ZoneTimeStep)) / (60.0*ZoneTimeStep)") # calculates the portion of the current timestep the CFIS damper needs to be open
+        infil_program.addLine("   Set #{cfis_on_for_hour_var.name} = 1") # CFIS damper will need to open for all the remaining timesteps in this hour
         infil_program.addLine("  EndIf")
-        infil_program.addLine("  Set QWHV = #{cfis_f_damper_open}*CFIS_Q_duct")
-        infil_program.addLine("  Set #{cfis_t_sum_open} = #{cfis_t_sum_open} + #{cfis_f_damper_open}*(ZoneTimeStep*60)")
-        infil_program.addLine("  Set cfis_cfm = (#{max_supply_fan_mfr} / 1.16097654) * #{mech_vent.MechVentCFISAirflowFraction} * #{UnitConversions.convert(1.0,'m^3/s','cfm')}")      # Density of 1.16097654 was back calculated using E+ results
-        infil_program.addLine("  Set #{whole_house_fan_actuator.name} = #{cfis_fan_power} * cfis_cfm * #{cfis_f_damper_open}*(1-Fan_RTF)")
+        infil_program.addLine("  Set QWHV = #{cfis_f_damper_open_var.name}*CFIS_Q_duct")
+        infil_program.addLine("  Set #{cfis_t_sum_open_var.name} = #{cfis_t_sum_open_var.name} + #{cfis_f_damper_open_var.name}*(ZoneTimeStep*60)")
+        infil_program.addLine("  Set cfis_cfm = (#{max_supply_fan_mfr.name} / 1.16097654) * #{mech_vent.MechVentCFISAirflowFraction} * #{UnitConversions.convert(1.0,'m^3/s','cfm')}")      # Density of 1.16097654 was back calculated using E+ results
+        infil_program.addLine("  Set #{whole_house_fan_actuator.name} = #{cfis_fan_power} * cfis_cfm * #{cfis_f_damper_open_var.name}*(1-#{fan_rtf_var.name})")
         infil_program.addLine("Else")
-        infil_program.addLine(" If (#{cfis_t_sum_open} + (Fan_RTF*ZoneTimeStep*60)) > CFIS_t_min_hr_open")
+        infil_program.addLine(" If (#{cfis_t_sum_open_var.name} + (#{fan_rtf_var.name}*ZoneTimeStep*60)) > CFIS_t_min_hr_open")
         # Damper is only open for a portion of this time step to achieve target minutes per hour
-        infil_program.addLine("  Set #{cfis_f_damper_open} = (CFIS_t_min_hr_open-#{cfis_t_sum_open})/(ZoneTimeStep*60)")
-        infil_program.addLine("  Set QWHV = #{cfis_f_damper_open}*CFIS_Q_duct")
-        infil_program.addLine("  Set #{cfis_t_sum_open} = CFIS_t_min_hr_open")
+        infil_program.addLine("  Set #{cfis_f_damper_open_var.name} = (CFIS_t_min_hr_open-#{cfis_t_sum_open_var.name})/(ZoneTimeStep*60)")
+        infil_program.addLine("  Set QWHV = #{cfis_f_damper_open_var.name}*CFIS_Q_duct")
+        infil_program.addLine("  Set #{cfis_t_sum_open_var.name} = CFIS_t_min_hr_open")
         infil_program.addLine(" Else")
         # Damper is open and using call for heat/cool to supply fresh air
-        infil_program.addLine("  Set #{cfis_t_sum_open} = #{cfis_t_sum_open} + (Fan_RTF*ZoneTimeStep*60)")
-        infil_program.addLine("  Set #{cfis_f_damper_open} = 1")
-        infil_program.addLine("  Set QWHV = Fan_RTF*CFIS_Q_duct")
+        infil_program.addLine("  Set #{cfis_t_sum_open_var.name} = #{cfis_t_sum_open_var.name} + (#{fan_rtf_var.name}*ZoneTimeStep*60)")
+        infil_program.addLine("  Set #{cfis_f_damper_open_var.name} = 1")
+        infil_program.addLine("  Set QWHV = #{fan_rtf_var.name}*CFIS_Q_duct")
         infil_program.addLine(" EndIf")
         # Fan power is metered under fan cooling and heating meters
         infil_program.addLine("  Set #{whole_house_fan_actuator.name} =  0")
@@ -1945,8 +1919,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       infil_program.addLine("Set Qbath = #{bath_sch_sensor.name}*#{UnitConversions.convert(mech_vent.bathroom_hour_avg_exhaust,"cfm","m^3/s").round(4)}")
       infil_program.addLine("Set QhpwhOut = 0")
       infil_program.addLine("Set QhpwhIn = 0")
-      infil_program.addLine("Set QductsOut = #{duct_lk_exhaust_fan_equiv}")
-      infil_program.addLine("Set QductsIn = #{duct_lk_supply_fan_equiv}")
+      infil_program.addLine("Set QductsOut = #{duct_lk_return_fan_equiv_var.name}")
+      infil_program.addLine("Set QductsIn = #{duct_lk_supply_fan_equiv_var.name}")
       
       if mech_vent.MechVentType == Constants.VentTypeBalanced
         infil_program.addLine("Set Qout = Qrange+Qbath+Qdryer+QhpwhOut+QductsOut")
@@ -2015,10 +1989,10 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       if mech_vent.MechVentType == Constants.VentTypeCFIS
         cfis_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
         cfis_program.setName(obj_name_ducts + " cfis init program")
-        cfis_program.addLine("Set #{cfis_t_sum_open} = 0")
-        cfis_program.addLine("Set #{cfis_on_for_hour} = 0")
-        cfis_program.addLine("Set #{duct_lk_exhaust_fan_equiv} = 0")
-        cfis_program.addLine("Set #{cfis_f_damper_open} = 0")
+        cfis_program.addLine("Set #{cfis_t_sum_open_var.name} = 0")
+        cfis_program.addLine("Set #{cfis_on_for_hour_var.name} = 0")
+        cfis_program.addLine("Set #{duct_lk_return_fan_equiv_var.name} = 0")
+        cfis_program.addLine("Set #{cfis_f_damper_open_var.name} = 0")
       end
       
       # Program Calling Manager

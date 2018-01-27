@@ -123,7 +123,7 @@ def check_num_objects(objects, expected_num_objects, mode)
     end
 end
 
-def check_unused_ems_variable(model)
+def check_ems(model)
     # check that all set variables are used somewhere (i.e., no typos)
     (model.getEnergyManagementSystemPrograms + model.getEnergyManagementSystemSubroutines).each do |ems|
       ems.to_s.each_line do |line|
@@ -138,5 +138,19 @@ def check_unused_ems_variable(model)
         end
         assert(count > 1)
       end
+    end
+
+    # check that no lines exceed 100 characters
+    model.to_s.each_line do |line|
+      next unless line.strip.start_with?("Set", "If", "Else", "EndIf")
+      if line.include? '!-' # Remove comments
+        line.slice!(line.index('!-')..line.length)
+        line.gsub!(',','')
+      end
+      line.strip!
+      if line.length > 100
+        puts "Line exceeds 100 characters: #{line} (#{line.length})"
+      end
+      assert(line.length <= 100)
     end
 end
