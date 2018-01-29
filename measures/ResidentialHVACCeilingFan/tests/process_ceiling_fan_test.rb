@@ -186,8 +186,8 @@ class ProcessCeilingFanTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert(result.info.size == num_infos)
-    assert(result.warnings.size == num_warnings)
+    assert_equal(result.info.size, num_infos)
+    assert_equal(result.warnings.size, num_warnings)
     
     # get the final objects in the model
     final_objects = get_objects(model)
@@ -200,7 +200,8 @@ class ProcessCeilingFanTest < MiniTest::Test
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
-    check_unused_ems_variable(model)
+    
+    check_ems(model)
 
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|

@@ -492,19 +492,13 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         measure.run(model, runner, argument_map)
         result = runner.result
 
-        # check that no lines exceed 100 characters
-        model.to_s.each_line do |line|
-          next unless line.strip.start_with?("Set", "If", "Else", "EndIf")
-          assert(line.length <= 100)
-        end
-        
         # show the output
         #show_output(result)
         
         # assert that it ran correctly
         assert_equal("Success", result.value.valueName)
-        assert(result.info.size == num_infos)
-        assert(result.warnings.size == num_warnings)
+        assert_equal(result.info.size, num_infos)
+        assert_equal(result.warnings.size, num_warnings)
         assert(result.finalCondition.is_initialized)
         
         # get the final objects in the model
@@ -518,7 +512,8 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         # check we have the expected number of new/deleted objects
         check_num_objects(all_new_objects, expected_num_new_objects, "added")
         check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
-        check_unused_ems_variable(model)
+        
+        check_ems(model)
 
         actual_values_wh = {"TankVolume"=>0, "Heater1Height"=>0, "Heater2Height"=>0, "TankU"=>0, "OnCycle"=>0, "OffCycle"=>0}
         actual_values_hpwh = {"CondBottom"=>0, "CondTop"=>0, "AirflowRate"=>0, "Sensor1Height"=>0, "Sensor2Height"=>0}

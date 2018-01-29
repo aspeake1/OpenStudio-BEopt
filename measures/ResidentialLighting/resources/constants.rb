@@ -323,6 +323,9 @@ class Constants
   def self.FuelTypeOil
     return 'oil'
   end
+  def self.FuelTypeWood
+    return 'wood'
+  end
   def self.GarageSpace(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""
     if unit_name != self.ObjectNameBuildingUnit
@@ -805,6 +808,13 @@ class Constants
     end
     return "res solar hot water#{s_unit}"
   end
+  def self.ObjectNameUnitHeater(fueltype="", unit_name=self.ObjectNameBuildingUnit)
+    s_unit = ""
+    if unit_name != self.ObjectNameBuildingUnit
+      s_unit = "|#{unit_name}"
+    end
+    return "residential unit heater #{fueltype}#{s_unit}"
+  end
   def self.ObjectNameWaterHeater(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""
     if unit_name != self.ObjectNameBuildingUnit
@@ -1163,6 +1173,9 @@ class Constants
   end
   def self.VentTypeBalanced
     return 'balanced'
+  end
+  def self.VentTypeCFIS
+    return 'central fan integrated supply'
   end
   def self.WaterHeaterTypeTankless
     return 'tankless'

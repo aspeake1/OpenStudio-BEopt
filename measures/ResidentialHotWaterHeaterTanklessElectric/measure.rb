@@ -171,7 +171,7 @@ class ResidentialHotWaterHeaterTanklessElectric < OpenStudio::Measure::ModelMeas
                           end
                           objects_to_remove << wh.to_WaterHeaterStratified.get.heater1SetpointTemperatureSchedule
                           objects_to_remove << wh.to_WaterHeaterStratified.get.heater2SetpointTemperatureSchedule
-                          Waterheater.remove_existing_hpwh(model, Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit", "u")).gsub("|","_"))
+                          Waterheater.remove_existing_hpwh(model, Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit ", "")).gsub("|","_"))
                         end
                     end
                 end
