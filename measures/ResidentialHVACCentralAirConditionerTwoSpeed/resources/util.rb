@@ -1837,7 +1837,7 @@ class UtilityBill
     degradation = [0] # annual energy degradation
     system_use_lifetime_output = 0 # 0=hourly first year, 1=hourly lifetime
     inflation_rate = 2.4 # %
-    ur_flat_buy_rate = 0 # FIXME: get from json?
+    ur_flat_buy_rate = 0
     ur_flat_sell_rate = 0
     ur_nm_yearend_sell_rate = 0
     if pv_compensation_type == "Net Metering"

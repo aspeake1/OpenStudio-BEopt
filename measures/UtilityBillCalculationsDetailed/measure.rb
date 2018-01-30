@@ -17,12 +17,12 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
 
   # human readable description
   def description
-    return "Calculate utility bills using a detailed method."
+    return "Calculate utility bills for detailed electricity tariffs."
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calculate electric utility bills based on tariffs from the URDB. Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. If '#{Constants.Auto}' is selected for marginal rates, the state average is used. User can also specify net metering or feed-in tariff PV compensation types, along with corresponding rates."
+    return "Calculate electric utility bills based on tariffs from the OpenEI Utility Rate Database (URDB). Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. User can specify net metering or feed-in tariff PV compensation types, along with corresponding rates."
   end 
   
   def fuel_types
@@ -58,13 +58,13 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     end
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("tariff_label", tariffs, true)
     arg.setDisplayName("Electricity: Tariff")
-    arg.setDescription("The tariff(s) to base the utility bill calculations on.")
+    arg.setDescription("Choose either 'Autoselect Tariff(s)', 'Custom Tariff', or a prepackaged tariff. If 'Autoselect Tariff(s)' is selected, tariff(s) from nearby utilities will be selected.")
     arg.setDefaultValue("Autoselect Tariff(s)")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("custom_tariff", false)
     arg.setDisplayName("Electricity: Custom Tariff File Location")
-    arg.setDescription("Absolute (or relative) path to custom tariff file.")
+    arg.setDescription("Absolute path to custom tariff file. See resources/tariffs.zip for example tariff files. Only applies if Tariff is 'Custom Tariff'.")
     args << arg
 
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("gas_fixed", true)
@@ -77,21 +77,21 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("gas_rate", true)
     arg.setDisplayName("Natural Gas: Marginal Rate")
     arg.setUnits("$/therm")
-    arg.setDescription("Price per therm for natural gas.")
+    arg.setDescription("Price per therm for natural gas. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("oil_rate", true)
     arg.setDisplayName("Oil: Marginal Rate")
     arg.setUnits("$/gal")
-    arg.setDescription("Price per gallon for fuel oil.")
+    arg.setDescription("Price per gallon for fuel oil. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("prop_rate", true)
     arg.setDisplayName("Propane: Marginal Rate")
     arg.setUnits("$/gal")
-    arg.setDescription("Price per gallon for propane.")
+    arg.setDescription("Price per gallon for propane. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
 
@@ -168,8 +168,7 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     # Assign the user inputs to variables
     tariff_label = runner.getStringArgumentValue("tariff_label", user_arguments)
     custom_tariff = runner.getOptionalStringArgumentValue("custom_tariff", user_arguments)
-    gas_fixed = runner.getOptionalStringArgumentValue("gas_fixed", user_arguments)
-    gas_fixed.is_initialized ? gas_fixed = gas_fixed.get : gas_fixed = 0
+    gas_fixed = runner.getStringArgumentValue("gas_fixed", user_arguments)
     pv_compensation_type = runner.getStringArgumentValue("pv_compensation_type", user_arguments)
     pv_sellback_rate = runner.getStringArgumentValue("pv_sellback_rate", user_arguments)
     pv_tariff_rate = runner.getStringArgumentValue("pv_tariff_rate", user_arguments)

@@ -16,12 +16,12 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
 
   # human readable description
   def description
-    return "Calculate utility bills using a simple method."
+    return "Calculate utility bills for simple electricity tariffs."
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calculate utility bills based on fixed charges for electric and gas, and marginal rates for all fuel types. If '#{Constants.Auto}' is selected for marginal rates, the state average is used. User can also specify net metering or feed-in tariff PV compensation types, along with corresponding rates."
+    return "Calculate utility bills based on fixed charges for electric and gas, and marginal rates for all fuel types. User can specify net metering or feed-in tariff PV compensation types, along with corresponding rates."
   end 
   
   def fuel_types
@@ -58,7 +58,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_rate", true)
     arg.setDisplayName("Electricity: Marginal Rate")
     arg.setUnits("$/kWh")
-    arg.setDescription("Price per kilowatt-hour for electricity.")
+    arg.setDescription("Price per kilowatt-hour for electricity. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
     
@@ -72,21 +72,21 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("gas_rate", true)
     arg.setDisplayName("Natural Gas: Marginal Rate")
     arg.setUnits("$/therm")
-    arg.setDescription("Price per therm for natural gas.")
+    arg.setDescription("Price per therm for natural gas. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("oil_rate", true)
     arg.setDisplayName("Oil: Marginal Rate")
     arg.setUnits("$/gal")
-    arg.setDescription("Price per gallon for fuel oil.")
+    arg.setDescription("Price per gallon for fuel oil. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("prop_rate", true)
     arg.setDisplayName("Propane: Marginal Rate")
     arg.setUnits("$/gal")
-    arg.setDescription("Price per gallon for propane.")
+    arg.setDescription("Price per gallon for propane. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
 
@@ -161,10 +161,8 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     end
     
     # Assign the user inputs to variables
-    elec_fixed = runner.getOptionalStringArgumentValue("elec_fixed", user_arguments)
-    elec_fixed.is_initialized ? elec_fixed = elec_fixed.get : elec_fixed = 0
-    gas_fixed = runner.getOptionalStringArgumentValue("gas_fixed", user_arguments)
-    gas_fixed.is_initialized ? gas_fixed = gas_fixed.get : gas_fixed = 0
+    elec_fixed = runner.getStringArgumentValue("elec_fixed", user_arguments)
+    gas_fixed = runner.getStringArgumentValue("gas_fixed", user_arguments)
     pv_compensation_type = runner.getStringArgumentValue("pv_compensation_type", user_arguments)
     pv_sellback_rate = runner.getStringArgumentValue("pv_sellback_rate", user_arguments)
     pv_tariff_rate = runner.getStringArgumentValue("pv_tariff_rate", user_arguments)

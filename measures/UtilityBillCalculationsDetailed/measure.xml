@@ -2,18 +2,18 @@
   <schema_version>3.0</schema_version>
   <name>utility_bill_calculations_detailed</name>
   <uid>1d640acd-1a68-49cb-91f0-f3a65dbe40a7</uid>
-  <version_id>c6e5324e-bf96-4b20-af39-9a6619c4e14f</version_id>
-  <version_modified>20180129T214610Z</version_modified>
+  <version_id>b146a513-c276-41fb-bb01-4b8707f2d7ea</version_id>
+  <version_modified>20180130T000854Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
   <class_name>UtilityBillCalculationsDetailed</class_name>
   <display_name>Calculate Detailed Utility Bills</display_name>
-  <description>Calculate utility bills using a detailed method.</description>
-  <modeler_description>Calculate electric utility bills based on tariffs from the URDB. Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. If 'auto' is selected for marginal rates, the state average is used. User can also specify net metering or feed-in tariff PV compensation types, along with corresponding rates.</modeler_description>
+  <description>Calculate utility bills for detailed electricity tariffs.</description>
+  <modeler_description>Calculate electric utility bills based on tariffs from the OpenEI Utility Rate Database (URDB). Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. User can specify net metering or feed-in tariff PV compensation types, along with corresponding rates.</modeler_description>
   <arguments>
     <argument>
       <name>tariff_label</name>
       <display_name>Electricity: Tariff</display_name>
-      <description>The tariff(s) to base the utility bill calculations on.</description>
+      <description>Choose either 'Autoselect Tariff(s)', 'Custom Tariff', or a prepackaged tariff. If 'Autoselect Tariff(s)' is selected, tariff(s) from nearby utilities will be selected.</description>
       <type>Choice</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -18412,7 +18412,7 @@
     <argument>
       <name>custom_tariff</name>
       <display_name>Electricity: Custom Tariff File Location</display_name>
-      <description>Absolute (or relative) path to custom tariff file.</description>
+      <description>Absolute path to custom tariff file. See resources/tariffs.zip for example tariff files. Only applies if Tariff is 'Custom Tariff'.</description>
       <type>String</type>
       <required>false</required>
       <model_dependent>false</model_dependent>
@@ -18430,7 +18430,7 @@
     <argument>
       <name>gas_rate</name>
       <display_name>Natural Gas: Marginal Rate</display_name>
-      <description>Price per therm for natural gas.</description>
+      <description>Price per therm for natural gas. Use 'auto for state-average value from EIA.</description>
       <type>String</type>
       <units>$/therm</units>
       <required>true</required>
@@ -18440,7 +18440,7 @@
     <argument>
       <name>oil_rate</name>
       <display_name>Oil: Marginal Rate</display_name>
-      <description>Price per gallon for fuel oil.</description>
+      <description>Price per gallon for fuel oil. Use 'auto for state-average value from EIA.</description>
       <type>String</type>
       <units>$/gal</units>
       <required>true</required>
@@ -18450,7 +18450,7 @@
     <argument>
       <name>prop_rate</name>
       <display_name>Propane: Marginal Rate</display_name>
-      <description>Price per gallon for propane.</description>
+      <description>Price per gallon for propane. Use 'auto for state-average value from EIA.</description>
       <type>String</type>
       <units>$/gal</units>
       <required>true</required>
@@ -18648,16 +18648,28 @@
       <checksum>EC6876AD</checksum>
     </file>
     <file>
-      <filename>utility_bill_calculations_detailed_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>BE9D472E</checksum>
-    </file>
-    <file>
       <filename>City of Linneus Missouri (Utility Company) - Electric Rate.json</filename>
       <filetype>json</filetype>
       <usage_type>test</usage_type>
       <checksum>1E2F49B9</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>A904261C</checksum>
+    </file>
+    <file>
+      <filename>utility_bill_calculations_detailed_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>F4D1E973</checksum>
+    </file>
+    <file>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>C40E5B1A</checksum>
     </file>
     <file>
       <version>
@@ -18668,19 +18680,7 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>F1F636B2</checksum>
-    </file>
-    <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>A904261C</checksum>
-    </file>
-    <file>
-      <filename>util.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>F01422A1</checksum>
+      <checksum>9B402496</checksum>
     </file>
   </files>
 </measure>

@@ -333,11 +333,6 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     assert_equal("Success", result.value.valueName)
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
-
-    result.stepValues.each do |arg|
-      next unless expected_values.keys.include? arg.name
-      assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.05)
-    end
     
     return model
   end
@@ -389,7 +384,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_values.keys.each do |fuel|
       result.stepValues.each do |arg|
         next unless fuel == arg.name
-        assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.05)
+        assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.005)
       end
     end
 
