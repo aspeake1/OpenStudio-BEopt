@@ -75,7 +75,7 @@ class ResidentialFreezerTest < MiniTest::Test
   def test_new_construction_basement
     args_hash = {}
     args_hash["freezer_E"] = 935.0
-    args_hash["location"] = "Space: finished basement space"
+    args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>935.0, "Location"=>args_hash["location"]}
@@ -188,22 +188,22 @@ class ResidentialFreezerTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     args_hash["freezer_E"] = 935.0
-    args_hash["location"] = "Space: finished basement space"
+    args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ScheduleRuleset"=>1}
-    expected_values = {"Annual_kwh"=>935.0, "Location"=>args_hash["location"]}
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_values = {"Annual_kwh"=>num_units*935.0, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end 
 
   def test_single_family_attached_new_construction_unfinished_basement
     num_units = 4
     args_hash = {}
     args_hash["freezer_E"] = 935.0
-    args_hash["location"] = "Space: unfinished basement space"
+    args_hash["location"] = Constants.SpaceTypeUnfinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ScheduleRuleset"=>1}
-    expected_values = {"Annual_kwh"=>935.0, "Location"=>args_hash["location"]}
-    _test_measure("SFA_4units_1story_UB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_values = {"Annual_kwh"=>num_units*935.0, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_UB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
   
   def test_multifamily_new_construction
@@ -317,7 +317,7 @@ class ResidentialFreezerTest < MiniTest::Test
             if obj_type == "ElectricEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
                 actual_values["Annual_kwh"] += UnitConversions.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh")
-                actual_values["Location"] << "Space: #{new_object.space.get.name.to_s}"
+                actual_values["Location"] << new_object.space.get.spaceType.get.standardsSpaceType.get
             end
         end
     end

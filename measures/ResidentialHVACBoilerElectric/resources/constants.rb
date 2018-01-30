@@ -263,12 +263,6 @@ class Constants
   def self.LocationExterior
     return 'exterior'
   end
-  def self.LocationSpace(space_name=nil)
-    return "Space: #{space_name}"
-  end
-  def self.LocationSpaceType(space_type_name=nil)
-    return "Space Type: #{space_type_name}"
-  end
   def self.MaterialCopper
     return 'copper'
   end
@@ -975,12 +969,6 @@ class Constants
   def self.SizingInfoZoneInfiltrationELA(zone) # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s, zone)
   end
-  def self.SpaceTypeUnfinishedAttic
-    return 'unfinished attic'
-  end
-  def self.SpaceTypeUnfinishedBasement
-    return 'unfinished basement'
-  end
   def self.SpaceTypeBathroom
     return 'bathroom' # only used by multi-zone simulations
   end
@@ -992,6 +980,9 @@ class Constants
   end
   def self.SpaceTypeCrawl
     return 'crawlspace'
+  end
+  def self.SpaceTypeFinishedBasement
+    return 'finished basement'
   end
   def self.SpaceTypeGarage
     return 'garage'
@@ -1007,6 +998,12 @@ class Constants
   end
   def self.SpaceTypePierBeam
     return 'pier and beam'
+  end
+  def self.SpaceTypeUnfinishedAttic
+    return 'unfinished attic'
+  end
+  def self.SpaceTypeUnfinishedBasement
+    return 'unfinished basement'
   end
   def self.TerrainOcean
     return 'ocean'
@@ -1057,17 +1054,18 @@ class Constants
     return ' See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.'
   end
   def self.ExpectedSpaceTypes
-    return [self.SpaceTypeUnfinishedAttic,
-            self.SpaceTypeUnfinishedBasement,
+    return [self.SpaceTypeBathroom,
+            self.SpaceTypeBedroom,
             self.SpaceTypeCorridor,
             self.SpaceTypeCrawl,
+            self.SpaceTypeFinishedBasement,
             self.SpaceTypeGarage,
+            self.SpaceTypeKitchen,
+            self.SpaceTypeLaundryRoom,
             self.SpaceTypeLiving,
             self.SpaceTypePierBeam,
-            self.SpaceTypeKitchen,
-            self.SpaceTypeBedroom,
-            self.SpaceTypeBathroom,
-            self.SpaceTypeLaundryRoom]
+            self.SpaceTypeUnfinishedAttic,
+            self.SpaceTypeUnfinishedBasement]
   end 
   
 end

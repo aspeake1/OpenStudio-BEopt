@@ -122,9 +122,9 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
             remove_existing(runner, space, obj_names)
         end
         
-        location_hierarchy = [[Constants.SpaceTypeBathroom, nil],
-                              [Constants.SpaceTypeLiving, "space_is_above_grade"],
-                              [Constants.SpaceTypeLiving, "space_is_below_grade"]]
+        location_hierarchy = [Constants.SpaceTypeBathroom,
+                              Constants.SpaceTypeLiving,
+                              Constants.SpaceTypeFinishedBasement]
                           
         tot_sh_gpd = 0
         tot_s_gpd = 0
@@ -143,7 +143,7 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
             end
 
             # Get space
-            space = Geometry.get_space_from_location(unit.spaces, Constants.Auto, location_hierarchy)
+            space = Geometry.get_space_from_location(unit, Constants.Auto, location_hierarchy)
             next if space.nil?
             
             #Get plant loop

@@ -109,8 +109,8 @@ class ResidentialWellPump < OpenStudio::Measure::ModelMeasure
         remove_existing(runner, space, obj_name)
     end
 
-    location_hierarchy = [[Constants.SpaceTypeLiving, "space_is_above_grade"],
-                          [Constants.SpaceTypeLiving, "space_is_below_grade"]]
+    location_hierarchy = [Constants.SpaceTypeLiving,
+                          Constants.SpaceTypeFinishedBasement]
 
     tot_wp_ann = 0
     msgs = []
@@ -129,7 +129,7 @@ class ResidentialWellPump < OpenStudio::Measure::ModelMeasure
         end
         
         # Get space
-        space = Geometry.get_space_from_location(unit.spaces, Constants.Auto, [Constants.SpaceTypeLiving])
+        space = Geometry.get_space_from_location(unit, Constants.Auto, location_hierarchy)
         next if space.nil?
 
         unit_obj_name = Constants.ObjectNameWellPump(unit.name.to_s)

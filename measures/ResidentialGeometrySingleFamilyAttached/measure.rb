@@ -530,12 +530,12 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
         foundation_space.setName("finished basement space")
         foundation_zone.setName("finished basement zone")
         foundation_space.setThermalZone(foundation_zone)
-        if space_types_hash.keys.include? Constants.SpaceTypeLiving
-          foundation_space_type = space_types_hash[Constants.SpaceTypeLiving]
+        if space_types_hash.keys.include? Constants.SpaceTypeFinishedBasement
+          foundation_space_type = space_types_hash[Constants.SpaceTypeFinishedBasement]
         else
           foundation_space_type = OpenStudio::Model::SpaceType.new(model)
-          foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeLiving)
-          space_types_hash[Constants.SpaceTypeLiving] = foundation_space_type
+          foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeFinishedBasement)
+          space_types_hash[Constants.SpaceTypeFinishedBasement] = foundation_space_type
         end
         foundation_space.setSpaceType(foundation_space_type)
       end
@@ -581,23 +581,23 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
 
           # front or back unit
           if unit_num % 2 != 0 # odd unit number
-            living_spaces = foundation_space_front
+            fnd_spaces = foundation_space_front
             pos += 1
           else # even unit number
-            living_spaces = foundation_space_back
+            fnd_spaces = foundation_space_back
           end
           
           if foundation_type == "finished basement"
-            living_zone = OpenStudio::Model::ThermalZone.new(model)
-            living_zone.setName("finished basement zone|#{Constants.ObjectNameBuildingUnit(unit_num)}")
+            basement_zone = OpenStudio::Model::ThermalZone.new(model)
+            basement_zone.setName("finished basement zone|#{Constants.ObjectNameBuildingUnit(unit_num)}")
           end
         
-          living_spaces.each do |living_space|
+          fnd_spaces.each do |fnd_space|
         
-            new_living_space = living_space.clone.to_Space.get
+            new_fnd_space = fnd_space.clone.to_Space.get
             if foundation_type == "finished basement"
-              new_living_space.setName("finished basement space|#{Constants.ObjectNameBuildingUnit(unit_num)}")
-              new_living_space.setSpaceType(living_space_type)
+              new_fnd_space.setName("finished basement space|#{Constants.ObjectNameBuildingUnit(unit_num)}")
+              new_fnd_space.setSpaceType(foundation_space_type)
             end
           
             m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
@@ -605,18 +605,18 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
             if (pos + 1) % 2 == 0
               m[1,3] = -offset
             end          
-            new_living_space.changeTransformation(OpenStudio::Transformation.new(m))
-            new_living_space.setXOrigin(0)
-            new_living_space.setYOrigin(0)
-            new_living_space.setZOrigin(0)
+            new_fnd_space.changeTransformation(OpenStudio::Transformation.new(m))
+            new_fnd_space.setXOrigin(0)
+            new_fnd_space.setYOrigin(0)
+            new_fnd_space.setZOrigin(0)
             if foundation_type == "finished basement"
-              new_living_space.setThermalZone(living_zone)
+              new_fnd_space.setThermalZone(basement_zone)
             end
          
-            foundation_spaces << new_living_space
+            foundation_spaces << new_fnd_space
             
             if foundation_type == "finished basement"
-              unit_spaces_hash[unit_num] << new_living_space
+              unit_spaces_hash[unit_num] << new_fnd_space
             end            
           
           end
@@ -628,20 +628,20 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
         pos = 0
         (2..num_units).to_a.each do |unit_num|
 
-          living_spaces = foundation_space_front
+          fnd_spaces = foundation_space_front
           pos += 1
           
           if foundation_type == "finished basement"
-            living_zone = OpenStudio::Model::ThermalZone.new(model)
-            living_zone.setName("finished basement zone|#{Constants.ObjectNameBuildingUnit(unit_num)}")
+            basement_zone = OpenStudio::Model::ThermalZone.new(model)
+            basement_zone.setName("finished basement zone|#{Constants.ObjectNameBuildingUnit(unit_num)}")
           end
         
-          living_spaces.each do |living_space|
+          fnd_spaces.each do |fnd_space|
             
-            new_living_space = living_space.clone.to_Space.get
+            new_fnd_space = fnd_space.clone.to_Space.get
             if foundation_type == "finished basement"
-              new_living_space.setName("finished basement space|#{Constants.ObjectNameBuildingUnit(unit_num)}")
-              new_living_space.setSpaceType(living_space_type)
+              new_fnd_space.setName("finished basement space|#{Constants.ObjectNameBuildingUnit(unit_num)}")
+              new_fnd_space.setSpaceType(foundation_space_type)
             end
           
             m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
@@ -649,18 +649,18 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
             if (pos + 1) % 2 == 0
               m[1,3] = -offset
             end          
-            new_living_space.changeTransformation(OpenStudio::Transformation.new(m))
-            new_living_space.setXOrigin(0)
-            new_living_space.setYOrigin(0)
-            new_living_space.setZOrigin(0)
+            new_fnd_space.changeTransformation(OpenStudio::Transformation.new(m))
+            new_fnd_space.setXOrigin(0)
+            new_fnd_space.setYOrigin(0)
+            new_fnd_space.setZOrigin(0)
             if foundation_type == "finished basement"
-              new_living_space.setThermalZone(living_zone)
+              new_fnd_space.setThermalZone(basement_zone)
             end
          
-            foundation_spaces << new_living_space
+            foundation_spaces << new_fnd_space
           
             if foundation_type == "finished basement"
-              unit_spaces_hash[unit_num] << new_living_space
+              unit_spaces_hash[unit_num] << new_fnd_space
             end
             
           end

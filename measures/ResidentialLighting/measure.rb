@@ -325,8 +325,6 @@ class ResidentialLighting < OpenStudio::Measure::ModelMeasure
     for monthNum in 1..12
         month = monthNum-1
         monthHalfHourKWHs = [0]
-        # Calculate hour 12.5 first; others depend on it
-        #monthHalfHourKWHs[24] = june_kws[24] + ((dec_kws[24] - june_kws[24]) / 2.0 / 0.266 * (1.0 / 1.5 / ((2.0*pi)**0.5)) * Math.exp(-0.5 * (((6 - monthNum).abs - 6) / 1.5)**2)) + ((dec_kws[24] - june_kws[24]) / 2 / 0.399 * (1 / 1 / ((2 * pi)**0.5)) * Math.exp(-0.5 * (((4.847 - sunrise_hour[month]).abs - 3.2) / 1.0)**2))
         for hourNum in 0..9
             monthHalfHourKWHs[hourNum] = june_kws[hourNum]
         end

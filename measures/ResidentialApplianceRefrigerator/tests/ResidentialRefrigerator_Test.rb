@@ -75,7 +75,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
   def test_new_construction_basement
     args_hash = {}
     args_hash["fridge_E"] = 434.0
-    args_hash["location"] = "Space: finished basement space"
+    args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>434.0, "Location"=>args_hash["location"]}
@@ -179,28 +179,28 @@ class ResidentialRefrigeratorTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units}
-    expected_values = {"Annual_kwh"=>1737.4, "Location"=>args_hash["location"]}
+    expected_values = {"Annual_kwh"=>num_units*434.35, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
   def test_single_family_attached_new_construction_finished_basement
     num_units = 4
     args_hash = {}
-    args_hash["location"] = "Space: finished basement space"
+    args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
-    expected_values = {"Annual_kwh"=>434.35, "Location"=>args_hash["location"]}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*434.35, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
 
   def test_single_family_attached_new_construction_unfinished_basement
     num_units = 4
     args_hash = {}
-    args_hash["location"] = "Space: unfinished basement space"
+    args_hash["location"] = Constants.SpaceTypeUnfinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
-    expected_values = {"Annual_kwh"=>434.35, "Location"=>args_hash["location"]}
-    _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*434.35, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
 
   def test_multifamily_new_construction
@@ -208,7 +208,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units}
-    expected_values = {"Annual_kwh"=>3474.8, "Location"=>args_hash["location"]}
+    expected_values = {"Annual_kwh"=>num_units*434.35, "Location"=>args_hash["location"]}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
   
@@ -313,7 +313,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
             if obj_type == "ElectricEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
                 actual_values["Annual_kwh"] += UnitConversions.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh")
-                actual_values["Location"] << "Space: #{new_object.space.get.name.to_s}"
+                actual_values["Location"] << new_object.space.get.spaceType.get.standardsSpaceType.get
             end
         end
     end

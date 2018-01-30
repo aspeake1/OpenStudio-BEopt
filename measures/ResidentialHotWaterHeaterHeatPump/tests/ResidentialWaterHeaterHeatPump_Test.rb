@@ -132,7 +132,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
   
     def test_new_construction_50_living
         args_hash = {}
-        args_hash["location"] = "Space: living space"
+        args_hash["location"] = Constants.SpaceTypeLiving
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16, "ScheduleConstant"=>7, "ScheduleRuleset"=>7}
         expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
@@ -401,16 +401,6 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
     end
 
-    # def test_single_family_attached_new_construction_living_space
-        # num_units = 4
-        # args_hash = {}
-        # args_hash["space"] = Constants.LivingSpace
-        # expected_num_del_objects = {}
-        # expected_num_new_objects = {"WaterHeaterStratified"=>1*num_units, "PlantLoop"=>1*num_units, "PumpVariableSpeed"=>1*num_units, "WaterHeaterHeatPumpWrappedCondenser"=>1*num_units, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1*num_units, "FanOnOff"=>1*num_units, "OtherEquipment"=>2*num_units, "OtherEquipmentDefinition"=>2*num_units, "EnergyManagementSystemSensor"=>9*num_units, "EnergyManagementSystemActuator"=>7*num_units, "EnergyManagementSystemTrendVariable"=>3*num_units, "EnergyManagementSystemProgram"=>2*num_units, "EnergyManagementSystemProgramCallingManager"=>1*num_units, "ScheduleConstant"=>6*num_units+1, "ScheduleRuleset"=>7*num_units, "OutputVariable"=>16}
-        # expected_values = {"TankVolume"=>45, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
-        # _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
-    # end  
-  
     def test_multifamily_new_construction
         num_units = 8
         args_hash = {}

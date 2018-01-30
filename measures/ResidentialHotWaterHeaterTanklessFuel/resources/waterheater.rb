@@ -437,20 +437,20 @@ class Waterheater
     
     def self.get_location_hierarchy(ba_cz_name)
         if [Constants.BAZoneHotDry, Constants.BAZoneHotHumid].include? ba_cz_name
-            return [[Constants.SpaceTypeGarage, nil],
-                    [Constants.SpaceTypeLiving, "space_is_below_grade"], 
-                    [Constants.SpaceTypeLiving, "space_is_above_grade"],
-                    [Constants.SpaceTypeLaundryRoom, nil], 
-                    [Constants.SpaceTypeCrawl, nil], 
-                    [Constants.SpaceTypeUnfinishedAttic, nil]]
+            return [Constants.SpaceTypeGarage,
+                    Constants.SpaceTypeLiving, 
+                    Constants.SpaceTypeFinishedBasement,
+                    Constants.SpaceTypeLaundryRoom, 
+                    Constants.SpaceTypeCrawl, 
+                    Constants.SpaceTypeUnfinishedAttic]
                                   
         elsif [Constants.BAZoneMarine, Constants.BAZoneMixedHumid, Constants.BAZoneMixedHumid, Constants.BAZoneCold, Constants.BAZoneVeryCold, Constants.BAZoneSubarctic].include? ba_cz_name
-            return [[Constants.SpaceTypeLiving, "space_is_below_grade"],
-                    [Constants.SpaceTypeUnfinishedBasement, nil], 
-                    [Constants.SpaceTypeLiving, "space_is_above_grade"], 
-                    [Constants.SpaceTypeLaundryRoom, nil], 
-                    [Constants.SpaceTypeCrawl, nil], 
-                    [Constants.SpaceTypeUnfinishedAttic, nil]]
+            return [Constants.SpaceTypeFinishedBasement,
+                    Constants.SpaceTypeUnfinishedBasement, 
+                    Constants.SpaceTypeLiving, 
+                    Constants.SpaceTypeLaundryRoom, 
+                    Constants.SpaceTypeCrawl, 
+                    Constants.SpaceTypeUnfinishedAttic]
         end
         return nil
     end

@@ -596,7 +596,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         foundation_space_type_name = Constants.SpaceTypeUnfinishedBasement
       elsif foundation_type == "finished basement"
         foundation_space_name = "finished basement space"
-        foundation_space_type_name = Constants.SpaceTypeLiving
+        foundation_space_type_name = Constants.SpaceTypeFinishedBasement
       elsif foundation_type == "pier and beam"
         foundation_space_name = "pier and beam space"
         foundation_space_type_name = Constants.SpaceTypePierBeam

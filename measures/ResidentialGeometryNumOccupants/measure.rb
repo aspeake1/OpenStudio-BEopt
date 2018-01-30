@@ -180,31 +180,31 @@ class AddResidentialOccupants < OpenStudio::Measure::ModelMeasure
       end
       
       # Get spaces
-      bedroom_spaces = Geometry.get_bedroom_spaces(unit.spaces)
-      living_spaces = Geometry.get_finished_spaces(unit.spaces) - bedroom_spaces
+      bedroom_ffa_spaces = Geometry.get_bedroom_spaces(unit.spaces)
+      non_bedroom_ffa_spaces = Geometry.get_finished_spaces(unit.spaces) - bedroom_ffa_spaces
       
       # Get FFA
-      living_ffa = Geometry.get_finished_floor_area_from_spaces(living_spaces, false, runner)
-      bedroom_ffa = Geometry.get_finished_floor_area_from_spaces(bedroom_spaces, false)
+      non_bedroom_ffa = Geometry.get_finished_floor_area_from_spaces(non_bedroom_ffa_spaces, false, runner)
+      bedroom_ffa = Geometry.get_finished_floor_area_from_spaces(bedroom_ffa_spaces, false)
       bedroom_ffa = 0 if bedroom_ffa.nil?
-      ffa = living_ffa + bedroom_ffa
+      ffa = non_bedroom_ffa + bedroom_ffa
       
       schedules = {}
-      if not bedroom_spaces.empty?
-          # Split schedules into living vs bedroom
+      if not bedroom_ffa_spaces.empty?
+          # Split schedules into non-bedroom vs bedroom
           bedroom_ratios = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75, 0.46, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.33, 1.0]
           
           living_weekday_sch = weekday_sch.split(",").map(&:to_f).zip(bedroom_ratios).map{|x,y| x*(1-y)}.join(", ")
           living_weekend_sch = weekend_sch.split(",").map(&:to_f).zip(bedroom_ratios).map{|x,y| x*(1-y)}.join(", ")
           living_activity_per_person = 420.0/384.0*activity_per_person
-          schedules[living_spaces] = [living_weekday_sch, living_weekend_sch, living_activity_per_person]
+          schedules[non_bedroom_ffa_spaces] = [living_weekday_sch, living_weekend_sch, living_activity_per_person]
           
           bedroom_weekday_sch = weekday_sch.split(",").map(&:to_f).zip(bedroom_ratios).map{|x,y| x*y}.join(", ")
           bedroom_weekend_sch = weekend_sch.split(",").map(&:to_f).zip(bedroom_ratios).map{|x,y| x*y}.join(", ")
           bedroom_activity_per_person = 350.0/384.0*activity_per_person
-          schedules[bedroom_spaces] = [bedroom_weekday_sch, bedroom_weekend_sch, bedroom_activity_per_person]
+          schedules[bedroom_ffa_spaces] = [bedroom_weekday_sch, bedroom_weekend_sch, bedroom_activity_per_person]
       else
-          schedules[living_spaces] = [weekday_sch, weekend_sch, activity_per_person]
+          schedules[non_bedroom_ffa_spaces] = [weekday_sch, weekend_sch, activity_per_person]
       end
       
       # Assign occupants to each space of the unit

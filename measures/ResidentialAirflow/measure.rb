@@ -2890,20 +2890,16 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     duct_location_zone = nil
     duct_location_name = "none"
     
-    location_hierarchy = [[Constants.SpaceTypeLiving, "is_basement"],
-                          [Constants.SpaceTypeUnfinishedBasement, nil],
-                          [Constants.SpaceTypeCrawl, nil],
-                          [Constants.SpaceTypePierBeam, nil],
-                          [Constants.SpaceTypeUnfinishedAttic, nil],
-                          [Constants.SpaceTypeGarage, nil],
-                          [Constants.SpaceTypeLiving, nil]]
+    location_hierarchy = [Constants.SpaceTypeFinishedBasement,
+                          Constants.SpaceTypeUnfinishedBasement,
+                          Constants.SpaceTypeCrawl,
+                          Constants.SpaceTypePierBeam,
+                          Constants.SpaceTypeUnfinishedAttic,
+                          Constants.SpaceTypeGarage,
+                          Constants.SpaceTypeLiving]
     
     # Get space
-    space = Geometry.get_space_from_location(building_unit.spaces+Geometry.get_unit_adjacent_common_spaces(building_unit), location, location_hierarchy)
-    if space.nil? and unit_index == 0 and location.start_with?("Space: ")
-        # Look once for user-specified space in common spaces
-        space = Geometry.get_space_from_location(Geometry.get_common_spaces(model), location, location_hierarchy)
-    end
+    space = Geometry.get_space_from_location(building_unit, location, location_hierarchy)
     return duct_location_zone, duct_location_name if space.nil?
     
     duct_location_zone = space.thermalZone.get

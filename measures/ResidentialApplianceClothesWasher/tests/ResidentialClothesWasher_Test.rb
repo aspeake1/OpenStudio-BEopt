@@ -147,7 +147,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     args_hash = {}
     args_hash["imef"] = (1.41 - 0.503) / 0.95
     args_hash["rated_annual_energy"] = 387
-    args_hash["location"] = "Space: finished basement space"
+    args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>42.9, "HotWater_gpd"=>10.00, "Location"=>args_hash["location"]}
@@ -339,28 +339,28 @@ class ResidentialClothesWasherTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleConstant"=>num_units, "ScheduleFixedInterval"=>num_units, "WaterUseEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units}
-    expected_values = {"Annual_kwh"=>171.77, "HotWater_gpd"=>39.99, "Location"=>args_hash["location"]}
+    expected_values = {"Annual_kwh"=>num_units*42.94, "HotWater_gpd"=>num_units*9.99, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
   def test_single_family_attached_new_construction_finished_basement
     num_units = 4
     args_hash = {}
-    args_hash["location"] = "Space: finished basement space"
+    args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ScheduleConstant"=>1, "ScheduleFixedInterval"=>1, "WaterUseEquipment"=>1, "WaterUseEquipmentDefinition"=>1}
-    expected_values = {"Annual_kwh"=>42.94, "HotWater_gpd"=>9.99, "Location"=>args_hash["location"]}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleConstant"=>num_units, "ScheduleFixedInterval"=>num_units, "WaterUseEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*42.94, "HotWater_gpd"=>num_units*9.99, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
 
   def test_single_family_attached_new_construction_unfinished_basement
     num_units = 4
     args_hash = {}
-    args_hash["location"] = "Space: unfinished basement space"
+    args_hash["location"] = Constants.SpaceTypeUnfinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ScheduleConstant"=>1, "ScheduleFixedInterval"=>1, "WaterUseEquipment"=>1, "WaterUseEquipmentDefinition"=>1}
-    expected_values = {"Annual_kwh"=>42.94, "HotWater_gpd"=>9.99, "Location"=>args_hash["location"]}
-    _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleConstant"=>num_units, "ScheduleFixedInterval"=>num_units, "WaterUseEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*42.94, "HotWater_gpd"=>num_units*9.99, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
 
   def test_multifamily_new_construction
@@ -475,11 +475,11 @@ class ResidentialClothesWasherTest < MiniTest::Test
             if obj_type == "ElectricEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
                 actual_values["Annual_kwh"] += UnitConversions.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh")
-                actual_values["Location"] << "Space: #{new_object.space.get.name.to_s}"
+                actual_values["Location"] << new_object.space.get.spaceType.get.standardsSpaceType.get
             elsif obj_type == "WaterUseEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.flowRateFractionSchedule.get)
                 actual_values["HotWater_gpd"] += UnitConversions.convert(full_load_hrs * new_object.waterUseEquipmentDefinition.peakFlowRate * new_object.multiplier, "m^3/s", "gal/min") * 60.0 / 365.0
-                actual_values["Location"] << "Space: #{new_object.space.get.name.to_s}"
+                actual_values["Location"] << new_object.space.get.spaceType.get.standardsSpaceType.get
             end
         end
     end

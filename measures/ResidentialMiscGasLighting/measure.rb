@@ -107,8 +107,8 @@ class ResidentialGasLighting < OpenStudio::Measure::ModelMeasure
         remove_existing(runner, space, obj_name)
     end
 
-    location_hierarchy = [[Constants.SpaceTypeLiving, "space_is_above_grade"],
-                          [Constants.SpaceTypeLiving, "space_is_below_grade"]]
+    location_hierarchy = [Constants.SpaceTypeLiving,
+                          Constants.SpaceTypeFinishedBasement]
 
     tot_gl_ann_g = 0
     msgs = []
@@ -127,7 +127,7 @@ class ResidentialGasLighting < OpenStudio::Measure::ModelMeasure
         end
         
         # Get space
-        space = Geometry.get_space_from_location(unit.spaces, Constants.Auto, location_hierarchy)
+        space = Geometry.get_space_from_location(unit, Constants.Auto, location_hierarchy)
         next if space.nil?
 
         unit_obj_name = Constants.ObjectNameGasLighting(unit.name.to_s)

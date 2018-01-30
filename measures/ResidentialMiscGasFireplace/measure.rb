@@ -73,7 +73,7 @@ class ResidentialGasFireplace < OpenStudio::Measure::ModelMeasure
     end
     location = OpenStudio::Measure::OSArgument::makeChoiceArgument("location", location_args, true)
     location.setDisplayName("Location")
-    location.setDescription("Specify the space or space type. '#{Constants.Auto}' will try to automatically choose an appropriate space.")
+    location.setDescription("The space type for the location. '#{Constants.Auto}' will automatically choose a space type based on the space types found in the model.")
     location.setDefaultValue(Constants.Auto)
     args << location
 
@@ -120,8 +120,8 @@ class ResidentialGasFireplace < OpenStudio::Measure::ModelMeasure
         remove_existing(runner, space, obj_name)
     end
     
-    location_hierarchy = [[Constants.SpaceTypeLiving, "space_is_above_grade"],
-                          [Constants.SpaceTypeLiving, "space_is_below_grade"]]
+    location_hierarchy = [Constants.SpaceTypeLiving,
+                          Constants.SpaceTypeFinishedBasement]
 
     tot_gf_ann_g = 0
     msgs = []
@@ -141,11 +141,7 @@ class ResidentialGasFireplace < OpenStudio::Measure::ModelMeasure
         end
         
         # Get space
-        space = Geometry.get_space_from_location(unit.spaces, location, location_hierarchy)
-        if space.nil? and unit_index == 0 and location.start_with?("Space: ")
-            # Look once for user-specified space in common spaces
-            space = Geometry.get_space_from_location(Geometry.get_common_spaces(model), location, location_hierarchy)
-        end
+        space = Geometry.get_space_from_location(unit, location, location_hierarchy)
         next if space.nil?
         
         unit_obj_name = Constants.ObjectNameGasFireplace(unit.name.to_s)

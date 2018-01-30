@@ -444,7 +444,8 @@ class Geometry
     end
     
     def self.is_living_space_type(space_type)
-      if [Constants.SpaceTypeLiving, Constants.SpaceTypeKitchen, Constants.SpaceTypeBedroom, Constants.SpaceTypeBathroom, Constants.SpaceTypeLaundryRoom].include? space_type
+      if [Constants.SpaceTypeLiving, Constants.SpaceTypeFinishedBasement, Constants.SpaceTypeKitchen, 
+          Constants.SpaceTypeBedroom, Constants.SpaceTypeBathroom, Constants.SpaceTypeLaundryRoom].include? space_type
         return true
       end
       return false
@@ -490,36 +491,23 @@ class Geometry
     
     def self.get_model_locations(model)
         locations = []
-        model.getSpaces.each do |space|
-            locations << Constants.LocationSpace(space.name)
-        end
         model.getSpaceTypes.each do |spaceType|
             next if not spaceType.standardsSpaceType.is_initialized
-            locations << Constants.LocationSpaceType(spaceType.standardsSpaceType.get)
+            locations << spaceType.standardsSpaceType.get
         end
         return locations
     end
     
-    def self.get_space_from_location(spaces, location, location_hierarchy)
+    def self.get_space_from_location(unit, location, location_hierarchy)
+        spaces = unit.spaces + self.get_unit_adjacent_common_spaces(unit)
         if location == Constants.Auto
-            location_hierarchy.each do |space_type, constraint_method|
+            location_hierarchy.each do |space_type|
                 spaces.each do |space|
                     next if not self.space_is_of_type(space, space_type)
-                    if not constraint_method.nil?
-                        # skip space if the constraint method (e.g., "space_is_above_grade") does not return true
-                        next if not Geometry.send(constraint_method, space)
-                    end
                     return space
                 end
             end
-        elsif location.start_with? Constants.LocationSpace
-            location = location.gsub(Constants.LocationSpace,"")
-            spaces.each do |space|
-              next if space.name.to_s != location
-              return space
-            end
-        elsif location.start_with? Constants.LocationSpaceType
-            location = location.gsub(Constants.LocationSpaceType,"")
+        else
             spaces.each do |space|
                 next if not space.spaceType.is_initialized
                 next if not space.spaceType.get.standardsSpaceType.is_initialized
@@ -811,9 +799,6 @@ class Geometry
     end
     
     def self.is_living(space_or_zone)
-        if self.is_finished_basement(space_or_zone) or self.is_finished_attic(space_or_zone)
-          return nil
-        end
         return self.space_or_zone_is_of_type(space_or_zone, Constants.SpaceTypeLiving)
     end
     
@@ -826,7 +811,7 @@ class Geometry
     end
     
     def self.is_finished_basement(space_or_zone)
-        return self.space_or_zone_is_of_type(space_or_zone, Constants.SpaceTypeLiving) && self.is_basement(space_or_zone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.SpaceTypeFinishedBasement)
     end
     
     def self.is_unfinished_basement(space_or_zone)
@@ -835,10 +820,6 @@ class Geometry
     
     def self.is_unfinished_attic(space_or_zone)
         return self.space_or_zone_is_of_type(space_or_zone, Constants.SpaceTypeUnfinishedAttic)
-    end
-    
-    def self.is_finished_attic(space_or_zone)
-        return self.space_or_zone_is_of_type(space_or_zone, Constants.SpaceTypeLiving) && self.is_attic(space_or_zone)
     end
     
     def self.is_garage(space_or_zone)
@@ -869,7 +850,7 @@ class Geometry
           end
         end
       end
-      return nil
+      return false
     end
     
     def self.zone_is_of_type(zone, space_type)
@@ -986,15 +967,6 @@ class Geometry
             unfinished_attic_spaces << space
         end
         return unfinished_attic_spaces
-    end
-        
-    def self.get_finished_attic_spaces(spaces)
-        finished_attic_spaces = []
-        spaces.each do |space|
-            next if not self.is_finished_attic(space)
-            finished_attic_spaces << space
-        end
-        return finished_attic_spaces
     end
         
     def self.get_garage_spaces(spaces)

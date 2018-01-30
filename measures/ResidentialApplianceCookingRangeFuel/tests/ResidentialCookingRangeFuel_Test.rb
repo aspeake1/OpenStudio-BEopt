@@ -93,7 +93,7 @@ class ResidentialCookingRangeFuelTest < MiniTest::Test
     args_hash = {}
     args_hash["c_ef"] = 0.4
     args_hash["o_ef"] = 0.058
-    args_hash["location"] = "Space: finished basement space"
+    args_hash["location"] = Constants.SpaceTypeFinishedBasement
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -105,7 +105,7 @@ class ResidentialCookingRangeFuelTest < MiniTest::Test
     args_hash = {}
     args_hash["c_ef"] = 0.4
     args_hash["o_ef"] = 0.058
-    args_hash["location"] = "Space: garage space"
+    args_hash["location"] = Constants.SpaceTypeGarage
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -331,7 +331,7 @@ class ResidentialCookingRangeFuelTest < MiniTest::Test
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units}
-    expected_values = {"Annual_kwh"=>319.48, "Annual_therm"=>114.13, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
+    expected_values = {"Annual_kwh"=>num_units*79.87, "Annual_therm"=>num_units*28.53, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
@@ -339,22 +339,22 @@ class ResidentialCookingRangeFuelTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     args_hash["fuel_type"] = Constants.FuelTypeGas
-    args_hash["location"] = "Space: finished basement space"
+    args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "OtherEquipment"=>1, "OtherEquipmentDefinition"=>1}
-    expected_values = {"Annual_kwh"=>79.87, "Annual_therm"=>28.53, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*79.87, "Annual_therm"=>num_units*28.53, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
 
   def test_single_family_attached_new_construction_unfinished_basement
     num_units = 4
     args_hash = {}
     args_hash["fuel_type"] = Constants.FuelTypeGas
-    args_hash["location"] = "Space: unfinished basement space"
+    args_hash["location"] = Constants.SpaceTypeUnfinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "OtherEquipment"=>1, "OtherEquipmentDefinition"=>1}
-    expected_values = {"Annual_kwh"=>79.87, "Annual_therm"=>28.53, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
-    _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*79.87, "Annual_therm"=>num_units*28.53, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
 
   def test_multifamily_new_construction
@@ -468,7 +468,7 @@ class ResidentialCookingRangeFuelTest < MiniTest::Test
             if obj_type == "ElectricEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
                 actual_values["Annual_kwh"] += UnitConversions.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh")
-                actual_values["Location"] << "Space: #{new_object.space.get.name.to_s}"
+                actual_values["Location"] << new_object.space.get.spaceType.get.standardsSpaceType.get
             elsif obj_type == "OtherEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
                 if args_hash["fuel_type"] == Constants.FuelTypeGas
@@ -476,7 +476,7 @@ class ResidentialCookingRangeFuelTest < MiniTest::Test
                 else
                     actual_values["Annual_gal"] += UnitConversions.btu2gal(UnitConversions.convert(full_load_hrs * new_object.otherEquipmentDefinition.designLevel.get * new_object.multiplier, "Wh", "Btu"), args_hash["fuel_type"])
                 end
-                actual_values["Location"] << "Space: #{new_object.space.get.name.to_s}"
+                actual_values["Location"] << new_object.space.get.spaceType.get.standardsSpaceType.get
                 assert_equal(HelperMethods.eplus_fuel_map(expected_values["FuelType"]), new_object.fuelType)
             end
         end

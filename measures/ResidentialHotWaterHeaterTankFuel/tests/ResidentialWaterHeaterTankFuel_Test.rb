@@ -176,7 +176,7 @@ class ResidentialHotWaterHeaterTankFuelTest < MiniTest::Test
 
   def test_new_construction_standard_living
     args_hash = {}
-    args_hash["location"] = "Space: living space"
+    args_hash["location"] = Constants.SpaceTypeLiving
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
@@ -486,11 +486,11 @@ class ResidentialHotWaterHeaterTankFuelTest < MiniTest::Test
   def test_single_family_attached_new_construction_living_zone
     num_units = 4
     args_hash = {}
-    args_hash["location"] = "Space: living space"
+    args_hash["location"] = Constants.SpaceTypeLiving
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>40, "InputCapacity"=>11.72, "ThermalEfficiency"=>0.773, "TankUA"=>7.88, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "FuelType"=>Constants.FuelTypeGas, "SkinLossFrac"=>0.64}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    expected_num_new_objects = {"WaterHeaterMixed"=>num_units, "PlantLoop"=>num_units, "PumpVariableSpeed"=>num_units, "ScheduleConstant"=>2*num_units}
+    expected_values = {"TankVolume"=>num_units*40, "InputCapacity"=>num_units*11.72, "ThermalEfficiency"=>num_units*0.773, "TankUA"=>num_units*7.88, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0, "FuelType"=>Constants.FuelTypeGas, "SkinLossFrac"=>num_units*0.64}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
   
   def test_multifamily_new_construction
