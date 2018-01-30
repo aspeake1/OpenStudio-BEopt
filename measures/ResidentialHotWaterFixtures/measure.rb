@@ -147,7 +147,7 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
             next if space.nil?
             
             #Get plant loop
-            plant_loop = Waterheater.get_plant_loop_from_string(model.getPlantLoops, plant_loop_s, unit, Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit", "u")).gsub("|","_"), runner)
+            plant_loop = Waterheater.get_plant_loop_from_string(model.getPlantLoops, plant_loop_s, unit, Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit ", "")).gsub("|","_"), runner)
             if plant_loop.nil?
                 return false
             end

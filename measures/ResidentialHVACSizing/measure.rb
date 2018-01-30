@@ -1251,16 +1251,16 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     icfm_Heating = ela * ft2in ** 2 * (c_s * htd.abs + c_w * (weather.design.HeatingWindspeed / mph2m_s) ** 2) ** 0.5
     icfm_Dehumid = ela * ft2in ** 2 * (c_s * mj8.dtd.abs + c_w * (dehumDesignWindSpeed / mph2m_s) ** 2) ** 0.5
 
-    q_unb, q_bal_Sens, q_bal_Lat, ventMultiplier = get_ventilation_rates(runner, unit)
-    return nil if q_unb.nil? or q_bal_Sens.nil? or q_bal_Lat.nil? or ventMultiplier.nil?
+    q_unb, q_bal_Sens, q_bal_Lat = get_ventilation_rates(runner, unit)
+    return nil if q_unb.nil? or q_bal_Sens.nil? or q_bal_Lat.nil?
 
-    cfm_Heating = q_bal_Sens + (icfm_Heating ** 2 + ventMultiplier * (q_unb ** 2)).abs ** 0.5
+    cfm_Heating = q_bal_Sens + (icfm_Heating ** 2 + q_unb ** 2) ** 0.5
     
-    cfm_Cool_Load_Sens = q_bal_Sens + (icfm_Cooling ** 2 + ventMultiplier * (q_unb ** 2)).abs ** 0.5
-    cfm_Cool_Load_Lat = q_bal_Lat + (icfm_Cooling ** 2 + ventMultiplier * (q_unb ** 2)).abs ** 0.5
+    cfm_Cool_Load_Sens = q_bal_Sens + (icfm_Cooling ** 2 + q_unb ** 2) ** 0.5
+    cfm_Cool_Load_Lat = q_bal_Lat + (icfm_Cooling ** 2 + q_unb ** 2) ** 0.5
     
-    cfm_Dehumid_Load_Sens = q_bal_Sens + (icfm_Dehumid ** 2 + ventMultiplier * (q_unb ** 2)).abs ** 0.5
-    cfm_Dehumid_Load_Lat = q_bal_Lat + (icfm_Dehumid ** 2 + ventMultiplier * (q_unb ** 2)).abs ** 0.5
+    cfm_Dehumid_Load_Sens = q_bal_Sens + (icfm_Dehumid ** 2 + q_unb ** 2) ** 0.5
+    cfm_Dehumid_Load_Lat = q_bal_Lat + (icfm_Dehumid ** 2 + q_unb ** 2) ** 0.5
     
     zone_loads.Heat_Infil = 1.1 * mj8.acf * cfm_Heating * htd
     
@@ -2697,14 +2697,11 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     q_unb = 0
     q_bal_Sens = 0
     q_bal_Lat = 0
-    ventMultiplier = 1
 
     if mechVentType == Constants.VentTypeExhaust
         q_unb = mechVentWholeHouseRate
-        ventMultiplier = 1
-    elsif mechVentType == Constants.VentTypeSupply
+    elsif mechVentType == Constants.VentTypeSupply or mechVentType == Constants.VentTypeCFIS
         q_unb = mechVentWholeHouseRate
-        ventMultiplier = -1
     elsif mechVentType == Constants.VentTypeBalanced
         totalEfficiency = get_unit_feature(runner, unit, Constants.SizingInfoMechVentTotalEfficiency, 'double')
         apparentSensibleEffectiveness = get_unit_feature(runner, unit, Constants.SizingInfoMechVentApparentSensibleEffectiveness, 'double')
@@ -2719,7 +2716,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         return nil
     end
     
-    return [q_unb, q_bal_Sens, q_bal_Lat, ventMultiplier]
+    return [q_unb, q_bal_Sens, q_bal_Lat]
   end
   
   def get_window_shgc(runner, surface)

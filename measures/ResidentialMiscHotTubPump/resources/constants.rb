@@ -1041,6 +1041,9 @@ class Constants
   def self.VentTypeBalanced
     return 'balanced'
   end
+  def self.VentTypeCFIS
+    return 'central fan integrated supply'
+  end
   def self.WaterHeaterTypeTankless
     return 'tankless'
   end

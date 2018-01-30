@@ -369,7 +369,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
 
         units.each_with_index do |unit, unit_index|
 
-            obj_name_hpwh = Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit", "u")).gsub("|","_")
+            obj_name_hpwh = Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit ", "")).gsub("|","_")
 
             # Get unit beds/baths
             nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)
