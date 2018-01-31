@@ -471,21 +471,15 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     args << nat_vent_max_oa_rh
     
     #make a choice arguments for duct location
-    duct_locations = OpenStudio::StringVector.new
-    duct_locations << "none"
-    duct_locations << Constants.Auto
-    duct_locations << Constants.LivingZone
-    duct_locations << Constants.AtticZone
-    duct_locations << Constants.UnfinishedAtticZone
-    duct_locations << Constants.BasementZone
-    duct_locations << Constants.FinishedBasementZone
-    duct_locations << Constants.UnfinishedBasementZone
-    duct_locations << Constants.CrawlZone
-    duct_locations << Constants.PierBeamZone
-    duct_locations << Constants.GarageZone
-    duct_location = OpenStudio::Measure::OSArgument::makeChoiceArgument("duct_location", duct_locations, true)
+    location_args = OpenStudio::StringVector.new
+    location_args << "none"
+    location_args << Constants.Auto
+    Geometry.get_model_locations(model).each do |loc|
+        location_args << loc
+    end
+    duct_location = OpenStudio::Measure::OSArgument::makeChoiceArgument("duct_location", location_args, true)
     duct_location.setDisplayName("Ducts: Location")
-    duct_location.setDescription("The space with the primary location of ducts.")
+    duct_location.setDescription("The primary location of ducts.")
     duct_location.setDefaultValue(Constants.Auto)
     args << duct_location
     
@@ -541,7 +535,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     duct_location_frac = OpenStudio::Measure::OSArgument::makeStringArgument("duct_location_frac", true)
     duct_location_frac.setDisplayName("Ducts: Location Fraction")
     duct_location_frac.setUnits("frac")
-    duct_location_frac.setDescription("Fraction of supply ducts in the space specified by Duct Location; the remainder of supply ducts will be located in above-grade conditioned space.")
+    duct_location_frac.setDescription("Fraction of supply ducts in the specified Duct Location; the remainder of supply ducts will be located in above-grade conditioned space.")
     duct_location_frac.setDefaultValue(Constants.Auto)
     args << duct_location_frac
 
@@ -710,9 +704,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       return false
     end
     
+    model_spaces = model.getSpaces
+    
     # Determine geometry for spaces and zones that aren't unit specific 
     spaces = []
-    model.getSpaces.each do |space|
+    model_spaces.each do |space|
       next if Geometry.space_is_below_grade(space)
       spaces << space
     end
@@ -724,8 +720,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
     building.stories = model.getBuilding.standardsNumberOfAboveGroundStories.get
     building.num_units = units.size
-    building.above_grade_volume = Geometry.get_above_grade_finished_volume_from_spaces(model.getSpaces, true)
-    building.above_grade_exterior_wall_area = Geometry.calculate_above_grade_exterior_wall_area(model.getSpaces, false)
+    building.above_grade_volume = Geometry.get_above_grade_finished_volume_from_spaces(model_spaces, true)
+    building.above_grade_exterior_wall_area = Geometry.calculate_above_grade_exterior_wall_area(model_spaces, false)
     model.getThermalZones.each do |thermal_zone|
       if Geometry.is_garage(thermal_zone)
         building.garage_zone = thermal_zone
@@ -745,11 +741,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       end
     end
 
-    building.finished_floor_area = Geometry.get_finished_floor_area_from_spaces(model.getSpaces, true, runner)
+    building.finished_floor_area = Geometry.get_finished_floor_area_from_spaces(model_spaces, true, runner)
     if building.finished_floor_area.nil?
       return false
     end
-    building.above_grade_finished_floor_area = Geometry.get_above_grade_finished_floor_area_from_spaces(model.getSpaces, true, runner)
+    building.above_grade_finished_floor_area = Geometry.get_above_grade_finished_floor_area_from_spaces(model_spaces, true, runner)
     if building.above_grade_finished_floor_area.nil?
       return false
     end    
@@ -908,7 +904,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     adiabatic_const.setName("AdiabaticConst")
     adiabatic_const.insertLayer(0, adiabatic_mat)
 
-    units.each do |building_unit|
+    units.each_with_index do |building_unit, unit_index|
 
       obj_name_airflow = Constants.ObjectNameAirflow(building_unit.name.to_s.gsub("unit ", "")).gsub("|","_")
       obj_name_infil = Constants.ObjectNameInfiltration(building_unit.name.to_s.gsub("unit ", "")).gsub("|","_")
@@ -929,12 +925,12 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       
       # Determine geometry for spaces and zones that are unit specific
       Geometry.get_thermal_zones_from_spaces(building_unit.spaces).each do |thermal_zone|
-        if Geometry.is_living(thermal_zone) or not /#{Constants.URBANoptFinishedZoneIdentifier} [1-9]\d*/.match(thermal_zone.name.to_s).nil?
-          unit.living_zone = thermal_zone
-          unit.living = LivingSpace.new(Geometry.get_height_of_spaces(unit.living_zone.spaces), UnitConversions.convert(unit.living_zone.floorArea,"m^2","ft^2"), Geometry.get_volume_from_spaces(thermal_zone.spaces), Geometry.get_z_origin_for_zone(thermal_zone))
-        elsif Geometry.is_finished_basement(thermal_zone) or thermal_zone.name.to_s.start_with? "#{Constants.URBANoptFinishedZoneIdentifier} 0"
+        if Geometry.is_finished_basement(thermal_zone)
           unit.finished_basement_zone = thermal_zone
           unit.finished_basement = FinBasement.new(fbsmtACH, Geometry.get_height_of_spaces(unit.finished_basement_zone.spaces), UnitConversions.convert(unit.finished_basement_zone.floorArea,"m^2","ft^2"), Geometry.get_volume_from_spaces(thermal_zone.spaces), Geometry.get_z_origin_for_zone(thermal_zone))
+        elsif Geometry.is_living(thermal_zone)
+          unit.living_zone = thermal_zone
+          unit.living = LivingSpace.new(Geometry.get_height_of_spaces(unit.living_zone.spaces), UnitConversions.convert(unit.living_zone.floorArea,"m^2","ft^2"), Geometry.get_volume_from_spaces(thermal_zone.spaces), Geometry.get_z_origin_for_zone(thermal_zone))
         end
       end
 
@@ -1091,7 +1087,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       
       infil, building, unit = _processInfiltrationForUnit(infil, wind_speed, building, unit, has_hvac_flue, has_water_heater_flue, has_fireplace_chimney, runner)
       nat_vent = _processNaturalVentilationForUnit(model, runner, nat_vent, wind_speed, infil, building, unit)   
-      ducts = _processDuctsForUnit(model, runner, ducts, building, unit, building_unit)
+      ducts = _processDuctsForUnit(model, runner, ducts, building, unit, building_unit, unit_index)
       if ducts.nil?
         return false
       end
@@ -2724,7 +2720,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
   end
   
-  def _processDuctsForUnit(model, runner, ducts, building, unit, building_unit)
+  def _processDuctsForUnit(model, runner, ducts, building, unit, building_unit, unit_index)
   
     if unit.has_mini_split_heat_pump # has mshp
       miniSplitHPIsDucted = HVAC.has_ducted_mshp(model, runner, unit.living_zone)
@@ -2743,7 +2739,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       ducts.DuctLocation = "none"
     end
     
-    ducts.duct_location_zone, ducts.duct_location_name = get_duct_location(ducts.DuctLocation, building, unit, building_unit)
+    ducts.duct_location_zone, ducts.duct_location_name = get_duct_location(ducts.DuctLocation, building_unit, unit_index)
 
     ducts.has_ducts = true
     if ducts.duct_location_name == "none"
@@ -2890,76 +2886,24 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
   
   end
   
-  def get_duct_location(duct_location, building, unit, building_unit)
+  def get_duct_location(location, building_unit, unit_index)
     duct_location_zone = nil
     duct_location_name = "none"
     
-    zones = []
+    location_hierarchy = [Constants.SpaceTypeFinishedBasement,
+                          Constants.SpaceTypeUnfinishedBasement,
+                          Constants.SpaceTypeCrawl,
+                          Constants.SpaceTypePierBeam,
+                          Constants.SpaceTypeUnfinishedAttic,
+                          Constants.SpaceTypeGarage,
+                          Constants.SpaceTypeLiving]
     
-    if duct_location == Constants.Auto
+    # Get space
+    space = Geometry.get_space_from_location(building_unit, location, location_hierarchy)
+    return duct_location_zone, duct_location_name if space.nil?
     
-      zones = [unit.finished_basement_zone,
-               building.unfinished_basement_zone,
-               building.crawlspace_zone,
-               building.pierbeam_zone,
-               building.unfinished_attic_zone,
-               building.garage_zone,
-               unit.living_zone]
-      
-    elsif duct_location == Constants.BasementZone
-    
-      zones = [unit.finished_basement_zone,
-               building.unfinished_basement_zone,
-               unit.living_zone]
-
-    elsif duct_location == Constants.FinishedBasementZone
-    
-      zones = [unit.finished_basement_zone,
-               unit.living_zone]
-
-    elsif duct_location == Constants.UnfinishedBasementZone
-    
-      zones = [building.unfinished_basement_zone,
-               unit.living_zone]
-
-    elsif duct_location == Constants.AtticZone or duct_location == Constants.UnfinishedAtticZone
-    
-      zones = [building.unfinished_attic_zone,
-               unit.living_zone]
-
-    elsif duct_location == Constants.LivingZone
-    
-      zones = [unit.living_zone]
-
-    elsif duct_location == Constants.GarageZone
-    
-      zones = [building.garage_zone,
-               unit.living_zone]
-
-    elsif duct_location == Constants.CrawlZone
-    
-      zones = [building.crawlspace_zone,
-               unit.living_zone]
-
-    elsif duct_location == Constants.PierBeamZone
-    
-      zones = [building.pierbeam_zone,
-               unit.living_zone]
-
-    end
-    
-    unit_zones = Geometry.get_thermal_zones_from_spaces(building_unit.spaces)
-    adjacent_common_spaces = Geometry.get_unit_adjacent_common_spaces(building_unit)
-    adjacent_common_zones = Geometry.get_thermal_zones_from_spaces(adjacent_common_spaces)
-    
-    zones.each do |zone|
-      next if zone.nil?
-      next if not (unit_zones.include?(zone) or adjacent_common_zones.include?(zone))
-      duct_location_zone = zone
-      duct_location_name = zone.name.to_s
-      break
-    end
-    
+    duct_location_zone = space.thermalZone.get
+    duct_location_name = duct_location_zone.name.to_s
     return duct_location_zone, duct_location_name
   end  
   
