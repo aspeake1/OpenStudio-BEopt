@@ -330,7 +330,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     puts cmd
     system(cmd)
     
-    FileUtils.cp(epw_path, "#{tests_dir(test_name)}")    
+    FileUtils.cp(epw_path, "#{tests_dir(test_name)}")
 
     return model    
   end
@@ -384,13 +384,14 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
       # run the measure
       measure.run(runner, argument_map)
       result = runner.result
-      # show_output(result)
+      show_output(result)
     ensure
       Dir.chdir(start_dir)
     end
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
+    puts result.info.size
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
     
