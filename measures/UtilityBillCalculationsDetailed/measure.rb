@@ -240,55 +240,9 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       end
 
     else # autoselect tariff based on distance to simulation epw location
+
+      tariffs = autoselect_tariffs(runner, weather_file.latitude, weather_file.longitude)
     
-      cols = CSV.read("#{File.dirname(__FILE__)}/resources/by_nsrdb.csv").transpose
-      closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to simulation epw
-      runner.registerInfo("Nearest usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")      
-      usafs = cols[1].collect { |i| i.to_s }
-      usaf_ixs = usafs.each_index.select{|i| usafs[i] == closest_usaf}
-      utilityid_to_nsrdbid = {} # {eiaid: [grid_cell, ...], ...}
-      usaf_ixs.each do |ix|
-        next if cols[4][ix].nil?
-        cols[4][ix].split("|").each do |utilityid|
-          next if utilityid == "no data"
-          if utilityid_to_nsrdbid.keys.include? utilityid
-            utilityid_to_nsrdbid[utilityid] << cols[0][ix]
-          else
-            utilityid_to_nsrdbid[utilityid] = [cols[0][ix]]
-          end
-        end
-      end
-
-      utilityid_to_filename = {} # {eiaid: {utility - name, ...}, ...}
-      cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
-      cols.each do |col|
-        next unless col[0].include? "eiaid"
-        utilityid_to_nsrdbid.keys.each do |utilityid|
-          eiaid_ixs = col.each_index.select{|i| col[i] == utilityid}
-          eiaid_ixs.each do |ix|
-            utility = cols[0][ix]
-            name = cols[2][ix]
-            filename = clean_filename("#{utility} - #{name}")
-            if utilityid_to_filename.keys.include? utilityid
-              utilityid_to_filename[utilityid] << filename
-            else
-              utilityid_to_filename[utilityid] = [filename]
-            end
-          end
-        end
-      end
-
-      utilityid_to_filename.each do |utilityid, filenames|
-        filenames.each do |filename|
-          zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
-          zip_file.listFiles.each do |zip_entry|
-            next unless zip_entry.to_s == "#{filename}.json"
-            zip_entry = zip_file.extractFile(zip_entry, ".")
-            tariffs[File.basename(File.expand_path(zip_entry.to_s)).chomp(".json")] = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
-          end
-        end          
-      end
-
     end
 
     timeseries = {}
@@ -321,20 +275,20 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       end
     end
 
-    result = calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariffs, tariff_label)
+    result = calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariffs)
     
     return result
     
   end
-
-  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariffs, tariff_label)
+  
+  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariffs)
 
     if tariffs.empty?
       runner.registerError("Could not locate any tariffs.")
       return false
     end
     
-    if tariff_label == "Autoselect Tariff(s)" or marginal_rates.values.include? Constants.Auto
+    if marginal_rates.values.include? Constants.Auto
       unless HelperMethods.state_code_map.values.include? weather_file_state
         runner.registerError("Rates do not exist for '#{weather_file_state}'.")
         return false
@@ -389,6 +343,7 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     end
   
     elec_bills = {}
+    no_charges = []
     fuels = {Constants.FuelTypeElectric=>"Electricity"}
     fuels.each do |fuel, file|
 
@@ -408,13 +363,16 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
             elec_bills[tariff[:eiaid]] = []
           end
           elec_bills[tariff[:eiaid]] << elec_bill
+          runner.registerInfo("Calculated utility bill: #{name} = #{total_bill + elec_bill}")
         else
-          runner.registerError("#{name} does not contain any charges.")
-          return false
+          no_charges << name
         end
-        
-        runner.registerInfo("Calculated utility bill: #{name} = #{total_bill + elec_bill}")
 
+      end
+      
+      if elec_bills.empty?
+        runner.registerError("Does not contain charges: #{no_charges.join(", ")}.")
+        return false        
       end
       
       avg_elec_bills = []
@@ -429,31 +387,98 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
   
   end
   
-  def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs)
+  def autoselect_tariffs(runner, epw_latitude, epw_longitude)
+  
+    cols = CSV.read("#{File.dirname(__FILE__)}/resources/by_nsrdb.csv").transpose
+    closest_usaf = closest_usaf_to_epw(epw_latitude, epw_longitude, cols.transpose) # minimize distance to simulation epw
+    runner.registerInfo("Closest usaf to #{epw_latitude}, #{epw_longitude}: #{closest_usaf}")      
+    usafs = cols[1].collect { |i| i.to_s }
+    usaf_ixs = usafs.each_index.select{|i| usafs[i] == closest_usaf}
+    utilityid_to_nsrdbid = {} # {eiaid: [grid_cell, ...], ...}
+    usaf_ixs.each do |ix|
+      next if cols[4][ix].nil?
+      cols[4][ix].split("|").each do |utilityid|
+        next if utilityid == "no data"
+        unless utilityid_to_nsrdbid.keys.include? utilityid
+          utilityid_to_nsrdbid[utilityid] = []
+        end
+        utilityid_to_nsrdbid[utilityid] << cols[0][ix]
+      end
+    end
+
+    utilityid_to_filename = {} # {eiaid: {utility - name, ...}, ...}
+    cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
+    cols.each do |col|
+      next unless col[0].include? "eiaid"
+      utilityid_to_nsrdbid.keys.each do |utilityid|
+        eiaid_ixs = col.each_index.select{|i| col[i] == utilityid}
+        eiaid_ixs.each do |ix|
+          utility = cols[0][ix]
+          name = cols[2][ix]
+          filename = clean_filename("#{utility} - #{name}")
+          unless utilityid_to_filename.keys.include? utilityid
+            utilityid_to_filename[utilityid] = []
+          end
+          utilityid_to_filename[utilityid] << filename
+        end
+      end
+    end
+
+    tariffs = {}
+    utilityid_to_filename.each do |utilityid, filenames|
+      filenames.each do |filename|
+        zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
+        zip_file.listFiles.each do |zip_entry|
+          next unless zip_entry.to_s == "#{filename}.json"
+          begin
+            zip_entry = zip_file.extractFile(zip_entry, ".")
+            tariffs[File.basename(File.expand_path(zip_entry.to_s)).chomp(".json")] = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
+          rescue
+          end
+        end
+      end          
+    end
+    
+    return tariffs
+  
+  end
+
+  def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs) # for the 216 resstock locations, epw=usaf
+    bldg_lat = bldg_lat.to_f
+    bldg_lon = bldg_lon.to_f
     distances = [1000000]
-    usafs.each do |usaf|
-      if (bldg_lat.to_f - usaf[3].to_f).abs > 1 and (bldg_lon.to_f - usaf[2].to_f).abs > 1 # reduce the set to save some time
-        distances << 100000
+    usafs.each_with_index do |usaf, i|
+      next if i == 0
+      nsrdb_gid_new, usafn, usaf_lon, usaf_lat, utilityid = usaf
+      usaf_lat = usaf_lat.to_f
+      usaf_lon = usaf_lon.to_f
+      if (bldg_lat - usaf_lat).abs > 1 and (bldg_lon - usaf_lon).abs > 1 # reduce the set to save some time
+        distances << 1000000
         next
       end
-      km = haversine(bldg_lat.to_f, bldg_lon.to_f, usaf[3].to_f, usaf[2].to_f)
+      km = haversine(bldg_lat, bldg_lon, usaf_lat, usaf_lon)
       distances << km
-    end    
+    end
     return usafs[distances.index(distances.min)][1]    
   end
 
   def haversine(lat1, lon1, lat2, lon2)
+
     # convert decimal degrees to radians
-    [lon1, lat1, lon2, lat2].each do |l|
-      l = UnitConversions.convert(l,"deg","rad")
-    end
+    lat1 = UnitConversions.convert(lat1, "deg", "rad")
+    lon1 = UnitConversions.convert(lon1, "deg", "rad")
+    lat2 = UnitConversions.convert(lat2, "deg", "rad")
+    lon2 = UnitConversions.convert(lon2, "deg", "rad")
+
     # haversine formula 
     dlon = lon2 - lon1 
     dlat = lat2 - lat1 
     a = Math.sin(dlat/2)**2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2)**2
     c = 2 * Math.asin(Math.sqrt(a)) 
     km = 6367 * c
+
     return km
+
   end
   
   def clean_filename(name)

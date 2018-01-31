@@ -22,7 +22,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 40, 1)
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 34, 1)
   end
   
   def test_functionality_feed_in_tariff_select_tariff
@@ -66,7 +66,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     result = _test_error(timeseries, args_hash, weather_file_state)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "City of Linneus Missouri (Utility Company) - Electric Rate does not contain any charges.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Does not contain charges: City of Linneus Missouri (Utility Company) - Electric Rate.")
   end
   
   def test_error_no_tariffs_found
@@ -102,7 +102,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values)
   end
 
   def test_calculations_1kW_pv_net_metering_custom_tariff
@@ -121,7 +121,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781-196, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values)
   end
   
   def test_calculations_10kW_pv_net_metering_custom_tariff
@@ -140,7 +140,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781-1042, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values)
   end
   
   def test_calculations_0kW_pv_feed_in_tariff_custom_tariff
@@ -159,7 +159,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values)
   end
 
   def test_calculations_1kW_pv_feed_in_tariff_custom_tariff
@@ -178,7 +178,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values)
   end
   
   def test_calculations_10kW_pv_feed_in_tariff_custom_tariff
@@ -197,11 +197,11 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values)
   end
 
 =begin
-  def test_validate_all_tariffs
+  def test_all_tariff_files_validate
     require 'zip'
     require 'parallel'
     args_hash = {}
@@ -213,18 +213,41 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
-    weather_file_state = "CO"
-    timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
+    weather_file_state = "CO"    
     Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
       Parallel.each_with_index(zip_file, in_threads: 1) do |entry, i|
         next unless entry.file?
+        timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
         puts "#{i} #{entry.name}"
-        args_hash["custom_tariff"] = entry.name        
-        expected_num_del_objects = {}
-        expected_num_new_objects = {}
+        args_hash["custom_tariff"] = entry.name
         expected_values = {}
-        _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+        _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values)
       end
+    end
+  end
+=end
+
+=begin
+  def test_all_resstock_epw_files
+    args_hash = {}
+    args_hash["tariff_label"] = "Autoselect Tariff(s)"
+    args_hash["custom_tariff"] = File.expand_path("../Southern California Edison Co - D - Region 5 - Monthly Tier.json", __FILE__)
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = Constants.PVNetMetering
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
+    cols = CSV.read("#{File.dirname(__FILE__)}/../tests/resstock_epws.csv", {:encoding=>'ISO-8859-1'})
+    cols.each_with_index do |col, i|
+      next if i == 0
+      id, filename, station_name, state, country, wx_type, usafn, latitude, longitude, time_diff, elevation = col
+      puts "#{i} #{filename}"
+      timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
+      expected_values = {}
+      _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, latitude, longitude)
     end
   end
 =end
@@ -374,7 +397,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     return model
   end
 
-  def _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, num_infos=0, num_warnings=0)  
+  def _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, epw_latitude=nil, epw_longitude=nil)
     # create an instance of the measure
     measure = UtilityBillCalculationsDetailed.new
 
@@ -412,15 +435,17 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
       rescue
       end
     end
-    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"], tariffs, args_hash["tariff_label"])
+    if args_hash["tariff_label"] == "Autoselect Tariff(s)"
+      tariffs = measure.autoselect_tariffs(runner, epw_latitude, epw_longitude)
+    end
+    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"], tariffs)
 
     result = runner.result
     # show_output(result)
     
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert(result.info.size == num_infos)
-    assert(result.warnings.size == num_warnings)
+    assert(result.info.size > 0)
 
     expected_values.keys.each do |fuel|
       result.stepValues.each do |arg|
@@ -474,7 +499,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
       rescue
       end
     end
-    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"], tariffs, args_hash["tariff_label"])
+    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"], tariffs)
 
     result = runner.result
     # show_output(result)

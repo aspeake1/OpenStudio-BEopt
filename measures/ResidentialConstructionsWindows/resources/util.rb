@@ -1918,6 +1918,7 @@ class UtilityBill
   end
   
   def self.validate_tariff(tariff)
+    return false if tariff.nil?
     rate_structures_available = [:energyratestructure, :demandratestructure]
     rate_structures_contained = tariff.keys & rate_structures_available
     return false if rate_structures_contained.empty?
