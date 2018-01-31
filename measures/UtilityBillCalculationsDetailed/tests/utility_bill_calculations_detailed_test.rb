@@ -14,7 +14,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 1, 1)
   end
   
   def test_functionality_net_metering_autoselect_tariffs
@@ -22,20 +22,37 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 4, 1)
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 40, 1)
   end
   
   def test_functionality_feed_in_tariff_select_tariff
     args_hash = {}
     args_hash["tariff_label"] = "4-County Electric Power Assn - Residential"
-    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 3, 1)
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 1, 1)
   end
   
-  def test_calculations_invalid_tariff
+  def test_error_invalid_location
+    args_hash = {}
+    args_hash["tariff_label"] = "Custom Tariff"
+    args_hash["custom_tariff"] = File.expand_path("../Southern California Edison Co - D - Region 5 - Monthly Tier.json", __FILE__)
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = Constants.PVNetMetering
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "AB"
+    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
+    result = _test_error(timeseries, args_hash, weather_file_state)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Rates do not exist for '#{weather_file_state}'.")
+  end
+  
+  def test_error_invalid_tariff
     args_hash = {}
     args_hash["tariff_label"] = "Custom Tariff"
     args_hash["custom_tariff"] = File.expand_path("../City of Linneus Missouri (Utility Company) - Electric Rate.json", __FILE__)
@@ -43,14 +60,30 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = "Net Metering"
+    args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4-1, 1)
+    result = _test_error(timeseries, args_hash, weather_file_state)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "City of Linneus Missouri (Utility Company) - Electric Rate does not contain any charges.")
+  end
+  
+  def test_error_no_tariffs_found
+    args_hash = {}
+    args_hash["tariff_label"] = "Custom Tariff"
+    args_hash["custom_tariff"] = File.expand_path("../Imaginary Tariff.json", __FILE__)
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = Constants.PVNetMetering
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
+    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
+    result = _test_error(timeseries, args_hash, weather_file_state)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Could not locate any tariffs.")
   end
   
   def test_calculations_0kW_pv_net_metering_custom_tariff
@@ -61,14 +94,15 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = "Net Metering"
+    args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
 
   def test_calculations_1kW_pv_net_metering_custom_tariff
@@ -79,14 +113,15 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = "Net Metering"
+    args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781-196, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
   
   def test_calculations_10kW_pv_net_metering_custom_tariff
@@ -97,14 +132,15 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = "Net Metering"
+    args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781-1042, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
   
   def test_calculations_0kW_pv_feed_in_tariff_custom_tariff
@@ -115,14 +151,15 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
 
   def test_calculations_1kW_pv_feed_in_tariff_custom_tariff
@@ -133,14 +170,15 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
   
   def test_calculations_10kW_pv_feed_in_tariff_custom_tariff
@@ -151,14 +189,15 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>781-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
 
 =begin
@@ -171,9 +210,10 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
       Parallel.each_with_index(zip_file, in_threads: 1) do |entry, i|
@@ -183,7 +223,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
         expected_num_del_objects = {}
         expected_num_new_objects = {}
         expected_values = {}
-        _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+        _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
       end
     end
   end
@@ -272,7 +312,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     return model    
   end
   
-  def _test_measure_functionality(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, debug=false)
+  def _test_measure_functionality(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0)
     # create an instance of the measure
     measure = UtilityBillCalculationsDetailed.new
 
@@ -285,9 +325,6 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
     
     model = get_model(File.dirname(__FILE__), osm_file_or_model)
-
-    # get the initial objects in the model
-    initial_objects = get_objects(model)
     
     # get arguments
     arguments = measure.arguments()
@@ -337,7 +374,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     return model
   end
 
-  def _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, num_infos=0, num_warnings=0, debug=false)  
+  def _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, num_infos=0, num_warnings=0)  
     # create an instance of the measure
     measure = UtilityBillCalculationsDetailed.new
 
@@ -364,14 +401,18 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
 
     marginal_rates = {Constants.FuelTypeGas=>args_hash["gas_rate"], Constants.FuelTypeOil=>args_hash["oil_rate"], Constants.FuelTypePropane=>args_hash["prop_rate"]}
     fixed_rates = {Constants.FuelTypeGas=>args_hash["gas_fixed"].to_f}
+    tariffs = {}
     begin
-      tariff = JSON.parse(File.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]
+      tariffs = {File.basename(args_hash["custom_tariff"]).chomp(".json") => JSON.parse(File.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]}
     rescue
-      Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
-        tariff = JSON.parse(zip_file.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]
+      begin
+        Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
+          tariffs = {File.basename(args_hash["custom_tariff"]).chomp(".json") => JSON.parse(zip_file.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]}
+        end
+      rescue
       end
     end
-    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"], tariff)
+    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"], tariffs, args_hash["tariff_label"])
 
     result = runner.result
     # show_output(result)
@@ -384,10 +425,65 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_values.keys.each do |fuel|
       result.stepValues.each do |arg|
         next unless fuel == arg.name
-        assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.005)
+        actual_value = arg.valueAsVariant.to_s
+        if actual_value.include? "="
+          actual_value = actual_value.split("=")
+          actual_value = actual_value[1]
+        end
+        assert_in_epsilon(expected_values[arg.name], actual_value.to_f, 0.005)
       end
     end
 
+  end
+  
+  def _test_error(timeseries, args_hash, weather_file_state)
+    # create an instance of the measure
+    measure = UtilityBillCalculationsDetailed.new
+
+    # check for standard methods
+    assert(!measure.name.empty?)
+    assert(!measure.description.empty?)
+    assert(!measure.modeler_description.empty?)
+
+    # create an instance of a runner
+    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
+    
+    # get arguments
+    arguments = measure.arguments()
+    argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
+    
+    # populate argument with specified hash value if specified
+    arguments.each do |arg|
+      temp_arg_var = arg.clone
+      if args_hash[arg.name]
+        assert(temp_arg_var.setValue(args_hash[arg.name]))
+      end
+      argument_map[arg.name] = temp_arg_var
+    end
+
+    marginal_rates = {Constants.FuelTypeGas=>args_hash["gas_rate"], Constants.FuelTypeOil=>args_hash["oil_rate"], Constants.FuelTypePropane=>args_hash["prop_rate"]}
+    fixed_rates = {Constants.FuelTypeGas=>args_hash["gas_fixed"].to_f}
+    tariffs = {}
+    begin
+      tariffs = {File.basename(args_hash["custom_tariff"]).chomp(".json") => JSON.parse(File.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]}
+    rescue
+      begin
+        Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
+          tariffs = {File.basename(args_hash["custom_tariff"]).chomp(".json") => JSON.parse(zip_file.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]}
+        end
+      rescue
+      end
+    end
+    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"], tariffs, args_hash["tariff_label"])
+
+    result = runner.result
+    # show_output(result)
+
+    # assert that it didn't run
+    assert_equal("Fail", result.value.valueName)
+    assert(result.errors.size == 1)
+    
+    return result
   end
   
   def get_timeseries(enduse_timeseries)

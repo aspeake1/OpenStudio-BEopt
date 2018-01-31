@@ -10,7 +10,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
   def test_error_missing_weather
     args_hash = {}
     result = _test_error(nil, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Model has not been assigned a weather file.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Model has not been assigned a weather file.")
   end
 
   def test_error_invalid_azimuth

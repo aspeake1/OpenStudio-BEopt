@@ -22,7 +22,7 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calculate electric utility bills based on tariffs from the OpenEI Utility Rate Database (URDB). Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. User can specify net metering or feed-in tariff PV compensation types, along with corresponding rates."
+    return "Calculate electric utility bills based on tariffs from the OpenEI Utility Rate Database (URDB). Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. User can specify PV compensation types of '#{Constants.PVNetMetering}' or '#{Constants.PVFeedInTariff}', along with corresponding rates."
   end 
   
   def fuel_types
@@ -96,25 +96,25 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     args << arg
 
     pv_compensation_types = OpenStudio::StringVector.new
-    pv_compensation_types << "Net Metering"
-    pv_compensation_types << "Feed-In Tariff"
+    pv_compensation_types << Constants.PVNetMetering
+    pv_compensation_types << Constants.PVFeedInTariff
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("pv_compensation_type", pv_compensation_types, true)
     arg.setDisplayName("PV: Compensation Type")
     arg.setDescription("The type of compensation for PV.")
-    arg.setDefaultValue("Net Metering")
+    arg.setDefaultValue(Constants.PVNetMetering)
     args << arg    
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("pv_sellback_rate", true)
     arg.setDisplayName("PV: Net Metering Annual Excess Sellback Rate")
     arg.setUnits("$/kWh")
-    arg.setDescription("The annual excess/net sellback rate for PV. Only applies if the PV compensation type is 'Net Metering'.")
+    arg.setDescription("The annual excess/net sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVNetMetering}'.")
     arg.setDefaultValue("0.03")
     args << arg
 
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("pv_tariff_rate", true)
     arg.setDisplayName("PV: Feed-In Tariff Rate")
     arg.setUnits("$/kWh")
-    arg.setDescription("The annual full/gross tariff rate for PV. Only applies if the PV compensation type is 'Feed-In Tariff'.")
+    arg.setDescription("The annual full/gross tariff rate for PV. Only applies if the PV compensation type is '#{Constants.PVFeedInTariff}'.")
     arg.setDefaultValue("0.12")
     args << arg
     
@@ -183,14 +183,21 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
                       Constants.FuelTypePropane=>runner.getStringArgumentValue("prop_rate", user_arguments)
                      }
     
-    # get the last model
+    # Get the last model
     model = runner.lastOpenStudioModel
     if model.empty?
       runner.registerError("Cannot find last model.")
       return false
     end
     model = model.get
-
+    
+    # Get weather file and state
+    weather_file = model.getSite.weatherFile.get
+    weather_file_state = weather_file.stateProvinceRegion
+    if HelperMethods.state_code_map.keys.include? weather_file_state
+      weather_file_state = HelperMethods.state_code_map[weather_file_state]
+    end
+      
     # Get the last sql file      
     sql = runner.lastEnergyPlusSqlFile
     if sql.empty?
@@ -215,21 +222,25 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       return false
     end
     
-    tariff = nil
+    tariffs = {}
     if tariff_label == "Custom Tariff" and custom_tariff.is_initialized
+
       custom_tariff = custom_tariff.get
       if File.exists?(File.expand_path(custom_tariff))
-        tariff = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
+        tariffs[File.basename(File.expand_path(custom_tariff)).chomp(".json")] = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
       end
+
     elsif tariff_label != "Autoselect Tariff(s)"
+
       zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
       zip_file.listFiles.each do |zip_entry|
         next unless zip_entry.to_s == "#{tariff_label}.json"
         zip_entry = zip_file.extractFile(zip_entry, ".")
-        tariff = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
+        tariffs[File.basename(File.expand_path(zip_entry.to_s)).chomp(".json")] = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
       end
+
     else # autoselect tariff based on distance to simulation epw location
-      weather_file = model.getSite.weatherFile.get
+    
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/by_nsrdb.csv").transpose
       closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to simulation epw
       runner.registerInfo("Nearest usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")      
@@ -266,20 +277,18 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
           end
         end
       end
-      
-      tariffs = []
+
       utilityid_to_filename.each do |utilityid, filenames|
         filenames.each do |filename|
           zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
           zip_file.listFiles.each do |zip_entry|
             next unless zip_entry.to_s == "#{filename}.json"
             zip_entry = zip_file.extractFile(zip_entry, ".")
-            tariffs << JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
+            tariffs[File.basename(File.expand_path(zip_entry.to_s)).chomp(".json")] = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
           end
         end          
       end
-      
-      tariff = tariffs[0] # FIXME: there can be multiple tariffs: multiple labels in multiple eiaids per usaf. average these? register all of them?
+
     end
 
     timeseries = {}
@@ -312,14 +321,25 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       end
     end
 
-    weather_file_state = model.getSite.weatherFile.get.stateProvinceRegion
-    calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
+    result = calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariffs, tariff_label)
     
-    return true
+    return result
     
   end
 
-  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
+  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariffs, tariff_label)
+
+    if tariffs.empty?
+      runner.registerError("Could not locate any tariffs.")
+      return false
+    end
+    
+    if tariff_label == "Autoselect Tariff(s)" or marginal_rates.values.include? Constants.Auto
+      unless HelperMethods.state_code_map.values.include? weather_file_state
+        runner.registerError("Rates do not exist for '#{weather_file_state}'.")
+        return false
+      end
+    end
   
     if timeseries["ElectricityProduced:Facility"].empty?
       timeseries["ElectricityProduced:Facility"] = Array.new(timeseries["Electricity:Facility"].length, 0)
@@ -329,60 +349,83 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       timeseries["Electricity:Facility"][i] += timeseries["ElectricityProduced:Facility"][i] # http://bigladdersoftware.com/epx/docs/8-7/input-output-reference/input-for-output.html
     end
   
-    fuels = {Constants.FuelTypeElectric=>"Electricity", Constants.FuelTypeGas=>"Natural gas", Constants.FuelTypeOil=>"Oil", Constants.FuelTypePropane=>"Propane"}
+    total_bill = 0
+    fuels = {Constants.FuelTypeGas=>"Natural gas", Constants.FuelTypeOil=>"Oil", Constants.FuelTypePropane=>"Propane"}
+    fuels.each do |fuel, file|
+ 
+      cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{file}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose      
+      cols[0].each_with_index do |rate_state, i|
+
+        next unless rate_state == weather_file_state
+
+        marginal_rate = marginal_rates[fuel]
+        if marginal_rate == Constants.Auto
+          average_rate = cols[1][i].to_f            
+          marginal_rate = average_rate
+          if [Constants.FuelTypeGas].include? fuel
+            household_consumption = cols[2][i].to_f
+            marginal_rate = average_rate - 12.0 * fixed_rates[fuel] / household_consumption
+          end
+        else
+          marginal_rate = marginal_rate.to_f
+        end
+
+        if fuel == Constants.FuelTypeGas and not timeseries["Gas:Facility"].empty?
+          gas_bill = UtilityBill.calculate_simple(timeseries["Gas:Facility"], fixed_rates[fuel], marginal_rate)
+          runner.registerValue(fuel, gas_bill)
+          total_bill += gas_bill
+        elsif fuel == Constants.FuelTypeOil and not timeseries["FuelOil#1:Facility"].empty?
+          oil_bill = UtilityBill.calculate_simple(timeseries["FuelOil#1:Facility"], 0, marginal_rate)
+          runner.registerValue(fuel, oil_bill)
+          total_bill += oil_bill
+        elsif fuel == Constants.FuelTypePropane and not timeseries["Propane:Facility"].empty?
+          prop_bill = UtilityBill.calculate_simple(timeseries["Propane:Facility"], 0, marginal_rate)
+          runner.registerValue(fuel, prop_bill)
+          total_bill += prop_bill
+        end
+
+      end
+
+    end
+  
+    elec_bills = {}
+    fuels = {Constants.FuelTypeElectric=>"Electricity"}
     fuels.each do |fuel, file|
 
-      if fuel == Constants.FuelTypeElectric
-
-        if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
-          unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
-          unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"))
-        end
-        require "#{File.dirname(__FILE__)}/resources/ssc_api"
-        timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
-        timeseries["ElectricityProduced:Facility"] = UtilityBill.remove_leap_day(timeseries["ElectricityProduced:Facility"])
-        if UtilityBill.validate_tariff(tariff)
-          total_bill = UtilityBill.calculate_detailed_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
-          UtilityBill.report_output(runner, fuel, total_bill)
-        else
-          runner.registerWarning("Electric tariff does not contain any charges.")
-        end
-
-      else    
-        cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{file}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
-        cols[0].each_with_index do |rate_state, i|
-
-          unless HelperMethods.state_code_map(weather_file_state).nil?
-            weather_file_state = HelperMethods.state_code_map(weather_file_state)
-          end
-          next unless rate_state == weather_file_state
-
-          marginal_rate = marginal_rates[fuel]
-          if marginal_rate == Constants.Auto
-            average_rate = cols[1][i].to_f            
-            marginal_rate = average_rate
-            if [Constants.FuelTypeGas].include? fuel
-              household_consumption = cols[2][i].to_f
-              marginal_rate = average_rate - 12.0 * fixed_rates[fuel] / household_consumption
-            end
-          else
-            marginal_rate = marginal_rate.to_f
-          end
-
-          if fuel == Constants.FuelTypeGas and not timeseries["Gas:Facility"].empty?
-            total_bill = UtilityBill.calculate_simple(timeseries["Gas:Facility"], fixed_rates[fuel], marginal_rate)
-          elsif fuel == Constants.FuelTypeOil and not timeseries["FuelOil#1:Facility"].empty?
-            total_bill = UtilityBill.calculate_simple(timeseries["FuelOil#1:Facility"], 0, marginal_rate)
-          elsif fuel == Constants.FuelTypePropane and not timeseries["Propane:Facility"].empty?
-            total_bill = UtilityBill.calculate_simple(timeseries["Propane:Facility"], 0, marginal_rate)
-          end
-
-          unless total_bill.nil?
-            UtilityBill.report_output(runner, fuel, total_bill)
-          end
-        end
+      if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
+        unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
+        unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"))
       end
-    end  
+      require "#{File.dirname(__FILE__)}/resources/ssc_api"
+      timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
+      timeseries["ElectricityProduced:Facility"] = UtilityBill.remove_leap_day(timeseries["ElectricityProduced:Facility"])
+
+      tariffs.each do |name, tariff|
+
+        if UtilityBill.validate_tariff(tariff)
+          elec_bill = UtilityBill.calculate_detailed_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
+          unless elec_bills.keys.include? tariff[:eiaid]
+            elec_bills[tariff[:eiaid]] = []
+          end
+          elec_bills[tariff[:eiaid]] << elec_bill
+        else
+          runner.registerError("#{name} does not contain any charges.")
+          return false
+        end
+        
+        runner.registerInfo("Calculated utility bill: #{name} = #{total_bill + elec_bill}")
+
+      end
+      
+      avg_elec_bills = []
+      elec_bills.each do |eiaid, bills|
+        avg_elec_bills << "#{eiaid}=#{bills.inject{ |sum, bill| sum + bill } / bills.size}"
+      end
+      runner.registerValue(fuel, avg_elec_bills.join(";"))
+
+    end
+    
+    return true
   
   end
   

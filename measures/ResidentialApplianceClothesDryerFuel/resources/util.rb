@@ -61,13 +61,13 @@ class HelperMethods
         end
     end
     
-    def self.state_code_map(state)
+    def self.state_code_map
       return {"Alabama"=>"AL", "Alaska"=>"AK", "Arizona"=>"AZ", "Arkansas"=>"AR","California"=>"CA","Colorado"=>"CO", "Connecticut"=>"CT", "Delaware"=>"DE", "District of Columbia"=>"DC",
               "Florida"=>"FL", "Georgia"=>"GA", "Hawaii"=>"HI", "Idaho"=>"ID", "Illinois"=>"IL","Indiana"=>"IN", "Iowa"=>"IA","Kansas"=>"KS", "Kentucky"=>"KY", "Louisiana"=>"LA",
               "Maine"=>"ME","Maryland"=>"MD", "Massachusetts"=>"MA", "Michigan"=>"MI", "Minnesota"=>"MN","Mississippi"=>"MS", "Missouri"=>"MO", "Montana"=>"MT","Nebraska"=>"NE", "Nevada"=>"NV",
               "New Hampshire"=>"NH", "New Jersey"=>"NJ", "New Mexico"=>"NM", "New York"=>"NY","North Carolina"=>"NC", "North Dakota"=>"ND", "Ohio"=>"OH", "Oklahoma"=>"OK",
               "Oregon"=>"OR", "Pennsylvania"=>"PA", "Puerto Rico"=>"PR", "Rhode Island"=>"RI","South Carolina"=>"SC", "South Dakota"=>"SD", "Tennessee"=>"TN", "Texas"=>"TX",
-              "Utah"=>"UT", "Vermont"=>"VT", "Virginia"=>"VA", "Washington"=>"WA", "West Virginia"=>"WV","Wisconsin"=>"WI", "Wyoming"=>"WY"}[state]
+              "Utah"=>"UT", "Vermont"=>"VT", "Virginia"=>"VA", "Washington"=>"WA", "West Virginia"=>"WV","Wisconsin"=>"WI", "Wyoming"=>"WY"}
     end
 
 end
@@ -1779,11 +1779,6 @@ class UtilityBill
     total_bill = 12.0 * fixed_rate + total_annual_energy * marginal_rate
     return total_bill
   end
-
-  def self.report_output(runner, fuel, total_bill)
-    runner.registerValue(fuel, total_bill)
-    runner.registerInfo("Registering #{fuel} utility bills.")
-  end
   
   def self.remove_leap_day(timeseries)
     if timeseries.length == 8784 # leap year
@@ -1794,16 +1789,16 @@ class UtilityBill
   
   def self.calculate_simple_electric(load, gen, ur_monthly_fixed_charge, ur_flat_buy_rate, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
   
-    analysis_period = 30 # years
-    degradation = [0] # annual energy degradation
-    system_use_lifetime_output = 0 # 0=hourly first year, 1=hourly lifetime
-    inflation_rate = 2.4 # %
+    analysis_period = 1
+    degradation = [0]
+    system_use_lifetime_output = 0
+    inflation_rate = 0
     ur_flat_sell_rate = 0
     ur_nm_yearend_sell_rate = 0
-    if pv_compensation_type == "Net Metering"
-      ur_enable_net_metering = 1
+    ur_enable_net_metering = 1
+    if pv_compensation_type == Constants.PVNetMetering
       ur_nm_yearend_sell_rate = pv_sellback_rate.to_f
-    elsif pv_compensation_type == "Feed-In Tariff"
+    elsif pv_compensation_type == Constants.PVFeedInTariff
       ur_enable_net_metering = 0
       ur_flat_sell_rate = pv_tariff_rate.to_f
     end
@@ -1811,8 +1806,8 @@ class UtilityBill
     p_data = SscApi.create_data_object
     SscApi.set_number(p_data, "analysis_period", analysis_period)
     SscApi.set_array(p_data, "degradation", degradation)
-    SscApi.set_array(p_data, "gen", gen) # system power generated, kW
-    SscApi.set_array(p_data, "load", load) # electricity load, kW
+    SscApi.set_array(p_data, "gen", gen)
+    SscApi.set_array(p_data, "load", load)
     SscApi.set_number(p_data, "system_use_lifetime_output", system_use_lifetime_output)
     SscApi.set_number(p_data, "inflation_rate", inflation_rate)
     SscApi.set_number(p_data, "ur_flat_buy_rate", ur_flat_buy_rate)
@@ -1824,8 +1819,8 @@ class UtilityBill
     p_mod = SscApi.create_module("utilityrate3")
     SscApi.execute_module(p_mod, p_data)
 
-    utility_bills = SscApi.get_array(p_data, "year1_monthly_utility_bill_w_sys")
-    total_bill = utility_bills.inject(0){ |sum, x| sum + x }
+    utility_bills = SscApi.get_array(p_data, "utility_bill_w_sys")
+    total_bill = utility_bills[1]
     
     return total_bill
   
@@ -1833,17 +1828,17 @@ class UtilityBill
   
   def self.calculate_detailed_electric(load, gen, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
   
-    analysis_period = 30 # years
-    degradation = [0] # annual energy degradation
-    system_use_lifetime_output = 0 # 0=hourly first year, 1=hourly lifetime
-    inflation_rate = 2.4 # %
+    analysis_period = 1
+    degradation = [0]
+    system_use_lifetime_output = 0
+    inflation_rate = 0
     ur_flat_buy_rate = 0
     ur_flat_sell_rate = 0
     ur_nm_yearend_sell_rate = 0
-    if pv_compensation_type == "Net Metering"
-      ur_enable_net_metering = 1
+    ur_enable_net_metering = 1
+    if pv_compensation_type == Constants.PVNetMetering
       ur_nm_yearend_sell_rate = pv_sellback_rate.to_f
-    elsif pv_compensation_type == "Feed-In Tariff"
+    elsif pv_compensation_type == Constants.PVFeedInTariff
       ur_enable_net_metering = 0
       ur_flat_sell_rate = pv_tariff_rate.to_f
     end
@@ -1851,8 +1846,8 @@ class UtilityBill
     p_data = SscApi.create_data_object
     SscApi.set_number(p_data, "analysis_period", analysis_period)
     SscApi.set_array(p_data, "degradation", degradation)
-    SscApi.set_array(p_data, "gen", gen) # system power generated, kW
-    SscApi.set_array(p_data, "load", load) # electricity load, kW
+    SscApi.set_array(p_data, "gen", gen)
+    SscApi.set_array(p_data, "load", load)
     SscApi.set_number(p_data, "system_use_lifetime_output", system_use_lifetime_output)
     SscApi.set_number(p_data, "inflation_rate", inflation_rate)
     SscApi.set_number(p_data, "ur_flat_buy_rate", ur_flat_buy_rate)
@@ -1861,7 +1856,7 @@ class UtilityBill
     SscApi.set_number(p_data, "ur_nm_yearend_sell_rate", ur_nm_yearend_sell_rate)
 
     unless tariff[:fixedmonthlycharge].nil?
-      SscApi.set_number(p_data, "ur_monthly_fixed_charge", tariff[:fixedmonthlycharge]) # $
+      SscApi.set_number(p_data, "ur_monthly_fixed_charge", tariff[:fixedmonthlycharge])
     end
     
     SscApi.set_number(p_data, "ur_ec_enable", 1)
@@ -1915,8 +1910,8 @@ class UtilityBill
     p_mod = SscApi.create_module("utilityrate3")
     SscApi.execute_module(p_mod, p_data)
 
-    utility_bills = SscApi.get_array(p_data, "year1_monthly_utility_bill_w_sys")
-    total_bill = utility_bills.inject(0){ |sum, x| sum + x }
+    utility_bills = SscApi.get_array(p_data, "utility_bill_w_sys")
+    total_bill = utility_bills[1]
     
     return total_bill
   
