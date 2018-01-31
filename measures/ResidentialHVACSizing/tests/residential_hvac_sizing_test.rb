@@ -2280,7 +2280,7 @@ class ProcessHVACSizingTest < MiniTest::Test
         os_val = 0.0
         os_val_found = false
         result.info.map{ |x| x.logMessage }.each do |info|
-            next if not info.split("\n")[0].start_with?(os_header)
+            next if not info.split("\n")[0].downcase.start_with?(os_header.downcase)
             info.split("\n").each do |info_line|
                 infos = info_line.split('=')
                 next if infos[0].strip != os_key
@@ -2288,10 +2288,7 @@ class ProcessHVACSizingTest < MiniTest::Test
                 os_val_found = true
             end
         end
-        if not os_val_found
-            puts "WARNING: Could not find corresponding OS value for #{beopt_key}."
-            next
-        end
+        assert(os_val_found)
         
         if apply_volume_adj
             if ['Heat Infil','Cool Infil Sens','Cool Infil Lat'].include?(beopt_key)

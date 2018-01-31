@@ -316,8 +316,8 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert_equal(result.info.size, num_infos)
-    assert_equal(result.warnings.size, num_warnings)
+    assert_equal(num_infos, result.info.size)
+    assert_equal(num_warnings, result.warnings.size)
     
     # get the final objects in the model
     final_objects = get_objects(model)
@@ -339,16 +339,16 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
             new_object = new_object.public_send("to_#{obj_type}").get
             if obj_type == "AirConditionerVariableRefrigerantFlow"
               unless new_object.isRatedTotalCoolingCapacityAutosized
-                if new_object.name.to_s.start_with? Constants.LivingZone
+                if new_object.name.to_s.start_with? Constants.LivingZone # FIXME
                   assert_in_epsilon(expected_values["CoolingNominalCapacity"], new_object.ratedTotalCoolingCapacity.get, 0.01)
-                elsif new_object.name.to_s.start_with? Constants.FinishedBasementZone
+                elsif new_object.name.to_s.start_with? Constants.FinishedBasementZone # FIXME
                   assert_in_epsilon(expected_values["FBsmtZoneCoolingNominalCapacity"], new_object.ratedTotalCoolingCapacity.get, 0.01)
                 end
               end
               unless new_object.isRatedTotalHeatingCapacityAutosized
-                if new_object.name.to_s.start_with? Constants.LivingZone
+                if new_object.name.to_s.start_with? Constants.LivingZone # FIXME
                   assert_in_epsilon(expected_values["HeatingNominalCapacity"], new_object.ratedTotalHeatingCapacity.get, 0.01)
-                elsif new_object.name.to_s.start_with? Constants.FinishedBasementZone
+                elsif new_object.name.to_s.start_with? Constants.FinishedBasementZone # FIXME
                   assert_in_epsilon(expected_values["FBsmtZoneHeatingNominalCapacity"], new_object.ratedTotalHeatingCapacity.get, 0.01)
                 end
               end

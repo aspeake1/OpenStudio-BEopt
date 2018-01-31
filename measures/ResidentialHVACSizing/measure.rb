@@ -200,10 +200,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         
         # Display debug info
         if show_debug_info
-            unit_num = Geometry.get_unit_number(model, unit)
-            display_zone_loads(runner, unit_num, zones_loads)
-            display_unit_initial_results(runner, unit_num, unit_init)
-            display_unit_final_results(runner, unit_num, unit_final)
+            display_zone_loads(runner, unit, zones_loads)
+            display_unit_initial_results(runner, unit, unit_init)
+            display_unit_final_results(runner, unit, unit_final)
         end
         
         # Set object values
@@ -1662,7 +1661,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             end
             roofAbsorptance = roofAbsorptance / total_area
             
-            roofPitch = Geometry.calculate_avg_roof_pitch([ducts.LocationSpace])
+            roofPitch = Geometry.get_roof_pitch(ducts.LocationSpace.surfaces)
             
             t_solair = calculate_t_solair(weather, roofAbsorptance, roofPitch) # Sol air temperature on outside of roof surface # 1)
              
@@ -4052,6 +4051,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
   def setObjectValues(runner, model, unit, hvac, ducts, unit_final)
     # Updates object properties in the model
     
+    model_plant_loops = model.getPlantLoops
+    
     thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
     control_and_slave_zones = HVAC.get_control_and_slave_zones(thermal_zones)
     
@@ -4103,7 +4104,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         # Coils
         setCoilsObjectValues(runner, unit, hvac, system, unit_final, 1.0)
         
-        model.getPlantLoops.each do |pl|
+        model_plant_loops.each do |pl|
             
             has_gshp = false
             pl.supplyComponents.each do |supply_component|
@@ -4273,7 +4274,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         coilHeatingWaterBaseboard.setMaximumWaterFlowRate(bb_max_flow)
         coilHeatingWaterBaseboard.setHeatingDesignCapacityMethod("autosize")
         
-        model.getPlantLoops.each do |pl|
+        model_plant_loops.each do |pl|
             found_boiler = false
             pl.components.each do |plc|
                 next if not plc.to_BoilerHotWater.is_initialized
@@ -4440,10 +4441,10 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
   end
   
-  def display_zone_loads(runner, unit_num, zone_loads)
+  def display_zone_loads(runner, unit, zone_loads)
     zone_loads.keys.each do |thermal_zone|
         loads = zone_loads[thermal_zone]
-        s = "Unit #{unit_num.to_s} Zone Loads for #{thermal_zone.name.to_s}:"
+        s = "#{unit.name.to_s} Zone Loads for #{thermal_zone.name.to_s}:"
         properties = [
                       :Heat_Windows, :Heat_Doors,
                       :Heat_Walls, :Heat_Roofs,
@@ -4465,8 +4466,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     end
   end
   
-  def display_unit_initial_results(runner, unit_num, unit_init)
-    s = "Unit #{unit_num.to_s} Initial Results (w/o ducts):"
+  def display_unit_initial_results(runner, unit, unit_init)
+    s = "#{unit.name.to_s} Initial Results (w/o ducts):"
     loads = [
              :Heat_Load, :Cool_Load_Sens, :Cool_Load_Lat, 
              :Dehumid_Load_Sens, :Dehumid_Load_Lat,
@@ -4483,8 +4484,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     runner.registerInfo("#{s}\n")
   end
                   
-  def display_unit_final_results(runner, unit_num, unit_final)
-    s = "Unit #{unit_num.to_s} Final Results:"
+  def display_unit_final_results(runner, unit, unit_final)
+    s = "#{unit.name.to_s} Final Results:"
     loads = [
              :Heat_Load, :Heat_Load_Ducts,
              :Cool_Load_Lat, :Cool_Load_Sens,

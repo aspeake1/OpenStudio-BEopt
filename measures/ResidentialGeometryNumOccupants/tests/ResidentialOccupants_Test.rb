@@ -32,7 +32,7 @@ class AddResidentialOccupantsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"NumOccupants"=>2.64}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces)
   end
   
   def test_new_construction_fixed_3
@@ -42,7 +42,7 @@ class AddResidentialOccupantsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"NumOccupants"=>3}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces)
   end
   
   def test_retrofit_replace
@@ -52,13 +52,13 @@ class AddResidentialOccupantsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"NumOccupants"=>3}
-    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces)
     args_hash = {}
     args_hash["num_occ"] = "2"
     expected_num_del_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"NumOccupants"=>2}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces*2)
   end
 
   def test_retrofit_remove
@@ -68,7 +68,7 @@ class AddResidentialOccupantsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"NumOccupants"=>3}
-    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces)
     args_hash = {}
     args_hash["num_occ"] = "0"
     expected_num_del_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
@@ -160,7 +160,7 @@ class AddResidentialOccupantsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"NumOccupants"=>9.39}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*2)
   end
 
   def test_multifamily_new_construction
@@ -251,8 +251,8 @@ class AddResidentialOccupantsTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert_equal(result.info.size, num_infos)
-    assert_equal(result.warnings.size, num_warnings)
+    assert_equal(num_infos, result.info.size)
+    assert_equal(num_warnings, result.warnings.size)
     assert(result.finalCondition.is_initialized)
     
     # get the final objects in the model

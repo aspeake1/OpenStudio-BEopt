@@ -450,8 +450,8 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert_equal(result.info.size, num_infos)
-    assert_equal(result.warnings.size, num_warnings)
+    assert_equal(num_infos, result.info.size)
+    assert_equal(num_warnings, result.warnings.size)
     
     # get the final objects in the model
     final_objects = get_objects(model)
