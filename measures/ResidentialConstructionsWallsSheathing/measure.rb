@@ -28,20 +28,6 @@ class ProcessConstructionsWallsSheathing < OpenStudio::Measure::ModelMeasure
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for finished, unfinished surfaces
-    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    finished_surfaces, unfinished_surfaces = get_sheathing_wall_surfaces(model, runner)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    (finished_surfaces + unfinished_surfaces).each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface
-    
     #make a double argument for OSB/Plywood Thickness
     osb_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("osb_thick_in",true)
     osb_thick_in.setDisplayName("OSB/Plywood Thickness")
@@ -78,19 +64,7 @@ class ProcessConstructionsWallsSheathing < OpenStudio::Measure::ModelMeasure
       return false
     end
     
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     finished_surfaces, unfinished_surfaces = get_sheathing_wall_surfaces(model, runner)
-    
-    unless surface_s == Constants.Auto
-      finished_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      unfinished_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     if finished_surfaces.empty? and unfinished_surfaces.empty?
         runner.registerAsNotApplicable("Measure not applied because no applicable surfaces were found.")

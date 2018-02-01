@@ -135,20 +135,6 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     _test_na(nil, args_hash)
   end
   
-  def test_apply_to_specific_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 14"
-    args_hash["cavity_r"] = 0
-    args_hash["install_grade"] = "III" # no insulation, shouldn't apply
-    args_hash["cavity_depth"] = 5.5
-    args_hash["ins_fills_cavity"] = "false" # no insulation, shouldn't apply
-    args_hash["framing_factor"] = 0.07
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.682, "LayerDensity"=>36.952, "LayerSpecificHeat"=>1208.183, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-
   private
   
   def _test_error(osm_file, args_hash)

@@ -90,15 +90,6 @@ class ProcessConstructionsWallsSheathingTest < MiniTest::Test
     _test_na(nil, args_hash)
   end
 
-  def test_apply_to_specific_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 2"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.1154577, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

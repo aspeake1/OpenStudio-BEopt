@@ -27,20 +27,6 @@ class ProcessConstructionsWallsExteriorWoodStud < OpenStudio::Measure::ModelMeas
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
     
-    #make a choice argument for above-grade exterior walls adjacent to finished space or attic walls under insulated roofs
-    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    finished_surfaces, unfinished_surfaces = get_wood_stud_wall_surfaces(model, runner)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    (finished_surfaces + unfinished_surfaces).each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface
-
     #make a double argument for R-value of installed cavity insulation
     cavity_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("cavity_r", true)
     cavity_r.setDisplayName("Cavity Insulation Installed R-value")
@@ -95,19 +81,7 @@ class ProcessConstructionsWallsExteriorWoodStud < OpenStudio::Measure::ModelMeas
       return false
     end
     
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     finished_surfaces, unfinished_surfaces = get_wood_stud_wall_surfaces(model, runner)
-    
-    unless surface_s == Constants.Auto
-      finished_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      unfinished_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     # Continue if no applicable surfaces
     if finished_surfaces.empty? and unfinished_surfaces.empty?

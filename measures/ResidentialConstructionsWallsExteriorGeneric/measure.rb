@@ -27,20 +27,6 @@ class ProcessConstructionsWallsExteriorGeneric < OpenStudio::Measure::ModelMeasu
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for finished, unfinished surfaces
-    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    finished_surfaces, unfinished_surfaces = get_generic_wall_surfaces(model, runner)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    (finished_surfaces + unfinished_surfaces).each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface
-    
     #make a double argument for layer 1: thickness
     thick_in1 = OpenStudio::Measure::OSArgument::makeDoubleArgument("thick_in_1", true)
     thick_in1.setDisplayName("Thickness 1")
@@ -197,19 +183,7 @@ class ProcessConstructionsWallsExteriorGeneric < OpenStudio::Measure::ModelMeasu
       return false
     end
     
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     finished_surfaces, unfinished_surfaces = get_generic_wall_surfaces(model, runner)
-    
-    unless surface_s == Constants.Auto
-      finished_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      unfinished_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     # Continue if no applicable surfaces
     if finished_surfaces.empty? and unfinished_surfaces.empty?

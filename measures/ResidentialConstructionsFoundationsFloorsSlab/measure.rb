@@ -27,19 +27,6 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for above-grade ground floors adjacent to finished space
-    surfaces = get_slab_floor_surfaces(model)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    surfaces.each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface    
-    
     #make a double argument for slab perimeter insulation R-value
     perim_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("perim_r", true)
     perim_r.setDisplayName("Perimeter Insulation Nominal R-value")
@@ -140,18 +127,7 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
       return false
     end
 
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-
     surfaces = get_slab_floor_surfaces(model)
-    
-    unless surface_s == Constants.Auto
-      surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     spaces = []
     surfaces.each do |surface|
@@ -242,14 +218,24 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
         return false
     end
-    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner) > 1
+    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner).size > 1
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} for a multifamily building.")
         return false
     end
     
-    # Define construction
+    # Define materials
+    mat_whole_ins = nil
+    if slabWholeInsRvalue > 0
+        thick_in = slabWholeInsRvalue*BaseMaterial.InsulationRigid.k_in
+        mat_whole_ins = Material.new(name='WholeSlabIns', thick_in=thick_in, mat_base=BaseMaterial.InsulationRigid)
+    end
     mat_slab = Material.new(name='SlabMass', thick_in=slabMassThickIn, mat_base=nil, k_in=slabMassCond, rho=slabMassDens, cp=slabMassSpecHeat)
+    
+    # Define construction
     slab = Construction.new([1.0])
+    if not mat_whole_ins.nil?
+        slab.add_layer(mat_whole_ins, true)
+    end
     slab.add_layer(mat_slab, true)
     
     # Create and assign construction to surfaces

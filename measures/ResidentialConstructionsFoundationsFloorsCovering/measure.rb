@@ -27,19 +27,6 @@ class ProcessConstructionsFoundationsFloorsCovering < OpenStudio::Measure::Model
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for above-grade floor surfaces
-    surfaces = get_covered_floor_surfaces(model)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    surfaces.each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface    
-    
     #make a double argument for floor covering fraction
     covering_frac = OpenStudio::Measure::OSArgument::makeDoubleArgument("covering_frac", true)
     covering_frac.setDisplayName("Floor Covering Fraction")
@@ -67,18 +54,7 @@ class ProcessConstructionsFoundationsFloorsCovering < OpenStudio::Measure::Model
       return false
     end
     
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     surfaces = get_covered_floor_surfaces(model)
-    
-    unless surface_s == Constants.Auto
-      surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end    
     
     # Continue if no applicable surfaces
     if surfaces.empty?

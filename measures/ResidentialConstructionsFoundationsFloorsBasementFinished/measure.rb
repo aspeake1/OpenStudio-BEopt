@@ -28,19 +28,6 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for finished basement walls and floors
-    wall_surfaces, floor_surfaces, spaces = get_finished_basement_surfaces(model)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    wall_surfaces.each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface
-    
     #make a double argument for wall insulation height
     wall_ins_height = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_ins_height", true)
     wall_ins_height.setDisplayName("Wall Insulation Height")
@@ -145,18 +132,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
       return false
     end
 
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-
     wall_surfaces, floor_surfaces, spaces = get_finished_basement_surfaces(model)
-    
-    unless surface_s == Constants.Auto
-      wall_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     # Continue if no applicable surfaces
     if wall_surfaces.empty? and floor_surfaces.empty?
@@ -214,7 +190,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
         return false
     end
-    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner) > 1
+    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner).size > 1
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} for a multifamily building.")
         return false
     end

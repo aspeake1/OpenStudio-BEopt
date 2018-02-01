@@ -27,19 +27,6 @@ class ProcessConstructionsCeilingsRoofsRadiantBarrier < OpenStudio::Measure::Mod
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for roofs above unfinished space
-    surfaces = get_unfinished_roofs(model)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    surfaces.each do |surface|
-      surfaces_args << surface.name.to_s
-    end   
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface
-    
     #make a boolean argument for Has Radiant Barrier
     has_rb = OpenStudio::Measure::OSArgument::makeBoolArgument("has_rb",true)
     has_rb.setDescription("Specifies whether the attic has a radiant barrier.")
@@ -59,18 +46,7 @@ class ProcessConstructionsCeilingsRoofsRadiantBarrier < OpenStudio::Measure::Mod
       return false
     end
     
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     surfaces = get_unfinished_roofs(model)
-    
-    unless surface_s == Constants.Auto
-      surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     if surfaces.empty?
         runner.registerAsNotApplicable("Measure not applied because no applicable surfaces were found.")

@@ -196,36 +196,6 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     _test_na(osm_geo_pier_beam, args_hash)
   end
 
-  def test_apply_to_specific_ceiling_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 23"
-    args_hash["wall_rigid_r"] = 0
-    args_hash["wall_rigid_thick_in"] = 0
-    args_hash["ceil_cavity_r"] = 13
-    args_hash["ceil_cavity_grade"] = "III"
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "FoundationKiva"=>1, "FoundationKivaSettings"=>1}
-    expected_values = {"SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end  
-  
-  def test_apply_to_specific_wall_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 19"
-    args_hash["wall_rigid_r"] = 10
-    args_hash["wall_rigid_thick_in"] = 2
-    args_hash["ceil_cavity_r"] = 0
-    args_hash["ceil_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

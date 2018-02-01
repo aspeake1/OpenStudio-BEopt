@@ -28,19 +28,6 @@ class ProcessConstructionsFoundationsFloorsSheathing < OpenStudio::Measure::Mode
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for floors of finished spaces
-    surfaces = get_floors_sheathing_surfaces(model)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    surfaces.each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface        
-    
     #make a double argument for OSB/Plywood Thickness
     osb_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("osb_thick_in",true)
     osb_thick_in.setDisplayName("OSB/Plywood Thickness")
@@ -77,18 +64,7 @@ class ProcessConstructionsFoundationsFloorsSheathing < OpenStudio::Measure::Mode
       return false
     end
 
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     surfaces = get_floors_sheathing_surfaces(model)
-    
-    unless surface_s == Constants.Auto
-      surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     # Continue if no applicable surfaces
     if surfaces.empty?

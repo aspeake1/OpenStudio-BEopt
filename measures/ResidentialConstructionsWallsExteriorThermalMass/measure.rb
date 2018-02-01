@@ -112,18 +112,7 @@ class ProcessConstructionsWallsExteriorThermalMass < OpenStudio::Measure::ModelM
       return false
     end
     
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     surfaces = get_exterior_thermal_mass_wall_surfaces(model)
-    
-    unless surface_s == Constants.Auto
-      surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     # Continue if no applicable surfaces
     if surfaces.empty?

@@ -84,15 +84,6 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
     _test_na(nil, args_hash)
   end
 
-  def test_apply_to_specific_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 14"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.0094488, "LayerConductivity"=>0.162714, "LayerDensity"=>1121.3999999999999, "LayerSpecificHeat"=>1465.4499999999998, "LayerThermalAbs"=>0.91, "LayerSolarAbs"=>0.85, "LayerVisibleAbs"=>0.85, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

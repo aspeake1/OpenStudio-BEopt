@@ -28,24 +28,6 @@ class ProcessConstructionsUninsulatedSurfacesTest < MiniTest::Test
     _test_measure("SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end    
 
-  def test_apply_to_specific_attic_wall_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 16"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>2, "Construction"=>1}
-    expected_values = {"LayerRValue"=>0.0889/0.393+0.0127/0.1154577, "LayerDensity"=>83.026+512.64, "LayerSpecificHeat"=>1211.616+1214.23, "LayerIndex"=>0+1, "SurfacesWithConstructions"=>1}
-    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
-  end
-
-  def test_apply_to_specific_adiabatic_floor_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 7"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerRValue"=>0.1397/0.557, "LayerDensity"=>67.639, "LayerSpecificHeat"=>1211.145, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
-  end
-
   def test_single_family_attached
     num_units = 4
     args_hash = {}

@@ -72,15 +72,6 @@ class ProcessConstructionsWallsInterzonalTest < MiniTest::Test
     _test_measure(osm_geo_int_walls, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
-  def test_apply_to_specific_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 12"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerRValue"=>0.0889/0.0550583396675322, "LayerDensity"=>162.40275, "LayerSpecificHeat"=>1178.9167077681875, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_int_walls, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

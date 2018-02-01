@@ -258,18 +258,6 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     _test_na(osm_geo_pier_beam, args_hash)
   end
 
-  def test_apply_to_specific_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 1"
-    args_hash["perim_r"] = 5
-    args_hash["perim_width"] = 2
-    args_hash["gap_r"] = 5
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

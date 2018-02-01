@@ -164,27 +164,6 @@ class ProcessConstructionsWallsExteriorGenericTest < MiniTest::Test
     _test_na(nil, args_hash)
   end
 
-  def test_apply_to_specific_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 2"
-    args_hash["thick_in_1"] = 2.5
-    args_hash["thick_in_2"] = 3.0
-    args_hash["thick_in_3"] = 2.5
-    args_hash["conductivity_1"] = 9.211
-    args_hash["conductivity_2"] = 0.425
-    args_hash["conductivity_3"] = 7.471
-    args_hash["density_1"] = 138.33
-    args_hash["density_2"] = 2.6
-    args_hash["density_3"] = 136.59
-    args_hash["specific_heat_1"] = 0.23
-    args_hash["specific_heat_2"] = 0.28
-    args_hash["specific_heat_3"] = 0.28
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
-    expected_values = {"LayerRValue"=>0.0635/1.3286+0.0762/0.0613+0.0635/1.0777, "LayerDensity"=>2216.046+41.652+2188.172, "LayerSpecificHeat"=>963.01+1172.36+1172.36, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

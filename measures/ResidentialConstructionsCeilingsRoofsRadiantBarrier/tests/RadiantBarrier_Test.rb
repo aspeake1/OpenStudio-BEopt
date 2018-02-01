@@ -35,16 +35,6 @@ class ProcessConstructionsCeilingsRoofsRadiantBarrierTest < MiniTest::Test
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
-  def test_apply_to_specific_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 14"
-    args_hash["has_rb"] = "true"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.00021336, "LayerConductivity"=>235.06980000000004, "LayerDensity"=>2700.9719999999998, "LayerSpecificHeat"=>921.14, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
-  end
-
   private
   
   def _test_error(osm_file, args_hash)

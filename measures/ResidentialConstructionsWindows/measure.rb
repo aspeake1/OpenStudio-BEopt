@@ -35,23 +35,6 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for window sub surfaces
-    sub_surfaces = get_window_sub_surfaces(model)
-    sub_surfaces_args = OpenStudio::StringVector.new
-    sub_surfaces_args << Constants.Auto
-    sub_surfaces_args << Constants.FacadeFront
-    sub_surfaces_args << Constants.FacadeBack
-    sub_surfaces_args << Constants.FacadeLeft
-    sub_surfaces_args << Constants.FacadeRight
-    sub_surfaces.each do |sub_surface|
-      sub_surfaces_args << sub_surface.name.to_s
-    end      
-    sub_surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("sub_surface", sub_surfaces_args, false)
-    sub_surface.setDisplayName("Subsurface(s)")
-    sub_surface.setDescription("Select the sub surface(s) to assign constructions.")
-    sub_surface.setDefaultValue(Constants.Auto)
-    args << sub_surface
-    
     #make an argument for entering front window u-factor
     ufactor = OpenStudio::Measure::OSArgument::makeDoubleArgument("ufactor",true)
     ufactor.setDisplayName("U-Factor")
@@ -93,20 +76,7 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
       return false
     end
     
-    sub_surface_s = runner.getOptionalStringArgumentValue("sub_surface",user_arguments)
-    if not sub_surface_s.is_initialized
-      sub_surface_s = Constants.Auto
-    else
-      sub_surface_s = sub_surface_s.get
-    end
-    
     sub_surfaces = get_window_sub_surfaces(model)
-    
-    if not [Constants.Auto, Constants.FacadeFront, Constants.FacadeBack, Constants.FacadeLeft, Constants.FacadeRight].include? sub_surface_s
-      sub_surfaces.delete_if { |sub_surface| sub_surface.name.to_s != sub_surface_s }
-    elsif not sub_surface_s == Constants.Auto
-      sub_surfaces.delete_if { |sub_surface| Geometry.get_facade_for_surface(sub_surface) != sub_surface_s }
-    end
     
     # Continue if no applicable sub surfaces
     if sub_surfaces.empty?

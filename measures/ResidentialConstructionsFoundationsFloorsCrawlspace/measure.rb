@@ -28,19 +28,6 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for crawlspace ceilings, walls, and floors
-    wall_surfaces, floor_surfaces, ceiling_surfaces, spaces = get_crawlspace_surfaces(model)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    (ceiling_surfaces + wall_surfaces).each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface
-    
     #make a double argument for wall continuous insulation R-value
     wall_rigid_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_rigid_r", true)
     wall_rigid_r.setDisplayName("Wall Continuous Insulation Nominal R-value")
@@ -112,20 +99,8 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
       return false
     end
 
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     wall_surfaces, floor_surfaces, ceiling_surfaces, spaces = get_crawlspace_surfaces(model)
 
-    unless surface_s == Constants.Auto
-      ceiling_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      wall_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
-    
     # Continue if no applicable surfaces
     if wall_surfaces.empty? and floor_surfaces.empty? and ceiling_surfaces.empty?
       runner.registerAsNotApplicable("Measure not applied because no applicable surfaces were found.")
@@ -166,7 +141,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
         return false
     end
-    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner) > 1
+    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner).size > 1
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} for a multifamily building.")
         return false
     end

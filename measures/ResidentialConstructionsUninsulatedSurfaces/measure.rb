@@ -28,19 +28,6 @@ class ProcessConstructionsUninsulatedSurfaces < OpenStudio::Measure::ModelMeasur
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for uninsulated surfaces
-    ext_wall_surfaces, slab_surfaces, roof_surfaces, finished_wall_surfaces, unfinished_wall_surfaces, finished_floor_surfaces, unfinished_floor_surfaces = get_uninsulated_surfaces(model)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    (ext_wall_surfaces + slab_surfaces + roof_surfaces + finished_wall_surfaces + unfinished_wall_surfaces + finished_floor_surfaces + unfinished_floor_surfaces).each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface
-    
     return args
   end #end the arguments method
 
@@ -53,24 +40,7 @@ class ProcessConstructionsUninsulatedSurfaces < OpenStudio::Measure::ModelMeasur
       return false
     end
 
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     ext_wall_surfaces, slab_surfaces, roof_surfaces, finished_wall_surfaces, unfinished_wall_surfaces, finished_floor_surfaces, unfinished_floor_surfaces = get_uninsulated_surfaces(model)
-    
-    unless surface_s == Constants.Auto
-      ext_wall_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      slab_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      roof_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      finished_wall_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      unfinished_wall_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      finished_floor_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-      unfinished_floor_surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end    
     
     # Continue if no applicable surfaces
     if ext_wall_surfaces.empty? and finished_floor_surfaces.empty? and unfinished_floor_surfaces.empty? and slab_surfaces.empty? and roof_surfaces.empty? and finished_wall_surfaces.empty? and unfinished_wall_surfaces.empty?
