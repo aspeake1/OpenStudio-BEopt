@@ -320,7 +320,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
       end
     end
     
-    runner.registerInfo("Calculated utility bill: #{total_bill}")
+    runner.registerInfo("Calculated utility bill: $%.2f" % total_bill)
     
     return true
 
