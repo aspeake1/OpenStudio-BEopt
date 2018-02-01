@@ -242,7 +242,21 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
         return false
     end
+    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner) > 1
+        runner.registerError("Exposed Perimeter must be #{Constants.Auto} for a multifamily building.")
+        return false
+    end
     
+    # Define construction
+    mat_slab = Material.new(name='SlabMass', thick_in=slabMassThickIn, mat_base=nil, k_in=slabMassCond, rho=slabMassDens, cp=slabMassSpecHeat)
+    slab = Construction.new([1.0])
+    slab.add_layer(mat_slab, true)
+    
+    # Create and assign construction to surfaces
+    if not slab.create_and_assign_constructions(surfaces, runner, model, name="Slab")
+        return false
+    end
+
     # Create Kiva foundation
     slabMassThick = UnitConversions.convert(slabMassThickIn, "in", "ft")
     foundation = Kiva.create_slab_foundation(model, slabPerimeterRvalue, slabPerimeterInsWidth, 
@@ -251,57 +265,53 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
                                                     
     # Assign surfaces to Kiva foundation
     surfaces.each do |surface|
+        if exposed_perim == Constants.Auto
+            surfaceExtPerimeter = Geometry.calculate_exposed_perimeter(model, [surface])
+        else
+            surfaceExtPerimeter = exposed_perim.to_f
+        end
+        
+        if surfaceExtPerimeter <= 0
+          runner.registerError("Calculated an exposed perimeter <= 0 for surface '#{floor_surface.name.to_s}'.")
+          return false
+        end
+    
         surface.setAdjacentFoundation(foundation)
-        surface.createSurfacePropertyExposedFoundationPerimeter("ExposedPerimeterFraction", 1.0)
+        surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(surfaceExtPerimeter,"ft","m"))
     end
+    
+    # FIXME: Remove soon
+    # Store info for HVAC Sizing measure
+    # ==================================
     
     # Get geometry values
     slabArea = Geometry.calculate_total_area_from_surfaces(surfaces)
-    if exposed_perim == Constants.Auto
-        slabExtPerimeter = Geometry.calculate_exposed_perimeter(model, surfaces)
-    else
-        slabExtPerimeter = exposed_perim.to_f
-    end
-    
-    # Process the slab
-    
+
     # Define materials
-    mat_whole_ins = nil
-    if slabWholeInsRvalue > 0
-        thick_in = slabWholeInsRvalue*BaseMaterial.InsulationRigid.k_in
-        mat_whole_ins = Material.new(name='WholeSlabIns', thick_in=thick_in, mat_base=BaseMaterial.InsulationRigid)
-    end
-    mat_slab = Material.new(name='SlabMass', thick_in=slabMassThickIn, mat_base=nil, k_in=slabMassCond, rho=slabMassDens, cp=slabMassSpecHeat)
-    
-    # Define construction
-    slab = Construction.new([1.0])
-    if not mat_whole_ins.nil?
-        slab.add_layer(mat_whole_ins, true)
-    end
-    slab.add_layer(mat_slab, true)
-    
-    # Create and assign construction to surfaces
-    if not slab.create_and_assign_constructions(surfaces, runner, model, name="Slab")
-        return false
-    end
-    
-    # Store info for HVAC Sizing measure
     slabCarpetPerimeterConduction, slabBarePerimeterConduction = SlabPerimeterConductancesByType(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabExtRvalue, slabWholeInsRvalue, slabExtInsDepth)
     carpetFloorFraction = Material.CoveringBare.rvalue/Material.CoveringBare(floorFraction=1.0).rvalue
     slab_perimeter_conduction = slabCarpetPerimeterConduction * carpetFloorFraction + slabBarePerimeterConduction * (1 - carpetFloorFraction)
 
-    if slabExtPerimeter > 0
-        effective_slab_Rvalue = slabArea / (slabExtPerimeter * slab_perimeter_conduction)
-    else
-        effective_slab_Rvalue = 1000.0 # hr*ft^2*F/Btu
-    end
-    
     surfaces.each do |surface|
+        if exposed_perim == Constants.Auto
+            slabExtPerimeter = Geometry.calculate_exposed_perimeter(model, [surface])
+        else
+            slabExtPerimeter = exposed_perim.to_f
+        end
+        
+        if slabExtPerimeter > 0
+            effective_slab_Rvalue = slabArea / (slabExtPerimeter * slab_perimeter_conduction)
+        else
+            effective_slab_Rvalue = 1000.0 # hr*ft^2*F/Btu
+        end
+        
         model.getBuildingUnits.each do |unit|
             next if unit.spaces.size == 0
             unit.setFeature(Constants.SizingInfoSlabRvalue(surface), effective_slab_Rvalue)
         end
     end
+    
+    # ==================================
     
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)

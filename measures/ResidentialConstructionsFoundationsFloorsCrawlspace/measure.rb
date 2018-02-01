@@ -166,6 +166,10 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
         runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
         return false
     end
+    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner) > 1
+        runner.registerError("Exposed Perimeter must be #{Constants.Auto} for a multifamily building.")
+        return false
+    end
     
     # Create Kiva foundation
     crawl_height = Geometry.spaces_avg_height(spaces)
@@ -205,17 +209,22 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
             return false
         end
         
-        # Exposed perimeter
-        if exposed_perim == Constants.Auto
-            csExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true)
-        else
-            csExtPerimeter = exposed_perim.to_f
-        end
-        
         # Assign surfaces to Kiva foundation
         floor_surfaces.each do |floor_surface|
+            # Exposed perimeter
+            if exposed_perim == Constants.Auto
+                surfaceExtPerimeter = Geometry.calculate_exposed_perimeter(model, [floor_surface], has_foundation_walls=true)
+            else
+                surfaceExtPerimeter = exposed_perim.to_f
+            end
+            
+            if surfaceExtPerimeter <= 0
+              runner.registerError("Calculated an exposed perimeter <= 0 for surface '#{floor_surface.name.to_s}'.")
+              return false
+            end
+            
             floor_surface.setAdjacentFoundation(foundation)
-            floor_surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(csExtPerimeter,"ft","m"))
+            floor_surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(surfaceExtPerimeter,"ft","m"))
         end
     end
 
