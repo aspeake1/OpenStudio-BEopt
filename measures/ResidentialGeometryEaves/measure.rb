@@ -2,6 +2,7 @@
 # http://nrel.github.io/OpenStudio-user-documentation/measures/measure_writing_guide/
 
 require "#{File.dirname(__FILE__)}/resources/geometry"
+require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 # start the measure
 class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
@@ -58,7 +59,7 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
     end
 
     roof_structure = runner.getStringArgumentValue("roof_structure",user_arguments)
-    eaves_depth = OpenStudio.convert(runner.getDoubleArgumentValue("eaves_depth",user_arguments),"ft","m").get
+    eaves_depth = UnitConversions.convert(runner.getDoubleArgumentValue("eaves_depth",user_arguments),"ft","m")
 
     # remove existing eaves
     num_removed = 0

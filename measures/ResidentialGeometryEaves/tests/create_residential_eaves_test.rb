@@ -262,14 +262,14 @@ class CreateResidentialEavesTest < MiniTest::Test
     result = runner.result
     
     # save the model to test output directory
-    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
-    model.save(output_file_path, true)
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    # model.save(output_file_path, true)
     
     # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    # assert(result.info.size == num_infos)
+    assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
 
     # get the final objects in the model
@@ -290,13 +290,13 @@ class CreateResidentialEavesTest < MiniTest::Test
             new_object = new_object.public_send("to_#{obj_type}").get
             if obj_type == "ShadingSurface"
                 l, w, h = Geometry.get_surface_dimensions(new_object)
-                l = OpenStudio.convert(l,"m","ft").get
-                w = OpenStudio.convert(w,"m","ft").get
+                l = UnitConversions.convert(l,"m","ft")
+                w = UnitConversions.convert(w,"m","ft")
                 if l < w
-                  next if OpenStudio::convert(l,"m","ft").get > 5
+                  next if UnitConversions.convert(l,"m","ft") > 5
                   assert_in_epsilon(expected_values["eaves_depth"], l, 0.01)
                 else
-                  next if OpenStudio::convert(w,"m","ft").get > 5
+                  next if UnitConversions.convert(w,"m","ft") > 5
                   assert_in_epsilon(expected_values["eaves_depth"], w, 0.01)
                 end
             end
