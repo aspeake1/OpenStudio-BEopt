@@ -195,14 +195,6 @@ class CreateResidentialEavesTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_InsetLeft.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, expected_num_new_objects["ShadingSurface"])
   end
 
-  def test_geometry_editor
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ShadingSurface"=>8, "ShadingSurfaceGroup"=>1}
-    expected_values = {"eaves_depth"=>2}
-    _test_measure("SFD_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, expected_num_new_objects["ShadingSurface"])  
-  end
-
   private
   
   def _test_error(osm_file, args_hash)
