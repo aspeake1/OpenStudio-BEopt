@@ -52,7 +52,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg.setDisplayName("Electricity: Fixed Charge")
     arg.setUnits("$/month")
     arg.setDescription("Monthly fixed charge for electricity.")
-    arg.setDefaultValue("8.0")
+    arg.setDefaultValue("12.0")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_rate", true)
