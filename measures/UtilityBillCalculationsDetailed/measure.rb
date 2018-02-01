@@ -52,9 +52,12 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     tariffs = OpenStudio::StringVector.new
     tariffs << "Autoselect Tariff(s)"
     tariffs << "Custom Tariff"
+    cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
     zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
-    zip_file.listFiles.each do |zip_entry|
-      tariffs << zip_entry.to_s.chomp(".json")
+    zip_file.listFiles.each do |label|
+      label = label.to_s.chomp(".json")
+      utility_name = get_utility_and_name_from_label(cols, label)
+      tariffs << utility_name
     end
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("tariff_label", tariffs, true)
     arg.setDisplayName("Electricity: Tariff")
@@ -227,16 +230,19 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
 
       custom_tariff = custom_tariff.get
       if File.exists?(File.expand_path(custom_tariff))
-        tariffs[File.basename(File.expand_path(custom_tariff)).chomp(".json")] = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
+        label = File.basename(File.expand_path(custom_tariff)).chomp(".json")
+        tariffs[label] = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
       end
 
-    elsif tariff_label != "Autoselect Tariff(s)"
-
+    elsif tariff_label != "Autoselect Tariff(s)" # tariff is selected from the list
+    
+      utility_name = tariff_label
+      label = get_label_from_utility_and_name(utility_name)
       zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
       zip_file.listFiles.each do |zip_entry|
-        next unless zip_entry.to_s == "#{tariff_label}.json"
+        next unless zip_entry.to_s == "#{label}.json"
         zip_entry = zip_file.extractFile(zip_entry, ".")
-        tariffs[File.basename(File.expand_path(zip_entry.to_s)).chomp(".json")] = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
+        tariffs[label] = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
       end
 
     else # autoselect tariff based on distance to simulation epw location
@@ -284,13 +290,13 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
   def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariffs)
 
     if tariffs.empty?
-      runner.registerError("Could not locate any tariffs.")
+      runner.registerError("Could not locate tariff(s).")
       return false
     end
     
     if marginal_rates.values.include? Constants.Auto
       unless HelperMethods.state_code_map.values.include? weather_file_state
-        runner.registerError("Rates do not exist for '#{weather_file_state}'.")
+        runner.registerError("Rates do not exist for state/province/region '#{weather_file_state}'.")
         return false
       end
     end
@@ -354,18 +360,20 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       require "#{File.dirname(__FILE__)}/resources/ssc_api"
       timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
       timeseries["ElectricityProduced:Facility"] = UtilityBill.remove_leap_day(timeseries["ElectricityProduced:Facility"])
+      
+      cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
+      tariffs.each do |label, tariff|
 
-      tariffs.each do |name, tariff|
-
+        utility_name = get_utility_and_name_from_label(cols, label)
         if UtilityBill.validate_tariff(tariff)
           elec_bill = UtilityBill.calculate_detailed_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
           unless elec_bills.keys.include? tariff[:eiaid]
             elec_bills[tariff[:eiaid]] = []
           end
           elec_bills[tariff[:eiaid]] << elec_bill
-          runner.registerInfo("Calculated utility bill: #{name} = #{total_bill + elec_bill}")
+          runner.registerInfo("Calculated utility bill: #{utility_name} = $%.2f" % (total_bill + elec_bill))
         else
-          no_charges << name
+          no_charges << "#{utility_name}"
         end
 
       end
@@ -394,28 +402,25 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     runner.registerInfo("Closest usaf to #{epw_latitude}, #{epw_longitude}: #{closest_usaf}")      
     usafs = cols[1].collect { |i| i.to_s }
     usaf_ixs = usafs.each_index.select{|i| usafs[i] == closest_usaf}
-    utilityid_to_nsrdbid = {} # {eiaid: [grid_cell, ...], ...}
+    utilityids = [] # [eiaid1, eiaid2, ...]
     usaf_ixs.each do |ix|
       next if cols[4][ix].nil?
       cols[4][ix].split("|").each do |utilityid|
         next if utilityid == "no data"
-        unless utilityid_to_nsrdbid.keys.include? utilityid
-          utilityid_to_nsrdbid[utilityid] = []
-        end
-        utilityid_to_nsrdbid[utilityid] << cols[0][ix]
+        next if utilityids.include? utilityid
+        utilityids << utilityid
       end
     end
 
-    utilityid_to_filename = {} # {eiaid: {utility - name, ...}, ...}
+    utilityid_to_filename = {} # {eiaid: {label, ...}, ...}
     cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
     cols.each do |col|
       next unless col[0].include? "eiaid"
-      utilityid_to_nsrdbid.keys.each do |utilityid|
+      utilityids.each do |utilityid|
         eiaid_ixs = col.each_index.select{|i| col[i] == utilityid}
         eiaid_ixs.each do |ix|
-          utility = cols[0][ix]
-          name = cols[2][ix]
-          filename = clean_filename("#{utility} - #{name}")
+          label = cols[3][ix]
+          filename = "#{label}.json"
           unless utilityid_to_filename.keys.include? utilityid
             utilityid_to_filename[utilityid] = []
           end
@@ -424,16 +429,18 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       end
     end
 
-    tariffs = {}
+    tariffs = {} # {label: tariff, ...} 
     utilityid_to_filename.each do |utilityid, filenames|
       filenames.each do |filename|
         zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
         zip_file.listFiles.each do |zip_entry|
-          next unless zip_entry.to_s == "#{filename}.json"
-          begin
-            zip_entry = zip_file.extractFile(zip_entry, ".")
-            tariffs[File.basename(File.expand_path(zip_entry.to_s)).chomp(".json")] = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
-          rescue
+          next unless zip_entry.to_s == filename
+          zip_entry = zip_file.extractFile(zip_entry, ".")
+          if File.exists?("./#{zip_entry}")
+            label = File.basename(File.expand_path(zip_entry.to_s)).chomp(".json")
+            tariffs[label] = JSON.parse(File.read(zip_entry.to_s), :symbolize_names=>true)[:items][0]
+          else
+            return []
           end
         end
       end          
@@ -443,6 +450,56 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
   
   end
 
+  def get_utility_and_name_from_label(cols, label)
+    label_ix = nil
+    utility = nil
+    name = nil
+    cols.each do |col|
+      next unless col[0] == "label"
+      label_ixs = col.each_index.select{|i| col[i] == label}
+      unless label_ixs.empty?
+        label_ix = label_ixs[0]
+      end
+    end
+    unless label_ix.nil?
+      cols.each do |col|
+        if col[0] == "utility"
+          utility = col[label_ix]
+        elsif col[0] == "name"
+          name = col[label_ix]
+        end
+      end
+      return "#{utility} - #{name}"
+    end
+    return label
+  end
+  
+  def get_label_from_utility_and_name(utility_name)
+    utility_name = utility_name.split(" - ")
+    utility = utility_name[0]
+    name = utility_name[1..-1].join(" - ")
+    cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
+    utility_ixs = []
+    name_ixs = []
+    utility_name_ix = nil
+    label = nil
+    cols.each do |col|
+      next unless col[0] == "utility"
+      utility_ixs = col.each_index.select{|i| col[i] == utility}
+    end
+    cols.each do |col|
+      next unless col[0] == "name"
+      name_ixs = col.each_index.select{|i| col[i] == name}
+    end
+    utility_name_ixs = utility_ixs & name_ixs
+    utility_name_ix = utility_name_ixs[0]
+    cols.each do |col|
+      next unless col[0] == "label"
+      label = col[utility_name_ix]
+    end
+    return label
+  end
+  
   def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs) # for the 216 resstock locations, epw=usaf
     bldg_lat = bldg_lat.to_f
     bldg_lon = bldg_lon.to_f
@@ -479,17 +536,6 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
 
     return km
 
-  end
-  
-  def clean_filename(name)
-    name = name.gsub("/", "_")
-    name = name.gsub(",", "")
-    name = name.gsub(":", " ")
-    name = name.gsub('"', "")
-    name = name.gsub(">", "")
-    name = name.gsub("<", "")
-    name = name.gsub("*", "")
-    return name.strip
   end
 
 end

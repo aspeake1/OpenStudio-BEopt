@@ -555,12 +555,6 @@ def get_tariff_json_files(tariffs_path)
   STDOUT.puts "Enter API Key:"
   api_key = STDIN.gets.strip
   return false if api_key.empty?
-  STDOUT.puts "<ENTER> for Add, 1 for Update:"
-  function = STDIN.gets.strip
-  update = false
-  if function == "1"
-    update = true
-  end
 
   url = URI.parse("https://api.openei.org/utility_rates?")
   http = Net::HTTP.new(url.host, url.port)
@@ -574,16 +568,8 @@ def get_tariff_json_files(tariffs_path)
   timestep = Time.now
   num_parallel = 1 # FIXME: segfault when num_parallel > 1
   Parallel.each_with_index(rows, in_threads: num_parallel) do |row, i|
-
+  
     utility, eiaid, name, label = row
-
-    entry_path = File.join(tariffs_path, clean_filename("#{utility} - #{name}.json"))
-    if not update
-      if File.exists?(entry_path)
-        puts "Skipping #{entry_path}: already exists."
-        next
-      end
-    end
 
     params = { 'version' => 3, 'format' => 'json', 'detail' => 'full', 'getpage' => label, 'api_key' => api_key }
     url.query = URI.encode_www_form(params)
@@ -598,23 +584,18 @@ def get_tariff_json_files(tariffs_path)
       end
       next
     end
+    
+    entry_path = File.join(tariffs_path, "#{label}.json")
 
     if response[:items].empty?
       puts "Skipping #{entry_path}: empty tariff."
       next
     end
 
-    if not File.exists?(entry_path)
-      puts "Added #{entry_path}."
-      File.open(entry_path, "w") do |f|
-        f.write(response.to_json)
-      end
-    elsif not JSON.parse(File.read(entry_path), :symbolize_names=>true) == response
-      puts "Updated #{entry_path}."
-      File.open(entry_path, "w") do |f|
-        f.write(response.to_json)
-      end
+    File.open(entry_path, "w") do |f|
+      f.write(response.to_json)
     end
+    puts "Added #{entry_path}."
 
     # Report out progress
     if i.to_f * 100 / rows.length >= report_at
@@ -627,17 +608,6 @@ def get_tariff_json_files(tariffs_path)
   
   return true
 
-end
-
-def clean_filename(name)
-  name = name.gsub("/", "_")
-  name = name.gsub(",", "")
-  name = name.gsub(":", " ")
-  name = name.gsub('"', "")
-  name = name.gsub(">", "")
-  name = name.gsub("<", "")
-  name = name.gsub("*", "")
-  return name.strip
 end
 
 def get_os_cli

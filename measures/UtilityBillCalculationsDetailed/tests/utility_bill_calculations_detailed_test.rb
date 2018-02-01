@@ -22,7 +22,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 34, 1)
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 35, 1)
   end
   
   def test_functionality_feed_in_tariff_select_tariff
@@ -49,13 +49,13 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     weather_file_state = "AB"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     result = _test_error(timeseries, args_hash, weather_file_state)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Rates do not exist for '#{weather_file_state}'.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Rates do not exist for state/province/region '#{weather_file_state}'.")
   end
   
   def test_error_invalid_tariff
     args_hash = {}
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../City of Linneus Missouri (Utility Company) - Electric Rate.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../539f75f7ec4f024411ed19fd.json", __FILE__)
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -66,7 +66,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     result = _test_error(timeseries, args_hash, weather_file_state)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Does not contain charges: City of Linneus Missouri (Utility Company) - Electric Rate.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Does not contain charges: City of Linneus, Missouri (Utility Company) - Electric Rate.")
   end
   
   def test_error_no_tariffs_found
@@ -83,7 +83,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     result = _test_error(timeseries, args_hash, weather_file_state)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Could not locate any tariffs.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Could not locate tariff(s).")
   end
   
   def test_calculations_0kW_pv_net_metering_custom_tariff
@@ -384,14 +384,13 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
       # run the measure
       measure.run(runner, argument_map)
       result = runner.result
-      show_output(result)
+      # show_output(result)
     ensure
       Dir.chdir(start_dir)
     end
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    puts result.info.size
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
     
@@ -473,11 +472,11 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     # get arguments
     arguments = measure.arguments()
     argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
-    
+
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
@@ -501,7 +500,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
       end
     end
     measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"], tariffs)
-
+      
     result = runner.result
     # show_output(result)
 
