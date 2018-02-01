@@ -7,14 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_SL_UA_CeilingIns.osm"
-  end
-  
-  def osm_geo_layers
-    return "SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm"
-  end
-
   def test_add_6in_hollow
     args_hash = {}
     args_hash["thickness"] = 6
@@ -27,7 +19,7 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1524/0.538472+0.0254/0.14026, "LayerDensity"=>1001.1218+71.989, "LayerSpecificHeat"=>852.065+1211.355, "LayerIndex"=>0+1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_6in_hollow_no_furring
@@ -42,7 +34,7 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1524/0.538472, "LayerDensity"=>1001.1218, "LayerSpecificHeat"=>852.065, "LayerIndex"=>0}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_8in_hollow_r10
@@ -57,7 +49,7 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.2032/0.284117+0.0508/0.04084, "LayerDensity"=>705.07224+110.334, "LayerSpecificHeat"=>858.2227+1154.524, "LayerIndex"=>0+1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_6in_concrete_filled
@@ -72,7 +64,7 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1524/0.6499+0.0254/0.1402, "LayerDensity"=>1800.455+71.989, "LayerSpecificHeat"=>845.554+1211.354, "LayerIndex"=>0+1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_6in_concrete_filled_to_layers
@@ -87,62 +79,62 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1524/0.6499+0.0254/0.1402, "LayerDensity"=>1800.455+71.989, "LayerSpecificHeat"=>845.554+1211.354, "LayerIndex"=>2+3}
-    _test_measure(osm_geo_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_thickness_zero
     args_hash = {}
     args_hash["thickness"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "CMU Block Thickness must be greater than 0.")
   end
     
   def test_argument_error_conductivity_zero
     args_hash = {}
     args_hash["conductivity"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "CMU Conductivity must be greater than 0.")
   end
 
   def test_argument_error_density_zero
     args_hash = {}
     args_hash["density"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "CMU Density must be greater than 0.")
   end
 
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["framing_factor"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
     args_hash["framing_factor"] = 1.0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_furring_rvalue_negative
     args_hash = {}
     args_hash["furring_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Furring Insulation R-value must be greater than or equal to 0.")
   end
   
   def test_argument_error_furring_spacing_negative
     args_hash = {}
     args_hash["furring_spacing"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Furring Stud Spacing must be greater than or equal to 0.")
   end
 
   def test_argument_error_furring_cavity_depth_negative
     args_hash = {}
     args_hash["furring_cavity_depth"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Furring Cavity Depth must be greater than or equal to 0.")
   end
 

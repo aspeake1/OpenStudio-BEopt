@@ -7,14 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsWallsExteriorSteelStudTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_SL_UA_CeilingIns.osm"
-  end
-  
-  def osm_geo_layers
-    return "SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm"
-  end
-
   def test_add_uninsulated_2x4
     args_hash = {}
     args_hash["cavity_r"] = 0
@@ -26,7 +18,7 @@ class ProcessConstructionsWallsExteriorSteelStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.5049, "LayerDensity"=>1.1476, "LayerSpecificHeat"=>1004.88, "LayerIndex"=>0}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r13_2x4_gr2
@@ -40,7 +32,7 @@ class ProcessConstructionsWallsExteriorSteelStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.087, "LayerDensity"=>44.989, "LayerSpecificHeat"=>1046.734, "LayerIndex"=>0}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r13_2x4_gr2_to_layers
@@ -54,48 +46,48 @@ class ProcessConstructionsWallsExteriorSteelStudTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.087, "LayerDensity"=>44.989, "LayerSpecificHeat"=>1046.734, "LayerIndex"=>2}
-    _test_measure(osm_geo_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_cavity_rvalue_negative
     args_hash = {}
     args_hash["cavity_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Insulation Nominal R-value must be greater than or equal to 0.")
   end
     
   def test_argument_error_cavity_depth_zero
     args_hash = {}
     args_hash["cavity_depth"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Depth must be greater than 0.")
   end
 
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["framing_factor"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
     args_hash["framing_factor"] = 1.0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_correction_factor_negative
     args_hash = {}
     args_hash["correction_factor"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Correction Factor must be greater than or equal to 0 and less than or equal to 1.")
   end
   
   def test_argument_error_correction_factor_gt_1
     args_hash = {}
     args_hash["correction_factor"] = 1.1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Correction Factor must be greater than or equal to 0 and less than or equal to 1.")
   end
 

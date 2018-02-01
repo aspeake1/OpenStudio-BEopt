@@ -7,16 +7,12 @@ require 'fileutils'
 
 class ProcessThermalMassFurnitureTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_UB_GRG_UA.osm"
-  end
-
   def test_retrofit_replace
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>4, "InternalMassDefinition"=>4, "InternalMass"=>4}
     expected_values = {"LayerThickness"=>0.1524+0.1524+0.1524+0.1524, "LayerConductivity"=>0.1154577+0.1154577+0.1154577+0.1154577, "LayerDensity"=>640.8+640.8+640.8+640.8, "LayerSpecificHeat"=>1214.23+1214.23+1214.23+1214.23}
-    model = _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_UB_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["mass"] = 9
     expected_num_del_objects = {"Material"=>4, "Construction"=>4, "InternalMassDefinition"=>4, "InternalMass"=>4}

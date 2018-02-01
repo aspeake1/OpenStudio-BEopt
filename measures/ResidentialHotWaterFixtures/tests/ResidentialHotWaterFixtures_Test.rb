@@ -7,22 +7,6 @@ require 'fileutils'
 
 class ResidentialHotWaterFixturesTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_FB_GRG_UA.osm"
-  end
-
-  def osm_geo_beds
-    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm"
-  end
-
-  def osm_geo_beds_loc_tankwh
-    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank.osm"
-  end
-
-  def osm_geo_beds_loc_tankwh_fixtures_recircdist
-    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_HWFixtures_RecircDist.osm"
-  end
-  
   def test_new_construction_none
     # Using energy multiplier
     args_hash = {}
@@ -32,7 +16,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "HotWater_gpd"=>0}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_new_construction_standard
@@ -40,7 +24,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_new_construction_varying_mults
@@ -51,7 +35,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>2, "OtherEquipment"=>2, "WaterUseEquipmentDefinition"=>2, "WaterUseEquipment"=>2, "ScheduleFixedInterval"=>2, "ScheduleConstant"=>2}
     expected_values = {"Annual_kwh"=>107.7, "HotWater_gpd"=>23}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_new_construction_basement
@@ -59,7 +43,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_retrofit_replace
@@ -67,7 +51,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60}
-    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["shower_mult"] = 0.0
     args_hash["sink_mult"] = 0.5
@@ -83,7 +67,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60}
-    model = _test_measure(osm_geo_beds_loc_tankwh_fixtures_recircdist, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank_HWFixtures_RecircDist.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
     
   def test_retrofit_remove
@@ -91,7 +75,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60}
-    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["shower_mult"] = 0.0
     args_hash["sink_mult"] = 0.0
@@ -105,21 +89,21 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
   def test_argument_error_shower_mult_negative
     args_hash = {}
     args_hash["shower_mult"] = -1
-    result = _test_error(osm_geo_beds_loc_tankwh, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Shower hot water usage multiplier must be greater than or equal to 0.")
   end
 
   def test_argument_error_sink_mult_negative
     args_hash = {}
     args_hash["sink_mult"] = -1
-    result = _test_error(osm_geo_beds_loc_tankwh, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Sink hot water usage multiplier must be greater than or equal to 0.")
   end
 
   def test_argument_error_bath_mult_negative
     args_hash = {}
     args_hash["bath_mult"] = -1
-    result = _test_error(osm_geo_beds_loc_tankwh, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Bath hot water usage multiplier must be greater than or equal to 0.")
   end
 
@@ -131,13 +115,13 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
   
   def test_error_missing_beds
     args_hash = {}
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
   end
   
   def test_error_missing_water_heater
     args_hash = {}
-    result = _test_error(osm_geo_beds, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not find plant loop.")
   end
 
@@ -147,7 +131,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>num_units*3, "OtherEquipment"=>num_units*3, "WaterUseEquipmentDefinition"=>num_units*3, "WaterUseEquipment"=>num_units*3, "ScheduleFixedInterval"=>num_units*3, "ScheduleConstant"=>num_units*3}
     expected_values = {"Annual_kwh"=>num_units*445.1, "HotWater_gpd"=>num_units*60}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
 
   def test_multifamily_new_construction
@@ -156,7 +140,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>num_units*3, "OtherEquipment"=>num_units*3, "WaterUseEquipmentDefinition"=>num_units*3, "WaterUseEquipment"=>num_units*3, "ScheduleFixedInterval"=>num_units*3, "ScheduleConstant"=>num_units*3}
     expected_values = {"Annual_kwh"=>num_units*445.1, "HotWater_gpd"=>num_units*60}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
   private

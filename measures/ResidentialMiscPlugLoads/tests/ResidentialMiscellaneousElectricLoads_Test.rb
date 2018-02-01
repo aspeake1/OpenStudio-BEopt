@@ -7,21 +7,13 @@ require 'fileutils'
 
 class ResidentialMiscellaneousElectricLoadsTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_FB_GRG_UA.osm"
-  end
-
-  def osm_geo_beds
-    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm"
-  end
-
   def test_new_construction_none
     args_hash = {}
     args_hash["mult"] = 0.0
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_new_construction_energy_use
@@ -31,7 +23,7 @@ class ResidentialMiscellaneousElectricLoadsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_fin_spaces, "ElectricEquipment"=>num_fin_spaces, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>2000}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
   end
   
   def test_new_construction_mult_1_0
@@ -41,7 +33,7 @@ class ResidentialMiscellaneousElectricLoadsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_fin_spaces, "ElectricEquipment"=>num_fin_spaces, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>2206}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
   end
   
   def test_new_construction_mult_1_5
@@ -51,7 +43,7 @@ class ResidentialMiscellaneousElectricLoadsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_fin_spaces, "ElectricEquipment"=>num_fin_spaces, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>3309}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
   end
   
   def test_new_construction_modified_schedule
@@ -63,7 +55,7 @@ class ResidentialMiscellaneousElectricLoadsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_fin_spaces, "ElectricEquipment"=>num_fin_spaces, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>2206}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
   end
 
   def test_retrofit_replace
@@ -72,7 +64,7 @@ class ResidentialMiscellaneousElectricLoadsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_fin_spaces, "ElectricEquipment"=>num_fin_spaces, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>2206}
-    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
     args_hash = {}
     args_hash["mult"] = 0.5
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>num_fin_spaces, "ElectricEquipment"=>num_fin_spaces, "ScheduleRuleset"=>1}
@@ -87,7 +79,7 @@ class ResidentialMiscellaneousElectricLoadsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_fin_spaces, "ElectricEquipment"=>num_fin_spaces, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>2206}
-    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_fin_spaces)
     args_hash = {}
     args_hash["mult"] = 0.0
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>num_fin_spaces, "ElectricEquipment"=>num_fin_spaces, "ScheduleRuleset"=>1}
@@ -99,55 +91,55 @@ class ResidentialMiscellaneousElectricLoadsTest < MiniTest::Test
   def test_argument_error_mult_negative
     args_hash = {}
     args_hash["mult"] = -1.0
-    result = _test_error(osm_geo_beds, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Multiplier must be greater than or equal to 0.")
   end
   
   def test_argument_error_weekday_sch_wrong_number_of_values
     args_hash = {}
     args_hash["weekday_sch"] = "1,1"
-    result = _test_error(osm_geo_beds, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
   end
   
   def test_argument_error_weekday_sch_not_number
     args_hash = {}
     args_hash["weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
   end
     
   def test_argument_error_weekend_sch_wrong_number_of_values
     args_hash = {}
     args_hash["weekend_sch"] = "1,1"
-    result = _test_error(osm_geo_beds, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
   end
     
   def test_argument_error_weekend_sch_not_number
     args_hash = {}
     args_hash["weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
   end
   
   def test_argument_error_monthly_sch_wrong_number_of_values  
     args_hash = {}
     args_hash["monthly_sch"] = "1,1"
-    result = _test_error(osm_geo_beds, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
   
   def test_argument_error_monthly_sch_not_number
     args_hash = {}
     args_hash["monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
   
   def test_error_missing_beds
     args_hash = {}
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
   end
     

@@ -7,14 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsWallsSheathingTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_SL_UA_CeilingIns.osm"
-  end
-  
-  def osm_geo_layers
-    return "SFD_2000sqft_2story_SL_UA_AllLayersButWallSheathing_CeilingIns.osm"
-  end
-
   def test_add_plywood
     args_hash = {}
     args_hash["osb_thick_in"] = 0.5
@@ -22,7 +14,7 @@ class ProcessConstructionsWallsSheathingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.1154577, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r10
@@ -33,7 +25,7 @@ class ProcessConstructionsWallsSheathingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0508, "LayerConductivity"=>0.02885, "LayerDensity"=>32.04, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_plywood_and_r10
@@ -44,7 +36,7 @@ class ProcessConstructionsWallsSheathingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0127+0.0508, "LayerConductivity"=>0.1154577+0.02885, "LayerDensity"=>512.64+32.04, "LayerSpecificHeat"=>1214.23+1214.23, "LayerIndex"=>0+1, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_plywood_and_r10_to_layers_and_remove
@@ -55,7 +47,7 @@ class ProcessConstructionsWallsSheathingTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0127+0.0508, "LayerConductivity"=>0.1154577+0.02885, "LayerDensity"=>512.64+32.04, "LayerSpecificHeat"=>1214.23+1214.23, "LayerIndex"=>1+2, "SurfacesWithConstructions"=>8}
-    model = _test_measure(osm_geo_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_UA_AllLayersButWallSheathing_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["osb_thick_in"] = 0
     args_hash["rigid_thick_in"] = 0
     expected_num_del_objects = {"Material"=>2, "Construction"=>1}
@@ -67,21 +59,21 @@ class ProcessConstructionsWallsSheathingTest < MiniTest::Test
   def test_argument_error_osb_thick_in_negative
     args_hash = {}
     args_hash["osb_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "OSB/Plywood Thickness must be greater than or equal to 0.")
   end
     
   def test_argument_error_rigid_rvalue_negative
     args_hash = {}
     args_hash["rigid_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Continuous Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
   def test_argument_error_rigid_thick_in_negative
     args_hash = {}
     args_hash["rigid_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Continuous Insulation Thickness must be greater than or equal to 0.")
   end
 
@@ -96,7 +88,7 @@ class ProcessConstructionsWallsSheathingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.1154577, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
   
   private

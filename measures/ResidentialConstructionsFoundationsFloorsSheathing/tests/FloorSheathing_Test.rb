@@ -7,28 +7,24 @@ require 'fileutils'
 
 class ProcessConstructionsFoundationsFloorsSheathingTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_FB_UA.osm"
-  end
-  
   def test_argument_error_osb_thick_in_negative
     args_hash = {}
     args_hash["osb_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "OSB/Plywood Thickness must be greater than or equal to 0.")
   end
     
   def test_argument_error_rigid_rvalue_negative
     args_hash = {}
     args_hash["rigid_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Continuous Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
   def test_argument_error_rigid_thick_in_negative
     args_hash = {}
     args_hash["rigid_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Continuous Insulation Thickness must be greater than or equal to 0.")
   end  
 
@@ -37,13 +33,13 @@ class ProcessConstructionsFoundationsFloorsSheathingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.01905, "LayerConductivity"=>0.1154577, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["osb_thick_in"] = 1
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0254, "LayerConductivity"=>0.1154577, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
+    _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
 
   def test_apply_to_specific_surface
@@ -52,7 +48,7 @@ class ProcessConstructionsFoundationsFloorsSheathingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.01905, "LayerConductivity"=>0.1154577, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
   
   private

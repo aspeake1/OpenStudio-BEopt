@@ -7,17 +7,9 @@ require 'fileutils'
 
 class ProcessConstructionsCeilingsRoofsRadiantBarrierTest < MiniTest::Test
 
-  def osm_geo_finished_attic
-    return "SFD_2000sqft_2story_SL_FA.osm"
-  end
-
-  def osm_geo_unfinished_attic
-    return "SFD_2000sqft_2story_SL_UA.osm"
-  end
-  
   def test_not_applicable_finished_attic
     args_hash = {}
-    _test_na(osm_geo_finished_attic, args_hash)
+    _test_na("SFD_2000sqft_2story_SL_FA.osm", args_hash)
   end
   
   def test_retrofit_replace
@@ -26,13 +18,13 @@ class ProcessConstructionsCeilingsRoofsRadiantBarrierTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.00021336, "LayerConductivity"=>235.06980000000004, "LayerDensity"=>2700.9719999999998, "LayerSpecificHeat"=>921.14, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["has_rb"] = "false"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"LayerThickness"=>00, "LayerConductivity"=>0, "LayerDensity"=>0, "LayerSpecificHeat"=>0, "LayerIndex"=>0, "SurfacesWithConstructions"=>0}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
   def test_apply_to_specific_surface
@@ -42,7 +34,7 @@ class ProcessConstructionsCeilingsRoofsRadiantBarrierTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.00021336, "LayerConductivity"=>235.06980000000004, "LayerDensity"=>2700.9719999999998, "LayerSpecificHeat"=>921.14, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
 
   private

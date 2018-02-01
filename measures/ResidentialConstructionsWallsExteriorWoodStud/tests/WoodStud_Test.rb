@@ -7,14 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_SL_UA_CeilingIns.osm"
-  end
-  
-  def osm_geo_layers
-    return "SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm"
-  end
-
   def test_add_uninsulated_2x4
     args_hash = {}
     args_hash["cavity_r"] = 0
@@ -25,7 +17,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.33822, "LayerDensity"=>129.0207, "LayerSpecificHeat"=>1212.833, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_add_r7_2x4
@@ -38,7 +30,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.07448, "LayerDensity"=>162.403, "LayerSpecificHeat"=>1178.9167, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r13_2x4_gr2
@@ -51,7 +43,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.05694, "LayerDensity"=>161.7351, "LayerSpecificHeat"=>1179.4578, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r21_2x6_ff15
@@ -64,7 +56,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.1397, "LayerConductivity"=>0.04757, "LayerDensity"=>115.704, "LayerSpecificHeat"=>1158.0555, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_uninsulated_2x4_and_insulate_to_r13_gr2
@@ -77,7 +69,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.33822, "LayerDensity"=>129.0207, "LayerSpecificHeat"=>1212.833, "LayerIndex"=>2, "SurfacesWithConstructions"=>8}
-    model = _test_measure(osm_geo_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["cavity_r"] = 13
     args_hash["install_grade"] = "II"
     args_hash["ins_fills_cavity"] = "true"
@@ -90,35 +82,35 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
   def test_argument_error_cavity_r_negative
     args_hash = {}
     args_hash["cavity_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Insulation Installed R-value must be greater than or equal to 0.")
   end
     
   def test_argument_error_cavity_depth_negative
     args_hash = {}
     args_hash["cavity_depth"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Depth must be greater than 0.")
   end
 
   def test_argument_error_cavity_depth_zero
     args_hash = {}
     args_hash["cavity_depth"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Depth must be greater than 0.")
   end
 
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["framing_factor"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
     args_hash["framing_factor"] = 1.0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
@@ -138,7 +130,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.33822, "LayerDensity"=>129.0207, "LayerSpecificHeat"=>1212.833, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
 
   private

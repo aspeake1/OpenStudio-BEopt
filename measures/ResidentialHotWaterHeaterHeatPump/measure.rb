@@ -202,73 +202,20 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
         end
         
         # Validate inputs further
-        valid_vol = validate_storage_tank_volume(vol, runner)
-        if valid_vol.nil?
-            return false
-        end
-        valid_t_set = validate_setpoint_temperature(t_set, runner)
-        if valid_t_set.nil?
-            return false
-        end
-        valid_cap = validate_element_capacity(e_cap, runner)
-        if valid_cap.nil?
-            return false
-        end
-        
-        valid_min_temp = validate_min_temp(min_temp,runner)
-        if valid_min_temp.nil?
-            return false
-        end
-        
-        valid_max_temp = validate_max_temp(max_temp,runner)
-        if valid_max_temp.nil?
-            return false
-        end
-        
-        valid_cap = validate_cap(cap,runner)
-        if valid_cap.nil?
-            return false
-        end
-        
-        valid_cop = validate_cop(cop,runner)
-        if valid_cop.nil?
-            return false
-        end
-        
-        valid_shr = validate_shr(shr,runner)
-        if valid_shr.nil?
-            return false
-        end
-        
-        valid_airflow_rate = validate_airflow_rate(airflow_rate,runner)
-        if valid_airflow_rate.nil?
-            return false
-        end
-        
-        valid_fan_power = validate_fan_power(fan_power,runner)
-        if valid_fan_power.nil?
-            return false
-        end
-        
-        valid_parasitics = validate_parasitics(parasitics,runner)
-        if valid_parasitics.nil?
-            return false
-        end
-        
-        valid_ua = validate_tank_ua(tank_ua,runner)
-        if valid_ua.nil?
-            return false
-        end
-        
-        valid_int_factor = validate_int_factor(int_factor,runner)
-        if valid_int_factor.nil?
-            return false
-        end
-        
-        valid_temp_depress = validate_temp_depress(temp_depress,runner)
-        if valid_temp_depress.nil?
-            return false
-        end
+        return false if not validate_storage_tank_volume(vol, runner)
+        return false if not validate_setpoint_temperature(t_set, runner)
+        return false if not validate_element_capacity(e_cap, runner)
+        return false if not validate_min_temp(min_temp,runner)
+        return false if not validate_max_temp(max_temp,runner)
+        return false if not validate_cap(cap,runner)
+        return false if not validate_cop(cop,runner)
+        return false if not validate_shr(shr,runner)
+        return false if not validate_airflow_rate(airflow_rate,runner)
+        return false if not validate_fan_power(fan_power,runner)
+        return false if not validate_parasitics(parasitics,runner)
+        return false if not validate_tank_ua(tank_ua,runner)
+        return false if not validate_int_factor(int_factor,runner)
+        return false if not validate_temp_depress(temp_depress,runner)
         
         # Get building units
         units = Geometry.get_building_units(model, runner)
@@ -938,7 +885,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
         vol = vol.to_f
         if vol <= 0.0
             runner.registerError("Storage tank volume must be greater than 0.")   
-            return nil
+            return false
         end
         if vol < 20.0
             runner.registerWarning("Tank volume seems low, double check inputs.")
@@ -951,7 +898,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_setpoint_temperature(t_set, runner)
         if (t_set <= 0.0 or t_set >= 212.0)
             runner.registerError("Hot water temperature must be greater than 0 and less than 212.")
-            return nil
+            return false
         end
         if t_set < 100.0
             runner.registerInfo("Setpoint temperature seems low, which could lead to bacteria growth in the tank. Double check inputs.")
@@ -964,7 +911,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_element_capacity(e_cap, runner)
         if e_cap < 0.0
             runner.registerError("Element capacity must be greater than 0.")
-            return nil
+            return false
         end
         if e_cap == 0.0
             runner.registerWarning("Element capacity of 0 wil disable the electric elements in the tank, double check inputs.")
@@ -979,7 +926,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_min_temp(min_temp, runner)
         if min_temp >= 80.0
             runner.registerError("Minimum temperature will prevent HPWH from running, double check inputs.")
-            return nil
+            return false
         end
         if min_temp <= -30.0
             runner.registerWarning("Minimum temperature seems low, double check inputs.")
@@ -992,7 +939,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_max_temp(max_temp, runner)
         if max_temp <= 0.0
             runner.registerError("Maximum temperature will prevent HPWH from running, double check inputs.")
-            return nil
+            return false
         end
         if max_temp <= 100.0
             runner.registerWarning("Maximum temperature seems low, double check inputs.")
@@ -1005,7 +952,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_cap(cap, runner)
         if cap <= 0.0
             runner.registerError("Rated capacity must be greater than 0.")
-            return nil
+            return false
         end
         if cap <= 0.2
             runner.registerWarning("Rated capacity seems low, double check inputs.")
@@ -1018,7 +965,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_cop(cop, runner)
         if cop <= 0.0
             runner.registerError("Rated COP must be greater than 0.")
-            return nil
+            return false
         end
         if cop <= 1.0
             runner.registerWarning("Rated COP seems low, double check inputs.")
@@ -1031,7 +978,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_shr(shr, runner)
         if (shr < 0.0 or shr > 1.0)
             runner.registerError("Rated sensible heat ratio must be between 0 and 1.")
-            return nil
+            return false
         end
         if shr <= 0.7
             runner.registerWarning("Rated sensible heat ratio seems low, double check inputs.")
@@ -1042,7 +989,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_airflow_rate(airflow_rate, runner)
         if airflow_rate <= 0.0
             runner.registerError("Airflow rate must be greater than 0.")
-            return nil
+            return false
         end
         if airflow_rate <= 50.0
             runner.registerWarning("Airflow rate seems low, double check inputs.")
@@ -1055,7 +1002,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_fan_power(fan_power, runner)
         if fan_power <= 0.0
             runner.registerError("Fan power must be greater than 0.")
-            return nil
+            return false
         end
         if fan_power > 1.0
             runner.registerWarning("Fan power seems high, double check inputs.")
@@ -1066,7 +1013,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
 	def validate_parasitics(parasitics, runner)
         if parasitics < 0.0
             runner.registerError("Parasitics must be greater than 0.")
-            return nil
+            return false
         end
         if parasitics > 20.0
             runner.registerWarning("Parasitics seem high, double check inputs.")
@@ -1077,7 +1024,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_tank_ua(tank_ua, runner)
         if tank_ua <= 0.0
             runner.registerError("Tank UA must be greater than 0.")
-            return nil
+            return false
         end
         if tank_ua <= 1.0
             runner.registerWarning("Tank UA seems low, double check inputs.")
@@ -1090,7 +1037,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_int_factor(int_factor, runner)
         if (int_factor < 0.0 or int_factor > 1.0)
             runner.registerError("Interaction factor must be between 0 and 1.")
-            return nil
+            return false
         end
         return true
     end
@@ -1098,7 +1045,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     def validate_temp_depress(temp_depress, runner)
         if temp_depress < 0.0 
             runner.registerError("Temperature depression must be greater than 0.")
-            return nil
+            return false
         end
         if temp_depress > 15.0
             runner.registerWarning("Temperature depression seems large, double check inputs.")

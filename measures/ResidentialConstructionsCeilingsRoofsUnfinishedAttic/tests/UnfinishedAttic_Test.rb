@@ -7,86 +7,78 @@ require 'fileutils'
 
 class ProcessConstructionsCeilingsRoofsUnfinishedAtticTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_FB_UA_Denver.osm"
-  end
-
-  def osm_geo_finished_attic
-    return "SFD_2000sqft_2story_SL_FA.osm"
-  end  
-  
   def test_not_applicable_finished_attic
     args_hash = {}
-    _test_na(osm_geo_finished_attic, args_hash)
+    _test_na("SFD_2000sqft_2story_SL_FA.osm", args_hash)
   end
   
   def test_argument_error_ceil_cavity_r_negative
     args_hash = {}
     args_hash["ceil_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Insulation Nominal R-value must be greater than or equal to 0.")
   end
   
   def test_argument_error_ceil_cavity_in_thk_negative
     args_hash = {}
     args_hash["ceil_ins_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Insulation Thickness must be greater than or equal to 0.")
   end
   
   def test_argument_error_ceil_framing_factor_negative
     args_hash = {}
     args_hash["ceil_ff"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_ceil_framing_factor_eq_1
     args_hash = {}
     args_hash["ceil_ff"] = 1.0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
   end
   
   def test_argument_error_ceil_joist_ht_negative
     args_hash = {}
     args_hash["ceil_joist_height"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Joist Height must be greater than 0.")
   end
   
   def test_argument_error_roof_cavity_r_negative
     args_hash = {}
     args_hash["roof_cavity_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Roof Cavity Insulation Nominal R-value must be greater than or equal to 0.")
   end
   
   def test_argument_error_roof_cavity_in_thk_negative
     args_hash = {}
     args_hash["roof_cavity_ins_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Roof Cavity Insulation Thickness must be greater than or equal to 0.")
   end
   
   def test_argument_error_roof_framing_factor_negative
     args_hash = {}
     args_hash["roof_ff"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Roof Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_roof_framing_factor_eq_1
     args_hash = {}
     args_hash["roof_ff"] = 1.0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Roof Framing Factor must be greater than or equal to 0 and less than 1.")
   end
   
   def test_argument_error_roof_joist_ht_negative
     args_hash = {}
     args_hash["roof_fram_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Roof Framing Thickness must be greater than 0.")
   end
   
@@ -97,7 +89,7 @@ class ProcessConstructionsCeilingsRoofsUnfinishedAtticTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>2}
     expected_values = {"LayerThickness"=>0.18415+0.0889, "LayerConductivity"=>8.103343031561298+0.0748255853219425, "LayerDensity"=>36.952092371013855+50.778528, "LayerSpecificHeat"=>1208.1833151295375+1165.039835, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end  
   
   def test_roof_insulated
@@ -109,7 +101,7 @@ class ProcessConstructionsCeilingsRoofsUnfinishedAtticTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>2}
     expected_values = {"LayerThickness"=>0.18415+0.0889, "LayerConductivity"=>0.0588738039479539+5.036356, "LayerDensity"=>78.34581+37.001327, "LayerSpecificHeat"=>1123.461011144055+1207.822949, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)   
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)   
   end
   
   def test_roof_ins_thk_more_than_roof_framing_thk
@@ -121,7 +113,7 @@ class ProcessConstructionsCeilingsRoofsUnfinishedAtticTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>2}
     expected_values = {"LayerThickness"=>0.2413+0.0889, "LayerConductivity"=>0.052124+5.036356, "LayerDensity"=>78.338295+37.001327, "LayerSpecificHeat"=>1123.407346+1207.822949, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)   
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)   
   end  
   
   def test_retrofit_replace
@@ -129,7 +121,7 @@ class ProcessConstructionsCeilingsRoofsUnfinishedAtticTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>3}
     expected_values = {"LayerThickness"=>0.0889+0.1282700089665573+0.18415, "LayerConductivity"=>0.0436673813937437+0.04111125+8.103343031561298, "LayerDensity"=>50.7834+16.02+36.952092371013855, "LayerSpecificHeat"=>1165.0954889589907+1046.75+1208.1833151295375, "LayerIndex"=>0+1+0+1, "SurfacesWithConstructions"=>4}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
   def test_apply_to_specific_surface
@@ -138,7 +130,7 @@ class ProcessConstructionsCeilingsRoofsUnfinishedAtticTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>2}
     expected_values = {"LayerThickness"=>0.0889+0.1282700089665573, "LayerConductivity"=>0.0436673813937437+0.04111125, "LayerDensity"=>50.7834+16.02, "LayerSpecificHeat"=>1165.0954889589907+1046.75, "LayerIndex"=>0+1+0+1, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
 
   private

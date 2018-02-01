@@ -122,7 +122,6 @@ namespace :test do
   
     # Generate hash that maps osw's to measures
     osw_map = {}
-    #measures = ["ResidentialHotWaterDistribution"] # Use this to specify individual measures (instead of all measures on the following line)
     measures = Dir.entries(File.expand_path("../measures/", __FILE__)).select {|entry| File.directory? File.join(File.expand_path("../measures/", __FILE__), entry) and !(entry == '.' || entry == '..') }
     measures.each do |m|
         testrbs = Dir[File.expand_path("../measures/#{m}/tests/*.rb", __FILE__)]
@@ -142,8 +141,8 @@ namespace :test do
             exit
       end
     end
-
-    osw_files = Dir.entries(osw_path).select {|entry| entry.end_with?(".osw") and !osw_map[entry].nil?}
+    
+    osw_files = Dir.entries(osw_path).select {|entry| entry.end_with?(".osw")}
     if File.exists?(File.expand_path("../log", __FILE__))
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
@@ -151,6 +150,8 @@ namespace :test do
     os_cli = get_os_cli()
 
     osw_files.each do |osw|
+    
+        next if osw_map[osw].nil?
 
         # Generate osm from osw
         osw_filename = osw
@@ -222,7 +223,13 @@ namespace :test do
                 puts "File deleted."
             end
         end
-    end    
+    end
+    
+    # Print warnings about unused OSWs
+    osw_files.each do |osw|
+        next if not osw_map[osw].nil?
+        puts "Unused OSW: #{osw}."
+    end
     
     puts "Completed. #{num_success} of #{num_tot} osm files were regenerated successfully (#{Time.now - start_time} seconds)."
     

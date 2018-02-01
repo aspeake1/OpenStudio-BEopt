@@ -7,37 +7,29 @@ require 'fileutils'
 
 class ProcessConstructionsFoundationsFloorsPierBeamTest < MiniTest::Test
 
-  def osm_geo_pier_beam
-    return "SFD_2000sqft_2story_PB_UA.osm"
-  end
-
-  def osm_geo_slab
-    return "SFD_2000sqft_2story_SL_UA.osm"
-  end
-  
   def test_not_applicable_slab
     args_hash = {}
-    _test_na(osm_geo_slab, args_hash)
+    _test_na("SFD_2000sqft_2story_SL_UA.osm", args_hash)
   end
   
   def test_argument_error_cavity_r_negative
     args_hash = {}
     args_hash["cavity_r"] = -1
-    result = _test_error(osm_geo_pier_beam, args_hash)
+    result = _test_error("SFD_2000sqft_2story_PB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["framing_factor"] = -1
-    result = _test_error(osm_geo_pier_beam, args_hash)
+    result = _test_error("SFD_2000sqft_2story_PB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
     args_hash["framing_factor"] = 1.0
-    result = _test_error(osm_geo_pier_beam, args_hash)
+    result = _test_error("SFD_2000sqft_2story_PB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
   
@@ -47,7 +39,7 @@ class ProcessConstructionsFoundationsFloorsPierBeamTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1397/1.904620, "LayerConductivity"=>2.598173704068639, "LayerDensity"=>67.684520, "LayerSpecificHeat"=>1210.925069, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_retrofit_replace
@@ -55,13 +47,13 @@ class ProcessConstructionsFoundationsFloorsPierBeamTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1397/0.048947, "LayerConductivity"=>0.048947, "LayerDensity"=>106.354587, "LayerSpecificHeat"=>1151.630118, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["cavity_r"] = "38"
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1397/0.029203, "LayerConductivity"=>0.048947, "LayerDensity"=>106.354587, "LayerSpecificHeat"=>1151.630118, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
+    _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
   def test_apply_to_specific_ceiling_surface
@@ -70,7 +62,7 @@ class ProcessConstructionsFoundationsFloorsPierBeamTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   private

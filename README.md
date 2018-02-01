@@ -106,7 +106,7 @@ The order in which these measures are called is important. For example, the Wind
 ||18. Window Construction|Window Areas, Location|
 ||19. Door Construction|Door Area|
 ||20. Furniture Thermal Mass||
-|4. Domestic Hot Water|1. Water Heater - Fuel Tank (or Electric Tank, Fuel Tankless, Heat Pump, etc.)|Beds/Baths|
+|4. Domestic Hot Water|1. Water Heater - Tank (or Tankless, Heat Pump, etc.)|Beds/Baths|
 ||2. Hot Water Fixtures|Water Heater|
 ||3. Hot Water Distribution|Hot Water Fixtures, Location|
 ||4. Solar Hot Water|Water Heater, Location|

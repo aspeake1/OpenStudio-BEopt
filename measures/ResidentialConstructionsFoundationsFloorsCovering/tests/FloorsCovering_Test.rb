@@ -7,28 +7,24 @@ require 'fileutils'
 
 class ProcessConstructionsFoundationsFloorsCoveringTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_SL_UA.osm"
-  end
-
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["covering_frac"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Floor Covering Fraction must be greater than or equal to 0 and less than or equal to 1.")
   end
 
   def test_argument_error_framing_factor_gt_1
     args_hash = {}
     args_hash["covering_frac"] = 1.1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Floor Covering Fraction must be greater than or equal to 0 and less than or equal to 1.")
   end  
 
   def test_argument_error_covering_r_negative
     args_hash = {}
     args_hash["covering_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Covering R-value must be greater than or equal to 0.")
   end 
   
@@ -38,7 +34,7 @@ class ProcessConstructionsFoundationsFloorsCoveringTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.0433443509615385, "LayerDensity"=>54.467999999999996, "LayerSpecificHeat"=>1339.84, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
   
   private

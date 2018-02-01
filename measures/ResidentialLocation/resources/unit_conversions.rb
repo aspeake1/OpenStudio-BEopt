@@ -79,6 +79,10 @@ class UnitConversions
         return x / 1000.0
       elsif from == 'w' and to == 'ton'
         return x / 3516.85284207
+      elsif from == 'kw' and to == 'kbtu/hr'
+      return x / 0.2930710701722222
+      elsif from == 'kbtu/hr' and to == 'kw'
+        return x * 0.2930710701722222
       
       # Power Flux
       elsif from == 'w/m^2' and to == 'btu/(hr*ft^2)'

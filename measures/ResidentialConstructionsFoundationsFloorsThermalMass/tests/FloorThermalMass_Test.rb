@@ -7,35 +7,31 @@ require 'fileutils'
 
 class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_FB_UA.osm"
-  end
-  
   def test_argument_error_thick_in_negative
     args_hash = {}
     args_hash["thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Thickness must be greater than 0.")
   end
     
   def test_argument_error_cond_negative
     args_hash = {}
     args_hash["cond"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Conductivity must be greater than 0.")
   end
 
   def test_argument_error_dens_negative
     args_hash = {}
     args_hash["dens"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Density must be greater than 0.")
   end
   
   def test_argument_error_specheat_negative
     args_hash = {}
     args_hash["specheat"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Specific Heat must be greater than 0.")
   end
 
@@ -44,7 +40,7 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.015875, "LayerConductivity"=>0.1154577, "LayerDensity"=>544.68, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    model = _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["thick_in"] = 2
     args_hash["cond"] = 4.75
@@ -62,7 +58,7 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.015875, "LayerConductivity"=>0.1154577, "LayerDensity"=>544.68, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
   
   private

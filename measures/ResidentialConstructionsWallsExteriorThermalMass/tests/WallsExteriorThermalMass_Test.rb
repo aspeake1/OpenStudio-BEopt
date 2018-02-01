@@ -7,14 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_SL_UA_CeilingIns.osm"
-  end
-  
-  def osm_geo_layers
-    return "SFD_2000sqft_2story_SL_UA_AllLayersButWallThermalMass_CeilingIns.osm"
-  end
-
   def test_add_1_2in_drywall
     args_hash = {}
     args_hash["thick_in1"] = 0.5
@@ -24,7 +16,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.16029, "LayerDensity"=>801, "LayerSpecificHeat"=>837.4, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_2_of_5_8in_drywall
@@ -40,7 +32,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.015875*2, "LayerConductivity"=>0.16029*2, "LayerDensity"=>801*2, "LayerSpecificHeat"=>837.4*2, "LayerIndex"=>0+1, "SurfacesWithConstructions"=>8}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_2_of_1_2in_drywall_to_layers_and_replace_with_5_8in_drywall
@@ -56,7 +48,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0127*2, "LayerConductivity"=>0.16029*2, "LayerDensity"=>801*2, "LayerSpecificHeat"=>837.4*2, "LayerIndex"=>3+4, "SurfacesWithConstructions"=>8}
-    model = _test_measure(osm_geo_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_UA_AllLayersButWallThermalMass_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["thick_in1"] = 0.625
     args_hash["cond1"] = 1.1112
@@ -75,7 +67,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["dens1"] = 1
     args_hash["specheat1"] = 1
     args_hash["thick_in2"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Layer 2 does not have all four properties (thickness, conductivity, density, specific heat) entered.")
   end
 
@@ -85,7 +77,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["cond1"] = 1
     args_hash["dens1"] = 1
     args_hash["specheat1"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Thickness 1 must be greater than 0.")
   end
 
@@ -99,7 +91,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["cond2"] = 1
     args_hash["dens2"] = 1
     args_hash["specheat2"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Thickness 2 must be greater than 0.")
   end
 
@@ -109,7 +101,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["cond1"] = 0
     args_hash["dens1"] = 1
     args_hash["specheat1"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Conductivity 1 must be greater than 0.")
   end
 
@@ -123,7 +115,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["cond2"] = 0
     args_hash["dens2"] = 1
     args_hash["specheat2"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Conductivity 2 must be greater than 0.")
   end
 
@@ -133,7 +125,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["cond1"] = 1
     args_hash["dens1"] = 0
     args_hash["specheat1"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Density 1 must be greater than 0.")
   end
 
@@ -147,7 +139,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["cond2"] = 1
     args_hash["dens2"] = 0
     args_hash["specheat2"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Density 2 must be greater than 0.")
   end
 
@@ -157,7 +149,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["cond1"] = 1
     args_hash["dens1"] = 1
     args_hash["specheat1"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Specific Heat 1 must be greater than 0.")
   end
 
@@ -171,7 +163,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     args_hash["cond2"] = 1
     args_hash["dens2"] = 1
     args_hash["specheat2"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Specific Heat 2 must be greater than 0.")
   end
 
@@ -186,7 +178,7 @@ class ProcessConstructionsWallsExteriorThermalMassTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.16029, "LayerDensity"=>801, "LayerSpecificHeat"=>837.4, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
   
   private

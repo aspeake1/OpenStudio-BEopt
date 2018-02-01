@@ -7,14 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsWallsExteriorDoubleWoodStudTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_SL_UA_CeilingIns.osm"
-  end
-  
-  def osm_geo_layers
-    return "SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm"
-  end
-
   def test_add_r33
     args_hash = {}
     args_hash["cavity_r"] = 33
@@ -27,7 +19,7 @@ class ProcessConstructionsWallsExteriorDoubleWoodStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRvalue"=>0.0889/0.0741*2+0.0889/0.0402, "LayerDensity"=>148.393*2+119.207, "LayerSpecificHeat"=>1174.037*2+1160.187, "LayerIndex"=>0+1+2}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r45_gr2_staggered
@@ -42,7 +34,7 @@ class ProcessConstructionsWallsExteriorDoubleWoodStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRvalue"=>0.0889/0.1794*2+0.0889/0.0285, "LayerDensity"=>146.657*2+117.470, "LayerSpecificHeat"=>1175.531*2+1161.847, "LayerIndex"=>0+1+2}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r45_gr2_staggered_zero_gap
@@ -57,7 +49,7 @@ class ProcessConstructionsWallsExteriorDoubleWoodStudTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>1}
     expected_values = {"LayerRvalue"=>0.0889/0.0493*2, "LayerDensity"=>146.657*2, "LayerSpecificHeat"=>1175.531*2, "LayerIndex"=>0+1}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r33_to_layers
@@ -72,62 +64,62 @@ class ProcessConstructionsWallsExteriorDoubleWoodStudTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRvalue"=>0.0889/0.0741*2+0.0889/0.0402, "LayerDensity"=>148.393*2+119.207, "LayerSpecificHeat"=>1174.037*2+1160.187, "LayerIndex"=>2+3+4}
-    _test_measure(osm_geo_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_cavity_rvalue_negative
     args_hash = {}
     args_hash["cavity_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Insulation Nominal R-value must be greater than 0.")
   end
     
   def test_argument_error_stud_depth_negative
     args_hash = {}
     args_hash["stud_depth"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Stud Depth must be greater than 0.")
   end
 
   def test_argument_error_stud_depth_zero
     args_hash = {}
     args_hash["stud_depth"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Stud Depth must be greater than 0.")
   end
   
   def test_argument_error_gap_depth_negative
     args_hash = {}
     args_hash["gap_depth"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Gap Depth must be greater than or equal to 0.")
   end
 
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["framing_factor"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
     args_hash["framing_factor"] = 1.0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
   
   def test_argument_error_framing_spacing_negative
     args_hash = {}
     args_hash["framing_spacing"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Spacing must be greater than 0.")
   end
 
   def test_argument_error_framing_spacing_eq_0
     args_hash = {}
     args_hash["framing_spacing"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Spacing must be greater than 0.")
   end
 

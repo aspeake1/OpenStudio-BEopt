@@ -7,42 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
 
-  def osm_geo_slab
-    return "SFD_2000sqft_2story_SL_UA.osm"
-  end
-
-  def osm_geo_slab_garage
-    return "SFD_2000sqft_2story_SL_GRG_UA.osm"
-  end
-
-  def osm_geo_crawl
-    return "SFD_2000sqft_2story_CS_UA.osm"
-  end
-
-  def osm_geo_crawl_garage
-    return "SFD_2000sqft_2story_CS_GRG_UA.osm"
-  end
-
-  def osm_geo_finished_basement
-    return "SFD_2000sqft_2story_FB_UA.osm"
-  end
-
-  def osm_geo_finished_basement_garage
-    return "SFD_2000sqft_2story_FB_GRG_UA.osm"
-  end
-
-  def osm_geo_unfinished_basement
-    return "SFD_2000sqft_2story_UB_UA.osm"
-  end
-
-  def osm_geo_unfinished_basement_garage
-    return "SFD_2000sqft_2story_UB_GRG_UA.osm"
-  end
-  
-  def osm_geo_pier_beam
-    return "SFD_2000sqft_2story_PB_UA.osm"
-  end
-
   def test_add_uninsulated
     args_hash = {}
     args_hash["wall_rigid_r"] = 0
@@ -55,7 +19,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>3}
     expected_values = {"LayerRValue"=>0.23495/2.59817+0.3048/1.731+0.2032/1.3114+11.24877, "LayerDensity"=>67.641+1842.3+2242.8, "LayerSpecificHeat"=>1211.14+418.7+837.4, "LayerIndex"=>0+0+1+0+1, "SurfacesWithConstructions"=>7}
-    _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_wall_r10
@@ -69,7 +33,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>5, "Construction"=>3}
     expected_values = {"LayerRValue"=>0.23495/2.59817+0.3048/1.731+0.2032/1.3114+0.0508/0.02885+2.401, "LayerDensity"=>67.641+1842.3+2242.8+32.04, "LayerSpecificHeat"=>1211.14+418.7+837.4+1214.23, "LayerIndex"=>0+0+1+2+0+1, "SurfacesWithConstructions"=>7}
-    _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_ceiling_r13_gr3
@@ -83,7 +47,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>3}
     expected_values = {"LayerRValue"=>0.23495/0.11686+0.3048/1.731+0.2032/1.3114+11.235, "LayerDensity"=>104.429+1842.3+2242.8, "LayerSpecificHeat"=>1153.611+418.7+837.4, "LayerIndex"=>0+0+1+0+1, "SurfacesWithConstructions"=>7}
-    _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_wall_r10_garage
@@ -97,62 +61,62 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>5, "Construction"=>3}
     expected_values = {"LayerRValue"=>0.23495/2.59817+0.3048/1.731+0.2032/1.3114+0.0508/0.02885+1.881, "LayerDensity"=>67.641+1842.3+2242.8+32.04, "LayerSpecificHeat"=>1211.14+418.7+837.4+1214.23, "LayerIndex"=>0+0+1+2+0+1, "SurfacesWithConstructions"=>9}
-    _test_measure(osm_geo_crawl_garage, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_CS_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_wall_rigid_r_negative
     args_hash = {}
     args_hash["wall_rigid_r"] = -1
-    result = _test_error(osm_geo_crawl, args_hash)
+    result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Continuous Insulation Nominal R-value must be greater than or equal to 0.")
   end
     
   def test_argument_error_wall_rigid_thick_in_negative
     args_hash = {}
     args_hash["wall_rigid_thick_in"] = -1
-    result = _test_error(osm_geo_crawl, args_hash)
+    result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Continuous Insulation Thickness must be greater than or equal to 0.")
   end
 
   def test_argument_error_ceil_cavity_r_negative
     args_hash = {}
     args_hash["ceil_cavity_r"] = -1
-    result = _test_error(osm_geo_crawl, args_hash)
+    result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Cavity Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
   def test_argument_error_ceil_ff_negative
     args_hash = {}
     args_hash["ceil_ff"] = -1
-    result = _test_error(osm_geo_crawl, args_hash)
+    result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_ceil_ff_eq_1
     args_hash = {}
     args_hash["ceil_ff"] = 1
-    result = _test_error(osm_geo_crawl, args_hash)
+    result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_ceil_joist_height_zero
     args_hash = {}
     args_hash["ceil_joist_height"] =0
-    result = _test_error(osm_geo_crawl, args_hash)
+    result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Joist Height must be greater than 0.")
   end
   
   def test_argument_error_exposed_perimeter_bad_string
     args_hash = {}
     args_hash["exposed_perim"] = "bad"
-    result = _test_error(osm_geo_crawl, args_hash)
+    result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exposed Perimeter must be auto or a number greater than or equal to 0.")
   end
 
   def test_argument_error_exposed_perimeter_negative
     args_hash = {}
     args_hash["exposed_perim"] = "-1"
-    result = _test_error(osm_geo_crawl, args_hash)
+    result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exposed Perimeter must be auto or a number greater than or equal to 0.")
   end
 
@@ -163,37 +127,37 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
 
   def test_not_applicable_slab
     args_hash = {}
-    _test_na(osm_geo_slab, args_hash)
+    _test_na("SFD_2000sqft_2story_SL_UA.osm", args_hash)
   end
 
   def test_not_applicable_slab_garage
     args_hash = {}
-    _test_na(osm_geo_slab_garage, args_hash)
+    _test_na("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash)
   end
 
   def test_not_applicable_finished_basement
     args_hash = {}
-    _test_na(osm_geo_finished_basement, args_hash)
+    _test_na("SFD_2000sqft_2story_FB_UA.osm", args_hash)
   end
 
   def test_not_applicable_finished_basement_garage
     args_hash = {}
-    _test_na(osm_geo_finished_basement_garage, args_hash)
+    _test_na("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
   end
   
   def test_not_applicable_unfinished_basement
     args_hash = {}
-    _test_na(osm_geo_unfinished_basement, args_hash)
+    _test_na("SFD_2000sqft_2story_UB_UA.osm", args_hash)
   end
 
   def test_not_applicable_unfinished_basement_garage
     args_hash = {}
-    _test_na(osm_geo_unfinished_basement_garage, args_hash)
+    _test_na("SFD_2000sqft_2story_UB_GRG_UA.osm", args_hash)
   end
   
   def test_not_applicable_pier_beam
     args_hash = {}
-    _test_na(osm_geo_pier_beam, args_hash)
+    _test_na("SFD_2000sqft_2story_PB_UA.osm", args_hash)
   end
 
   def test_apply_to_specific_ceiling_surface
@@ -208,7 +172,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
   def test_apply_to_specific_wall_surface
@@ -223,7 +187,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>2}
     expected_values = {"SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   private

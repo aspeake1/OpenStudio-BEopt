@@ -7,14 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
 
-  def osm_geo_unfinished_attic
-    return "SFD_2000sqft_2story_SL_UA.osm"
-  end
-  
-  def osm_geo_unfinished_attic_layers
-    return "SFD_2000sqft_2story_SL_FA_AllLayersButRoofingMaterial.osm"
-  end
-  
   def test_add_tile_dark
     args_hash = {}
     args_hash["solar_abs"] = 0.9
@@ -22,7 +14,7 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.00945, "LayerConductivity"=>0.163, "LayerDensity"=>1121.4, "LayerSpecificHeat"=>1465.445, "LayerThermalAbs"=>0.94, "LayerSolarAbs"=>0.9, "LayerVisibleAbs"=>0.9, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_add_galvanized_steel
@@ -32,7 +24,7 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.00945, "LayerConductivity"=>0.163, "LayerDensity"=>1121.4, "LayerSpecificHeat"=>1465.445, "LayerThermalAbs"=>0.88, "LayerSolarAbs"=>0.7, "LayerVisibleAbs"=>0.7, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_tile_dark_to_layers_and_replace_with_galvanized_steel
@@ -42,7 +34,7 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.00945, "LayerConductivity"=>0.163, "LayerDensity"=>1121.4, "LayerSpecificHeat"=>1465.445, "LayerThermalAbs"=>0.94, "LayerSolarAbs"=>0.9, "LayerVisibleAbs"=>0.9, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    model = _test_measure(osm_geo_unfinished_attic_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_FA_AllLayersButRoofingMaterial.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["solar_abs"] = 0.7
     args_hash["emissivity"] = 0.88
     expected_num_del_objects = {"Material"=>1, "Construction"=>1}
@@ -54,28 +46,28 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
   def test_argument_error_solar_abs_lt_0
     args_hash = {}
     args_hash["solar_abs"] = -1
-    result = _test_error(osm_geo_unfinished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Solar Absorptivity must be greater than or equal to 0 and less than or equal to 1.")
   end
     
   def test_argument_error_solar_abs_gt_1
     args_hash = {}
     args_hash["solar_abs"] = 1.1
-    result = _test_error(osm_geo_unfinished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Solar Absorptivity must be greater than or equal to 0 and less than or equal to 1.")
   end
 
   def test_argument_error_emissivity_lt_0
     args_hash = {}
     args_hash["emissivity"] = -1
-    result = _test_error(osm_geo_unfinished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Emissivity must be greater than or equal to 0 and less than or equal to 1.")
   end
 
   def test_argument_error_emissivity_gt_1
     args_hash = {}
     args_hash["emissivity"] = 1.1
-    result = _test_error(osm_geo_unfinished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Emissivity must be greater than or equal to 0 and less than or equal to 1.")
   end
 
@@ -90,7 +82,7 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0094488, "LayerConductivity"=>0.162714, "LayerDensity"=>1121.3999999999999, "LayerSpecificHeat"=>1465.4499999999998, "LayerThermalAbs"=>0.91, "LayerSolarAbs"=>0.85, "LayerVisibleAbs"=>0.85, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
   
   private

@@ -7,41 +7,29 @@ require 'fileutils'
 
 class ProcessConstructionsFoundationsFloorsInterzonalFloorsTest < MiniTest::Test
 
-  def osm_geo
-    "SFD_2000sqft_2story_SL_UA.osm"
-  end
-
-  def osm_geo_int_floor
-    return "SFD_2000sqft_2story_SL_GRG_UA.osm"
-  end
-  
-  def osm_geo_pier_beam
-    return "SFD_2000sqft_2story_PB_UA.osm"
-  end
-  
   def test_not_applicable
     args_hash = {}
-    _test_na(osm_geo, args_hash)
+    _test_na("SFD_2000sqft_2story_SL_UA.osm", args_hash)
   end
   
   def test_argument_error_cavity_r_negative
     args_hash = {}
     args_hash["cavity_r"] = -1
-    result = _test_error(osm_geo_int_floor, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Cavity Insulation Nominal R-value must be greater than or equal to 0.")
   end
   
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["framing_factor"] = -1
-    result = _test_error(osm_geo_int_floor, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
     args_hash["framing_factor"] = 1.0
-    result = _test_error(osm_geo_int_floor, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end  
   
@@ -51,7 +39,7 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloorsTest < MiniTest::Test
     # expected_num_del_objects = {}
     # expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     # expected_values = {"LayerRValue"=>0.1397/1.9049152380695729, "LayerDensity"=>106.36479, "LayerSpecificHeat"=>1151.685130657429, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    # _test_measure(osm_geo_int_floor, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    # _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   # end
   
   # def test_floor_above_ambient
@@ -59,7 +47,7 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloorsTest < MiniTest::Test
     # expected_num_del_objects = {}
     # expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     # expected_values = {"LayerRValue"=>0.1397/0.0489547873864979, "LayerDensity"=>106.36479, "LayerSpecificHeat"=>1151.685130657429, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    # _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    # _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   # end  
   
   def test_retrofit_replace
@@ -67,17 +55,17 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloorsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1397/0.0489547873864979, "LayerDensity"=>106.36479, "LayerSpecificHeat"=>1151.685130657429, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_int_floor, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["cavity_r"] = 38
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1397/0.0292076004914801, "LayerDensity"=>106.36479, "LayerSpecificHeat"=>1151.685130657429, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_int_floor, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
+    _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
   def test_apply_to_specific_surface
-    model = get_model(File.dirname(__FILE__), osm_geo_int_floor)
+    model = get_model(File.dirname(__FILE__), "SFD_2000sqft_2story_SL_GRG_UA.osm")
     surfaces = ProcessConstructionsFoundationsFloorsInterzonalFloors.new.get_interzonal_floor_surfaces(model)
     args_hash = {}
     args_hash["surface"] = surfaces[0].name.to_s

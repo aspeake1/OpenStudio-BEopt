@@ -7,14 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsWallsExteriorICFTest < MiniTest::Test
 
-  def osm_geo
-    return "SFD_2000sqft_2story_SL_UA_CeilingIns.osm"
-  end
-  
-  def osm_geo_layers
-    return "SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm"
-  end
-
   def test_add_2in_eps_4in_concrete
     args_hash = {}
     args_hash["icf_r"] = 10
@@ -24,7 +16,7 @@ class ProcessConstructionsWallsExteriorICFTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0508/0.0310*2+0.1016/1.2205, "LayerDensity"=>68.565*2+2111.307, "LayerSpecificHeat"=>1214.23*2+844.353, "LayerIndex"=>0+1+2}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_2in_eps_12in_concrete
@@ -36,7 +28,7 @@ class ProcessConstructionsWallsExteriorICFTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0508/0.0291*2+0.3048/1.2205, "LayerDensity"=>68.565*2+2111.307, "LayerSpecificHeat"=>1214.23*2+844.353, "LayerIndex"=>0+1+2}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_2in_eps_12in_concrete_to_layers
@@ -48,62 +40,62 @@ class ProcessConstructionsWallsExteriorICFTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0508/0.0291*2+0.3048/1.2205, "LayerDensity"=>68.565*2+2111.307, "LayerSpecificHeat"=>1214.23*2+844.353, "LayerIndex"=>2+3+4}
-    _test_measure(osm_geo_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_icf_rvalue_negative
     args_hash = {}
     args_hash["icf_r"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Nominal Insulation R-value must be greater than 0.")
   end
     
   def test_argument_error_icf_rvalue_zero
     args_hash = {}
     args_hash["icf_r"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Nominal Insulation R-value must be greater than 0.")
   end
 
   def test_argument_error_ins_thick_in_negative
     args_hash = {}
     args_hash["ins_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Insulation Thickness must be greater than 0.")
   end
 
   def test_argument_error_ins_thick_in_zero
     args_hash = {}
     args_hash["ins_thick_in"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Insulation Thickness must be greater than 0.")
   end
 
   def test_argument_error_concrete_thick_in_negative
     args_hash = {}
     args_hash["concrete_thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Concrete Thickness must be greater than 0.")
   end
 
   def test_argument_error_concrete_thick_in_zero
     args_hash = {}
     args_hash["concrete_thick_in"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Concrete Thickness must be greater than 0.")
   end
 
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["framing_factor"] = -1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
     args_hash["framing_factor"] = 1.0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 

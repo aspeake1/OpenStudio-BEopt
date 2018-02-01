@@ -7,53 +7,13 @@ require 'fileutils'
 
 class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
 
-  def osm_geo_slab
-    return "SFD_2000sqft_2story_SL_UA.osm"
-  end
-
-  def osm_geo_slab_garage
-    return "SFD_2000sqft_2story_SL_GRG_UA.osm"
-  end
-  
-  def osm_geo_slab_garage_windows_doors
-    return "SFD_2000sqft_2story_SL_GRG_UA_Windows_Doors.osm"
-  end
-
-  def osm_geo_crawl
-    return "SFD_2000sqft_2story_CS_UA.osm"
-  end
-
-  def osm_geo_crawl_garage
-    return "SFD_2000sqft_2story_CS_GRG_UA.osm"
-  end
-
-  def osm_geo_finished_basement
-    return "SFD_2000sqft_2story_FB_UA.osm"
-  end
-
-  def osm_geo_finished_basement_garage
-    return "SFD_2000sqft_2story_FB_GRG_UA.osm"
-  end
-
-  def osm_geo_unfinished_basement
-    return "SFD_2000sqft_2story_UB_UA.osm"
-  end
-
-  def osm_geo_unfinished_basement_garage
-    return "SFD_2000sqft_2story_UB_GRG_UA.osm"
-  end
-  
-  def osm_geo_pier_beam
-    return "SFD_2000sqft_2story_PB_UA.osm"
-  end
-
   def test_add_uninsulated
     args_hash = {}
     args_hash["exposed_perim"] = "134.16407864998726"
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.02949+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_2ft_r5_perimeter_r5_gap
@@ -64,7 +24,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.01838+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_4ft_r15_exterior
@@ -74,7 +34,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.00845+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_whole_slab_r20_r10_gap
@@ -84,7 +44,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.00571+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_whole_slab_r20_r10_gap_garage
@@ -94,7 +54,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.00743+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_slab_garage, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_add_whole_slab_r20_r10_gap_garage_windows_doors
@@ -106,76 +66,76 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.00743+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_slab_garage_windows_doors, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_GRG_UA_Windows_Doors.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_perim_r_negative
     args_hash = {}
     args_hash["perim_r"] = -1
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Perimeter Insulation Nominal R-value must be greater than or equal to 0.")
   end
     
   def test_argument_error_perim_width_negative
     args_hash = {}
     args_hash["perim_width"] = -1
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Perimeter Insulation Width must be greater than or equal to 0.")
   end
 
   def test_argument_error_whole_r_negative
     args_hash = {}
     args_hash["whole_r"] = -1
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Whole Slab Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
   def test_argument_error_gap_r_negative
     args_hash = {}
     args_hash["gap_r"] = -1
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Gap Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
   def test_argument_error_ext_r_negative
     args_hash = {}
     args_hash["ext_r"] = -1
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exterior Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
   def test_argument_error_ext_depth_negative
     args_hash = {}
     args_hash["ext_depth"] = -1
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exterior Insulation Depth must be greater than or equal to 0.")
   end
 
   def test_argument_error_mass_thick_in_zero
     args_hash = {}
     args_hash["mass_thick_in"] = 0
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mass Thickness must be greater than 0.")
   end
 
   def test_argument_error_mass_conductivity_zero
     args_hash = {}
     args_hash["mass_conductivity"] = 0
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mass Conductivity must be greater than 0.")
   end
 
   def test_argument_error_mass_density_zero
     args_hash = {}
     args_hash["mass_density"] = 0
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mass Density must be greater than 0.")
   end
 
   def test_argument_error_mass_specific_heat_zero
     args_hash = {}
     args_hash["mass_specific_heat"] = 0
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mass Specific Heat must be greater than 0.")
   end
   
@@ -183,7 +143,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash = {}
     args_hash["perim_r"] = 5
     args_hash["perim_width"] = 0
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Perimeter insulation does not have both properties (R-value and Width) entered.")
   end
 
@@ -191,7 +151,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash = {}
     args_hash["ext_r"] = 0
     args_hash["ext_depth"] = 5
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exterior insulation does not have both properties (R-value and Depth) entered.")
   end
 
@@ -200,21 +160,21 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash["whole_r"] = 10
     args_hash["ext_r"] = 10
     args_hash["ext_depth"] = 10
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Invalid insulation configuration. The only valid configurations are: Exterior, Perimeter+Gap, Whole+Gap, Perimeter, or Whole.")
   end
   
   def test_argument_error_exposed_perimeter_bad_string
     args_hash = {}
     args_hash["exposed_perim"] = "bad"
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exposed Perimeter must be auto or a number greater than or equal to 0.")
   end
 
   def test_argument_error_exposed_perimeter_negative
     args_hash = {}
     args_hash["exposed_perim"] = "-1"
-    result = _test_error(osm_geo_slab, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exposed Perimeter must be auto or a number greater than or equal to 0.")
   end
 
@@ -225,37 +185,37 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
 
   def test_not_applicable_crawl
     args_hash = {}
-    _test_na(osm_geo_crawl, args_hash)
+    _test_na("SFD_2000sqft_2story_CS_UA.osm", args_hash)
   end
 
   def test_not_applicable_crawl_garage
     args_hash = {}
-    _test_na(osm_geo_crawl_garage, args_hash)
+    _test_na("SFD_2000sqft_2story_CS_GRG_UA.osm", args_hash)
   end
 
   def test_not_applicable_finished_basement
     args_hash = {}
-    _test_na(osm_geo_finished_basement, args_hash)
+    _test_na("SFD_2000sqft_2story_FB_UA.osm", args_hash)
   end
 
   def test_not_applicable_finished_basement_garage
     args_hash = {}
-    _test_na(osm_geo_finished_basement_garage, args_hash)
+    _test_na("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
   end
   
   def test_not_applicable_unfinished_basement
     args_hash = {}
-    _test_na(osm_geo_unfinished_basement, args_hash)
+    _test_na("SFD_2000sqft_2story_UB_UA.osm", args_hash)
   end
 
   def test_not_applicable_unfinished_basement_garage
     args_hash = {}
-    _test_na(osm_geo_unfinished_basement_garage, args_hash)
+    _test_na("SFD_2000sqft_2story_UB_GRG_UA.osm", args_hash)
   end
   
   def test_not_applicable_pier_beam
     args_hash = {}
-    _test_na(osm_geo_pier_beam, args_hash)
+    _test_na("SFD_2000sqft_2story_PB_UA.osm", args_hash)
   end
 
   def test_apply_to_specific_surface
@@ -267,7 +227,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.01838+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   private

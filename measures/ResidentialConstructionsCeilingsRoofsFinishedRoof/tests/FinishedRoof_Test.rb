@@ -7,18 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
 
-  def osm_geo_finished_attic
-    return "SFD_2000sqft_2story_SL_FA.osm"
-  end
-
-  def osm_geo_finished_attic_layers
-    return "SFD_2000sqft_2story_SL_FA_AllLayersButFinishedRoof.osm"
-  end
-
-  def osm_geo_unfinished_attic
-    return "SFD_2000sqft_2story_SL_UA.osm"
-  end
-  
   def test_add_uninsulated_2x6
     args_hash = {}
     args_hash["cavity_r"] = 0
@@ -29,7 +17,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.682, "LayerDensity"=>36.952, "LayerSpecificHeat"=>1208.183, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_add_uninsulated_2x6_gr3
@@ -42,7 +30,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.682, "LayerDensity"=>36.952, "LayerSpecificHeat"=>1208.183, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r19_2x6_gr1
@@ -55,7 +43,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.050, "LayerDensity"=>78.346, "LayerSpecificHeat"=>1123.461, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r19_2x10_gr3_ff11
@@ -68,7 +56,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.235, "LayerConductivity"=>0.090, "LayerDensity"=>95.044, "LayerSpecificHeat"=>1146.094, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_add_r19_2x8_gr1_to_layers_and_replace_with_r30c
@@ -81,7 +69,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.184, "LayerConductivity"=>0.056, "LayerDensity"=>78.346, "LayerSpecificHeat"=>1123.461, "LayerIndex"=>2, "SurfacesWithConstructions"=>2}
-    model = _test_measure(osm_geo_finished_attic_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_FA_AllLayersButFinishedRoof.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["cavity_r"] = 28.1 # compressed R-value
     args_hash["ins_fills_cavity"] = "true"
     expected_num_del_objects = {"Material"=>1, "Construction"=>1}
@@ -93,41 +81,41 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
   def test_argument_error_cavity_r_negative
     args_hash = {}
     args_hash["cavity_r"] = -1
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Insulation Installed R-value must be greater than or equal to 0.")
   end
     
   def test_argument_error_cavity_depth_negative
     args_hash = {}
     args_hash["cavity_depth"] = -1
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Depth must be greater than 0.")
   end
 
   def test_argument_error_cavity_depth_zero
     args_hash = {}
     args_hash["cavity_depth"] = 0
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Depth must be greater than 0.")
   end
 
   def test_argument_error_framing_factor_negative
     args_hash = {}
     args_hash["framing_factor"] = -1
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
     args_hash["framing_factor"] = 1.0
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_not_applicable_unfinished_attic
     args_hash = {}
-    _test_na(osm_geo_unfinished_attic, args_hash)
+    _test_na("SFD_2000sqft_2story_SL_UA.osm", args_hash)
   end
 
   def test_not_applicable_no_geometry
@@ -146,7 +134,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.682, "LayerDensity"=>36.952, "LayerSpecificHeat"=>1208.183, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   private

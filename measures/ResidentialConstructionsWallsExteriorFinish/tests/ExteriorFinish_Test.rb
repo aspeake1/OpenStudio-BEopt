@@ -7,22 +7,6 @@ require 'fileutils'
 
 class ProcessConstructionsWallsExteriorFinishTest < MiniTest::Test
 
-  def osm_geo_unfinished_attic
-    return "SFD_2000sqft_2story_SL_UA_CeilingIns.osm"
-  end
-  
-  def osm_geo_unfinished_attic_layers
-    return "SFD_2000sqft_2story_SL_UA_AllLayersButExteriorFinish_CeilingIns.osm"
-  end
-
-  def osm_geo_finished_attic
-    return "SFD_2000sqft_2story_SL_FA.osm"
-  end
-  
-  def osm_geo_finished_attic_layers
-    return "SFD_2000sqft_2story_SL_FA_AllLayersButExteriorFinish.osm"
-  end
-  
   def test_unfinished_attic_add_vinyl_light
     args_hash = {}
     args_hash["solar_abs"] = 0.3
@@ -34,7 +18,7 @@ class ProcessConstructionsWallsExteriorFinishTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.009525, "LayerConductivity"=>0.089435, "LayerDensity"=>177.822, "LayerSpecificHeat"=>1046.75, "LayerThermalAbs"=>0.9, "LayerSolarAbs"=>0.3, "LayerVisibleAbs"=>0.3, "LayerIndex"=>0, "SurfacesWithConstructions"=>10}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_finished_attic_add_wood_medium_dark
@@ -48,7 +32,7 @@ class ProcessConstructionsWallsExteriorFinishTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0254, "LayerConductivity"=>0.1024175, "LayerDensity"=>544.68, "LayerSpecificHeat"=>1172.36, "LayerThermalAbs"=>0.92, "LayerSolarAbs"=>0.75, "LayerVisibleAbs"=>0.75, "LayerIndex"=>0, "SurfacesWithConstructions"=>10}
-    _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_finished_attic_add_vinyl_light_to_layers_and_replace_with_wood_medium_dark
@@ -62,7 +46,7 @@ class ProcessConstructionsWallsExteriorFinishTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>1}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.009525, "LayerConductivity"=>0.089435, "LayerDensity"=>177.822, "LayerSpecificHeat"=>1046.75, "LayerThermalAbs"=>0.9, "LayerSolarAbs"=>0.3, "LayerVisibleAbs"=>0.3, "LayerIndex"=>0, "SurfacesWithConstructions"=>10}
-    model = _test_measure(osm_geo_finished_attic_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_FA_AllLayersButExteriorFinish.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["solar_abs"] = 0.75
     args_hash["conductivity"] = 0.71
     args_hash["density"] = 34.0
@@ -86,7 +70,7 @@ class ProcessConstructionsWallsExteriorFinishTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>2}
     expected_num_new_objects = {"Material"=>1, "Construction"=>2}
     expected_values = {"LayerThickness"=>0.009525, "LayerConductivity"=>0.089435, "LayerDensity"=>177.822, "LayerSpecificHeat"=>1046.75, "LayerThermalAbs"=>0.9, "LayerSolarAbs"=>0.3, "LayerVisibleAbs"=>0.3, "LayerIndex"=>0, "SurfacesWithConstructions"=>10}
-    model = _test_measure(osm_geo_unfinished_attic_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_UA_AllLayersButExteriorFinish_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["solar_abs"] = 0.75
     args_hash["conductivity"] = 0.71
     args_hash["density"] = 34.0
@@ -102,56 +86,56 @@ class ProcessConstructionsWallsExteriorFinishTest < MiniTest::Test
   def test_argument_error_solar_abs_lt_0
     args_hash = {}
     args_hash["solar_abs"] = -1
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Solar Absorptivity must be greater than or equal to 0 and less than or equal to 1.")
   end
     
   def test_argument_error_solar_abs_gt_1
     args_hash = {}
     args_hash["solar_abs"] = 1.1
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Solar Absorptivity must be greater than or equal to 0 and less than or equal to 1.")
   end
 
   def test_argument_error_emissivity_lt_0
     args_hash = {}
     args_hash["emissivity"] = -1
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Emissivity must be greater than or equal to 0 and less than or equal to 1.")
   end
 
   def test_argument_error_emissivity_gt_1
     args_hash = {}
     args_hash["emissivity"] = 1.1
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Emissivity must be greater than or equal to 0 and less than or equal to 1.")
   end
 
   def test_argument_error_conductivity_eq_0
     args_hash = {}
     args_hash["conductivity"] = 0
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Conductivity must be greater than 0.")
   end
   
   def test_argument_error_density_eq_0
     args_hash = {}
     args_hash["density"] = 0
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Density must be greater than 0.")
   end
 
   def test_argument_error_specific_heat_eq_0
     args_hash = {}
     args_hash["specific_heat"] = 0
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Specific Heat must be greater than 0.")
   end
 
   def test_argument_error_thick_in_eq_0
     args_hash = {}
     args_hash["thick_in"] = 0
-    result = _test_error(osm_geo_finished_attic, args_hash)
+    result = _test_error("SFD_2000sqft_2story_SL_FA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Thickness must be greater than 0.")
   end
 
@@ -166,7 +150,7 @@ class ProcessConstructionsWallsExteriorFinishTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.009525, "LayerConductivity"=>0.089435, "LayerDensity"=>177.822, "LayerSpecificHeat"=>1046.75, "LayerThermalAbs"=>0.9, "LayerSolarAbs"=>0.3, "LayerVisibleAbs"=>0.3, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
-    _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
   
   private

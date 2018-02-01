@@ -9,25 +9,13 @@ require_relative '../resources/constants'
 
 class WindowAreaTest < MiniTest::Test
   
-  def osm_geo
-    return "SFD_2000sqft_2story_FB_GRG_UA.osm"
-  end
-  
-  def osm_geo_rotated
-    return "SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm"
-  end
-  
-  def osm_geo_door_area
-    return "SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm"
-  end
-  
   def test_no_window_area
     args_hash = {}
     args_hash["front_wwr"] = 0
     args_hash["back_wwr"] = 0
     args_hash["left_wwr"] = 0
     args_hash["right_wwr"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 0)
     assert_equal("Success", result.value.valueName)
     assert_equal(result.finalCondition.get.logMessage, "No windows added.")
@@ -36,19 +24,19 @@ class WindowAreaTest < MiniTest::Test
   def test_sfd_new_construction_rotated
     args_hash = {}
     expected_values = {"Constructions"=>0}
-    model = _test_measure(osm_geo_rotated, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], expected_values)
   end
   
   def test_sfd_new_construction_door_area
     args_hash = {}
     expected_values = {"Constructions"=>0}
-    model = _test_measure(osm_geo_door_area, args_hash, [0, 0, 0, 0], [0.0, 59.0, 32.8, 15.5], expected_values)
+    model = _test_measure("SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm", args_hash, [0, 0, 0, 0], [0.0, 59.0, 32.8, 15.5], expected_values)
   end
   
   def test_sfd_retrofit_replace
     args_hash = {}
     expected_values = {"Constructions"=>0}
-    model = _test_measure(osm_geo, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], expected_values)
     args_hash = {}
     args_hash["front_wwr"] = 0.12
     args_hash["left_wwr"] = 0.12
@@ -59,7 +47,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_window_area_front_lt_0
     args_hash = {}
     args_hash["front_wwr"] = -20
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Front window-to-wall ratio must be greater than or equal to 0 and less than 1.")
@@ -68,7 +56,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_window_area_back_lt_0
     args_hash = {}
     args_hash["back_wwr"] = -20
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Back window-to-wall ratio must be greater than or equal to 0 and less than 1.")
@@ -77,7 +65,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_window_area_left_lt_0
     args_hash = {}
     args_hash["left_wwr"] = -20
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Left window-to-wall ratio must be greater than or equal to 0 and less than 1.")
@@ -86,7 +74,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_window_area_right_lt_0
     args_hash = {}
     args_hash["right_wwr"] = -20
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Right window-to-wall ratio must be greater than or equal to 0 and less than 1.")
@@ -95,7 +83,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_window_area_front_eq_1
     args_hash = {}
     args_hash["front_wwr"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Front window-to-wall ratio must be greater than or equal to 0 and less than 1.")
@@ -104,7 +92,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_window_area_back_eq_1
     args_hash = {}
     args_hash["back_wwr"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Back window-to-wall ratio must be greater than or equal to 0 and less than 1.")
@@ -113,7 +101,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_window_area_left_eq_1
     args_hash = {}
     args_hash["left_wwr"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Left window-to-wall ratio must be greater than or equal to 0 and less than 1.")
@@ -122,7 +110,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_window_area_right_eq_1
     args_hash = {}
     args_hash["right_wwr"] = 1
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Right window-to-wall ratio must be greater than or equal to 0 and less than 1.")
@@ -131,7 +119,7 @@ class WindowAreaTest < MiniTest::Test
   def test_argument_error_invalid_aspect_ratio
     args_hash = {}
     args_hash["aspect_ratio"] = 0
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Window Aspect Ratio must be greater than 0.")
@@ -141,7 +129,7 @@ class WindowAreaTest < MiniTest::Test
     args_hash = {}
     args_hash["front_wwr"] = 0.5
     args_hash["front_area"] = 50
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Both front window-to-wall ratio and front window area are specified.")
@@ -151,7 +139,7 @@ class WindowAreaTest < MiniTest::Test
     args_hash = {}
     args_hash["back_wwr"] = 0.5
     args_hash["back_area"] = 50
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Both back window-to-wall ratio and back window area are specified.")
@@ -161,7 +149,7 @@ class WindowAreaTest < MiniTest::Test
     args_hash = {}
     args_hash["left_wwr"] = 0.5
     args_hash["left_area"] = 50
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Both left window-to-wall ratio and left window area are specified.")
@@ -171,7 +159,7 @@ class WindowAreaTest < MiniTest::Test
     args_hash = {}
     args_hash["right_wwr"] = 0.5
     args_hash["right_area"] = 50
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Both right window-to-wall ratio and right window area are specified.")
