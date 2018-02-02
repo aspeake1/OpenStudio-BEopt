@@ -155,7 +155,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>64.0, "Annual_therm"=>29.0, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher_ElecClothesDryer.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank_ClothesWasher_ElecClothesDryer.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
   def test_retrofit_remove

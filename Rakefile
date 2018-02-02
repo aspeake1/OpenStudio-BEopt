@@ -147,6 +147,18 @@ namespace :test do
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
     
+    # Print warnings about unused OSWs
+    osw_files.each do |osw|
+        next if not osw_map[osw].nil?
+        puts "Warning: Unused OSW '#{osw}'."
+    end
+
+    # Print more warnings
+    osw_map.each do |osw, measures|
+        next if osw_files.include? osw
+        puts "Warning: OSW not found '#{osw}'."
+    end
+    
     os_cli = get_os_cli()
 
     osw_files.each do |osw|
@@ -223,12 +235,6 @@ namespace :test do
                 puts "File deleted."
             end
         end
-    end
-    
-    # Print warnings about unused OSWs
-    osw_files.each do |osw|
-        next if not osw_map[osw].nil?
-        puts "Unused OSW: #{osw}."
     end
     
     puts "Completed. #{num_success} of #{num_tot} osm files were regenerated successfully (#{Time.now - start_time} seconds)."
