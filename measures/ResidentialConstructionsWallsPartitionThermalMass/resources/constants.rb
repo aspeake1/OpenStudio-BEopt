@@ -411,20 +411,16 @@ class Constants
     end
     return "residential clothes dryer#{s_fuel}#{s_unit}"
   end
-  def self.ObjectNameCookingRange(fueltype, ignition=false, unit_name=self.ObjectNameBuildingUnit)
+  def self.ObjectNameCookingRange(fueltype, unit_name=self.ObjectNameBuildingUnit)
     s_fuel = ""
     if not fueltype.nil?
       s_fuel = " #{fueltype}"
-    end
-    s_ignition = ""
-    if ignition
-      s_ignition = " ignition"
     end
     s_unit = ""
     if unit_name != self.ObjectNameBuildingUnit
       s_unit = "|#{unit_name}"
     end
-    return "residential range#{s_fuel}#{s_ignition}#{s_unit}"
+    return "residential range#{s_fuel}#{s_unit}"
   end
   def self.ObjectNameCoolingSeason
     return 'residential cooling season'

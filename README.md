@@ -119,7 +119,7 @@ The order in which these measures are called is important. For example, the Wind
 ||2. Clothes Washer|Water Heater, Location|
 ||3. Clothes Dryer - Electric (or Fuel)|Beds/Baths, Clothes Washer|
 ||4. Dishwasher|Water Heater, Location|
-||5. Cooking Range - Electric (or Fuel)|Beds/Baths|
+||5. Cooking Range|Beds/Baths|
 |7. Lighting|1. Lighting|Location|
 |8. Misc Loads|1. Plug Loads|Beds/Baths|
 ||2. Extra Refrigerator||
