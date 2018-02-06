@@ -433,7 +433,79 @@ class ResidentialAirflowTest < MiniTest::Test
     expected_values = {"res_infil_1_program"=>{"c"=>0.05, "Cs"=>0.086238, "Cw"=>0.128435, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000229, "Cw"=>0.000319}, "res ds_1 ret air zone"=>{"RADuctVol"=>120}, "res_ds_1_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, "TerrainType"=>"Suburbs", "DuctLocation"=>"garage zone"}
     model, result = _test_measure("SFD_2000sqft_2story_SL_GRG_FR_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)    
   end
+  
+  def test_error_duct_total_leakage_invalid
+    args_hash = {}
+    args_hash["duct_total_leakage"] = -0.00001
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Ducts: Total Leakage must be greater than or equal to 0.")
+  end
+  
+  def test_error_duct_supply_leakage_frac_invalid
+    args_hash = {}
+    args_hash["duct_supply_frac"] = -0.00001
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Ducts: Supply Leakage Fraction of Total must be greater than or equal to 0 and less than or equal to 1.")
+  end
+  
+  def test_error_duct_return_leakage_frac_invalid
+    args_hash = {}
+    args_hash["duct_return_frac"] = -0.00001
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Ducts: Return Leakage Fraction of Total must be greater than or equal to 0 and less than or equal to 1.")
+  end
+  
+  def test_error_duct_supply_ah_leakage_frac_invalid
+    args_hash = {}
+    args_hash["duct_ah_supply_frac"] = -0.00001
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Ducts: Supply Air Handler Leakage Fraction of Total must be greater than or equal to 0 and less than or equal to 1.")
+  end
+  
+  def test_error_duct_return_ah_leakage_frac_invalid
+    args_hash = {}
+    args_hash["duct_ah_return_frac"] = -0.00001
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Ducts: Return Air Handler Leakage Fraction of Total must be greater than or equal to 0 and less than or equal to 1.")
+  end
 
+  def test_error_duct_r_value_invalid
+    args_hash = {}
+    args_hash["duct_r"] = -0.00001
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Ducts: Insulation Nominal R-Value must be greater than or equal to 0.")
+  end
+  
+  def test_error_duct_supply_surface_area_mult_invalid
+    args_hash = {}
+    args_hash["duct_supply_area_mult"] = -0.00001
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Ducts: Supply Surface Area Multiplier must be greater than or equal to 0.")
+  end
+  
+  def test_error_duct_return_surface_area_mult_invalid
+    args_hash = {}
+    args_hash["duct_return_area_mult"] = -0.00001
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Ducts: Return Surface Area Multiplier must be greater than or equal to 0.")
+  end
+  
   def test_retrofit_infiltration
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"
@@ -456,10 +528,11 @@ class ResidentialAirflowTest < MiniTest::Test
     args_hash["has_hvac_flue"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>num_units*7, "ScheduleRule"=>num_units*84, "EnergyManagementSystemSubroutine"=>num_units*1, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*22, "EnergyManagementSystemActuator"=>num_units*17, "EnergyManagementSystemGlobalVariable"=>num_units*23, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ZoneMixing"=>num_units*2, "OtherEquipment"=>num_units*10, "OtherEquipmentDefinition"=>num_units*10, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Surface"=>num_units*6, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "AirLoopHVACReturnPlenum"=>num_units*1, "Material"=>1, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "SurfacePropertyConvectionCoefficients"=>num_units*6}
-    expected_values = {"res_infil_1_program"=>{"c"=>0.041400, "Cs"=>0.060333, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_1 ret air zone"=>{"RADuctVol"=>33.63722}, "res_ds_1_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, \
-      # "res_infil_2_program"=>{"c"=>0.021430, "Cs"=>0.065930, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_2 ret air zone"=>{"RADuctVol"=>33.63722}, "res_ds_2_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, \
-      # "res_infil_3_program"=>{"c"=>0.021430, "Cs"=>0.065930, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_3 ret air zone"=>{"RADuctVol"=>33.63722}, "res_ds_3_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, \
-      "res_infil_4_program"=>{"c"=>0.041400, "Cs"=>0.060333, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_4 ret air zone"=>{"RADuctVol"=>33.63722}, "res_ds_4_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
+    expected_values = {"res_infil_1_program"=>{"c"=>0.042099, "Cs"=>0.066417, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_1 ret air zone"=>{"RADuctVol"=>34}, "res_ds_1_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, \
+                       "res_infil_2_program"=>{"c"=>0.020801, "Cs"=>0.066417, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_2 ret air zone"=>{"RADuctVol"=>34}, "res_ds_2_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, \
+                       "res_infil_3_program"=>{"c"=>0.020801, "Cs"=>0.066417, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_3 ret air zone"=>{"RADuctVol"=>34}, "res_ds_3_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, \
+                       "res_infil_4_program"=>{"c"=>0.042099, "Cs"=>0.066417, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_4 ret air zone"=>{"RADuctVol"=>34}, "res_ds_4_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, \
+                       "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
     model, result = _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, num_units)
   end
 
@@ -469,14 +542,15 @@ class ResidentialAirflowTest < MiniTest::Test
     args_hash["has_hvac_flue"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>num_units*7, "ScheduleRule"=>num_units*84, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*13, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "AirLoopHVACReturnPlenum"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6}
-    expected_values = {"res_infil_1_program"=>{"c"=>0.046569, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-      "res_infil_2_program"=>{"c"=>0.046569, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-      # "res_infil_3_program"=>{"c"=>0.046569, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-      # "res_infil_4_program"=>{"c"=>0.046569, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-      # "res_infil_5_program"=>{"c"=>0.046569, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_5_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-      # "res_infil_6_program"=>{"c"=>0.046569, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_6_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-      "res_infil_7_program"=>{"c"=>0.046569, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_7_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-      "res_infil_8_program"=>{"c"=>0.046569, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_8_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "TerrainType"=>"Suburbs"}
+    expected_values = {"res_infil_1_program"=>{"c"=>0.047360, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_2_program"=>{"c"=>0.047360, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_3_program"=>{"c"=>0.015540, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_4_program"=>{"c"=>0.015540, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_5_program"=>{"c"=>0.015540, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_5_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_6_program"=>{"c"=>0.015540, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_6_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_7_program"=>{"c"=>0.047360, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_7_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_8_program"=>{"c"=>0.047360, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.471947}, "res_nv_8_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "TerrainType"=>"Suburbs"}
     model, result = _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, num_units)
   end 
   
@@ -612,7 +686,7 @@ class ResidentialAirflowTest < MiniTest::Test
         assert_equal(values, actual_values[obj_name])
       else
         values.each do |lhs, rhs|
-          assert_in_epsilon(rhs, actual_values[obj_name][lhs].to_f, 0.01)
+          assert_in_epsilon(rhs, actual_values[obj_name][lhs].to_f, 0.0125)
         end
       end
     end
