@@ -335,6 +335,12 @@ class Constants
   def self.PVModuleTypeThinFilm
     return 'thin film'
   end
+  def self.PVNetMetering
+    return 'Net Metering'
+  end
+  def self.PVFeedInTariff
+    return 'Feed-In Tariff'
+  end  
   def self.MonthNames
     return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   end
