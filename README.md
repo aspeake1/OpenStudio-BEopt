@@ -86,26 +86,12 @@ The order in which these measures are called is important. For example, the Wind
 ||7. Window Areas||
 ||8. Overhangs|Window Areas|
 ||9. Neighbors||
-|3. Envelope Constructions|1. Uninsulated Surfaces||
-||2. Ceilings/Roofs - Unfinished Attic (or Finished Roof)||
-||3. Ceilings/Roofs - Roof Sheathing||
-||4. Ceilings/Roofs - Roofing Material||
-||5. Ceilings/Roofs - Radiant Barrier||
-||6. Ceilings/Roofs - Ceiling Thermal Mass||
-||7. Foundations/Floors - Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
-||8. Foundations/Floors - Interzonal Floor Construction||
-||9. Foundations/Floors - Floor Covering||
-||10. Foundations/Floors - Floor Sheathing||
-||11. Foundations/Floors - Floor Thermal Mass||
-||12. Walls - Wood Stud (or Double Stud, CMU, etc.)||
-||13. Walls - Interzonal Construction||
-||14. Walls - Wall Sheathing||
-||15. Walls - Exterior Finish||
-||16. Walls - Exterior Thermal Mass||
-||17. Walls - Partition Thermal Mass||
-||18. Window Construction|Window Areas, Location|
-||19. Door Construction|Door Area|
-||20. Furniture Thermal Mass||
+|3. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
+||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
+||3. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
+||4. Floors||
+||5. Window Construction|Window Areas, Location|
+||6. Door Construction|Door Area|
 |4. Domestic Hot Water|1. Water Heater - Tank (or Tankless, Heat Pump, etc.)|Beds/Baths|
 ||2. Hot Water Fixtures|Water Heater|
 ||3. Hot Water Distribution|Hot Water Fixtures, Location|

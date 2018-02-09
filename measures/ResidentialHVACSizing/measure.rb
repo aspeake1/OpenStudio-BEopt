@@ -13,6 +13,7 @@ require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/weather"
 require "#{File.dirname(__FILE__)}/resources/schedules"
+require "#{File.dirname(__FILE__)}/resources/constructions"
 
 #start the measure
 class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
@@ -314,9 +315,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
         is_vented = space_is_vented(space, 0.001)
         
-        attic_floor_r = Construction.get_space_r_value(runner, space, "floor")
+        attic_floor_r = get_space_r_value(runner, space, "floor")
         return nil if attic_floor_r.nil?
-        attic_roof_r = Construction.get_space_r_value(runner, space, "roofceiling")
+        attic_roof_r = get_space_r_value(runner, space, "roofceiling")
         return nil if attic_roof_r.nil?
         
         # Unfinished attic
@@ -395,9 +396,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
         is_vented = space_is_vented(space, 0.001)
         
-        attic_floor_r = Construction.get_space_r_value(runner, space, "floor")
+        attic_floor_r = get_space_r_value(runner, space, "floor")
         return nil if attic_floor_r.nil?
-        attic_roof_r = Construction.get_space_r_value(runner, space, "roofceiling")
+        attic_roof_r = get_space_r_value(runner, space, "roofceiling")
         return nil if attic_roof_r.nil?
         
         # Unfinished attic
@@ -547,9 +548,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
         is_vented = space_is_vented(space, 0.001)
         
-        attic_floor_r = Construction.get_space_r_value(runner, space, "floor")
+        attic_floor_r = get_space_r_value(runner, space, "floor")
         return nil if attic_floor_r.nil?
-        attic_roof_r = Construction.get_space_r_value(runner, space, "roofceiling")
+        attic_roof_r = get_space_r_value(runner, space, "roofceiling")
         return nil if attic_roof_r.nil?
         
         # Unfinished attic
@@ -769,7 +770,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             next if not window.subSurfaceType.downcase.include?("window")
             
             # U-factor
-            u_window = Construction.get_surface_ufactor(runner, window, window.subSurfaceType)
+            u_window = get_surface_ufactor(runner, window, window.subSurfaceType)
             return nil if u_window.nil?
             zone_loads.Heat_Windows += u_window * UnitConversions.convert(window.grossArea,"m^2","ft^2") * htd
             zone_loads.Dehumid_Windows += u_window * UnitConversions.convert(window.grossArea,"m^2","ft^2") * mj8.dtd
@@ -955,7 +956,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     Geometry.get_spaces_above_grade_exterior_walls(thermal_zone.spaces).each do |wall|
         wall.subSurfaces.each do |door|
             next if not door.subSurfaceType.downcase.include?("door")
-            door_ufactor = Construction.get_surface_ufactor(runner, door, door.subSurfaceType)
+            door_ufactor = get_surface_ufactor(runner, door, door.subSurfaceType)
             return nil if door_ufactor.nil?
             zone_loads.Heat_Doors += door_ufactor * UnitConversions.convert(door.grossArea,"m^2","ft^2") * htd
             zone_loads.Cool_Doors += door_ufactor * UnitConversions.convert(door.grossArea,"m^2","ft^2") * cltd_Door
@@ -1020,7 +1021,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             cltd_Wall = [cltd_Wall + cltd_corr, 0].max       # Assume zero cooling load for negative CLTD's
         end
 
-        wall_ufactor = Construction.get_surface_ufactor(runner, wall, wall.surfaceType)
+        wall_ufactor = get_surface_ufactor(runner, wall, wall.surfaceType)
         return nil if wall_ufactor.nil?
         zone_loads.Cool_Walls += wall_ufactor * UnitConversions.convert(wall.netArea,"m^2","ft^2") * cltd_Wall
         zone_loads.Heat_Walls += wall_ufactor * UnitConversions.convert(wall.netArea,"m^2","ft^2") * htd
@@ -1029,7 +1030,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
 
     # Interzonal Walls
     Geometry.get_spaces_interzonal_walls(thermal_zone.spaces).each do |wall|
-        wall_ufactor = Construction.get_surface_ufactor(runner, wall, wall.surfaceType)
+        wall_ufactor = get_surface_ufactor(runner, wall, wall.surfaceType)
         return nil if wall_ufactor.nil?
         adjacent_space = wall.adjacentSurface.get.space.get
         zone_loads.Cool_Walls += wall_ufactor * UnitConversions.convert(wall.netArea,"m^2","ft^2") * (mj8.cool_design_temps[adjacent_space] - mj8.cool_setpoint)
@@ -1136,7 +1137,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         # Adjust base CLTD for different CTD or DR
         cltd_FinishedRoof = cltd_FinishedRoof + (weather.design.CoolingDrybulb - 95) + mj8.daily_range_temp_adjust[mj8.daily_range_num]
 
-        roof_ufactor = Construction.get_surface_ufactor(runner, roof, roof.surfaceType)
+        roof_ufactor = get_surface_ufactor(runner, roof, roof.surfaceType)
         return nil if roof_ufactor.nil?
         zone_loads.Cool_Roofs += roof_ufactor * UnitConversions.convert(roof.netArea,"m^2","ft^2") * cltd_FinishedRoof
         zone_loads.Heat_Roofs += roof_ufactor * UnitConversions.convert(roof.netArea,"m^2","ft^2") * htd
@@ -1159,7 +1160,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
     # Exterior Floors
     Geometry.get_spaces_above_grade_exterior_floors(thermal_zone.spaces).each do |floor|
-        floor_ufactor = Construction.get_surface_ufactor(runner, floor, floor.surfaceType)
+        floor_ufactor = get_surface_ufactor(runner, floor, floor.surfaceType)
         return nil if floor_ufactor.nil?
         zone_loads.Cool_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * (mj8.ctd - 5 + mj8.daily_range_temp_adjust[mj8.daily_range_num])
         zone_loads.Heat_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * htd
@@ -1168,7 +1169,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
     # Interzonal Floors
     Geometry.get_spaces_interzonal_floors_and_ceilings(thermal_zone.spaces).each do |floor|
-        floor_ufactor = Construction.get_surface_ufactor(runner, floor, floor.surfaceType)
+        floor_ufactor = get_surface_ufactor(runner, floor, floor.surfaceType)
         return nil if floor_ufactor.nil?
         adjacent_space = floor.adjacentSurface.get.space.get
         zone_loads.Cool_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * (mj8.cool_design_temps[adjacent_space] - mj8.cool_setpoint)
@@ -1192,7 +1193,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     Geometry.get_spaces_above_grade_ground_floors(thermal_zone.spaces).each do |floor|
         #Get stored u-factor since the surface u-factor is fictional
         #TODO: Revert this some day.
-        #floor_ufactor = Construction.get_surface_ufactor(runner, floor, floor.surfaceType)
+        #floor_ufactor = get_surface_ufactor(runner, floor, floor.surfaceType)
         #return nil if floor_ufactor.nil?
         floor_rvalue = get_unit_feature(runner, unit, Constants.SizingInfoSlabRvalue(floor), 'double')
         return nil if floor_rvalue.nil?
@@ -2306,9 +2307,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             
             # Calculate the cooling design temperature for the unfinished attic based on Figure A12-14
             if Geometry.is_unfinished_attic(space)
-                attic_floor_r = Construction.get_space_r_value(runner, space, "floor")
+                attic_floor_r = get_space_r_value(runner, space, "floor")
                 return nil if attic_floor_r.nil?
-                attic_roof_r = Construction.get_space_r_value(runner, space, "roofceiling")
+                attic_roof_r = get_space_r_value(runner, space, "roofceiling")
                 return nil if attic_roof_r.nil?
                 if attic_floor_r > attic_roof_r
                     mj8.heat_design_temps[space] = heat_db
@@ -3479,7 +3480,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
     # Surface UAs
     space.surfaces.each do |surface|
-        ufactor = Construction.get_surface_ufactor(runner, surface, surface.surfaceType)
+        ufactor = get_surface_ufactor(runner, surface, surface.surfaceType)
         return nil if ufactor.nil?
         
         # Exclude surfaces adjacent to unfinished space

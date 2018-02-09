@@ -204,11 +204,11 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
     path_fracs = [1]
     
     # Define construction
-    window = Construction.new(path_fracs)
-    window.add_layer(glaz_mat, true)
+    window = Construction.new("WindowConstruction", path_fracs)
+    window.add_layer(glaz_mat)
     
     # Create and assign construction to surfaces
-    if not window.create_and_assign_constructions(sub_surfaces, runner, model, name="WindowConstruction")
+    if not window.create_and_assign_constructions(sub_surfaces, runner, model)
         return false
     end
     

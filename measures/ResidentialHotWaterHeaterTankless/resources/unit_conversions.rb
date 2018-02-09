@@ -253,6 +253,8 @@ class UnitConversions
       # R-Value
       elsif from == 'hr*ft^2*f/btu' and to == 'm^2*k/w'
         return x * 0.1761
+      elsif from == 'm^2*k/w' and to == 'hr*ft^2*f/btu'
+        return x / 0.1761
       
       # U-Factor
       elsif from == 'btu/(hr*ft^2*f)' and to == 'w/(m^2*k)'

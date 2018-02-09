@@ -23,15 +23,6 @@ class Constants
   def self.DefaultHumiditySetpoint
     return 0.60
   end
-  def self.DefaultSolarAbsCeiling
-    return 0.3
-  end
-  def self.DefaultSolarAbsFloor
-    return 0.6
-  end
-  def self.DefaultSolarAbsWall
-    return 0.5
-  end
   def self.g
     return 32.174    # gravity (ft/s2)
   end
@@ -59,6 +50,9 @@ class Constants
 
   # Strings --------------------
   
+  def self.AirFilm
+    return 'AirFilm'
+  end
   def self.Auto
     return 'auto'
   end
@@ -277,57 +271,6 @@ class Constants
   end
   def self.MaterialPEX
     return 'pex'
-  end
-  def self.MaterialCeilingMass
-    return 'ResCeilingMass1'
-  end
-  def self.MaterialCeilingMass2
-    return 'ResCeilingMass2'
-  end
-  def self.MaterialFloorMass
-    return 'ResFloorMass'
-  end
-  def self.MaterialFloorCovering
-    return 'ResFloorCovering'
-  end
-  def self.MaterialFloorRigidIns
-    return 'ResFloorRigidIns'
-  end
-  def self.MaterialFloorSheathing
-    return 'ResFloorSheathing'
-  end
-  def self.MaterialRadiantBarrier
-    return 'ResRadiantBarrier'
-  end
-  def self.MaterialRoofMaterial
-    return 'ResRoofMaterial'
-  end
-  def self.MaterialRoofRigidIns
-    return 'ResRoofRigidIns'
-  end
-  def self.MaterialRoofSheathing
-    return 'ResRoofSheathing'
-  end
-  def self.MaterialWallExtFinish
-    return 'ResExtFinish'
-  end
-  def self.MaterialWallMass
-    return 'ResExtWallMass1'
-  end
-  def self.MaterialWallMass2
-    return 'ResExtWallMass2'
-  end
-  def self.MaterialWallMassOtherSide
-    return 'ResExtWallMassOtherSide1'
-  end
-  def self.MaterialWallMassOtherSide2
-    return 'ResExtWallMassOtherSide2'
-  end
-  def self.MaterialWallRigidIns
-    return 'ResExtWallRigidIns'
-  end
-  def self.MaterialWallSheathing
-    return 'ResExtWallSheathing'
   end
   def self.PVModuleTypeStandard
     return 'standard'
@@ -1000,6 +943,36 @@ class Constants
   end
   def self.SpaceTypeUnfinishedBasement
     return 'unfinished basement'
+  end
+  def self.SurfaceTypeFloorFinInsUnfin
+    return 'FloorFinInsUnfin' # e.g., unfinished attic floor
+  end
+  def self.SurfaceTypeRoofUnfinUninsExt
+    return 'RoofUnfinUninsExt' # e.g., garage roof
+  end
+  def self.SurfaceTypeRoofUnfinInsExt
+    return 'RoofUnfinInsExt' # e.g., unfinished attic roof
+  end
+  def self.SurfaceTypeRoofFinInsExt
+    return 'RoofFinInsExt' # e.g., finished attic roof
+  end
+  def self.SurfaceTypeWallExtInsFin # e.g., living exterior wall
+    return 'WallExtInsFin'
+  end
+  def self.SurfaceTypeWallExtInsUnfin # e.g., attic gable wall under insulated roof
+    return 'WallExtInsUnfin'
+  end
+  def self.SurfaceTypeWallExtUninsUnfin # e.g., garage exterior wall or attic gable wall under uninsulated roof
+    return 'WallExtUninsUnfin'
+  end
+  def self.SurfaceTypeWallIntFinInsUnfin # e.g., wall between finished/unfinished spaces
+    return 'WallIntFinInsUnfin'
+  end
+  def self.SurfaceTypeWallIntFinUninsFin # e.g., wall between two finished spaces
+    return 'WallIntFinUninsFin'
+  end
+  def self.SurfaceTypeWallIntUnfinUninsUnfin # e.g., wall between two unfinished spaces
+    return 'WallIntUnfinUninsUnfin'
   end
   def self.TerrainOcean
     return 'ocean'

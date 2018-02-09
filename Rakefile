@@ -154,9 +154,24 @@ namespace :test do
     end
 
     # Print more warnings
-    osw_map.each do |osw, measures|
+    osw_map.each do |osw, _measures|
         next if osw_files.include? osw
         puts "Warning: OSW not found '#{osw}'."
+    end
+    
+    # Remove any extra osm's in the measures test dirs
+    measures.each do |m|
+        osms = Dir[File.expand_path("../measures/#{m}/tests/*.osm", __FILE__)]
+        osms.each do |osm|
+            osw = File.basename(osm).gsub('.osm','.osw')
+            if osw_map[osw].nil? or !osw_map[osw].include?(m)
+                puts "Extra file #{osw} found in #{m}/tests. Do you want to delete it? (y/n)"
+                input = STDIN.gets.strip.downcase
+                next if input != "y"
+                FileUtils.rm(osm)
+                puts "File deleted."
+            end
+        end
     end
     
     os_cli = get_os_cli()
@@ -219,21 +234,6 @@ namespace :test do
         end
         if File.exists?(File.expand_path("../test/osw_files/out.osw", __FILE__))
             FileUtils.rm(File.expand_path("../test/osw_files/out.osw", __FILE__))
-        end
-    end
-    
-    # Remove any extra osm's in the measures test dirs
-    measures.each do |m|
-        osms = Dir[File.expand_path("../measures/#{m}/tests/*.osm", __FILE__)]
-        osms.each do |osm|
-            osw = File.basename(osm).gsub('.osm','.osw')
-            if not osw_map[osw].nil? and not osw_map[osw].include?(m)
-                puts "Extra file #{osw} found in #{m}/tests. Do you want to delete it? (y/n)"
-                input = STDIN.gets.strip.downcase
-                next if input != "y"
-                FileUtils.rm(osm)
-                puts "File deleted."
-            end
         end
     end
     
@@ -331,24 +331,33 @@ task :update_measures do
   puts "Updating measure.xml files..."
   system(command)
   
-  # Generate example OSW
-  generate_example_osw_of_all_measures_in_order
+  # Generate example OSWs
+  
+  # Check that there is no missing/extra measures in the measure-info.json
+  # and get all_measures name (folders) in the correct order
+  data_hash = get_and_proof_measure_order_json()
+  
+  generate_example_osws(data_hash, "ResidentialGeometrySingleFamilyDetached", "example_single_family_detached.osw")
+  generate_example_osws(data_hash, "ResidentialGeometrySingleFamilyAttached", "example_single_family_attached.osw")
+  generate_example_osws(data_hash, "ResidentialGeometryMultifamily", "example_multifamily.osw")
+  generate_example_osws(data_hash, "ResidentialGeometryFromFloorspaceJS", "example_from_floorspacejs.osw")
+  
+  # Update README.md
+  update_readme(data_hash)
   
 end
 
-# This function will generate an OpenStudio OSW
+# This function will generate OpenStudio OSWs
 # with all the measures in it, in the order specified in /resources/measure-info.json
-#
-#@return [Bool] true if successful, false if not
-def generate_example_osw_of_all_measures_in_order()
+def generate_example_osws(data_hash, geometry_measure, osw_filename)
 
   require 'openstudio'
   require_relative 'resources/meta_measure'
 
-  puts "Updating example OSW..."
+  puts "Updating #{osw_filename}..."
   
   model = OpenStudio::Model::Model.new
-  osw_path = "workflows/create-model-example.osw"
+  osw_path = "workflows/#{osw_filename}"
   
   if File.exist?(osw_path)
     File.delete(osw_path)
@@ -359,16 +368,16 @@ def generate_example_osw_of_all_measures_in_order()
   workflowJSON.addMeasurePath("../measures")
   workflowJSON.setSeedFile("../seeds/EmptySeedModel.osm")
   
-  # Check that there is no missing/extra measures in the measure-info.json
-  # and get all_measures name (folders) in the correct order
-  data_hash = get_and_proof_measure_order_json()
-  
   steps = OpenStudio::WorkflowStepVector.new
   
   data_hash.each do |group|
-    group["group_steps"].each do |group_step|
+    group["group_steps"].each_with_index do |group_step, group_step_idx|
       
-        measure = group_step["measures"][0]
+        if group["group_name"].include? "Geometry" and group_step_idx == 0
+            measure = geometry_measure
+        else
+            measure = group_step["measures"][0]
+        end
         measure_path = File.expand_path(File.join("../measures", measure), workflowJSON.oswDir.to_s) 
 
         measure_instance = get_measure_instance("#{measure_path}/measure.rb")
@@ -385,7 +394,7 @@ def generate_example_osw_of_all_measures_in_order()
             if arg.hasDefaultValue
                 step.setArgument(arg.name, arg.defaultValueAsString)
             elsif arg.required
-                puts "Error: No default value provied for #{measure} argument '#{arg.name}'."
+                puts "Error: No default value provided for #{measure} argument '#{arg.name}'."
                 exit
             end
         end
@@ -398,9 +407,6 @@ def generate_example_osw_of_all_measures_in_order()
   workflowJSON.setWorkflowSteps(steps)
   workflowJSON.save
   
-  # Update README.md as well
-  update_readme(data_hash)
-
 end
 
 # This method updates the "Measure Order" table in the README.md

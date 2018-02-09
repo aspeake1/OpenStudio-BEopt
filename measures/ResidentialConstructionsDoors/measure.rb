@@ -103,11 +103,11 @@ class ProcessConstructionsDoors < OpenStudio::Measure::ModelMeasure
         path_fracs = [1]
         
         # Define construction
-        fin_door = Construction.new(path_fracs)
-        fin_door.add_layer(fin_door_mat, true)
+        fin_door = Construction.new("LivingDoors", path_fracs)
+        fin_door.add_layer(fin_door_mat)
         
         # Create and assign construction to surfaces
-        if not fin_door.create_and_assign_constructions(finished_sub_surfaces, runner, model, name="LivingDoors")
+        if not fin_door.create_and_assign_constructions(finished_sub_surfaces, runner, model)
             return false
         end
     end
@@ -124,11 +124,11 @@ class ProcessConstructionsDoors < OpenStudio::Measure::ModelMeasure
         path_fracs = [1]
         
         # Define construction
-        unfin_door = Construction.new(path_fracs)
-        unfin_door.add_layer(unfin_door_mat, true)
+        unfin_door = Construction.new("UnfinDoors", path_fracs)
+        unfin_door.add_layer(unfin_door_mat)
         
         # Create and assign construction to surfaces
-        if not unfin_door.create_and_assign_constructions(unfinished_sub_surfaces, runner, model, name="UnfinDoors")
+        if not unfin_door.create_and_assign_constructions(unfinished_sub_surfaces, runner, model)
             return false
         end
     end
