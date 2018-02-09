@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require_relative '../measure.rb'
 require 'fileutils'
 
-class RResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
+class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
 
   def test_error_empty_floorplan_path
     args_hash = {}
