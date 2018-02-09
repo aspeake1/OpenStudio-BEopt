@@ -74,24 +74,6 @@ class ProcessConstructionsWindowsTest < MiniTest::Test
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
-  def test_apply_to_specific_facade
-    args_hash = {}
-    args_hash["sub_surface"] = Constants.FacadeFront
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"SimpleGlazing"=>1, "Construction"=>1, "ShadingControl"=>1, "WindowMaterialShade"=>1, "ScheduleRuleset"=>1}
-    expected_values = {"shgc"=>0.3*0.7, "ufactor"=>0.37, "SubSurfacesWithConstructions"=>12}
-    model = _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
-  end
-  
-  def test_apply_to_specific_sub_surface
-    args_hash = {}
-    args_hash["sub_surface"] = "Surface 5 - Window 1"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"SimpleGlazing"=>1, "Construction"=>1, "ShadingControl"=>1, "WindowMaterialShade"=>1, "ScheduleRuleset"=>1}
-    expected_values = {"shgc"=>0.3*0.7, "ufactor"=>0.37, "SubSurfacesWithConstructions"=>1}
-    model = _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

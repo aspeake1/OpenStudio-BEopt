@@ -26,19 +26,6 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for interzonal floor surfaces
-    surfaces = get_interzonal_floor_surfaces(model)
-    surfaces_args = OpenStudio::StringVector.new
-    surfaces_args << Constants.Auto
-    surfaces.each do |surface|
-      surfaces_args << surface.name.to_s
-    end
-    surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
-    surface.setDisplayName("Surface(s)")
-    surface.setDescription("Select the surface(s) to assign constructions.")
-    surface.setDefaultValue(Constants.Auto)
-    args << surface
-    
     #make a double argument for nominal R-value of cavity insulation
     cavity_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("cavity_r", true)
     cavity_r.setDisplayName("Cavity Insulation Nominal R-value")
@@ -78,18 +65,7 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
       return false
     end
 
-    surface_s = runner.getOptionalStringArgumentValue("surface",user_arguments)
-    if not surface_s.is_initialized
-      surface_s = Constants.Auto
-    else
-      surface_s = surface_s.get
-    end
-    
     surfaces = get_interzonal_floor_surfaces(model)
-    
-    unless surface_s == Constants.Auto
-      surfaces.delete_if { |surface| surface.name.to_s != surface_s }
-    end
     
     # Continue if no applicable surfaces
     if surfaces.empty?
@@ -122,18 +98,19 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
     end
     mat_framing = Material.new(name=nil, thick_in=Material.Stud2x6.thick_in, mat_base=BaseMaterial.Wood)
     mat_gap = Material.AirCavityClosed(Material.Stud2x6.thick_in)
+    mat_wood_floor = Material.new(name="Wood Floor", thick_in=0.625, mat_base=nil, k_in=0.8004, rho=34.0, cp=0.29) # wood surface
     
     # Set paths
-    izfGapFactor = Construction.get_wall_gap_factor(intFloorInstallGrade, intFloorFramingFactor, intFloorCavityInsRvalueNominal)
+    izfGapFactor = get_gap_factor(intFloorInstallGrade, intFloorFramingFactor, intFloorCavityInsRvalueNominal)
     path_fracs = [intFloorFramingFactor, 1 - intFloorFramingFactor - izfGapFactor, izfGapFactor]
     
     # Define construction
     izf_const = Construction.new("UnfinInsFinFloor", path_fracs)
     izf_const.add_layer(Material.AirFilmFloorReduced)
     izf_const.add_layer([mat_framing, mat_cavity, mat_gap], "IntFloorIns")
-    izf_const.add_layer(Material.DefaultFloorSheathing) # sheathing added in separate measure
-    izf_const.add_layer(Material.DefaultFloorMass) # thermal mass added in separate measure
-    izf_const.add_layer(Material.DefaultFloorCovering) # floor covering added in separate measure
+    izf_const.add_layer(Material.Plywood(0.75)) # sheathing added in separate measure
+    izf_const.add_layer(mat_wood_floor) # thermal mass added in separate measure
+    izf_const.add_layer(Material.CoveringBare) # floor covering added in separate measure
     izf_const.add_layer(Material.AirFilmFloorReduced)
     
     # Create and assign construction to surfaces

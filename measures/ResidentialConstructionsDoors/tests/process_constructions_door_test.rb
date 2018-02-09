@@ -30,15 +30,6 @@ class ProcessConstructionsDoorsTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "U-Factor must be greater than 0.")    
   end  
   
-  def test_apply_to_specific_sub_surface
-    args_hash = {}
-    args_hash["sub_surface"] = "unit 1 - Surface 13 - Door"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.04445, "LayerConductivity"=>0.0612266553480475, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SubSurfacesWithConstructions"=>1}
-    model = _test_measure("SFD_2000sqft_2story_SL_GRG_UA_Windows_Doors.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

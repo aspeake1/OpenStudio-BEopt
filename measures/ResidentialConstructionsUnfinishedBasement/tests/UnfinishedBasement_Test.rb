@@ -23,8 +23,8 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceil_joist_height"] = 9.25
     args_hash["exposed_perim"] = "134.16407864998726"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"LayerRValue"=>0.40683+0.3048/1.731+0.2032/1.3114+176.1+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+2242.8+67.642, "LayerSpecificHeat"=>418.7+837.4+837.4+1211.14, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>7}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0.09, "SurfacesWithConstructions"=>7}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -43,8 +43,8 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"LayerRValue"=>0.798+0.3048/1.731+0.2032/1.3114+176.1+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+2242.8+67.642, "LayerSpecificHeat"=>418.7+837.4+837.4+1211.14, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>7}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_values = {"WallRValue"=>1.76, "WallDepth"=>1.22, "CeilingRValue"=>0.09, "SurfacesWithConstructions"=>7}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -63,8 +63,8 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"LayerRValue"=>0.3048/1.731+0.2032/1.3114+0.051816/0.029427+16.646+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+32.04+2242.8+67.642, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4+1211.14, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>7}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_values = {"WallRValue"=>1.76, "WallDepth"=>2.44, "CeilingRValue"=>0.09, "SurfacesWithConstructions"=>7}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -83,8 +83,8 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>3}
-    expected_values = {"LayerRValue"=>0.946+0.3048/1.731+0.2032/1.3114+0.025908/0.029427+176.1+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+32.04+2242.8+67.642, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4+1211.14, "LayerIndex"=>0+1+2+3+0+1+2+0, "SurfacesWithConstructions"=>7}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_values = {"WallRValue"=>1.79+0.88, "WallDepth"=>2.44+2.44, "CeilingRValue"=>0.09, "SurfacesWithConstructions"=>7}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -103,8 +103,8 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"LayerRValue"=>0.40683+0.3048/1.731+0.2032/1.3114+176.1+0.1016/1.3114+0.23495/0.11686, "LayerDensity"=>1842.3+2242.8+2242.8+104.429, "LayerSpecificHeat"=>418.7+837.4+837.4+1153.61, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>7}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>2.01, "SurfacesWithConstructions"=>7}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -123,8 +123,8 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"LayerRValue"=>0.3048/1.731+0.2032/1.3114+0.051816/0.029427+13.2319+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+32.04+2242.8+67.64, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4+1211.14, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>9}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_values = {"SurfacesWithConstructions"=>9}
     _test_measure("SFD_2000sqft_2story_UB_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -259,48 +259,6 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     _test_na("SFD_2000sqft_2story_PB_UA.osm", args_hash)
   end
 
-  def test_apply_to_specific_ceiling_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 23"
-    args_hash["wall_ins_height"] = 0
-    args_hash["wall_cavity_r"] = 0
-    args_hash["wall_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["wall_cavity_depth"] = 0
-    args_hash["wall_cavity_insfills"] = true
-    args_hash["wall_ff"] = 0
-    args_hash["wall_rigid_r"] = 0
-    args_hash["wall_rigid_thick_in"] = 0
-    args_hash["ceil_cavity_r"] = 13
-    args_hash["ceil_cavity_grade"] = "III"
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"SurfacesWithConstructions"=>2}
-    _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end  
-  
-  def test_apply_to_specific_wall_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 19"
-    args_hash["wall_ins_height"] = 4
-    args_hash["wall_cavity_r"] = 0
-    args_hash["wall_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["wall_cavity_depth"] = 0
-    args_hash["wall_cavity_insfills"] = true
-    args_hash["wall_ff"] = 0
-    args_hash["wall_rigid_r"] = 10
-    args_hash["wall_rigid_thick_in"] = 2
-    args_hash["ceil_cavity_r"] = 0
-    args_hash["ceil_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
-    expected_values = {"SurfacesWithConstructions"=>2}
-    _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end  
-  
   private
   
   def _test_error(osm_file, args_hash)
@@ -427,58 +385,57 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"LayerRValue"=>0, "LayerDensity"=>0, "LayerSpecificHeat"=>0, "LayerIndex"=>0, "SurfacesWithConstructions"=>0}
+    actual_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "SurfacesWithConstructions"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "Material"
-                if new_object.to_StandardOpaqueMaterial.is_initialized
-                    new_object = new_object.to_StandardOpaqueMaterial.get
-                    actual_values["LayerRValue"] += new_object.thickness/new_object.conductivity
-                else
-                    new_object = new_object.to_MasslessOpaqueMaterial.get
-                    actual_values["LayerRValue"] += new_object.thermalResistance
+            if obj_type == "FoundationKiva"
+                if new_object.interiorVerticalInsulationMaterial.is_initialized
+                    mat = new_object.interiorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+                    actual_values["WallRValue"] += mat.thickness/mat.conductivity
                 end
-                actual_values["LayerDensity"] += new_object.density
-                actual_values["LayerSpecificHeat"] += new_object.specificHeat
+                if new_object.interiorVerticalInsulationDepth.is_initialized
+                    actual_values["WallDepth"] += new_object.interiorVerticalInsulationDepth.get
+                end
+                if new_object.exteriorVerticalInsulationMaterial.is_initialized
+                    mat = new_object.exteriorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+                    actual_values["WallRValue"] += mat.thickness/mat.conductivity
+                end
+                if new_object.exteriorVerticalInsulationDepth.is_initialized
+                    actual_values["WallDepth"] += new_object.exteriorVerticalInsulationDepth.get
+                end
             elsif obj_type == "Construction"
                 next if !all_new_objects.keys.include?("Material")
-                all_new_objects["Material"].each do |new_material|
-                    if new_material.to_StandardOpaqueMaterial.is_initialized
-                        new_material = new_material.to_StandardOpaqueMaterial.get
-                    else
-                        new_material = new_material.to_MasslessOpaqueMaterial.get
-                    end
-                    next if new_object.getLayerIndices(new_material)[0].nil?
-                    actual_values["LayerIndex"] += new_object.getLayerIndices(new_material)[0]
-                end
                 model.getSurfaces.each do |surface|
                   if surface.construction.is_initialized
                     next unless surface.construction.get == new_object
                     actual_values["SurfacesWithConstructions"] += 1
+                    if surface.surfaceType.downcase == "roofceiling"
+                      surface.construction.get.to_LayeredConstruction.get.layers.each do |layer|
+                        mat = layer.to_StandardOpaqueMaterial.get
+                        actual_values["CeilingRValue"] +=  mat.thickness/mat.conductivity
+                      end
+                    end
                   end
                 end
             end
         end
     end
     
-    if not expected_values["LayerRValue"].nil?
-      assert_in_epsilon(expected_values["LayerRValue"], actual_values["LayerRValue"], 0.02)
+    if not expected_values["WallRValue"].nil?
+      assert_in_epsilon(expected_values["WallRValue"], actual_values["WallRValue"], 0.03)
     end
-    if not expected_values["LayerDensity"].nil?
-      assert_in_epsilon(expected_values["LayerDensity"], actual_values["LayerDensity"], 0.02)
+    if not expected_values["WallDepth"].nil?
+      assert_in_epsilon(expected_values["WallDepth"], actual_values["WallDepth"], 0.03)
     end
-    if not expected_values["LayerSpecificHeat"].nil?
-      assert_in_epsilon(expected_values["LayerSpecificHeat"], actual_values["LayerSpecificHeat"], 0.01)
-    end
-    if not expected_values["LayerIndex"].nil?
-      assert_in_epsilon(expected_values["LayerIndex"], actual_values["LayerIndex"], 0.01)
+    if not expected_values["CeilingRValue"].nil?
+      assert_in_epsilon(expected_values["CeilingRValue"], actual_values["CeilingRValue"], 0.05)
     end
     if not expected_values["SurfacesWithConstructions"].nil?
-      assert_in_epsilon(expected_values["SurfacesWithConstructions"], actual_values["SurfacesWithConstructions"], 0.01)
+      assert_equal(expected_values["SurfacesWithConstructions"], actual_values["SurfacesWithConstructions"])
     end
-    
+
     return model
   end
   

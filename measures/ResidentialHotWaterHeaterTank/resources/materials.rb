@@ -297,7 +297,7 @@ class Material
     end
 
     def self.Plywood(thick_in)
-        return self.new(name="Plywood #{thick_in.to_s} in.", thick_in=0.5, mat_base=BaseMaterial.Wood)
+        return self.new(name="Plywood #{thick_in.to_s} in.", thick_in=thick_in, mat_base=BaseMaterial.Wood)
     end
 
     def self.RadiantBarrier

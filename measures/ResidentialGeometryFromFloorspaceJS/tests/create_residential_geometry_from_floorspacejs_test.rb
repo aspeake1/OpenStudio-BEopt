@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require_relative '../measure.rb'
 require 'fileutils'
 
-class RResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
+class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
 
   def test_error_empty_floorplan_path
     args_hash = {}
@@ -200,11 +200,11 @@ class RResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = runner.result
 
     # save the model to test output directory
-    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{File.basename(args_hash["floorplan_path"]).gsub(".json","")}" + ".osm")
-    model.save(output_file_path,true)    
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{File.basename(args_hash["floorplan_path"]).gsub(".json","")}" + ".osm")
+    # model.save(output_file_path,true)    
     
     # show the output
-    #show_output(result)
+    # show_output(result)
     
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -213,7 +213,7 @@ class RResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["PortList", "ZoneHVACEquipmentList", "Node", "SizingZone"]
+    obj_type_exclusions = ["PortList", "ZoneHVACEquipmentList", "Node", "SizingZone", "RenderingColor"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
     

@@ -460,7 +460,7 @@ class Geometry
     def self.space_is_below_grade(space)
         space.surfaces.each do |surface|
             next if surface.surfaceType.downcase != "wall"
-            if surface.isGroundSurface
+            if surface.outsideBoundaryCondition.downcase == "foundation"
                 return true
             end
         end
@@ -594,7 +594,7 @@ class Geometry
             end
             space.surfaces.each do |surface|
                 next if surface.surfaceType.downcase != "wall"
-                next if surface.isGroundSurface
+                next if surface.outsideBoundaryCondition.downcase == "foundation"
                 wall_area += UnitConversions.convert(surface.grossArea * mult, "m^2", "ft^2")
             end
         end
@@ -611,7 +611,7 @@ class Geometry
             space.surfaces.each do |surface|
                 next if surface.surfaceType.downcase != "wall"
                 next if surface.outsideBoundaryCondition.downcase != "outdoors"
-                next if surface.isGroundSurface
+                next if surface.outsideBoundaryCondition.downcase == "foundation"
                 next unless self.space_is_finished(surface.space.get)
                 wall_area += UnitConversions.convert(surface.grossArea * mult, "m^2", "ft^2")
             end
@@ -695,8 +695,7 @@ class Geometry
         # check edges for matches
         ground_edges.each do |e1|
             model_edges.each do |e2|
-                # see if edges have same geometry
-                next if not ((e1[0] == e2[1] and e1[1] == e2[0]) or (e1[0] == e2[0] and e1[1] == e2[1]))
+                next if not ((equal_vertices(e1[0], e2[1]) and equal_vertices(e1[1], e2[0])) or (equal_vertices(e1[0], e2[0]) and equal_vertices(e1[1], e2[1])))
                 point_one = OpenStudio::Point3d.new(e1[0][0],e1[0][1],e1[0][2])
                 point_two = OpenStudio::Point3d.new(e1[1][0],e1[1][1],e1[1][2])
                 length = OpenStudio::Vector3d.new(point_one - point_two).length
@@ -706,6 +705,14 @@ class Geometry
         end
     
         return UnitConversions.convert(perimeter, "m", "ft")
+    end
+    
+    def self.equal_vertices(v1, v2)
+      tol = 0.001
+      return false if (v1[0] - v2[0]).abs > tol
+      return false if (v1[1] - v2[1]).abs > tol
+      return false if (v1[2] - v2[2]).abs > tol
+      return true
     end
     
     def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false)
@@ -1059,7 +1066,7 @@ class Geometry
         end
         return true
     end
-   
+    
     def self.get_closest_neighbor_distance(model)
         house_points = []
         neighbor_points = []
@@ -1125,7 +1132,7 @@ class Geometry
             space.surfaces.each do |surface|
                 next if above_grade_ground_floors.include?(surface)
                 next if surface.surfaceType.downcase != "floor"
-                next if surface.outsideBoundaryCondition.downcase != "ground"
+                next if surface.outsideBoundaryCondition.downcase != "foundation"
                 above_grade_ground_floors << surface
             end
         end
@@ -1181,7 +1188,7 @@ class Geometry
             space.surfaces.each do |surface|
                 next if below_grade_exterior_walls.include?(surface)
                 next if surface.surfaceType.downcase != "wall"
-                next if surface.outsideBoundaryCondition.downcase != "ground"
+                next if surface.outsideBoundaryCondition.downcase != "foundation"
                 below_grade_exterior_walls << surface
             end
         end
@@ -1196,7 +1203,7 @@ class Geometry
             space.surfaces.each do |surface|
                 next if below_grade_exterior_floors.include?(surface)
                 next if surface.surfaceType.downcase != "floor"
-                next if surface.outsideBoundaryCondition.downcase != "ground"
+                next if surface.outsideBoundaryCondition.downcase != "foundation"
                 below_grade_exterior_floors << surface
             end
         end

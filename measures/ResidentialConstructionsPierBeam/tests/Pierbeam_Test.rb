@@ -56,15 +56,6 @@ class ProcessConstructionsPierBeamTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
-  def test_apply_to_specific_ceiling_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 23"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"SurfacesWithConstructions"=>2}
-    _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-  
   private
   
   def _test_error(osm_file, args_hash)

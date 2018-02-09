@@ -112,9 +112,9 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
 
     #make an argument for crawlspace height
     foundation_height = OpenStudio::Measure::OSArgument::makeDoubleArgument("foundation_height",true)
-    foundation_height.setDisplayName("Crawlspace Height")
+    foundation_height.setDisplayName("Foundation Height")
     foundation_height.setUnits("ft")
-    foundation_height.setDescription("The height of the crawlspace walls.")
+    foundation_height.setDescription("The height of the foundation (e.g., 3ft for crawlspace, 8ft for basement).")
     foundation_height.setDefaultValue(3.0)
     args << foundation_height
     
@@ -193,8 +193,6 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     
     if foundation_type == "slab"
       foundation_height = 0.0
-    elsif foundation_type == "unfinished basement" or foundation_type == "finished basement"
-      foundation_height = 8.0
     end
     
     # error checking
@@ -204,10 +202,6 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     end
     if aspect_ratio < 0
       runner.registerError("Invalid aspect ratio entered.")
-      return false
-    end
-    if foundation_type == "crawlspace" and ( foundation_height < 1.5 or foundation_height > 5.0 )
-      runner.registerError("The crawlspace height can be set between 1.5 and 5 ft.")
       return false
     end
     if foundation_type == "pier and beam" and ( foundation_height <= 0.0 )
@@ -626,7 +620,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
           end
         end
       end
-
+      
       m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
       m[0,3] = 0
       m[1,3] = 0
@@ -793,6 +787,12 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         surface.adjacentSurface.get.remove
         surface.remove
       end
+    end
+    
+    # set foundation outside boundary condition to Kiva "foundation"
+    model.getSurfaces.each do |surface|
+        next if surface.outsideBoundaryCondition.downcase != "ground"
+        surface.setOutsideBoundaryCondition("Foundation")
     end
     
     # Store building unit information

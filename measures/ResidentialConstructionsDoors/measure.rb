@@ -32,19 +32,6 @@ class ProcessConstructionsDoors < OpenStudio::Measure::ModelMeasure
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make a choice argument for door sub surfaces
-    finished_sub_surfaces, unfinished_sub_surfaces = get_door_sub_surfaces(model)
-    sub_surfaces_args = OpenStudio::StringVector.new
-    sub_surfaces_args << Constants.Auto
-    (finished_sub_surfaces + unfinished_sub_surfaces).each do |sub_surface|
-      sub_surfaces_args << sub_surface.name.to_s
-    end        
-    sub_surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("sub_surface", sub_surfaces_args, false)
-    sub_surface.setDisplayName("Subsurface(s)")
-    sub_surface.setDescription("Select the sub surface(s) to assign constructions.")
-    sub_surface.setDefaultValue(Constants.Auto)
-    args << sub_surface     
-    
     #make a string argument for door u-factor
     door_ufactor = OpenStudio::Measure::OSArgument::makeDoubleArgument("door_ufactor", true)
     door_ufactor.setDisplayName("U-Factor")
@@ -65,13 +52,6 @@ class ProcessConstructionsDoors < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    sub_surface_s = runner.getOptionalStringArgumentValue("sub_surface",user_arguments)
-    if not sub_surface_s.is_initialized
-      sub_surface_s = Constants.Auto
-    else
-      sub_surface_s = sub_surface_s.get
-    end
-    
     doorUfactor = runner.getDoubleArgumentValue("door_ufactor",user_arguments)
     if doorUfactor <= 0.0
         runner.registerError("U-Factor must be greater than 0.")
@@ -80,11 +60,6 @@ class ProcessConstructionsDoors < OpenStudio::Measure::ModelMeasure
 
     finished_sub_surfaces, unfinished_sub_surfaces = get_door_sub_surfaces(model)
     
-    unless sub_surface_s == Constants.Auto
-      finished_sub_surfaces.delete_if { |sub_surface| sub_surface.name.to_s != sub_surface_s }
-      unfinished_sub_surfaces.delete_if { |sub_surface| sub_surface.name.to_s != sub_surface_s }
-    end
-
     # Continue if no applicable sub surfaces
     if finished_sub_surfaces.empty? and unfinished_sub_surfaces.empty?
       runner.registerAsNotApplicable("Measure not applied because no doors were found.")

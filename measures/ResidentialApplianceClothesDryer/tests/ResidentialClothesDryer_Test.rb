@@ -455,7 +455,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
                 if args_hash["fuel_type"] == Constants.FuelTypeGas
                     actual_values["Annual_therm"] += UnitConversions.convert(full_load_hrs * new_object.otherEquipmentDefinition.designLevel.get * new_object.multiplier, "Wh", "therm")
                 else
-                    actual_values["Annual_gal"] += UnitConversions.btu2gal(UnitConversions.convert(full_load_hrs * new_object.otherEquipmentDefinition.designLevel.get * new_object.multiplier, "Wh", "Btu"), args_hash["fuel_type"])
+                    actual_values["Annual_gal"] += UnitConversions.convert(UnitConversions.convert(full_load_hrs * new_object.otherEquipmentDefinition.designLevel.get * new_object.multiplier, "Wh", "Btu"), "Btu", "gal", args_hash["fuel_type"])
                 end
                 actual_values["Location"] << new_object.space.get.spaceType.get.standardsSpaceType.get
                 assert_equal(HelperMethods.eplus_fuel_map(expected_values["FuelType"]), new_object.fuelType)

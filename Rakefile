@@ -531,37 +531,49 @@ def get_osms_listed_in_test(testrb)
     return osms.uniq
 end
 
-desc 'update urdb tariffs in utility bill measure'
+desc 'update urdb tariffs'
 task :update_tariffs do
   require 'csv'
   require 'net/https'
-  require 'openstudio'
+  require 'zip'
 
   tariffs_path = "./resources/tariffs"
-  result = get_tariff_json_files(tariffs_path)  
-  if result
-    zip_file = OpenStudio::ZipFile.new(tariffs_zip, false)
-    zip_file.addDirectory(tariffs_path, OpenStudio::toPath("/"))
+  tariffs_zip = "#{tariffs_path}.zip"
+  
+  if not File.exists?(tariffs_path)
+    FileUtils.mkdir_p("./resources/tariffs")  
   end
-  FileUtils.rm_rf(tariffs_path)
+  
+  if File.exists?(tariffs_zip)
+    Zip::File.open(tariffs_zip) do |zip_file|
+      zip_file.each do |entry|
+        next unless entry.file?
+        entry_path = File.join(tariffs_path, entry.name)
+        zip_file.extract(entry, entry_path) unless File.exists?(entry_path)
+      end
+    end
+    FileUtils.rm_rf(tariffs_zip)
+  end
+  
+  result = get_tariff_json_files(tariffs_path)
+  
+  if result
+    Zip::File.open(tariffs_zip, Zip::File::CREATE) do |zip_file|
+        Dir[File.join(tariffs_path, "*")].each do |entry|
+          zip_file.add(entry.sub(tariffs_path + "/", ""), entry)
+        end
+    end
+    FileUtils.rm_rf(tariffs_path)
+  end
 
 end
 
 def get_tariff_json_files(tariffs_path)
+  require 'parallel'
 
   STDOUT.puts "Enter API Key:"
   api_key = STDIN.gets.strip
   return false if api_key.empty?
-
-  tariffs_zip = "#{tariffs_path}.zip"
-  unzip_file = OpenStudio::UnzipFile.new(tariffs_zip)
-  if not File.exists?(tariffs_path)
-    puts "Extracting #{tariffs_zip} to #{tariffs_path} ..."
-    unzip_file.extractAllFiles(OpenStudio::toPath(tariffs_path))
-  end
-  if !File.exists?(tariffs_path)
-    FileUtils.mkdir_p(tariffs_path)
-  end
 
   url = URI.parse("https://api.openei.org/utility_rates?")
   http = Net::HTTP.new(url.host, url.port)
@@ -569,50 +581,49 @@ def get_tariff_json_files(tariffs_path)
   http.verify_mode = OpenSSL::SSL::VERIFY_NONE  
 
   rows = CSV.read("./resources/utilities.csv", {:encoding=>'ISO-8859-1'})
-  size = 0
-  progress = 0
-  rows.each_with_index do |row, i|
-
-    size += 1
-    next if i == 0
+  rows = rows[1..-1] # ignore header
+  interval = 1
+  report_at = interval
+  timestep = Time.now
+  num_parallel = 1 # FIXME: segfault when num_parallel > 1
+  Parallel.each_with_index(rows, in_threads: num_parallel) do |row, i|
+  
     utility, eiaid, name, label = row
-    tariff_file_name = File.join(tariffs_path, "#{eiaid}_#{label}.json")
-    
-    # next if File.file?(tariff_file_name) # just add, don't update
 
     params = { 'version' => 3, 'format' => 'json', 'detail' => 'full', 'getpage' => label, 'api_key' => api_key }
     url.query = URI.encode_www_form(params)
-    request = Net::HTTP::Get.new(url.request_uri)
+    request = Net::HTTP::Get.new(url.request_uri)    
     response = http.request(request)
     response = JSON.parse(response.body, :symbolize_names=>true)
 
     if response.keys.include? :error
-      puts "#{eiaid}_#{label}: #{response[:error][:message]}."
+      puts "#{response[:error][:message]}."
       if response[:error][:message].include? "exceeded your rate limit"
-        return false
+        false
       end
       next
     end
-
-    if not File.file?(tariff_file_name)
-      puts "Added #{tariff_file_name} to #{tariffs_path}."
-      File.open(tariff_file_name, "w") do |f|
-        f.write(response.to_json)
-      end
-    elsif not JSON.parse(File.read(tariff_file_name), :symbolize_names=>true) == response
-      puts "Updated #{tariff_file_name} to #{tariffs_path}."
-      File.open(tariff_file_name, "w") do |f|
-        f.write(response.to_json)
-      end
-    end
     
-    new_progress = (size * 100) / rows.length
-    unless new_progress == progress
-      puts "Completed %3d%% ..." % [new_progress]
-    end
-    progress = new_progress
+    entry_path = File.join(tariffs_path, "#{label}.json")
 
-  end    
+    if response[:items].empty?
+      puts "Skipping #{entry_path}: empty tariff."
+      next
+    end
+
+    File.open(entry_path, "w") do |f|
+      f.write(response.to_json)
+    end
+    puts "Added #{entry_path}."
+
+    # Report out progress
+    if i.to_f * 100 / rows.length >= report_at
+      puts "INFO: Completed #{report_at}%; #{(Time.now - timestep).round}s"
+      report_at += interval
+      timestep = Time.now
+    end
+
+  end
   
   return true
 

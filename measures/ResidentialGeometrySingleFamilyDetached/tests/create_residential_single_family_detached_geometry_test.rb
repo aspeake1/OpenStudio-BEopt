@@ -20,14 +20,6 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid aspect ratio entered.")
   end
   
-  def test_argument_error_crawl_height_invalid
-    args_hash = {}
-    args_hash["foundation_type"] = "crawlspace"
-    args_hash["foundation_height"] = 0
-    result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "The crawlspace height can be set between 1.5 and 5 ft.")
-  end  
-  
   def test_argument_error_pierbeam_height_invalid
     args_hash = {}
     args_hash["foundation_type"] = "pier and beam"
@@ -105,6 +97,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   
   def test_fbasement    
     args_hash = {}
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
@@ -114,6 +107,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
 
   def test_ufbasement    
     args_hash = {}
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "unfinished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
@@ -141,6 +135,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   
   def test_finished_attic_and_finished_basement    
     args_hash = {}
+    args_hash["foundation_height"] = 8.0
     args_hash["attic_type"] = "finished attic"
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
@@ -163,6 +158,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>4}
@@ -174,6 +170,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
@@ -186,6 +183,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["attic_type"] = "finished attic"
     args_hash["garage_protrusion"] = 0.5
@@ -199,6 +197,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "unfinished basement"
     args_hash["attic_type"] = "finished attic"
     args_hash["garage_protrusion"] = 0.5
@@ -212,6 +211,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
@@ -223,6 +223,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   def test_twostory_fbasement_hasgarage_noprotrusion_garageright_garagetobackwall_gableroof    
     args_hash = {}
     args_hash["garage_width"] = 10
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>30, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
@@ -233,6 +234,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   def test_twostory_fbasement_hasgarage_noprotrusion_garageright_gableroof
     args_hash = {}
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
@@ -243,6 +245,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   def test_twostory_fbasement_hasgarage_halfprotrusion_garageright_gableroof
     args_hash = {}
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
@@ -254,6 +257,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   def test_twostory_fbasement_hasgarage_halfprotrusion_garageright_gableroof_fattic    
     args_hash = {}
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["attic_type"] = "finished attic"
     args_hash["garage_protrusion"] = 0.5
@@ -266,6 +270,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   def test_twostory_ubasement_hasgarage_halfprotrusion_garageright_gableroof_fattic    
     args_hash = {}
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "unfinished basement"
     args_hash["attic_type"] = "finished attic"
     args_hash["garage_protrusion"] = 0.5
@@ -278,6 +283,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   def test_twostory_fbasement_hasgarage_fullprotrusion_garageright_gableroof    
     args_hash = {}
     args_hash["garage_width"] = 12
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
@@ -291,6 +297,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>4}
@@ -303,6 +310,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
@@ -316,6 +324,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
@@ -328,6 +337,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
@@ -339,6 +349,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
@@ -351,6 +362,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
@@ -539,6 +551,11 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     end
     assert_in_epsilon(expected_values["FinishedFloorArea"], actual_values["FinishedFloorArea"], 0.01)
     assert_in_epsilon(expected_values["BuildingHeight"], Geometry.get_height_of_spaces(new_spaces), 0.01)
+    
+    # Ensure no surfaces adjacent to "ground" (should be Kiva "foundation")
+    model.getSurfaces.each do |surface|
+      refute_equal(surface.outsideBoundaryCondition.downcase, "ground")
+    end
     
     return model
   end
