@@ -236,14 +236,6 @@ class WindowAreaTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows_OneConstruction.osm", args_hash, [128.8, 128.8, 64.6, 64.4], [85.9, 128.8, 42.9, 64.6], expected_values)  
   end
   
-  def test_sfd_retrofit_replace_four_constructions
-    args_hash = {}
-    args_hash["front_wwr"] = 0.12
-    args_hash["left_wwr"] = 0.12
-    expected_values = {"Constructions"=>4}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows_FourConstructions.osm", args_hash, [128.8, 128.8, 64.6, 64.4], [85.9, 128.8, 42.9, 64.6], expected_values)  
-  end  
-  
   private
   
   def _test_error(osm_file, args_hash)

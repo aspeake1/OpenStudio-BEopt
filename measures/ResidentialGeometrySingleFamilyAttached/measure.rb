@@ -205,8 +205,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     
     # Convert to SI
     foundation_height = UnitConversions.convert(foundation_height,"ft","m")
-    
-    space_types_hash = {}
         
     # starting spaces
     runner.registerInitialCondition("The building started with #{model.getSpaces.size} spaces.")
@@ -247,13 +245,8 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     living_space = OpenStudio::Model::Space::fromFloorPrint(living_polygon, wall_height, model)
     living_space = living_space.get
     living_space.setName("living space")
-    if space_types_hash.keys.include? Constants.SpaceTypeLiving
-      living_space_type = space_types_hash[Constants.SpaceTypeLiving]
-    else
-      living_space_type = OpenStudio::Model::SpaceType.new(model)
-      living_space_type.setStandardsSpaceType(Constants.SpaceTypeLiving)
-      space_types_hash[Constants.SpaceTypeLiving] = living_space_type
-    end
+    living_space_type = OpenStudio::Model::SpaceType.new(model)
+    living_space_type.setStandardsSpaceType(Constants.SpaceTypeLiving)
     living_space.setSpaceType(living_space_type)
     living_space.setThermalZone(living_zone)
     
@@ -285,19 +278,12 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       if attic_type == "finished attic"
         attic_space.setName("finished attic space")
         attic_space.setThermalZone(living_zone)
+        attic_space.setSpaceType(living_space_type)
         living_spaces_front << attic_space
       else
         attic_spaces << attic_space
         attic_space_front = attic_space
       end
-      if space_types_hash.keys.include? Constants.SpaceTypeLiving
-        attic_space_type = space_types_hash[Constants.SpaceTypeLiving]
-      else
-        attic_space_type = OpenStudio::Model::SpaceType.new(model)
-        attic_space_type.setStandardsSpaceType(Constants.SpaceTypeLiving)
-        space_types_hash[Constants.SpaceTypeLiving] = attic_space_type
-      end
-      attic_space.setSpaceType(attic_space_type)
     end    
     
     # create the unit
@@ -353,13 +339,13 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
         attic_space = get_attic_space(model, x, -y, wall_height, num_floors, roof_pitch, roof_type)
         if attic_type == "finished attic"
           attic_space.setName("finished attic space|#{Constants.ObjectNameBuildingUnit(2)}")
-          attic_space.setThermalZone(living_zone)        
+          attic_space.setThermalZone(living_zone)
+          attic_space.setSpaceType(living_space_type)
           living_spaces_back << attic_space
         else
           attic_spaces << attic_space
           attic_space_back = attic_space
         end
-        attic_space.setSpaceType(attic_space_type)
       end      
       
       # create the back unit
@@ -524,13 +510,8 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
         foundation_space.setName("finished basement space")
         foundation_zone.setName("finished basement zone")
         foundation_space.setThermalZone(foundation_zone)
-        if space_types_hash.keys.include? Constants.SpaceTypeFinishedBasement
-          foundation_space_type = space_types_hash[Constants.SpaceTypeFinishedBasement]
-        else
-          foundation_space_type = OpenStudio::Model::SpaceType.new(model)
-          foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeFinishedBasement)
-          space_types_hash[Constants.SpaceTypeFinishedBasement] = foundation_space_type
-        end
+        foundation_space_type = OpenStudio::Model::SpaceType.new(model)
+        foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeFinishedBasement)
         foundation_space.setSpaceType(foundation_space_type)
       end
       
@@ -680,26 +661,16 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           foundation_zone = OpenStudio::Model::ThermalZone.new(model)
           foundation_zone.setName("crawl zone")
           foundation_space.setThermalZone(foundation_zone)
-          if space_types_hash.keys.include? Constants.SpaceTypeCrawl
-            foundation_space_type = space_types_hash[Constants.SpaceTypeCrawl]
-          else
-            foundation_space_type = OpenStudio::Model::SpaceType.new(model)
-            foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeCrawl)
-            space_types_hash[Constants.SpaceTypeCrawl] = foundation_space_type
-          end
+          foundation_space_type = OpenStudio::Model::SpaceType.new(model)
+          foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeCrawl)
           foundation_space.setSpaceType(foundation_space_type)
         elsif foundation_type == "unfinished basement"
           foundation_space.setName("unfinished basement space")
           foundation_zone = OpenStudio::Model::ThermalZone.new(model)
           foundation_zone.setName("unfinished basement zone")
           foundation_space.setThermalZone(foundation_zone)
-          if space_types_hash.keys.include? Constants.SpaceTypeUnfinishedBasement
-            foundation_space_type = space_types_hash[Constants.SpaceTypeUnfinishedBasement]
-          else
-            foundation_space_type = OpenStudio::Model::SpaceType.new(model)
-            foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedBasement)
-            space_types_hash[Constants.SpaceTypeUnfinishedBasement] = foundation_space_type
-          end
+          foundation_space_type = OpenStudio::Model::SpaceType.new(model)
+          foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedBasement)
           foundation_space.setSpaceType(foundation_space_type)
         end
       end
@@ -729,18 +700,24 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     OpenStudio::Model.matchSurfaces(spaces)    
     
     if attic_type == "unfinished attic" and roof_type != Constants.RoofTypeFlat
-      attic_space = Geometry.make_one_space_from_multiple_spaces(model, attic_spaces)
+      if offset == 0
+        x *= num_units
+        if has_rear_units
+          x /= 2
+        end
+        attic_spaces.each do |attic_space|
+          attic_space.remove
+        end
+        attic_space = get_attic_space(model, x, y, wall_height, num_floors, roof_pitch, roof_type, has_rear_units)
+      else
+        attic_space = Geometry.make_one_space_from_multiple_spaces(model, attic_spaces)
+      end
       attic_space.setName("unfinished attic space")
       attic_zone = OpenStudio::Model::ThermalZone.new(model)
       attic_zone.setName("unfinished attic zone")
       attic_space.setThermalZone(attic_zone)
-      if space_types_hash.keys.include? Constants.SpaceTypeUnfinishedAttic
-        attic_space_type = space_types_hash[Constants.SpaceTypeUnfinishedAttic]
-      else
-        attic_space_type = OpenStudio::Model::SpaceType.new(model)
-        attic_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedAttic)
-        space_types_hash[Constants.SpaceTypeUnfinishedAttic] = attic_space_type
-      end
+      attic_space_type = OpenStudio::Model::SpaceType.new(model)
+      attic_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedAttic)
       attic_space.setSpaceType(attic_space_type)
     end
     
@@ -881,11 +858,16 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
 
   end
   
-  def get_attic_space(model, x, y, wall_height, num_floors, roof_pitch, roof_type)
-                    
+  def get_attic_space(model, x, y, wall_height, num_floors, roof_pitch, roof_type, has_rear_units=false)
+              
+    y_rear = 0
+    if has_rear_units
+      y_rear = y
+    end  
+              
     if y > 0
-      nw_point = OpenStudio::Point3d.new(0, 0, wall_height * num_floors)
-      ne_point = OpenStudio::Point3d.new(x, 0, wall_height * num_floors)
+      nw_point = OpenStudio::Point3d.new(0, y_rear, wall_height * num_floors)
+      ne_point = OpenStudio::Point3d.new(x, y_rear, wall_height * num_floors)
       sw_point = OpenStudio::Point3d.new(0, -y, wall_height * num_floors)
       se_point = OpenStudio::Point3d.new(x, -y, wall_height * num_floors)
     else
@@ -895,25 +877,25 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       se_point = OpenStudio::Point3d.new(x, 0, wall_height * num_floors)    
     end
     attic_polygon = Geometry.make_polygon(sw_point, nw_point, ne_point, se_point)
-    if y.abs >= x
+    if y.abs + y_rear >= x
       attic_height = (x / 2.0) * roof_pitch
     else
-      attic_height = (y.abs / 2.0) * roof_pitch
+      attic_height = ((y.abs + y_rear) / 2.0) * roof_pitch
     end    
     
     side_type = nil
     if roof_type == Constants.RoofTypeGable
       if y > 0
-        if x <= y
-          roof_n_point = OpenStudio::Point3d.new(x / 2.0, 0, wall_height * num_floors + attic_height)
+        if x <= (y + y_rear)
+          roof_n_point = OpenStudio::Point3d.new(x / 2.0, y_rear, wall_height * num_floors + attic_height)
           roof_s_point = OpenStudio::Point3d.new(x / 2.0, -y, wall_height * num_floors + attic_height)
           polygon_w_roof = Geometry.make_polygon(roof_n_point, nw_point, sw_point, roof_s_point)
           polygon_e_roof = Geometry.make_polygon(roof_s_point, se_point, ne_point, roof_n_point)
           polygon_s_wall = Geometry.make_polygon(roof_s_point, sw_point, se_point)
           polygon_n_wall = Geometry.make_polygon(roof_n_point, ne_point, nw_point)
         else
-          roof_w_point = OpenStudio::Point3d.new(0, -y / 2.0, wall_height * num_floors + attic_height)
-          roof_e_point = OpenStudio::Point3d.new(x, -y / 2.0, wall_height * num_floors + attic_height)
+          roof_w_point = OpenStudio::Point3d.new(0, (y_rear - y) / 2.0, wall_height * num_floors + attic_height)
+          roof_e_point = OpenStudio::Point3d.new(x, (y_rear - y) / 2.0, wall_height * num_floors + attic_height)
           polygon_w_roof = Geometry.make_polygon(roof_w_point, roof_e_point, ne_point, nw_point)
           polygon_e_roof = Geometry.make_polygon(roof_e_point, roof_w_point, sw_point, se_point)
           polygon_s_wall = Geometry.make_polygon(roof_w_point, nw_point, sw_point)
@@ -939,16 +921,16 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       side_type = "Wall"
     elsif roof_type == Constants.RoofTypeHip
       if y > 0
-        if x <= y
-          roof_n_point = OpenStudio::Point3d.new(x / 2.0, -x / 2.0, wall_height * num_floors + attic_height)
+        if x <= (y + y_rear)
+          roof_n_point = OpenStudio::Point3d.new(x / 2.0, y_rear - x / 2.0, wall_height * num_floors + attic_height)
           roof_s_point = OpenStudio::Point3d.new(x / 2.0, -y + x / 2.0, wall_height * num_floors + attic_height)
           polygon_w_roof = Geometry.make_polygon(roof_n_point, nw_point, sw_point, roof_s_point)
           polygon_e_roof = Geometry.make_polygon(roof_s_point, se_point, ne_point, roof_n_point)
           polygon_s_wall = Geometry.make_polygon(roof_s_point, sw_point, se_point)
           polygon_n_wall = Geometry.make_polygon(roof_n_point, ne_point, nw_point)
         else
-          roof_w_point = OpenStudio::Point3d.new(y / 2.0, -y / 2.0, wall_height * num_floors + attic_height)
-          roof_e_point = OpenStudio::Point3d.new(x - y / 2.0, -y / 2.0, wall_height * num_floors + attic_height)
+          roof_w_point = OpenStudio::Point3d.new((y + y_rear) / 2.0, (y_rear - y) / 2.0, wall_height * num_floors + attic_height)
+          roof_e_point = OpenStudio::Point3d.new(x - (y + y_rear) / 2.0, (y_rear - y) / 2.0, wall_height * num_floors + attic_height)
           polygon_w_roof = Geometry.make_polygon(roof_w_point, sw_point, se_point, roof_e_point)
           polygon_e_roof = Geometry.make_polygon(roof_e_point, ne_point, nw_point, roof_w_point)
           polygon_s_wall = Geometry.make_polygon(roof_e_point, se_point, ne_point)
