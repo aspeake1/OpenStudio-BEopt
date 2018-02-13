@@ -36,3 +36,5 @@ gem 'parallel'
 gem 'rubyzip'
 
 gem 'ruby-prof'
+
+gem 'openstudio-standards', '~> 0.1.15'
