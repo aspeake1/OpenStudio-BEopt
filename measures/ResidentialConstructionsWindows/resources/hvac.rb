@@ -607,6 +607,16 @@ class HVAC
       return nil
     end
 
+    def self.get_central_ptac(model, runner, thermal_zone)
+      # Returns the central PTAC if available
+      model.getZoneHVACPackagedTerminalAirConditioners.each do |ptac|
+        next unless thermal_zone.handle.to_s == ptac.thermalZone.get.handle.to_s
+        next unless ptac.heatingCoil.to_CoilHeatingWater.is_initialized
+        return ptac
+      end
+      return nil
+    end
+
     # Has Equipment methods
 
     def self.has_central_ac(model, runner, thermal_zone)
@@ -721,7 +731,7 @@ class HVAC
     end
 
     def self.has_central_ptac(model, runner, thermal_zone)
-      ptac = self.get_ptac(model, runner, thermal_zone)
+      ptac = self.get_central_ptac(model, runner, thermal_zone)
       if not ptac.nil?
         return true
       end
