@@ -37,4 +37,9 @@ gem 'rubyzip'
 
 gem 'ruby-prof'
 
-gem 'openstudio-standards', '~> 0.1.15'
+gem 'openstudio-standards', :git => 'git://github.com/NREL/openstudio-standards.git', :branch => 'master'
+gem 'aes', '~> 0.5.0'
+gem 'geocoder', '~> 1.4.4'
+gem 'highline'
+gem 'launchy'
+gem 'win32console'
