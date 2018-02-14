@@ -36,35 +36,105 @@ class ProcessCentralSystemTest < MiniTest::Test
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
 
-  def test_multifamily_central_system_inferred_hydronic
+  def test_single_family_attached_central_system_ptac
     num_zones = 8
     args_hash = {}
-    args_hash["htg_src"] = "Electricity"
-    args_hash["delivery_type"] = "hydronic"
+    args_hash["system_type"] = "PTAC"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"PlantLoop"=>1, "PumpConstantSpeed"=>1, "EnergyManagementSystemSensor"=>1, "EnergyManagementSystemActuator"=>2, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1, "CoilHeatingElectric"=>num_zones, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_zones, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_zones, "FanOnOff"=>num_zones*3, "ZoneHVACWaterToAirHeatPump"=>num_zones, "HeatExchangerAirToAirSensibleAndLatent"=>num_zones, "ZoneHVACEnergyRecoveryVentilatorController"=>num_zones, "ZoneHVACEnergyRecoveryVentilator"=>num_zones}
-    expected_values = {}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
-  end
-
-  def test_single_family_attached_central_system
-    num_zones = 8
-    args_hash = {}
-    args_hash["system_type"] = "PSZ-AC"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVAC"=>num_zones, "SetpointManagerSingleZoneReheat"=>num_zones, "FanConstantVolume"=>num_zones, "CoilHeatingGas"=>num_zones, "CoilHeatingElectric"=>num_zones, "CoilCoolingDXSingleSpeed"=>num_zones, "ControllerOutdoorAir"=>num_zones, "ControllerMechanicalVentilation"=>num_zones, "AirLoopHVACOutdoorAirSystem"=>num_zones, "AvailabilityManagerNightCycle"=>num_zones, "AirTerminalSingleDuctUncontrolled"=>num_zones}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "FanConstantVolume"=>num_zones, "CoilHeatingWater"=>num_zones, "ControllerWaterCoil"=>num_zones, "CoilCoolingDXSingleSpeed"=>num_zones, "ZoneHVACPackagedTerminalAirConditioner"=>num_zones}
     expected_values = {}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
 
-  def test_multifamily_central_system
+  def test_single_family_attached_central_system_ptac_elec
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "PTAC"
+    args_hash["htg_src"] = "Electricity"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"FanConstantVolume"=>num_zones, "CoilHeatingElectric"=>num_zones, "CoilCoolingDXSingleSpeed"=>num_zones, "ZoneHVACPackagedTerminalAirConditioner"=>num_zones}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_single_family_attached_central_system_pthp
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "PTHP"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ZoneHVACPackagedTerminalHeatPump"=>num_zones, "FanConstantVolume"=>num_zones, "CoilHeatingDXSingleSpeed"=>num_zones, "CoilCoolingDXSingleSpeed"=>num_zones, "CoilHeatingElectric"=>num_zones}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_single_family_attached_central_system_fan_coil
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "Fan Coil"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_zones, "CoilCoolingWater"=>num_zones, "CoilHeatingWater"=>num_zones, "FanOnOff"=>num_zones, "ZoneHVACFourPipeFanCoil"=>num_zones}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_single_family_attached_central_system_baseboards
     num_zones = 8
     args_hash = {}
     args_hash["system_type"] = "Baseboards"
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_zones, "ZoneHVACBaseboardConvectiveWater"=>num_zones}
     expected_values = {}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_single_family_attached_central_system_baseboards
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "Baseboards"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_zones, "ZoneHVACBaseboardConvectiveWater"=>num_zones}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_single_family_attached_central_system_unit_heaters
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "Unit Heaters"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"FanConstantVolume"=>num_zones, "CoilHeatingGas"=>num_zones, "ZoneHVACUnitHeater"=>num_zones}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_single_family_attached_central_system_water_source_heat_pumps_with_ervs
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "Water Source Heat Pumps with ERVs"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "SetpointManagerScheduledDualSetpoint"=>2, "PumpConstantSpeed"=>1, "EvaporativeFluidCoolerSingleSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingElectric"=>num_zones, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_zones, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_zones, "FanOnOff"=>3*num_zones, "ZoneHVACWaterToAirHeatPump"=>num_zones, "ZoneHVACEnergyRecoveryVentilatorController"=>num_zones, "HeatExchangerAirToAirSensibleAndLatent"=>num_zones, "ZoneHVACEnergyRecoveryVentilator"=>num_zones}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_single_family_attached_central_system_ground_source_heat_pumps_with_ervs
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "Ground Source Heat Pumps with ERVs"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpConstantSpeed"=>1, "CoilHeatingElectric"=>num_zones, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_zones, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_zones, "FanOnOff"=>3*num_zones, "ZoneHVACWaterToAirHeatPump"=>num_zones, "ZoneHVACEnergyRecoveryVentilatorController"=>num_zones, "HeatExchangerAirToAirSensibleAndLatent"=>num_zones, "ZoneHVACEnergyRecoveryVentilator"=>num_zones, "EnergyManagementSystemSensor"=>1, "EnergyManagementSystemActuator"=>2, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_single_family_attached_central_system_fan_coil_with_ervs
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "Fan Coil with ERVs"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ControllerWaterCoil"=>2*num_zones, "PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "CoilHeatingWater"=>num_zones, "CoilCoolingWater"=>num_zones, "FanOnOff"=>3*num_zones, "ZoneHVACFourPipeFanCoil"=>num_zones, "ZoneHVACEnergyRecoveryVentilatorController"=>num_zones, "HeatExchangerAirToAirSensibleAndLatent"=>num_zones, "ZoneHVACEnergyRecoveryVentilator"=>num_zones}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
 
   private
@@ -104,8 +174,8 @@ class ProcessCentralSystemTest < MiniTest::Test
     result = runner.result
 
     # save the model to test output directory
-    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
-    # model.save(output_file_path, true)
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    model.save(output_file_path, true)
 
     # show_output(result)
 
@@ -118,7 +188,10 @@ class ProcessCentralSystemTest < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["CurveQuadratic", "CurveBiquadratic", "CurveExponent", "CurveCubic", "PipeAdiabatic", "ScheduleTypeLimits", "ScheduleDay", "AvailabilityManagerAssignmentList", "ConnectorMixer", "ConnectorSplitter", "Node", "SizingPlant", "ScheduleConstant", "PlantComponentTemperatureSource", "SizingSystem", "AirLoopHVACZoneSplitter", "AirLoopHVACZoneMixer", "ModelObjectList", "ScheduleRuleset", "SetpointManagerScheduled"]
+    obj_type_exclusions = ["CurveQuadratic", "CurveBiquadratic", "CurveExponent", "CurveCubic", "PipeAdiabatic", "ScheduleTypeLimits", "ScheduleDay",\
+                           "AvailabilityManagerAssignmentList", "ConnectorMixer", "ConnectorSplitter", "Node", "SizingPlant", "ScheduleConstant",\
+                           "PlantComponentTemperatureSource", "SizingSystem", "AirLoopHVACZoneSplitter", "AirLoopHVACZoneMixer", "ModelObjectList",\
+                           "ScheduleRuleset", "SetpointManagerScheduled", "CoilCoolingDXVariableSpeedSpeedData", "AvailabilityManagerNightCycle"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 
