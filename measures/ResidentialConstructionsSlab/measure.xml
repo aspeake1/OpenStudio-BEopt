@@ -2,16 +2,16 @@
   <schema_version>3.0</schema_version>
   <name>process_constructions_slab</name>
   <uid>4fd36916-5b69-43d2-a7bb-e7fad34508db</uid>
-  <version_id>2ed5d16c-1a34-4107-8535-915ce2291dc0</version_id>
-  <version_modified>20180209T214034Z</version_modified>
+  <version_id>dfe87da6-48ac-42a0-a0fd-5834d1ccf289</version_id>
+  <version_modified>20180217T014049Z</version_modified>
   <xml_checksum>1E963D9C</xml_checksum>
   <class_name>ProcessConstructionsSlab</class_name>
   <display_name>Set Residential Slab Construction</display_name>
   <description>This measure assigns a construction to slabs. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Calculates and assigns material layer properties of slab constructions for floors between above-grade finished space and the ground.</modeler_description>
+  <modeler_description>Calculates and assigns material layer properties of slab constructions of finished spaces. Any existing constructions for these surfaces will be removed.</modeler_description>
   <arguments>
     <argument>
-      <name>perim_r</name>
+      <name>perimeter_r</name>
       <display_name>Perimeter Insulation Nominal R-value</display_name>
       <description>Perimeter insulation is placed horizontally below the perimeter of the slab.</description>
       <type>Double</type>
@@ -21,7 +21,7 @@
       <default_value>0</default_value>
     </argument>
     <argument>
-      <name>perim_width</name>
+      <name>perimeter_width</name>
       <display_name>Perimeter Insulation Width</display_name>
       <description>The distance from the perimeter of the house where the perimeter insulation ends.</description>
       <type>Double</type>
@@ -51,7 +51,7 @@
       <default_value>0</default_value>
     </argument>
     <argument>
-      <name>ext_r</name>
+      <name>exterior_r</name>
       <display_name>Exterior Insulation Nominal R-value</display_name>
       <description>Exterior insulation is placed vertically on the exterior of the foundation wall.</description>
       <type>Double</type>
@@ -61,7 +61,7 @@
       <default_value>0</default_value>
     </argument>
     <argument>
-      <name>ext_depth</name>
+      <name>exterior_depth</name>
       <display_name>Exterior Insulation Depth</display_name>
       <description>The depth of the exterior foundation insulation.</description>
       <type>Double</type>
@@ -69,56 +69,6 @@
       <required>true</required>
       <model_dependent>false</model_dependent>
       <default_value>0</default_value>
-    </argument>
-    <argument>
-      <name>mass_thick_in</name>
-      <display_name>Mass Thickness</display_name>
-      <description>Thickness of the slab foundation mass.</description>
-      <type>Double</type>
-      <units>in</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>4</default_value>
-    </argument>
-    <argument>
-      <name>mass_conductivity</name>
-      <display_name>Mass Conductivity</display_name>
-      <description>Conductivity of the slab foundation mass.</description>
-      <type>Double</type>
-      <units>Btu-in/h-ft^2-R</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>9.1</default_value>
-    </argument>
-    <argument>
-      <name>mass_density</name>
-      <display_name>Mass Density</display_name>
-      <description>Density of the slab foundation mass.</description>
-      <type>Double</type>
-      <units>lb/ft^3</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>140</default_value>
-    </argument>
-    <argument>
-      <name>mass_specific_heat</name>
-      <display_name>Mass Specific Heat</display_name>
-      <description>Specific heat of the slab foundation mass.</description>
-      <type>Double</type>
-      <units>Btu/lb-R</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>0.2</default_value>
-    </argument>
-    <argument>
-      <name>exposed_perim</name>
-      <display_name>Exposed Perimeter</display_name>
-      <description>Total length of the slab's perimeter that is on the exterior of the building's footprint.</description>
-      <type>String</type>
-      <units>ft</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>auto</default_value>
     </argument>
   </arguments>
   <outputs/>
@@ -140,72 +90,6 @@
   </attributes>
   <files>
     <file>
-      <filename>SFD_2000sqft_2story_UB_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>8582F1A0</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_UB_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>B53AFD21</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_PB_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>0BF85167</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_GRG_UA_Windows_Doors.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>451934AA</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>346001F1</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>7702DB6D</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>782A5F97</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_CS_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>9FD99008</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_CS_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>3A3ED0AC</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>6843B59F</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>00369AB2</checksum>
-    </file>
-    <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -218,16 +102,28 @@
       <checksum>B37E7F24</checksum>
     </file>
     <file>
-      <filename>Slab_Test.rb</filename>
+      <filename>materials.rb</filename>
       <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>4C8B0B6D</checksum>
+      <usage_type>resource</usage_type>
+      <checksum>D5E9964F</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>73DEEBFE</checksum>
+      <checksum>D636DB8B</checksum>
+    </file>
+    <file>
+      <filename>Slab_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>6D3538EA</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>B8962888</checksum>
     </file>
     <file>
       <version>
@@ -238,19 +134,19 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>2795045E</checksum>
+      <checksum>EB3391F5</checksum>
     </file>
     <file>
       <filename>constructions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>2E8CE294</checksum>
+      <checksum>0190F500</checksum>
     </file>
     <file>
-      <filename>materials.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>ADC77BC1</checksum>
+      <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>F136D73D</checksum>
     </file>
   </files>
 </measure>

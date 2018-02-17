@@ -19,7 +19,7 @@ class ProcessConstructionsSlab < OpenStudio::Measure::ModelMeasure
   end
   
   def modeler_description
-    return "Calculates and assigns material layer properties of slab constructions for floors between above-grade finished space and the ground."
+    return "Calculates and assigns material layer properties of slab constructions of finished spaces. Any existing constructions for these surfaces will be removed."
   end  
   
   #define the arguments that the user will input
@@ -27,20 +27,20 @@ class ProcessConstructionsSlab < OpenStudio::Measure::ModelMeasure
     args = OpenStudio::Measure::OSArgumentVector.new
 
     #make a double argument for slab perimeter insulation R-value
-    perim_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("perim_r", true)
-    perim_r.setDisplayName("Perimeter Insulation Nominal R-value")
-    perim_r.setUnits("hr-ft^2-R/Btu")
-    perim_r.setDescription("Perimeter insulation is placed horizontally below the perimeter of the slab.")
-    perim_r.setDefaultValue(0.0)
-    args << perim_r
+    perimeter_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("perimeter_r", true)
+    perimeter_r.setDisplayName("Perimeter Insulation Nominal R-value")
+    perimeter_r.setUnits("hr-ft^2-R/Btu")
+    perimeter_r.setDescription("Perimeter insulation is placed horizontally below the perimeter of the slab.")
+    perimeter_r.setDefaultValue(0.0)
+    args << perimeter_r
     
     #make a double argument for slab perimeter insulation width
-    perim_width = OpenStudio::Measure::OSArgument::makeDoubleArgument("perim_width", true)
-    perim_width.setDisplayName("Perimeter Insulation Width")
-    perim_width.setUnits("ft")
-    perim_width.setDescription("The distance from the perimeter of the house where the perimeter insulation ends.")
-    perim_width.setDefaultValue(0.0)
-    args << perim_width
+    perimeter_width = OpenStudio::Measure::OSArgument::makeDoubleArgument("perimeter_width", true)
+    perimeter_width.setDisplayName("Perimeter Insulation Width")
+    perimeter_width.setUnits("ft")
+    perimeter_width.setDescription("The distance from the perimeter of the house where the perimeter insulation ends.")
+    perimeter_width.setDefaultValue(0.0)
+    args << perimeter_width
 
     #make a double argument for whole slab insulation R-value
     whole_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("whole_r", true)
@@ -59,61 +59,21 @@ class ProcessConstructionsSlab < OpenStudio::Measure::ModelMeasure
     args << gap_r
 
     #make a double argument for slab exterior insulation R-value
-    ext_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("ext_r", true)
-    ext_r.setDisplayName("Exterior Insulation Nominal R-value")
-    ext_r.setUnits("hr-ft^2-R/Btu")
-    ext_r.setDescription("Exterior insulation is placed vertically on the exterior of the foundation wall.")
-    ext_r.setDefaultValue(0.0)
-    args << ext_r
+    exterior_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("exterior_r", true)
+    exterior_r.setDisplayName("Exterior Insulation Nominal R-value")
+    exterior_r.setUnits("hr-ft^2-R/Btu")
+    exterior_r.setDescription("Exterior insulation is placed vertically on the exterior of the foundation wall.")
+    exterior_r.setDefaultValue(0.0)
+    args << exterior_r
     
     #make a double argument for slab exterior insulation depth
-    ext_depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("ext_depth", true)
-    ext_depth.setDisplayName("Exterior Insulation Depth")
-    ext_depth.setUnits("ft")
-    ext_depth.setDescription("The depth of the exterior foundation insulation.")
-    ext_depth.setDefaultValue(0.0)
-    args << ext_depth
+    exterior_depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("exterior_depth", true)
+    exterior_depth.setDisplayName("Exterior Insulation Depth")
+    exterior_depth.setUnits("ft")
+    exterior_depth.setDescription("The depth of the exterior foundation insulation.")
+    exterior_depth.setDefaultValue(0.0)
+    args << exterior_depth
 
-    #make a double argument for slab mass thickness
-    mass_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("mass_thick_in", true)
-    mass_thick_in.setDisplayName("Mass Thickness")
-    mass_thick_in.setUnits("in")
-    mass_thick_in.setDescription("Thickness of the slab foundation mass.")
-    mass_thick_in.setDefaultValue(4.0)
-    args << mass_thick_in
-    
-    #make a double argument for slab mass conductivity
-    mass_cond = OpenStudio::Measure::OSArgument::makeDoubleArgument("mass_conductivity", true)
-    mass_cond.setDisplayName("Mass Conductivity")
-    mass_cond.setUnits("Btu-in/h-ft^2-R")
-    mass_cond.setDescription("Conductivity of the slab foundation mass.")
-    mass_cond.setDefaultValue(9.1)
-    args << mass_cond
-
-    #make a double argument for slab mass density
-    mass_dens = OpenStudio::Measure::OSArgument::makeDoubleArgument("mass_density", true)
-    mass_dens.setDisplayName("Mass Density")
-    mass_dens.setUnits("lb/ft^3")
-    mass_dens.setDescription("Density of the slab foundation mass.")
-    mass_dens.setDefaultValue(140.0)
-    args << mass_dens
-
-    #make a double argument for slab mass specific heat
-    mass_specheat = OpenStudio::Measure::OSArgument::makeDoubleArgument("mass_specific_heat", true)
-    mass_specheat.setDisplayName("Mass Specific Heat")
-    mass_specheat.setUnits("Btu/lb-R")
-    mass_specheat.setDescription("Specific heat of the slab foundation mass.")
-    mass_specheat.setDefaultValue(0.2)
-    args << mass_specheat
-    
-    #make a string argument for exposed perimeter
-    exposed_perim = OpenStudio::Measure::OSArgument::makeStringArgument("exposed_perim", true)
-    exposed_perim.setDisplayName("Exposed Perimeter")
-    exposed_perim.setUnits("ft")
-    exposed_perim.setDescription("Total length of the slab's perimeter that is on the exterior of the building's footprint.")
-    exposed_perim.setDefaultValue(Constants.Auto)
-    args << exposed_perim
-    
     return args
   end #end the arguments method
 
@@ -126,143 +86,35 @@ class ProcessConstructionsSlab < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    surfaces = get_slab_floor_surfaces(model)
-    
-    spaces = []
-    surfaces.each do |surface|
-      space = surface.space.get
-      if not spaces.include? space
-          # Floors between above-grade finished space and ground
-          spaces << space
-      end
-    end
-  
-    # Continue if no applicable surfaces
-    if surfaces.empty?
-      runner.registerAsNotApplicable("Measure not applied because no applicable surfaces were found.")
-      return true
-    end
+    floors_by_type = SurfaceTypes.get_floors(model, runner)
 
     # Get Inputs
-    slabPerimeterRvalue = runner.getDoubleArgumentValue("perim_r",user_arguments)
-    slabPerimeterInsWidth = runner.getDoubleArgumentValue("perim_width",user_arguments)
-    slabWholeInsRvalue = runner.getDoubleArgumentValue("whole_r",user_arguments)
-    slabGapRvalue = runner.getDoubleArgumentValue("gap_r",user_arguments)
-    slabExtRvalue = runner.getDoubleArgumentValue("ext_r",user_arguments)
-    slabExtInsDepth = runner.getDoubleArgumentValue("ext_depth",user_arguments)
-    slabMassThickIn = runner.getDoubleArgumentValue("mass_thick_in",user_arguments)
-    slabMassCond = runner.getDoubleArgumentValue("mass_conductivity",user_arguments)
-    slabMassDens = runner.getDoubleArgumentValue("mass_density",user_arguments)
-    slabMassSpecHeat = runner.getDoubleArgumentValue("mass_specific_heat",user_arguments)
-    exposed_perim = runner.getStringArgumentValue("exposed_perim",user_arguments)
+    perimeter_r = runner.getDoubleArgumentValue("perimeter_r",user_arguments)
+    perimeter_width = runner.getDoubleArgumentValue("perimeter_width",user_arguments)
+    whole_r = runner.getDoubleArgumentValue("whole_r",user_arguments)
+    gap_r = runner.getDoubleArgumentValue("gap_r",user_arguments)
+    exterior_r = runner.getDoubleArgumentValue("exterior_r",user_arguments)
+    exterior_depth = runner.getDoubleArgumentValue("exterior_depth",user_arguments)
 
-    # Validate Inputs
-    if slabPerimeterRvalue < 0.0
-        runner.registerError("Perimeter Insulation Nominal R-value must be greater than or equal to 0.")
-        return false    
-    end
-    if slabPerimeterInsWidth < 0.0
-        runner.registerError("Perimeter Insulation Width must be greater than or equal to 0.")
-        return false    
-    end
-    if slabWholeInsRvalue < 0.0
-        runner.registerError("Whole Slab Insulation Nominal R-value must be greater than or equal to 0.")
-        return false    
-    end
-    if slabGapRvalue < 0.0
-        runner.registerError("Gap Insulation Nominal R-value must be greater than or equal to 0.")
-        return false    
-    end
-    if slabExtRvalue < 0.0
-        runner.registerError("Exterior Insulation Nominal R-value must be greater than or equal to 0.")
-        return false    
-    end
-    if slabExtInsDepth < 0.0
-        runner.registerError("Exterior Insulation Depth must be greater than or equal to 0.")
-        return false    
-    end
-    if slabMassThickIn <= 0.0
-        runner.registerError("Mass Thickness must be greater than 0.")
-        return false    
-    end
-    if slabMassCond <= 0.0
-        runner.registerError("Mass Conductivity must be greater than 0.")
-        return false    
-    end
-    if slabMassDens <= 0.0
-        runner.registerError("Mass Density must be greater than 0.")
-        return false    
-    end
-    if slabMassSpecHeat <= 0.0
-        runner.registerError("Mass Specific Heat must be greater than 0.")
-        return false    
-    end
-    if (slabPerimeterRvalue == 0.0 and slabPerimeterInsWidth != 0.0) or (slabPerimeterRvalue != 0.0 and slabPerimeterInsWidth == 0.0)
-        runner.registerError("Perimeter insulation does not have both properties (R-value and Width) entered.")
-        return false    
-    end
-    if (slabExtRvalue == 0.0 and slabExtInsDepth != 0.0) or (slabExtRvalue != 0.0 and slabExtInsDepth == 0.0)
-        runner.registerError("Exterior insulation does not have both properties (R-value and Depth) entered.")
-        return false    
-    end
-    if ((slabPerimeterRvalue > 0.0 and slabWholeInsRvalue > 0.0) or
-        (slabPerimeterRvalue > 0.0 and slabExtRvalue > 0.0) or 
-        (slabWholeInsRvalue > 0.0 and slabExtRvalue > 0.0) or 
-        (slabExtRvalue > 0.0 and slabGapRvalue > 0.0) or
-        (slabGapRvalue > 0.0 and slabPerimeterRvalue == 0 and slabWholeInsRvalue == 0 and slabExtRvalue == 0))
-        runner.registerError("Invalid insulation configuration. The only valid configurations are: Exterior, Perimeter+Gap, Whole+Gap, Perimeter, or Whole.")
-        return false    
-    end
-    if exposed_perim != Constants.Auto and (not MathTools.valid_float?(exposed_perim) or exposed_perim.to_f < 0)
-        runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
-        return false
-    end
-    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner).size > 1
-        runner.registerError("Exposed Perimeter must be #{Constants.Auto} for a multifamily building.")
-        return false
-    end
-    
-    # Define materials
-    mat_whole_ins = nil
-    if slabWholeInsRvalue > 0
-        thick_in = slabWholeInsRvalue*BaseMaterial.InsulationRigid.k_in
-        mat_whole_ins = Material.new(name='WholeSlabIns', thick_in=thick_in, mat_base=BaseMaterial.InsulationRigid)
-    end
-    mat_slab = Material.new(name='SlabMass', thick_in=slabMassThickIn, mat_base=nil, k_in=slabMassCond, rho=slabMassDens, cp=slabMassSpecHeat)
-    
-    # Define construction
-    slab = Construction.new("Slab", [1.0])
-    if not mat_whole_ins.nil?
-        slab.add_layer(mat_whole_ins, true)
-    end
-    slab.add_layer(mat_slab, true)
-    
-    # Create and assign construction to surfaces
-    if not slab.create_and_assign_constructions(surfaces, runner, model)
-        return false
-    end
-
-    # Create Kiva foundation
-    slabMassThick = UnitConversions.convert(slabMassThickIn, "in", "ft")
-    foundation = Kiva.create_slab_foundation(model, slabPerimeterRvalue, slabPerimeterInsWidth, 
-                                                    slabGapRvalue, slabMassThick, 
-                                                    slabExtRvalue, slabExtInsDepth)
-                                                    
-    # Assign surfaces to Kiva foundation
-    surfaces.each do |surface|
-        if exposed_perim == Constants.Auto
-            surfaceExtPerimeter = Geometry.calculate_exposed_perimeter(model, [surface])
-        else
-            surfaceExtPerimeter = exposed_perim.to_f
+    # Apply constructions
+    floors_by_type[Constants.SurfaceTypeFloorFndGrndFinSlab].each do |floor_surface|
+        if not FoundationConstructions.apply_slab(runner, model, 
+                                                  floor_surface,
+                                                  Constants.SurfaceTypeFloorFndGrndFinSlab,
+                                                  perimeter_r, perimeter_width,
+                                                  gap_r, exterior_r, exterior_depth,
+                                                  whole_r, 4.0, false, nil, nil)
+            return false
         end
-        
-        if surfaceExtPerimeter <= 0
-          runner.registerError("Calculated an exposed perimeter <= 0 for surface '#{floor_surface.name.to_s}'.")
-          return false
-        end
+    end
     
-        surface.setAdjacentFoundation(foundation)
-        surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(surfaceExtPerimeter,"ft","m"))
+    floors_by_type[Constants.SurfaceTypeFloorFndGrndUnfinSlab].each do |surface|
+        if not FoundationConstructions.apply_slab(runner, model, 
+                                                  surface,
+                                                  Constants.SurfaceTypeFloorFndGrndUnfinSlab,
+                                                  0, 0, 0, 0, 0, 0, 4.0, false, nil, nil)
+            return false
+        end
     end
     
     # FIXME: Remove soon
@@ -270,19 +122,16 @@ class ProcessConstructionsSlab < OpenStudio::Measure::ModelMeasure
     # ==================================
     
     # Get geometry values
+    surfaces = floors_by_type[Constants.SurfaceTypeFloorFndGrndFinSlab]
     slabArea = Geometry.calculate_total_area_from_surfaces(surfaces)
 
     # Define materials
-    slabCarpetPerimeterConduction, slabBarePerimeterConduction = SlabPerimeterConductancesByType(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabExtRvalue, slabWholeInsRvalue, slabExtInsDepth)
+    slabCarpetPerimeterConduction, slabBarePerimeterConduction = SlabPerimeterConductancesByType(perimeter_r, gap_r, perimeter_width, exterior_r, whole_r, exterior_depth)
     carpetFloorFraction = Material.CoveringBare.rvalue/Material.CoveringBare(floorFraction=1.0).rvalue
     slab_perimeter_conduction = slabCarpetPerimeterConduction * carpetFloorFraction + slabBarePerimeterConduction * (1 - carpetFloorFraction)
 
     surfaces.each do |surface|
-        if exposed_perim == Constants.Auto
-            slabExtPerimeter = Geometry.calculate_exposed_perimeter(model, [surface])
-        else
-            slabExtPerimeter = exposed_perim.to_f
-        end
+        slabExtPerimeter = Geometry.calculate_exposed_perimeter(model, [surface])
         
         if slabExtPerimeter > 0
             effective_slab_Rvalue = slabArea / (slabExtPerimeter * slab_perimeter_conduction)
@@ -305,19 +154,19 @@ class ProcessConstructionsSlab < OpenStudio::Measure::ModelMeasure
  
   end #end the run method
 
-  def SlabPerimeterConductancesByType(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabExtRvalue, slabWholeInsRvalue, slabExtInsDepth)
+  def SlabPerimeterConductancesByType(perimeter_r, gap_r, perimeter_width, exterior_r, whole_r, exterior_depth)
     slabWidth = 28 # Width (shorter dimension) of slab, feet, to match Winkelmann analysis.
     slabLength = 55 # Longer dimension of slab, feet, to match Winkelmann analysis.
     soilConductivity = 1
-    if slabPerimeterRvalue > 0
-        slabCarpetPerimeterConduction = PerimeterSlabInsulation(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabWidth, slabLength, 1, soilConductivity)
-        slabBarePerimeterConduction = PerimeterSlabInsulation(slabPerimeterRvalue, slabGapRvalue, slabPerimeterInsWidth, slabWidth, slabLength, 0, soilConductivity)
-    elsif slabExtRvalue > 0
-        slabCarpetPerimeterConduction = ExteriorSlabInsulation(slabExtInsDepth, slabExtRvalue, 1)
-        slabBarePerimeterConduction = ExteriorSlabInsulation(slabExtInsDepth, slabExtRvalue, 0)
-    elsif slabWholeInsRvalue > 0
-        slabCarpetPerimeterConduction = FullSlabInsulation(slabWholeInsRvalue, slabGapRvalue, slabWidth, slabLength, 1, soilConductivity)
-        slabBarePerimeterConduction = FullSlabInsulation(slabWholeInsRvalue, slabGapRvalue, slabWidth, slabLength, 0, soilConductivity)
+    if perimeter_r > 0
+        slabCarpetPerimeterConduction = PerimeterSlabInsulation(perimeter_r, gap_r, perimeter_width, slabWidth, slabLength, 1, soilConductivity)
+        slabBarePerimeterConduction = PerimeterSlabInsulation(perimeter_r, gap_r, perimeter_width, slabWidth, slabLength, 0, soilConductivity)
+    elsif exterior_r > 0
+        slabCarpetPerimeterConduction = ExteriorSlabInsulation(exterior_depth, exterior_r, 1)
+        slabBarePerimeterConduction = ExteriorSlabInsulation(exterior_depth, exterior_r, 0)
+    elsif whole_r > 0
+        slabCarpetPerimeterConduction = FullSlabInsulation(whole_r, gap_r, slabWidth, slabLength, 1, soilConductivity)
+        slabBarePerimeterConduction = FullSlabInsulation(whole_r, gap_r, slabWidth, slabLength, 0, soilConductivity)
     else
         slabCarpetPerimeterConduction = FullSlabInsulation(0, 0, slabWidth, slabLength, 1, soilConductivity)
         slabBarePerimeterConduction = FullSlabInsulation(0, 0, slabWidth, slabLength, 0, soilConductivity)
@@ -431,20 +280,6 @@ class ProcessConstructionsSlab < OpenStudio::Measure::ModelMeasure
     end
     perimeterConductance = a / (b + rvalue ** e1 * depth ** e2) 
     return perimeterConductance
-  end
-  
-  def get_slab_floor_surfaces(model)
-    surfaces = []
-    model.getSpaces.each do |space|
-        next if Geometry.space_is_unfinished(space)
-        next if Geometry.space_is_below_grade(space)
-        space.surfaces.each do |surface|
-            next if surface.surfaceType.downcase != "floor"
-            next if surface.outsideBoundaryCondition.downcase != "foundation"
-            surfaces << surface
-        end
-    end
-    return surfaces
   end
   
 end #end the measure

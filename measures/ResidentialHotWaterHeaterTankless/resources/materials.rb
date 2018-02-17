@@ -168,14 +168,10 @@ class Material
         return self.new(name="Floor Covering", thick_in=thickness, mat_base=nil, k_in=thickness / (rvalue * floorFraction), rho=3.4, cp=0.32, tAbs=0.9, sAbs=0.9)
     end
 
-    def self.Concrete8in
-        return self.new(name="Concrete 8 in.", thick_in=8, mat_base=BaseMaterial.Concrete, k_in=nil, rho=nil, cp=nil, tAbs=0.9)
+    def self.Concrete(thick_in)
+        return self.new(name="Concrete 8 in.", thick_in=thick_in, mat_base=BaseMaterial.Concrete, k_in=nil, rho=nil, cp=nil, tAbs=0.9)
     end
 
-    def self.Concrete4in
-        return self.new(name="Concrete 4 in.", thick_in=4, mat_base=BaseMaterial.Concrete, k_in=nil, rho=nil, cp=nil, tAbs=0.9)
-    end
-    
     def self.ExtFinishStuccoMedDark
         return self.new(name="Stucco, Medium/Dark", thick_in=1.0, mat_base=nil, k_in=4.5, rho=80.0, cp=0.21, tAbs=0.9, sAbs=0.75, vAbs=0.75)
     end
@@ -218,6 +214,10 @@ class Material
     
     def self.ExtFinishFiberCementMedDark
         return self.new(name="Fiber-Cement, Medium/Dark", thick_in=0.375, mat_base=nil, k_in=1.79, rho=21.7, cp=0.24, tAbs=0.9, sAbs=0.75, vAbs=0.75)
+    end
+    
+    def self.FloorWood
+        return Material.new(name="Wood Floor", thick_in=0.625, mat_base=nil, k_in=0.8004, rho=34.0, cp=0.29)
     end
     
     def self.GypsumWall(thick_in)

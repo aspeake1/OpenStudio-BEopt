@@ -1,14 +1,14 @@
 <measure>
   <schema_version>3.0</schema_version>
-  <name>process_constructions_foundations_floors_interzonal_floors</name>
+  <name>process_constructions_floors</name>
   <uid>65e577ab-327e-4afa-af30-0f6b4e6b1ebf</uid>
-  <version_id>5ebe8261-c40f-4893-bd0a-67c5b777b587</version_id>
-  <version_modified>20180209T214034Z</version_modified>
+  <version_id>e14be89b-928c-4568-9d13-476a220e2340</version_id>
+  <version_modified>20180217T014049Z</version_modified>
   <xml_checksum>1E963D9C</xml_checksum>
-  <class_name>ProcessConstructionsFoundationsFloorsInterzonalFloors</class_name>
-  <display_name>Set Residential Foundations/Floors - Interzonal Floor Construction</display_name>
+  <class_name>ProcessConstructionsFloors</class_name>
+  <display_name>Set Residential Floor Construction</display_name>
   <description>This measure assigns a wood stud construction to floors between finished space and unfinished space or floors below cantilevered finished space. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Calculates and assigns material layer properties of wood stud constructions for floors 1) between finished and unfinished spaces or 2) between finished spaces and outside. If the floors have an existing construction, the layers (other than floor covering and floor mass) are replaced. This measure is intended to be used in conjunction with Floor Covering and Floor Mass measures.</modeler_description>
+  <modeler_description>Calculates and assigns material layer properties of wood stud constructions for floors 1) between finished and unfinished spaces not covered by other measures or 2) between finished spaces and outside. Any existing constructions for these surfaces will be removed.</modeler_description>
   <arguments>
     <argument>
       <name>cavity_r</name>
@@ -27,19 +27,19 @@
       <type>Choice</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
-      <default_value>I</default_value>
+      <default_value>1</default_value>
       <choices>
         <choice>
-          <value>I</value>
-          <display_name>I</display_name>
+          <value>1</value>
+          <display_name>1</display_name>
         </choice>
         <choice>
-          <value>II</value>
-          <display_name>II</display_name>
+          <value>2</value>
+          <display_name>2</display_name>
         </choice>
         <choice>
-          <value>III</value>
-          <display_name>III</display_name>
+          <value>3</value>
+          <display_name>3</display_name>
         </choice>
       </choices>
     </argument>
@@ -52,6 +52,16 @@
       <required>true</required>
       <model_dependent>false</model_dependent>
       <default_value>0.13</default_value>
+    </argument>
+    <argument>
+      <name>joist_height_in</name>
+      <display_name>Joist Height</display_name>
+      <description>Height of the joist member.</description>
+      <type>Double</type>
+      <units>in</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>5.5</default_value>
     </argument>
   </arguments>
   <outputs/>
@@ -73,36 +83,6 @@
   </attributes>
   <files>
     <file>
-      <filename>InterzonalFloors_Test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>C44C11F0</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_PB_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>0BF85167</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>346001F1</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>7702DB6D</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>00369AB2</checksum>
-    </file>
-    <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -115,22 +95,22 @@
       <checksum>B37E7F24</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>73DEEBFE</checksum>
-    </file>
-    <file>
-      <filename>constructions.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>2E8CE294</checksum>
-    </file>
-    <file>
       <filename>materials.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>ADC77BC1</checksum>
+      <checksum>D5E9964F</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>D636DB8B</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>B8962888</checksum>
     </file>
     <file>
       <version>
@@ -141,7 +121,25 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>D37D7E0C</checksum>
+      <checksum>A628F8B5</checksum>
+    </file>
+    <file>
+      <filename>Floors_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>886896E5</checksum>
+    </file>
+    <file>
+      <filename>constructions.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>0190F500</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_GRG_UA.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>C25011F0</checksum>
     </file>
   </files>
 </measure>

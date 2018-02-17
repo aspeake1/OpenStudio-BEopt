@@ -1,5 +1,5 @@
 {
-   "created_at" : "20180209T232109Z",
+   "created_at" : "20180217T014105Z",
    "measure_paths" : [ "../measures" ],
    "seed_file" : "../seeds/EmptySeedModel.osm",
    "steps" : [
@@ -147,12 +147,11 @@
             "roof_install_grade" : "1",
             "roof_osb_thick_in" : "0.75",
             "roof_rigid_r" : "0",
-            "roof_rigid_thick_in" : "0",
             "roofing_material" : "Asphalt Shingles, Medium"
          },
          "description" : "This measure assigns constructions to unfinished attic floors and roofs. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialConstructionsUnfinishedAttic",
-         "modeler_description" : "Calculates and assigns material layer properties of constructions for 1) floors between unfinished attic and living space and 2) unfinished attic roofs. Uninsulated constructions will also be assigned to other roofs over unfinished space. Any existing constructions for these surfaces will be removed.",
+         "modeler_description" : "Calculates and assigns material layer properties of constructions for unfinished attic: 1) floors and 2) roofs. Uninsulated constructions will also be assigned to other roofs over unfinished space. Any existing constructions for these surfaces will be removed.",
          "name" : "Set Residential Unfinished Attic Constructions"
       },
       {
@@ -165,63 +164,58 @@
             "framing_factor" : "0.25",
             "install_grade" : "1",
             "osb_thick_in" : "0.5",
-            "rigid_r" : "0",
-            "rigid_thick_in" : "0"
+            "rigid_r" : "0"
          },
          "description" : "This measure assigns a wood stud construction to above-grade walls. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialConstructionsWallsWoodStud",
-         "modeler_description" : "Calculates and assigns material layer properties of wood stud constructions for 1) exterior walls of finished spaces, 2) exterior walls (e.g. gable walls) of unfinished attics under roof insulation, and 3) interior walls (e.g., attic knee walls) between finished and unfinished spaces. Uninsulated constructions will also be assigned to 1) exterior walls of unfinished spaces, 2) interior walls between finished spaces, and 3) interior walls between unfinished spaces. Any existing constructions for these surfaces will be removed.",
+         "modeler_description" : "Calculates and assigns material layer properties of wood stud constructions for 1) exterior walls of finished spaces, 2) exterior walls (e.g. gable walls) of unfinished attics under roof insulation, and 3) interior walls (e.g., attic knee walls) between finished and unfinished spaces. Adds furniture & partition wall mass. Uninsulated constructions will also be assigned to 1) exterior walls of unfinished spaces, 2) interior walls between finished spaces, and 3) interior walls between unfinished spaces. Any existing constructions for these surfaces will be removed.",
          "name" : "Set Residential Walls - Wood Stud Construction"
       },
       {
          "arguments" : {
-            "exposed_perim" : "auto",
-            "ext_depth" : "0",
-            "ext_r" : "0",
+            "exterior_depth" : "0",
+            "exterior_r" : "0",
             "gap_r" : "0",
-            "mass_conductivity" : "9.1",
-            "mass_density" : "140",
-            "mass_specific_heat" : "0.2",
-            "mass_thick_in" : "4",
-            "perim_r" : "0",
-            "perim_width" : "0",
+            "perimeter_r" : "0",
+            "perimeter_width" : "0",
             "whole_r" : "0"
          },
          "description" : "This measure assigns a construction to slabs. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialConstructionsSlab",
-         "modeler_description" : "Calculates and assigns material layer properties of slab constructions for floors between above-grade finished space and the ground.",
+         "modeler_description" : "Calculates and assigns material layer properties of slab constructions of finished spaces. Any existing constructions for these surfaces will be removed.",
          "name" : "Set Residential Slab Construction"
       },
       {
          "arguments" : {
             "cavity_r" : "19",
             "framing_factor" : "0.13",
-            "install_grade" : "I"
+            "install_grade" : "1",
+            "joist_height_in" : "5.5"
          },
          "description" : "This measure assigns a wood stud construction to floors between finished space and unfinished space or floors below cantilevered finished space. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialConstructionsFloors",
-         "modeler_description" : "Calculates and assigns material layer properties of wood stud constructions for floors 1) between finished and unfinished spaces or 2) between finished spaces and outside. If the floors have an existing construction, the layers (other than floor covering and floor mass) are replaced. This measure is intended to be used in conjunction with Floor Covering and Floor Mass measures.",
-         "name" : "Set Residential Foundations/Floors - Interzonal Floor Construction"
+         "modeler_description" : "Calculates and assigns material layer properties of wood stud constructions for floors 1) between finished and unfinished spaces not covered by other measures or 2) between finished spaces and outside. Any existing constructions for these surfaces will be removed.",
+         "name" : "Set Residential Floor Construction"
       },
       {
          "arguments" : {
-            "cooling_shade_mult" : "0.7",
-            "heating_shade_mult" : "0.7",
+            "cool_shade_mult" : "0.7",
+            "heat_shade_mult" : "0.7",
             "shgc" : "0.3",
             "ufactor" : "0.37"
          },
          "description" : "This measure assigns a construction to windows. This measure also creates the interior shading schedule, which is based on shade multipliers and the heating and cooling season logic defined in the Building America House Simulation Protocols. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialConstructionsWindows",
-         "modeler_description" : "Calculates material layer properties of constructions for windows. Finds sub surfaces and sets applicable constructions. Using interior heating and cooling shading multipliers and the Building America heating and cooling season logic, creates schedule rulesets for window shade and shading control.",
+         "modeler_description" : "Calculates material layer properties of constructions for windows. Finds sub-surfaces and sets applicable constructions. Using interior heating and cooling shading multipliers and the Building America heating and cooling season logic, creates schedule rulesets for window shade and shading control.",
          "name" : "Set Residential Window Construction"
       },
       {
          "arguments" : {
-            "door_ufactor" : "0.2"
+            "ufactor" : "0.2"
          },
-         "description" : "This measure assigns a construction to exterior doors adjacent to finished or unfinished space. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
+         "description" : "This measure assigns a construction to exterior doors. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialConstructionsDoors",
-         "modeler_description" : "Calculates material layer properties of constructions for exterior door sub-surfaces adjacent to 1) finished space or 2) unfinished space.",
+         "modeler_description" : "Calculates material layer properties of constructions for exterior door sub-surfaces. Any existing constructions for these sub-surfaces will be removed.",
          "name" : "Set Residential Door Construction"
       },
       {
@@ -708,5 +702,5 @@
          "name" : "Set Residential HVAC Sizing"
       }
    ],
-   "updated_at" : "20180209T232109Z"
+   "updated_at" : "20180217T014106Z"
 }

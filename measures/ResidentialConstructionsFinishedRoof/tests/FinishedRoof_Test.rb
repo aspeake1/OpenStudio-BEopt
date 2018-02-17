@@ -10,7 +10,7 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
   def test_uninsulated_2x6
     args_hash = {}
     args_hash["cavity_r"] = 0
-    args_hash["install_grade"] = "III" # no insulation, shouldn't apply
+    args_hash["install_grade"] = "3" # no insulation, shouldn't apply
     args_hash["cavity_depth"] = 5.5
     args_hash["ins_fills_cavity"] = "false" # no insulation, shouldn't apply
     args_hash["framing_factor"] = 0.07
@@ -23,7 +23,7 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
   def test_uninsulated_2x6_gr3
     args_hash = {}
     args_hash["cavity_r"] = 0
-    args_hash["install_grade"] = "III" # no insulation, shouldn't apply
+    args_hash["install_grade"] = "3" # no insulation, shouldn't apply
     args_hash["cavity_depth"] = 5.5
     args_hash["ins_fills_cavity"] = "true" # no insulation, shouldn't apply
     args_hash["framing_factor"] = 0.07
@@ -36,7 +36,7 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
   def test_r19_2x6_gr1
     args_hash = {}
     args_hash["cavity_r"] = 17.3 # compressed R-value
-    args_hash["install_grade"] = "I"
+    args_hash["install_grade"] = "1"
     args_hash["cavity_depth"] = 5.5
     args_hash["ins_fills_cavity"] = "true"
     args_hash["framing_factor"] = 0.07
@@ -49,7 +49,7 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
   def test_r19_2x10_gr3_ff11
     args_hash = {}
     args_hash["cavity_r"] = 19
-    args_hash["install_grade"] = "III"
+    args_hash["install_grade"] = "3"
     args_hash["cavity_depth"] = 9.25
     args_hash["ins_fills_cavity"] = "false"
     args_hash["framing_factor"] = 0.11

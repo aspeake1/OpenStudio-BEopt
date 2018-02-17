@@ -115,6 +115,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_ufbasement_double_loaded_corr
     args_hash = {}
     args_hash["num_units_per_floor"] = 4
+    args_hash["foundation_type"] = "unfinished basement"
     args_hash["foundation_height"] = 8.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3}

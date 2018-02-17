@@ -176,6 +176,12 @@ namespace :test do
     
     os_cli = get_os_cli()
 
+    num_osws = 0
+    osw_files.each do |osw|
+        next if osw_map[osw].nil?
+        num_osws += 1
+    end
+    
     osw_files.each do |osw|
     
         next if osw_map[osw].nil?
@@ -184,7 +190,7 @@ namespace :test do
         osw_filename = osw
         num_tot += 1
         
-        puts "[#{num_tot}/#{osw_map.size}] Regenerating osm from #{osw}..."
+        puts "[#{num_tot}/#{num_osws}] Regenerating osm from #{osw}..."
         osw = File.expand_path("../test/osw_files/#{osw}", __FILE__)
         osm = File.expand_path("../test/osw_files/run/in.osm", __FILE__)
         osw_gem = File.expand_path("gems/OpenStudio-workflow-gem/lib/") # Speed up osm generation

@@ -11,13 +11,13 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     args_hash = {}
     args_hash["cavity_r"] = 33
     args_hash["install_grade"] = "1"
-    args_hash["stud_depth"] = 3.5
-    args_hash["gap_depth"] = 3.5
+    args_hash["stud_depth_in"] = 3.5
+    args_hash["gap_depth_in"] = 3.5
     args_hash["framing_factor"] = 0.22
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = false
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     stud_cavity_r = 0.0889/0.074106442682155
@@ -32,13 +32,13 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     args_hash = {}
     args_hash["cavity_r"] = 45
     args_hash["install_grade"] = "2"
-    args_hash["stud_depth"] = 3.5
-    args_hash["gap_depth"] = 3.5
+    args_hash["stud_depth_in"] = 3.5
+    args_hash["gap_depth_in"] = 3.5
     args_hash["framing_factor"] = 0.22
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     stud_cavity_r = 0.0889/0.0923381015350972
@@ -48,8 +48,8 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     expected_values = {"AssemblyR"=>assembly_r}
     model = _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # Replace
-    expected_num_del_objects = {"Construction"=>2}
-    expected_num_new_objects = {"Construction"=>2}
+    expected_num_del_objects = {"Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_num_new_objects = {"Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -57,13 +57,13 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     args_hash = {}
     args_hash["cavity_r"] = 45
     args_hash["install_grade"] = "2"
-    args_hash["stud_depth"] = 3.5
-    args_hash["gap_depth"] = 0
+    args_hash["stud_depth_in"] = 3.5
+    args_hash["gap_depth_in"] = 0
     args_hash["framing_factor"] = 0.22
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     stud_cavity_r = 0.0889/0.0416689707469601
@@ -77,18 +77,17 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     args_hash = {}
     args_hash["cavity_r"] = 45
     args_hash["install_grade"] = "2"
-    args_hash["stud_depth"] = 3.5
-    args_hash["gap_depth"] = 0
+    args_hash["stud_depth_in"] = 3.5
+    args_hash["gap_depth_in"] = 0
     args_hash["framing_factor"] = 0.22
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = true
     args_hash["drywall_thick_in"] = 1.0
     args_hash["osb_thick_in"] = 0
     args_hash["rigid_r"] = 10
-    args_hash["rigid_thick_in"] = 2
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.1016/0.793375
     stud_cavity_r = 0.0889/0.0345169239141704
     drywall_r = 0.0254/0.1602906
@@ -105,23 +104,23 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Insulation Nominal R-value must be greater than 0.")
   end
     
-  def test_argument_error_stud_depth_negative
+  def test_argument_error_stud_depth_in_negative
     args_hash = {}
-    args_hash["stud_depth"] = -1
+    args_hash["stud_depth_in"] = -1
     result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Stud Depth must be greater than 0.")
   end
 
-  def test_argument_error_stud_depth_zero
+  def test_argument_error_stud_depth_in_zero
     args_hash = {}
-    args_hash["stud_depth"] = 0
+    args_hash["stud_depth_in"] = 0
     result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Stud Depth must be greater than 0.")
   end
   
-  def test_argument_error_gap_depth_negative
+  def test_argument_error_gap_depth_in_negative
     args_hash = {}
-    args_hash["gap_depth"] = -1
+    args_hash["gap_depth_in"] = -1
     result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Gap Depth must be greater than or equal to 0.")
   end

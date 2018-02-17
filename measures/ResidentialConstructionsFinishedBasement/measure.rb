@@ -20,7 +20,7 @@ class ProcessConstructionsFinishedBasement < OpenStudio::Measure::ModelMeasure
   end
   
   def modeler_description
-    return "Calculates and assigns material layer properties of constructions for: 1) walls between below-grade finished space and ground, and 2) floors below below-grade finished space."
+    return "Calculates and assigns material layer properties of constructions for finished basement: 1) walls, and 2) floors. Any existing constructions for these surfaces will be removed."
   end   
   
   #define the arguments that the user will input
@@ -43,41 +43,39 @@ class ProcessConstructionsFinishedBasement < OpenStudio::Measure::ModelMeasure
     wall_cavity_r.setDefaultValue(0)
     args << wall_cavity_r
     
-    #make a choice argument for model objects
-    installgrade_display_names = OpenStudio::StringVector.new
-    installgrade_display_names << "I"
-    installgrade_display_names << "II"
-    installgrade_display_names << "III"
-
     #make a choice argument for wall cavity insulation installation grade
-    wall_cavity_grade = OpenStudio::Measure::OSArgument::makeChoiceArgument("wall_cavity_grade", installgrade_display_names, true)
-    wall_cavity_grade.setDisplayName("Wall Cavity Install Grade")
-    wall_cavity_grade.setDescription("Installation grade as defined by RESNET standard. 5% of the cavity is considered missing insulation for Grade 3, 2% for Grade 2, and 0% for Grade 1.")
-    wall_cavity_grade.setDefaultValue("I")
-    args << wall_cavity_grade
+    installgrade_display_names = OpenStudio::StringVector.new
+    installgrade_display_names << "1"
+    installgrade_display_names << "2"
+    installgrade_display_names << "3"
+    wall_install_grade = OpenStudio::Measure::OSArgument::makeChoiceArgument("wall_install_grade", installgrade_display_names, true)
+    wall_install_grade.setDisplayName("Wall Cavity Install Grade")
+    wall_install_grade.setDescription("Installation grade as defined by RESNET standard. 5% of the cavity is considered missing insulation for Grade 3, 2% for Grade 2, and 0% for Grade 1.")
+    wall_install_grade.setDefaultValue("1")
+    args << wall_install_grade
     
     #make a double argument for wall cavity depth
-    wall_cavity_depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_cavity_depth", true)
-    wall_cavity_depth.setDisplayName("Wall Cavity Depth")
-    wall_cavity_depth.setUnits("in")
-    wall_cavity_depth.setDescription("Depth of the stud cavity. 3.5\" for 2x4s, 5.5\" for 2x6s, etc.")
-    wall_cavity_depth.setDefaultValue(0)
-    args << wall_cavity_depth
+    wall_cavity_depth_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_cavity_depth_in", true)
+    wall_cavity_depth_in.setDisplayName("Wall Cavity Depth")
+    wall_cavity_depth_in.setUnits("in")
+    wall_cavity_depth_in.setDescription("Depth of the stud cavity. 3.5\" for 2x4s, 5.5\" for 2x6s, etc.")
+    wall_cavity_depth_in.setDefaultValue(0)
+    args << wall_cavity_depth_in
     
     #make a bool argument for whether the cavity insulation fills the wall cavity
-    wall_cavity_insfills = OpenStudio::Measure::OSArgument::makeBoolArgument("wall_cavity_insfills", true)
-    wall_cavity_insfills.setDisplayName("Wall Insulation Fills Cavity")
-    wall_cavity_insfills.setDescription("When the insulation does not completely fill the depth of the cavity, air film resistances are added to the insulation R-value.")
-    wall_cavity_insfills.setDefaultValue(false)
-    args << wall_cavity_insfills
+    wall_filled_cavity = OpenStudio::Measure::OSArgument::makeBoolArgument("wall_filled_cavity", true)
+    wall_filled_cavity.setDisplayName("Wall Insulation Fills Cavity")
+    wall_filled_cavity.setDescription("When the insulation does not completely fill the depth of the cavity, air film resistances are added to the insulation R-value.")
+    wall_filled_cavity.setDefaultValue(false)
+    args << wall_filled_cavity
     
     #make a double argument for wall framing factor
-    wall_ff = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_ff", true)
-    wall_ff.setDisplayName("Wall Framing Factor")
-    wall_ff.setUnits("frac")
-    wall_ff.setDescription("The fraction of a basement wall assembly that is comprised of structural framing.")
-    wall_ff.setDefaultValue(0)
-    args << wall_ff
+    wall_framing_factor = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_framing_factor", true)
+    wall_framing_factor.setDisplayName("Wall Framing Factor")
+    wall_framing_factor.setUnits("frac")
+    wall_framing_factor.setDescription("The fraction of a basement wall assembly that is comprised of structural framing.")
+    wall_framing_factor.setDefaultValue(0)
+    args << wall_framing_factor
     
     #make a double argument for wall continuous insulation R-value
     wall_rigid_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_rigid_r", true)
@@ -86,39 +84,23 @@ class ProcessConstructionsFinishedBasement < OpenStudio::Measure::ModelMeasure
     wall_rigid_r.setDescription("The R-value of the continuous insulation.")
     wall_rigid_r.setDefaultValue(10.0)
     args << wall_rigid_r
-
-    #make a double argument for wall continuous insulation thickness
-    wall_rigid_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_rigid_thick_in", true)
-    wall_rigid_thick_in.setDisplayName("Wall Continuous Insulation Thickness")
-    wall_rigid_thick_in.setUnits("in")
-    wall_rigid_thick_in.setDescription("The thickness of the continuous insulation.")
-    wall_rigid_thick_in.setDefaultValue(2.0)
-    args << wall_rigid_thick_in
     
-    #make a choice argument for ceiling framing factor
-    ceil_ff = OpenStudio::Measure::OSArgument::makeDoubleArgument("ceil_ff", true)
-    ceil_ff.setDisplayName("Ceiling Framing Factor")
-    ceil_ff.setUnits("frac")
-    ceil_ff.setDescription("Fraction of ceiling that is framing.")
-    ceil_ff.setDefaultValue(0.13)
-    args << ceil_ff
+    #make a double argument for wall drywall thickness
+    wall_drywall_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_drywall_thick_in", true)
+    wall_drywall_thick_in.setDisplayName("Wall Drywall Thickness")
+    wall_drywall_thick_in.setUnits("in")
+    wall_drywall_thick_in.setDescription("Thickness of the wall drywall material.")
+    wall_drywall_thick_in.setDefaultValue(0.5)
+    args << wall_drywall_thick_in
 
-    #make a choice argument for ceiling joist height
-    ceil_joist_height = OpenStudio::Measure::OSArgument::makeDoubleArgument("ceil_joist_height", true)
-    ceil_joist_height.setDisplayName("Ceiling Joist Height")
-    ceil_joist_height.setUnits("in")
-    ceil_joist_height.setDescription("Height of the joist member.")
-    ceil_joist_height.setDefaultValue(9.25)
-    args << ceil_joist_height    
+    #make a double argument for slab insulation R-value
+    slab_whole_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("slab_whole_r", true)
+    slab_whole_r.setDisplayName("Whole Slab Insulation Nominal R-value")
+    slab_whole_r.setUnits("h-ft^2-R/Btu")
+    slab_whole_r.setDescription("The R-value of the continuous insulation.")
+    slab_whole_r.setDefaultValue(0)
+    args << slab_whole_r
     
-    #make a string argument for exposed perimeter
-    exposed_perim = OpenStudio::Measure::OSArgument::makeStringArgument("exposed_perim", true)
-    exposed_perim.setDisplayName("Exposed Perimeter")
-    exposed_perim.setUnits("ft")
-    exposed_perim.setDescription("Total length of the basement's perimeter that is on the exterior of the building's footprint.")
-    exposed_perim.setDefaultValue(Constants.Auto)
-    args << exposed_perim    
-
     return args
   end #end the arguments method
 
@@ -131,133 +113,47 @@ class ProcessConstructionsFinishedBasement < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    wall_surfaces, floor_surfaces, spaces = get_finished_basement_surfaces(model)
+    walls_by_type = SurfaceTypes.get_walls(model, runner)
+    floors_by_type = SurfaceTypes.get_floors(model, runner)
     
-    # Continue if no applicable surfaces
-    if wall_surfaces.empty? and floor_surfaces.empty?
-      runner.registerAsNotApplicable("Measure not applied because no applicable surfaces were found.")
-      return true
-    end
-
     # Get Inputs
-    fbsmtWallInsHeight = runner.getDoubleArgumentValue("wall_ins_height",user_arguments)
-    fbsmtWallCavityInsRvalueInstalled = runner.getDoubleArgumentValue("wall_cavity_r",user_arguments)
-    fbsmtWallInstallGrade = {"I"=>1, "II"=>2, "III"=>3}[runner.getStringArgumentValue("wall_cavity_grade",user_arguments)]
-    fbsmtWallCavityDepth = runner.getDoubleArgumentValue("wall_cavity_depth",user_arguments)
-    fbsmtWallCavityInsFillsCavity = runner.getBoolArgumentValue("wall_cavity_insfills",user_arguments)
-    fbsmtWallFramingFactor = runner.getDoubleArgumentValue("wall_ff",user_arguments)
-    fbsmtWallContInsRvalue = runner.getDoubleArgumentValue("wall_rigid_r",user_arguments)
-    fbsmtWallContInsThickness = runner.getDoubleArgumentValue("wall_rigid_thick_in",user_arguments)
-    fbsmtCeilingFramingFactor = runner.getDoubleArgumentValue("ceil_ff",user_arguments)
-    fbsmtCeilingJoistHeight = runner.getDoubleArgumentValue("ceil_joist_height",user_arguments)
-    exposed_perim = runner.getStringArgumentValue("exposed_perim",user_arguments)
+    wall_ins_height = runner.getDoubleArgumentValue("wall_ins_height",user_arguments)
+    wall_cavity_r = runner.getDoubleArgumentValue("wall_cavity_r",user_arguments)
+    wall_install_grade = runner.getStringArgumentValue("wall_install_grade",user_arguments).to_i
+    wall_cavity_depth_in = runner.getDoubleArgumentValue("wall_cavity_depth_in",user_arguments)
+    wall_filled_cavity = runner.getBoolArgumentValue("wall_filled_cavity",user_arguments)
+    wall_framing_factor = runner.getDoubleArgumentValue("wall_framing_factor",user_arguments)
+    wall_rigid_r = runner.getDoubleArgumentValue("wall_rigid_r",user_arguments)
+    wall_drywall_thick_in = runner.getDoubleArgumentValue("wall_drywall_thick_in",user_arguments)
+    slab_whole_r = runner.getDoubleArgumentValue("slab_whole_r",user_arguments)
     
-    # Validate Inputs
-    if fbsmtWallInsHeight < 0.0
-        runner.registerError("Wall Insulation Height must be greater than or equal to 0.")
-        return false
-    end
-    if fbsmtWallCavityInsRvalueInstalled < 0.0
-        runner.registerError("Wall Cavity Insulation Installed R-value must be greater than or equal to 0.")
-        return false
-    end
-    if fbsmtWallCavityDepth < 0.0
-        runner.registerError("Wall Cavity Depth must be greater than or equal to 0.")
-        return false
-    end
-    if fbsmtWallFramingFactor < 0.0 or fbsmtWallFramingFactor >= 1.0
-        runner.registerError("Wall Framing Factor must be greater than or equal to 0 and less than 1.")
-        return false
-    end
-    if fbsmtWallContInsRvalue < 0.0
-        runner.registerError("Wall Continuous Insulation Nominal R-value must be greater than or equal to 0.")
-        return false
-    end
-    if fbsmtWallContInsThickness < 0.0
-        runner.registerError("Wall Continuous Insulation Thickness must be greater than or equal to 0.")
-        return false
-    end
-    if fbsmtCeilingFramingFactor < 0.0 or fbsmtCeilingFramingFactor >= 1.0
-        runner.registerError("Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
-        return false
-    end
-    if fbsmtCeilingJoistHeight <= 0.0
-        runner.registerError("Ceiling Joist Height must be greater than 0.")
-        return false
-    end
-    if exposed_perim != Constants.Auto and (not MathTools.valid_float?(exposed_perim) or exposed_perim.to_f < 0)
-        runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
-        return false
-    end
-    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner).size > 1
-        runner.registerError("Exposed Perimeter must be #{Constants.Auto} for a multifamily building.")
-        return false
-    end
-    
-    # Calculate interior wall R-value
-    int_wall_Rvalue = calc_wall_r_value(runner, fbsmtWallCavityDepth, fbsmtWallCavityInsRvalueInstalled, 
-                                                fbsmtWallCavityInsFillsCavity, fbsmtWallFramingFactor, 
-                                                fbsmtWallInstallGrade, fbsmtWallContInsRvalue, 
-                                                fbsmtWallContInsThickness)
-    if int_wall_Rvalue.nil?
-        return false
-    end
-    
-    # Create Kiva foundation
+    spaces = Geometry.get_finished_basement_spaces(model.getSpaces)
     basement_height = Geometry.spaces_avg_height(spaces)
-    foundation = Kiva.create_crawl_or_basement_foundation(model, int_wall_Rvalue, basement_height, 
-                                                                 fbsmtWallContInsRvalue, fbsmtWallInsHeight)
-
-    # -------------------------------
-    # Process the basement walls
-    # -------------------------------
     
-    if not wall_surfaces.empty?
-        # Define construction
-        fbsmt_wall = Construction.new("GrndInsFinWall", [1])
-        fbsmt_wall.add_layer(Material.Concrete8in, true)
-
-        # Create and assign construction to surfaces
-        if not fbsmt_wall.create_and_assign_constructions(wall_surfaces, runner, model)
+    # Apply constructions
+    floors_by_type[Constants.SurfaceTypeFloorFndGrndFinB].each do |floor_surface|
+        wall_surfaces = FoundationConstructions.get_walls_connected_to_floor(walls_by_type[Constants.SurfaceTypeWallFndGrndFinB], 
+                                                                             floor_surface)
+        if not FoundationConstructions.apply_walls_and_slab(runner, model, 
+                                                            wall_surfaces, 
+                                                            Constants.SurfaceTypeWallFndGrndFinB, 
+                                                            wall_ins_height, wall_cavity_r, wall_install_grade,
+                                                            wall_cavity_depth_in, wall_filled_cavity,
+                                                            wall_framing_factor, wall_rigid_r, wall_drywall_thick_in,
+                                                            8.0, basement_height, 
+                                                            floor_surface,
+                                                            Constants.SurfaceTypeFloorFndGrndFinB,
+                                                            slab_whole_r)
             return false
-        end
-        
-        # Assign surfaces to Kiva foundation
-        wall_surfaces.each do |wall_surface|
-            wall_surface.setAdjacentFoundation(foundation)
         end
     end
-
-    # -------------------------------
-    # Process the basement floor
-    # -------------------------------
     
-    if not floor_surfaces.empty? and not wall_surfaces.empty?
-        # Define construction
-        fbsmt_floor = Construction.new("GrndUninsFinBFloor", [1.0])
-        fbsmt_floor.add_layer(Material.Concrete4in, true)
-        
-        # Create and assign construction to surfaces
-        if not fbsmt_floor.create_and_assign_constructions(floor_surfaces, runner, model)
+    floors_by_type[Constants.SurfaceTypeFloorFndGrndUnfinSlab].each do |surface|
+        if not FoundationConstructions.apply_slab(runner, model, 
+                                                  surface,
+                                                  Constants.SurfaceTypeFloorFndGrndUnfinSlab,
+                                                  0, 0, 0, 0, 0, 0, 4.0, false, nil, nil)
             return false
-        end
-        
-        # Assign surfaces to Kiva foundation
-        floor_surfaces.each do |floor_surface|
-            # Exposed perimeter
-            if exposed_perim == Constants.Auto
-                surfaceExtPerimeter = Geometry.calculate_exposed_perimeter(model, [floor_surface], has_foundation_walls=true)
-            else
-                surfaceExtPerimeter = exposed_perim.to_f
-            end
-            
-            if surfaceExtPerimeter <= 0
-              runner.registerError("Calculated an exposed perimeter <= 0 for surface '#{floor_surface.name.to_s}'.")
-              return false
-            end
-            
-            floor_surface.setAdjacentFoundation(foundation)
-            floor_surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(surfaceExtPerimeter,"ft","m"))
         end
     end
     
@@ -268,71 +164,6 @@ class ProcessConstructionsFinishedBasement < OpenStudio::Measure::ModelMeasure
 
   end #end the run method
   
-  def get_finished_basement_surfaces(model)
-    wall_surfaces = []
-    floor_surfaces = []
-    spaces = Geometry.get_finished_basement_spaces(model.getSpaces)
-    spaces.each do |space|
-        space.surfaces.each do |surface|
-            # Wall between below-grade finished space and ground
-            if surface.surfaceType.downcase == "wall" and surface.outsideBoundaryCondition.downcase == "foundation"
-                wall_surfaces << surface
-            end
-            # Floor below below-grade finished space
-            if surface.surfaceType.downcase == "floor" and surface.outsideBoundaryCondition.downcase == "foundation"
-                floor_surfaces << surface
-            end
-        end
-    end
-    return wall_surfaces, floor_surfaces, spaces
-  end
-  
-  def calc_wall_r_value(runner, cavityDepth, cavityInsRvalue, cavityInsFillsCavity,
-                        framingFactor, installGrade, contInsRvalue, contInsThickness)
-    # Define materials
-    mat_framing = nil
-    mat_cavity = nil
-    mat_gap = nil
-    mat_rigid = nil
-    if cavityDepth > 0
-        if cavityInsRvalue > 0
-            if cavityInsFillsCavity
-                # Insulation
-                mat_cavity = Material.new(name=nil, thick_in=cavityDepth, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=cavityDepth / cavityInsRvalue)
-            else
-                # Insulation plus air gap when insulation thickness < cavity depth
-                mat_cavity = Material.new(name=nil, thick_in=cavityDepth, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=cavityDepth / (cavityInsRvalue + Gas.AirGapRvalue))
-            end
-        else
-            # Empty cavity
-            mat_cavity = Material.AirCavityClosed(cavityDepth)
-        end
-        mat_framing = Material.new(name=nil, thick_in=cavityDepth, mat_base=BaseMaterial.Wood)
-        mat_gap = Material.AirCavityClosed(cavityDepth)
-    end
-    if contInsRvalue > 0 and contInsThickness > 0
-        mat_rigid = Material.new(name=nil, thick_in=contInsThickness, mat_base=BaseMaterial.InsulationRigid, k_in=contInsThickness / contInsRvalue)
-    end
-
-    # Set paths
-    gapFactor = get_gap_factor(installGrade, framingFactor, cavityInsRvalue)
-    path_fracs = [framingFactor, 1 - framingFactor - gapFactor, gapFactor]
-    
-    # Define construction (only used to calculate assembly R-value)
-    fbsmt_wall = Construction.new("ForRvalue", path_fracs)
-    fbsmt_wall.add_layer(Material.GypsumWall(0.5), false)
-    if not mat_framing.nil? and not mat_cavity.nil? and not mat_gap.nil?
-        fbsmt_wall.add_layer(Material.AirFilmVertical, false)
-        fbsmt_wall.add_layer([mat_framing, mat_cavity, mat_gap], false)
-    end
-    if not mat_rigid.nil?
-        fbsmt_wall.add_layer(mat_rigid, false)
-    end
-
-    return fbsmt_wall.assembly_rvalue(runner) - contInsRvalue
-  end
-
-
 end #end the measure
 
 #this allows the measure to be use by the application

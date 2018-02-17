@@ -7,12 +7,12 @@ require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/constructions"
 
 #start the measure
-class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::ModelMeasure
+class ProcessConstructionsCrawlspace < OpenStudio::Measure::ModelMeasure
   
   #define the name that a user will see, this method may be deprecated as
   #the display name in PAT comes from the name field in measure.xml
   def name
-    return "Set Residential Foundations/Floors - Crawlspace Constructions"
+    return "Set Residential Crawlspace Constructions"
   end
   
   def description
@@ -20,7 +20,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
   end
   
   def modeler_description
-    return "Calculates and assigns material layer properties of constructions for: 1) ceilings above below-grade unfinished space, 2) walls between below-grade unfinished space and ground, and 3) floors below below-grade unfinished space."
+    return "Calculates and assigns material layer properties of constructions for crawlspace: 1) ceilings, 2) walls, and 3) floors. Any existing constructions for these surfaces will be removed."
   end    
   
   #define the arguments that the user will input
@@ -35,57 +35,49 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
     wall_rigid_r.setDefaultValue(10.0)
     args << wall_rigid_r
 
-    #make a double argument for wall continuous insulation thickness
-    wall_rigid_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("wall_rigid_thick_in", true)
-    wall_rigid_thick_in.setDisplayName("Wall Continuous Insulation Thickness")
-    wall_rigid_thick_in.setUnits("in")
-    wall_rigid_thick_in.setDescription("The thickness of the continuous insulation.")
-    wall_rigid_thick_in.setDefaultValue(2.0)
-    args << wall_rigid_thick_in
-
     #make a double argument for ceiling cavity R-value
-    ceil_cavity_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("ceil_cavity_r", true)
-    ceil_cavity_r.setDisplayName("Ceiling Cavity Insulation Nominal R-value")
-    ceil_cavity_r.setUnits("h-ft^2-R/Btu")
-    ceil_cavity_r.setDescription("Refers to the R-value of the cavity insulation and not the overall R-value of the assembly.")
-    ceil_cavity_r.setDefaultValue(0)
-    args << ceil_cavity_r
+    ceiling_cavity_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("ceiling_cavity_r", true)
+    ceiling_cavity_r.setDisplayName("Ceiling Cavity Insulation Nominal R-value")
+    ceiling_cavity_r.setUnits("h-ft^2-R/Btu")
+    ceiling_cavity_r.setDescription("Refers to the R-value of the cavity insulation and not the overall R-value of the assembly.")
+    ceiling_cavity_r.setDefaultValue(0)
+    args << ceiling_cavity_r
 
     #make a choice argument for ceiling cavity insulation installation grade
     installgrade_display_names = OpenStudio::StringVector.new
-    installgrade_display_names << "I"
-    installgrade_display_names << "II"
-    installgrade_display_names << "III"
-    ceil_cavity_grade = OpenStudio::Measure::OSArgument::makeChoiceArgument("ceil_cavity_grade", installgrade_display_names, true)
-    ceil_cavity_grade.setDisplayName("Ceiling Cavity Install Grade")
-    ceil_cavity_grade.setDescription("Installation grade as defined by RESNET standard. 5% of the cavity is considered missing insulation for Grade 3, 2% for Grade 2, and 0% for Grade 1.")
-    ceil_cavity_grade.setDefaultValue("I")
-    args << ceil_cavity_grade
+    installgrade_display_names << "1"
+    installgrade_display_names << "2"
+    installgrade_display_names << "3"
+    ceiling_install_grade = OpenStudio::Measure::OSArgument::makeChoiceArgument("ceiling_install_grade", installgrade_display_names, true)
+    ceiling_install_grade.setDisplayName("Ceiling Cavity Install Grade")
+    ceiling_install_grade.setDescription("Installation grade as defined by RESNET standard. 5% of the cavity is considered missing insulation for Grade 3, 2% for Grade 2, and 0% for Grade 1.")
+    ceiling_install_grade.setDefaultValue("1")
+    args << ceiling_install_grade
 
     #make a choice argument for ceiling framing factor
-    ceil_ff = OpenStudio::Measure::OSArgument::makeDoubleArgument("ceil_ff", true)
-    ceil_ff.setDisplayName("Ceiling Framing Factor")
-    ceil_ff.setUnits("frac")
-    ceil_ff.setDescription("Fraction of ceiling that is framing.")
-    ceil_ff.setDefaultValue(0.13)
-    args << ceil_ff
+    ceiling_framing_factor = OpenStudio::Measure::OSArgument::makeDoubleArgument("ceiling_framing_factor", true)
+    ceiling_framing_factor.setDisplayName("Ceiling Framing Factor")
+    ceiling_framing_factor.setUnits("frac")
+    ceiling_framing_factor.setDescription("Fraction of ceiling that is framing.")
+    ceiling_framing_factor.setDefaultValue(0.13)
+    args << ceiling_framing_factor
 
     #make a choice argument for ceiling joist height
-    ceil_joist_height = OpenStudio::Measure::OSArgument::makeDoubleArgument("ceil_joist_height", true)
-    ceil_joist_height.setDisplayName("Ceiling Joist Height")
-    ceil_joist_height.setUnits("in")
-    ceil_joist_height.setDescription("Height of the joist member.")
-    ceil_joist_height.setDefaultValue(9.25)
-    args << ceil_joist_height    
+    ceiling_joist_height_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("ceiling_joist_height_in", true)
+    ceiling_joist_height_in.setDisplayName("Ceiling Joist Height")
+    ceiling_joist_height_in.setUnits("in")
+    ceiling_joist_height_in.setDescription("Height of the joist member.")
+    ceiling_joist_height_in.setDefaultValue(9.25)
+    args << ceiling_joist_height_in    
     
-    #make a string argument for exposed perimeter
-    exposed_perim = OpenStudio::Measure::OSArgument::makeStringArgument("exposed_perim", true)
-    exposed_perim.setDisplayName("Exposed Perimeter")
-    exposed_perim.setUnits("ft")
-    exposed_perim.setDescription("Total length of the crawlspace's perimeter that is on the exterior of the building's footprint.")
-    exposed_perim.setDefaultValue(Constants.Auto)
-    args << exposed_perim    
-    
+    #make a double argument for slab insulation R-value
+    slab_whole_r = OpenStudio::Measure::OSArgument::makeDoubleArgument("slab_whole_r", true)
+    slab_whole_r.setDisplayName("Whole Slab Insulation Nominal R-value")
+    slab_whole_r.setUnits("h-ft^2-R/Btu")
+    slab_whole_r.setDescription("The R-value of the continuous insulation.")
+    slab_whole_r.setDefaultValue(0)
+    args << slab_whole_r
+
     return args
   end #end the arguments method
 
@@ -98,141 +90,50 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
       return false
     end
 
-    wall_surfaces, floor_surfaces, ceiling_surfaces, spaces = get_crawlspace_surfaces(model)
+    walls_by_type = SurfaceTypes.get_walls(model, runner)
+    floors_by_type = SurfaceTypes.get_floors(model, runner)
 
-    # Continue if no applicable surfaces
-    if wall_surfaces.empty? and floor_surfaces.empty? and ceiling_surfaces.empty?
-      runner.registerAsNotApplicable("Measure not applied because no applicable surfaces were found.")
-      return true
-    end    
-    
     # Get Inputs
-    crawlWallContInsRvalueNominal = runner.getDoubleArgumentValue("wall_rigid_r",user_arguments)
-    crawlWallContInsThickness = runner.getDoubleArgumentValue("wall_rigid_thick_in",user_arguments)
-    crawlCeilingCavityInsRvalueNominal = runner.getDoubleArgumentValue("ceil_cavity_r",user_arguments)
-    crawlCeilingInstallGrade = {"I"=>1, "II"=>2, "III"=>3}[runner.getStringArgumentValue("ceil_cavity_grade",user_arguments)]
-    crawlCeilingFramingFactor = runner.getDoubleArgumentValue("ceil_ff",user_arguments)
-    crawlCeilingJoistHeight = runner.getDoubleArgumentValue("ceil_joist_height",user_arguments)
-    exposed_perim = runner.getStringArgumentValue("exposed_perim",user_arguments)
+    wall_rigid_r = runner.getDoubleArgumentValue("wall_rigid_r",user_arguments)
+    ceiling_cavity_r = runner.getDoubleArgumentValue("ceiling_cavity_r",user_arguments)
+    ceiling_install_grade = runner.getStringArgumentValue("ceiling_install_grade",user_arguments).to_i
+    ceiling_framing_factor = runner.getDoubleArgumentValue("ceiling_framing_factor",user_arguments)
+    ceiling_joist_height_in = runner.getDoubleArgumentValue("ceiling_joist_height_in",user_arguments)
+    slab_whole_r = runner.getDoubleArgumentValue("slab_whole_r",user_arguments)
     
-    # Validate Inputs
-    if crawlWallContInsRvalueNominal < 0.0
-        runner.registerError("Wall Continuous Insulation Nominal R-value must be greater than or equal to 0.")
-        return false
-    end
-    if crawlWallContInsThickness < 0.0
-        runner.registerError("Wall Continuous Insulation Thickness must be greater than or equal to 0.")
-        return false
-    end
-    if crawlCeilingCavityInsRvalueNominal < 0.0
-        runner.registerError("Ceiling Cavity Insulation Nominal R-value must be greater than or equal to 0.")
-        return false
-    end
-    if crawlCeilingFramingFactor < 0.0 or crawlCeilingFramingFactor >= 1.0
-        runner.registerError("Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
-        return false
-    end
-    if crawlCeilingJoistHeight <= 0.0
-        runner.registerError("Ceiling Joist Height must be greater than 0.")
-        return false
-    end    
-    if exposed_perim != Constants.Auto and (not MathTools.valid_float?(exposed_perim) or exposed_perim.to_f < 0)
-        runner.registerError("Exposed Perimeter must be #{Constants.Auto} or a number greater than or equal to 0.")
-        return false
-    end
-    if exposed_perim != Constants.Auto and Geometry.get_building_units(model, runner).size > 1
-        runner.registerError("Exposed Perimeter must be #{Constants.Auto} for a multifamily building.")
-        return false
-    end
-    
-    # Create Kiva foundation
+    spaces = Geometry.get_crawl_spaces(model.getSpaces)
     crawl_height = Geometry.spaces_avg_height(spaces)
-    foundation = Kiva.create_crawl_or_basement_foundation(model, 0, 0, crawlWallContInsRvalueNominal, crawl_height)
     
-    # -------------------------------
-    # Process the crawl walls
-    # -------------------------------
-    
-    if not wall_surfaces.empty?
-        # Define construction
-        cs_wall = Construction.new("GrndInsUnfinCSWall", [1.0])
-        cs_wall.add_layer(Material.Concrete8in, true)
-        
-        # Create and assign construction to surfaces
-        if not cs_wall.create_and_assign_constructions(wall_surfaces, runner, model)
+    # Apply constructions
+    floors_by_type[Constants.SurfaceTypeFloorFndGrndCS].each do |floor_surface|
+        wall_surfaces = FoundationConstructions.get_walls_connected_to_floor(walls_by_type[Constants.SurfaceTypeWallFndGrndCS], 
+                                                                             floor_surface)
+        if not FoundationConstructions.apply_walls_and_slab(runner, model,
+                                                            wall_surfaces, 
+                                                            Constants.SurfaceTypeWallFndGrndCS, 
+                                                            crawl_height, 0, 1, 0, true, 0, 
+                                                            wall_rigid_r, 0, 8.0, crawl_height,
+                                                            floor_surface, 
+                                                            Constants.SurfaceTypeFloorFndGrndCS,
+                                                            slab_whole_r)
             return false
-        end
-        
-        # Assign surfaces to Kiva foundation
-        wall_surfaces.each do |wall_surface|
-            wall_surface.setAdjacentFoundation(foundation)
         end
     end
     
-    # -------------------------------
-    # Process the crawl floor
-    # -------------------------------
-    
-    if not floor_surfaces.empty? and not wall_surfaces.empty?
-        # Define construction
-        cs_floor = Construction.new("GrndUninsUnfinCSFloor", [1.0])
-        cs_floor.add_layer(Material.Concrete4in, true)
-        
-        # Create and assign construction to surfaces
-        if not cs_floor.create_and_assign_constructions(floor_surfaces, runner, model)
-            return false
-        end
-        
-        # Assign surfaces to Kiva foundation
-        floor_surfaces.each do |floor_surface|
-            # Exposed perimeter
-            if exposed_perim == Constants.Auto
-                surfaceExtPerimeter = Geometry.calculate_exposed_perimeter(model, [floor_surface], has_foundation_walls=true)
-            else
-                surfaceExtPerimeter = exposed_perim.to_f
-            end
-            
-            if surfaceExtPerimeter <= 0
-              runner.registerError("Calculated an exposed perimeter <= 0 for surface '#{floor_surface.name.to_s}'.")
-              return false
-            end
-            
-            floor_surface.setAdjacentFoundation(foundation)
-            floor_surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(surfaceExtPerimeter,"ft","m"))
-        end
+    if not FloorConstructions.apply_foundation_ceiling(runner, model,
+                                                       floors_by_type[Constants.SurfaceTypeFloorCSInsFin],
+                                                       Constants.SurfaceTypeFloorCSInsFin,
+                                                       ceiling_cavity_r, ceiling_install_grade,
+                                                       ceiling_framing_factor, ceiling_joist_height_in,
+                                                       0.75, Material.FloorWood, Material.CoveringBare)
+        return false
     end
-
-    # -------------------------------
-    # Process the crawl ceiling
-    # -------------------------------
     
-    if not ceiling_surfaces.empty?
-        # Define materials
-        mat_2x = Material.Stud2x(crawlCeilingJoistHeight)
-        if crawlCeilingCavityInsRvalueNominal == 0
-            mat_cavity = Material.AirCavityOpen(thick_in=mat_2x.thick_in)
-        else    
-            mat_cavity = Material.new(name=nil, thick_in=mat_2x.thick_in, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=mat_2x.thick_in / crawlCeilingCavityInsRvalueNominal)
-        end
-        mat_framing = Material.new(name=nil, thick_in=mat_2x.thick_in, mat_base=BaseMaterial.Wood)
-        mat_gap = Material.AirCavityOpen(mat_2x.thick_in)
-        mat_wood_floor = Material.new(name="Wood Floor", thick_in=0.625, mat_base=nil, k_in=0.8004, rho=34.0, cp=0.29) # wood surface
-        
-        # Set paths
-        csGapFactor = get_gap_factor(crawlCeilingInstallGrade, crawlCeilingFramingFactor, crawlCeilingCavityInsRvalueNominal)
-        path_fracs = [crawlCeilingFramingFactor, 1 - crawlCeilingFramingFactor - csGapFactor, csGapFactor]
-        
-        # Define construction
-        cs_ceiling = Construction.new("UnfinCSInsFinFloor", path_fracs)
-        cs_ceiling.add_layer(Material.AirFilmFloorReduced)
-        cs_ceiling.add_layer([mat_framing, mat_cavity, mat_gap], "CrawlCeilingIns")
-        cs_ceiling.add_layer(Material.Plywood(0.75)) # sheathing added in separate measure
-        cs_ceiling.add_layer(mat_wood_floor) # thermal mass added in separate measure
-        cs_ceiling.add_layer(Material.CoveringBare) # floor covering added in separate measure
-        cs_ceiling.add_layer(Material.AirFilmFloorReduced)
-
-        # Create and assign construction to surfaces
-        if not cs_ceiling.create_and_assign_constructions(ceiling_surfaces, runner, model)
+    floors_by_type[Constants.SurfaceTypeFloorFndGrndUnfinSlab].each do |surface|
+        if not FoundationConstructions.apply_slab(runner, model, 
+                                                  surface,
+                                                  Constants.SurfaceTypeFloorFndGrndUnfinSlab,
+                                                  0, 0, 0, 0, 0, 0, 4.0, false, nil, nil)
             return false
         end
     end
@@ -244,34 +145,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
 
   end #end the run method
 
-  def get_crawlspace_surfaces(model)
-    wall_surfaces = []
-    floor_surfaces = []
-    ceiling_surfaces = []
-    spaces = Geometry.get_crawl_spaces(model.getSpaces)
-    spaces.each do |space|
-        space.surfaces.each do |surface|
-            # Wall between below-grade unfinished space and ground
-            if surface.surfaceType.downcase == "wall" and surface.outsideBoundaryCondition.downcase == "foundation"
-                wall_surfaces << surface
-            end
-            # Floor below below-grade unfinished space
-            if surface.surfaceType.downcase == "floor" and surface.outsideBoundaryCondition.downcase == "foundation"
-                floor_surfaces << surface
-            end
-            # Ceiling above below-grade unfinished space and below finished space
-            if surface.surfaceType.downcase == "roofceiling" and surface.adjacentSurface.is_initialized and surface.adjacentSurface.get.space.is_initialized
-                adjacent_space = surface.adjacentSurface.get.space.get
-                if Geometry.space_is_finished(adjacent_space)
-                    ceiling_surfaces << surface
-                end
-            end
-        end
-    end
-    return wall_surfaces, floor_surfaces, ceiling_surfaces, spaces
-  end
-  
 end #end the measure
 
 #this allows the measure to be use by the application
-ProcessConstructionsFoundationsFloorsCrawlspace.new.registerWithApplication
+ProcessConstructionsCrawlspace.new.registerWithApplication

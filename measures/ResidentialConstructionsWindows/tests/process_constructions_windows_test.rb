@@ -7,54 +7,14 @@ require 'fileutils'
 
 class ProcessConstructionsWindowsTest < MiniTest::Test
 
-  def test_argument_error_invalid_ufactor
-    args_hash = {}
-    args_hash["ufactor"] = 0
-    result = _test_error("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash)
-    assert(result.errors.size == 1)
-    assert_equal("Fail", result.value.valueName)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Invalid window U-factor.")    
-  end
-  
-  def test_argument_error_invalid_shgc
-    args_hash = {}
-    args_hash["shgc"] = 0
-    result = _test_error("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash)
-    assert(result.errors.size == 1)
-    assert_equal("Fail", result.value.valueName)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Invalid window SHGC.")    
-  end
-  
-  def test_error_no_weather
-    args_hash = {}
-    result = _test_error("SFD_2000sqft_2story_SL_UA_Windows.osm", args_hash)
-    assert(result.errors.size == 1)
-    assert_equal("Fail", result.value.valueName)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Model has not been assigned a weather file.")    
-  end  
-  
   def test_no_solar_gain_reduction
     args_hash = {}
-    args_hash["heating_shade_mult"] = 1
-    args_hash["cooling_shade_mult"] = 1
+    args_hash["heat_shade_mult"] = 1
+    args_hash["cool_shade_mult"] = 1
     expected_num_del_objects = {}
     expected_num_new_objects = {"SimpleGlazing"=>1, "Construction"=>1}
     expected_values = {"shgc"=>0.3, "ufactor"=>0.37, "SubSurfacesWithConstructions"=>36}
     result = _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-  
-  def test_skip_missing_geometry
-    args_hash = {}
-    result = _test_error(nil, args_hash)
-    assert(result.errors.size == 0)
-    assert_equal("NA", result.value.valueName)    
-  end
-  
-  def test_skip_no_windows
-    args_hash = {}
-    result = _test_error("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash)
-    assert(result.errors.size == 0)
-    assert_equal("NA", result.value.valueName)   
   end
   
   def test_retrofit_replace
@@ -66,13 +26,39 @@ class ProcessConstructionsWindowsTest < MiniTest::Test
     args_hash = {}
     args_hash["ufactor"] = 0.20
     args_hash["shgc"] = 0.5
-    args_hash["heating_shade_mult"] = 1
-    args_hash["cooling_shade_mult"] = 1
+    args_hash["heat_shade_mult"] = 1
+    args_hash["cool_shade_mult"] = 1
     expected_num_del_objects = {"SimpleGlazing"=>1, "Construction"=>1, "ShadingControl"=>1, "WindowMaterialShade"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"SimpleGlazing"=>1, "Construction"=>1}
     expected_values = {"shgc"=>0.5, "ufactor"=>0.20, "SubSurfacesWithConstructions"=>36}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  def test_argument_error_invalid_ufactor
+    args_hash = {}
+    args_hash["ufactor"] = 0
+    result = _test_error("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Window U-factor must be greater than zero.")    
+  end
+  
+  def test_argument_error_invalid_shgc
+    args_hash = {}
+    args_hash["shgc"] = 0
+    result = _test_error("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Window SHGC must be greater than zero.")    
+  end
+  
+  def test_error_no_weather
+    args_hash = {}
+    result = _test_error("SFD_2000sqft_2story_SL_UA_Windows.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Model has not been assigned a weather file.")    
+  end  
   
   private
   

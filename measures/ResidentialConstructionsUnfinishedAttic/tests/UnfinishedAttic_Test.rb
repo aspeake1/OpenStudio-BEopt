@@ -54,7 +54,6 @@ class ProcessConstructionsUnfinishedAtticTest < MiniTest::Test
     args_hash["ceiling_drywall_thick_in"] = 1.0
     args_hash["roof_osb_thick_in"] = 0
     args_hash["roof_rigid_r"] = 10
-    args_hash["roof_rigid_thick_in"] = 2
     args_hash["roofing_material"] = Material.RoofingMetalWhite.name
     args_hash["has_radiant_barrier"] = true
     expected_num_del_objects = {}

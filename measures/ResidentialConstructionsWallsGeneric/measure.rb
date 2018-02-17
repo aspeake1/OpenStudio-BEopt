@@ -20,7 +20,7 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
   end
   
   def modeler_description
-    return "Calculates and assigns material layer properties of generic layered constructions for 1) exterior walls of finished spaces, 2) exterior walls (e.g. gable walls) of unfinished attics under roof insulation, and 3) interior walls (e.g., attic knee walls) between finished and unfinished spaces. Uninsulated constructions will also be assigned to 1) exterior walls of unfinished spaces, 2) interior walls between finished spaces, and 3) interior walls between unfinished spaces. Any existing constructions for these surfaces will be removed."
+    return "Calculates and assigns material layer properties of generic layered constructions for 1) exterior walls of finished spaces, 2) exterior walls (e.g. gable walls) of unfinished attics under roof insulation, and 3) interior walls (e.g., attic knee walls) between finished and unfinished spaces. Adds furniture & partition wall mass. Uninsulated constructions will also be assigned to 1) exterior walls of unfinished spaces, 2) interior walls between finished spaces, and 3) interior walls between unfinished spaces. Any existing constructions for these surfaces will be removed."
   end  
   
   #define the arguments that the user will input
@@ -195,14 +195,6 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
     rigid_r.setDefaultValue(0.0)
     args << rigid_r
 
-    #make a double argument for Rigid Insulation Thickness
-    rigid_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("rigid_thick_in",true)
-    rigid_thick_in.setDisplayName("Continuous Insulation Thickness")
-    rigid_thick_in.setUnits("in")
-    rigid_thick_in.setDescription("The thickness of the continuous insulation.")
-    rigid_thick_in.setDefaultValue(0.0)
-    args << rigid_thick_in
-    
     #make a choice argument for exterior finish material
     finishes = OpenStudio::StringVector.new
     WallConstructions.get_exterior_finish_materials.each do |mat|
@@ -210,7 +202,7 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
     end
     exterior_finish = OpenStudio::Measure::OSArgument::makeChoiceArgument("exterior_finish", finishes, true)
     exterior_finish.setDisplayName("Exterior Finish")
-    exterior_finish.setDescription("The exterior finish.")
+    exterior_finish.setDescription("The exterior finish material.")
     exterior_finish.setDefaultValue(Material.ExtFinishVinylLight.name)
     args << exterior_finish
     
@@ -226,7 +218,7 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
       return false
     end
     
-    walls_by_type = get_wall_surfaces_by_type(model, runner)
+    walls_by_type = SurfaceTypes.get_walls(model, runner)
     
     # Get inputs
     thick_in1 = runner.getDoubleArgumentValue("thick_in_1",user_arguments)
@@ -252,7 +244,6 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
     drywall_thick_in = runner.getDoubleArgumentValue("drywall_thick_in",user_arguments)
     osb_thick_in = runner.getDoubleArgumentValue("osb_thick_in",user_arguments)
     rigid_r = runner.getDoubleArgumentValue("rigid_r",user_arguments)
-    rigid_thick_in = runner.getDoubleArgumentValue("rigid_thick_in",user_arguments)
     mat_ext_finish = WallConstructions.get_exterior_finish_material(runner.getStringArgumentValue("exterior_finish",user_arguments))
     
     if thick_in2.empty? then thick_in2 = nil else thick_in2 = thick_in2.get end
@@ -280,32 +271,40 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
     specheats = [specheat1, specheat2, specheat3, specheat4, specheat5]
     
     # Apply constructions
-    if not WallConstructions.apply_generic(walls_by_type[Constants.SurfaceTypeWallExtInsFin], 
-                                           runner, model, Constants.SurfaceTypeWallExtInsFin,
+    if not WallConstructions.apply_generic(runner, model,
+                                           walls_by_type[Constants.SurfaceTypeWallExtInsFin], 
+                                           Constants.SurfaceTypeWallExtInsFin,
                                            thick_ins, conds, denss, specheats,
                                            drywall_thick_in, osb_thick_in, rigid_r,
-                                           rigid_thick_in, mat_ext_finish)
+                                           mat_ext_finish)
         return false
     end
     
-    if not WallConstructions.apply_generic(walls_by_type[Constants.SurfaceTypeWallExtInsUnfin], 
-                                           runner, model, Constants.SurfaceTypeWallExtInsUnfin,
+    if not WallConstructions.apply_generic(runner, model,
+                                           walls_by_type[Constants.SurfaceTypeWallExtInsUnfin], 
+                                           Constants.SurfaceTypeWallExtInsUnfin,
                                            thick_ins, conds, denss, specheats,
                                            0, osb_thick_in, rigid_r,
-                                           rigid_thick_in, mat_ext_finish)
+                                           mat_ext_finish)
         return false
     end
     
-    if not WallConstructions.apply_generic(walls_by_type[Constants.SurfaceTypeWallIntFinInsUnfin], 
-                                           runner, model, Constants.SurfaceTypeWallIntFinInsUnfin,
+    if not WallConstructions.apply_generic(runner, model,
+                                           walls_by_type[Constants.SurfaceTypeWallIntFinInsUnfin], 
+                                           Constants.SurfaceTypeWallIntFinInsUnfin,
                                            thick_ins, conds, denss, specheats,
                                            0, osb_thick_in, rigid_r,
-                                           rigid_thick_in, nil)
+                                           nil)
         return false
     end
     
-    if not WallConstructions.apply_uninsulated(walls_by_type, runner, model,
+    if not WallConstructions.apply_uninsulated(runner, model, walls_by_type,
                                                osb_thick_in, drywall_thick_in, mat_ext_finish)
+        return false
+    end
+    
+    if not ThermalMassConstructions.apply(runner, model, walls_by_type,
+                                          drywall_thick_in, 1.0, 1.0)
         return false
     end
     

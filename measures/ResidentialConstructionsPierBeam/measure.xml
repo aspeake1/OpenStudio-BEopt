@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>process_constructions_pier_beam</name>
   <uid>c47f2fc2-008e-403c-82e6-fd751b4f3b8a</uid>
-  <version_id>fda287e8-bf06-4438-8436-1ef7627c81c4</version_id>
-  <version_modified>20180209T214034Z</version_modified>
+  <version_id>9ac0a514-92fd-4e7b-989a-a8ab656e8e45</version_id>
+  <version_modified>20180217T014049Z</version_modified>
   <xml_checksum>1E963D9C</xml_checksum>
   <class_name>ProcessConstructionsPierBeam</class_name>
   <display_name>Set Residential Pier &amp; Beam Construction</display_name>
-  <description>This measure assigns a wood stud construction to the ceiling of the pier &amp; beam space. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Calculates and assigns material layer properties of wood stud constructions for floors finished space and pier &amp; beam space. If the floors have an existing construction, the layers (other than floor covering and floor mass) are replaced. This measure is intended to be used in conjunction with Floor Covering and Floor Mass measures.</modeler_description>
+  <description>This measure assigns a wood stud construction to the pier &amp; beam space ceiling. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>Calculates and assigns material layer properties of wood stud constructions for  pier &amp; beam ceilings. Any existing constructions for these surfaces will be removed.</modeler_description>
   <arguments>
     <argument>
       <name>cavity_r</name>
@@ -27,19 +27,19 @@
       <type>Choice</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
-      <default_value>I</default_value>
+      <default_value>1</default_value>
       <choices>
         <choice>
-          <value>I</value>
-          <display_name>I</display_name>
+          <value>1</value>
+          <display_name>1</display_name>
         </choice>
         <choice>
-          <value>II</value>
-          <display_name>II</display_name>
+          <value>2</value>
+          <display_name>2</display_name>
         </choice>
         <choice>
-          <value>III</value>
-          <display_name>III</display_name>
+          <value>3</value>
+          <display_name>3</display_name>
         </choice>
       </choices>
     </argument>
@@ -52,6 +52,16 @@
       <required>true</required>
       <model_dependent>false</model_dependent>
       <default_value>0.13</default_value>
+    </argument>
+    <argument>
+      <name>joist_height_in</name>
+      <display_name>Joist Height</display_name>
+      <description>Height of the joist member.</description>
+      <type>Double</type>
+      <units>in</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>5.5</default_value>
     </argument>
   </arguments>
   <outputs/>
@@ -73,24 +83,6 @@
   </attributes>
   <files>
     <file>
-      <filename>SFD_2000sqft_2story_PB_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>0BF85167</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>346001F1</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>00369AB2</checksum>
-    </file>
-    <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -103,28 +95,22 @@
       <checksum>B37E7F24</checksum>
     </file>
     <file>
-      <filename>Pierbeam_Test.rb</filename>
+      <filename>materials.rb</filename>
       <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>4E15B583</checksum>
+      <usage_type>resource</usage_type>
+      <checksum>D5E9964F</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>73DEEBFE</checksum>
+      <checksum>D636DB8B</checksum>
     </file>
     <file>
-      <filename>constructions.rb</filename>
+      <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>2E8CE294</checksum>
-    </file>
-    <file>
-      <filename>materials.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>ADC77BC1</checksum>
+      <checksum>B8962888</checksum>
     </file>
     <file>
       <version>
@@ -135,7 +121,25 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>E0B1F38F</checksum>
+      <checksum>0CAACDDC</checksum>
+    </file>
+    <file>
+      <filename>Pierbeam_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>7BB732D4</checksum>
+    </file>
+    <file>
+      <filename>constructions.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>0190F500</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_PB_UA.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>0E56E587</checksum>
     </file>
   </files>
 </measure>

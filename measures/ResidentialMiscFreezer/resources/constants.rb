@@ -935,34 +935,76 @@ class Constants
   def self.SpaceTypeUnfinishedBasement
     return 'unfinished basement'
   end
-  def self.SurfaceTypeFloorFinInsUnfin
-    return 'FloorFinInsUnfin' # e.g., unfinished attic floor
+  def self.SurfaceTypeFloorFinInsUnfinAttic # unfinished attic floor
+    return 'FloorFinInsUnfinAttic'
   end
-  def self.SurfaceTypeRoofUnfinUninsExt
-    return 'RoofUnfinUninsExt' # e.g., garage roof
+  def self.SurfaceTypeFloorFinInsUnfin # interzonal or cantilevered floor
+    return 'FloorFinInsUnfin'
   end
-  def self.SurfaceTypeRoofUnfinInsExt
-    return 'RoofUnfinInsExt' # e.g., unfinished attic roof
+  def self.SurfaceTypeFloorFinUninsFin # floor between 1st/2nd story living spaces
+    return 'FloorFinUninsFin'
   end
-  def self.SurfaceTypeRoofFinInsExt
-    return 'RoofFinInsExt' # e.g., finished attic roof
+  def self.SurfaceTypeFloorUnfinUninsUnfin # floor between garage and attic
+    return 'FloorUnfinUninsUnfin'
   end
-  def self.SurfaceTypeWallExtInsFin # e.g., living exterior wall
+  def self.SurfaceTypeFloorFndGrndFinB # finished basement floor
+    return 'FloorFndGrndFinB'
+  end
+  def self.SurfaceTypeFloorFndGrndUnfinB # unfinished basement floor
+    return 'FloorFndGrndUnfinB'
+  end
+  def self.SurfaceTypeFloorFndGrndFinSlab # finished slab
+    return 'FloorFndGrndFinSlab'
+  end
+  def self.SurfaceTypeFloorFndGrndUnfinSlab # garage slab
+    return 'FloorFndGrndUnfinSlab'
+  end
+  def self.SurfaceTypeFloorUnfinBInsFin # unfinished basement ceiling
+    return 'FloorUnfinBInsFin'
+  end
+  def self.SurfaceTypeFloorCSInsFin # crawlspace ceiling
+    return 'FloorCSInsFin'
+  end
+  def self.SurfaceTypeFloorPBInsFin # pier beam ceiling
+    return 'FloorPBInsFin'
+  end
+  def self.SurfaceTypeFloorFndGrndCS # crawlspace floor
+    return 'FloorFndGrndCS'
+  end
+  def self.SurfaceTypeRoofUnfinUninsExt # garage roof
+    return 'RoofUnfinUninsExt'
+  end
+  def self.SurfaceTypeRoofUnfinInsExt # unfinished attic roof
+    return 'RoofUnfinInsExt'
+  end
+  def self.SurfaceTypeRoofFinInsExt # finished attic roof
+    return 'RoofFinInsExt'
+  end
+  def self.SurfaceTypeWallExtInsFin # living exterior wall
     return 'WallExtInsFin'
   end
-  def self.SurfaceTypeWallExtInsUnfin # e.g., attic gable wall under insulated roof
+  def self.SurfaceTypeWallExtInsUnfin # attic gable wall under insulated roof
     return 'WallExtInsUnfin'
   end
-  def self.SurfaceTypeWallExtUninsUnfin # e.g., garage exterior wall or attic gable wall under uninsulated roof
+  def self.SurfaceTypeWallExtUninsUnfin # garage exterior wall or attic gable wall under uninsulated roof
     return 'WallExtUninsUnfin'
   end
-  def self.SurfaceTypeWallIntFinInsUnfin # e.g., wall between finished/unfinished spaces
+  def self.SurfaceTypeWallFndGrndFinB # finished basement wall
+    return 'WallFndGrndFinB'
+  end
+  def self.SurfaceTypeWallFndGrndUnfinB # unfinished basement wall
+    return 'WallFndGrndUnfinB'
+  end
+  def self.SurfaceTypeWallFndGrndCS  # crawlspace wall
+    return 'WallFndGrndCS'
+  end
+  def self.SurfaceTypeWallIntFinInsUnfin # interzonal wall
     return 'WallIntFinInsUnfin'
   end
-  def self.SurfaceTypeWallIntFinUninsFin # e.g., wall between two finished spaces
+  def self.SurfaceTypeWallIntFinUninsFin # wall between two finished spaces
     return 'WallIntFinUninsFin'
   end
-  def self.SurfaceTypeWallIntUnfinUninsUnfin # e.g., wall between two unfinished spaces
+  def self.SurfaceTypeWallIntUnfinUninsUnfin # wall between two unfinished spaces
     return 'WallIntUnfinUninsUnfin'
   end
   def self.TerrainOcean

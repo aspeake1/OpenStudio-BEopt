@@ -6,12 +6,12 @@ require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/constructions"
 
 #start the measure
-class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measure::ModelMeasure
+class ProcessConstructionsFloors < OpenStudio::Measure::ModelMeasure
 
   #define the name that a user will see, this method may be deprecated as
   #the display name in PAT comes from the name field in measure.xml
   def name
-    return "Set Residential Foundations/Floors - Interzonal Floor Construction"
+    return "Set Residential Floor Construction"
   end
   
   def description
@@ -19,7 +19,7 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
   end
   
   def modeler_description
-    return "Calculates and assigns material layer properties of wood stud constructions for floors 1) between finished and unfinished spaces or 2) between finished spaces and outside. If the floors have an existing construction, the layers (other than floor covering and floor mass) are replaced. This measure is intended to be used in conjunction with Floor Covering and Floor Mass measures."
+    return "Calculates and assigns material layer properties of wood stud constructions for floors 1) between finished and unfinished spaces not covered by other measures or 2) between finished spaces and outside. Any existing constructions for these surfaces will be removed."
   end    
   
   #define the arguments that the user will input
@@ -36,22 +36,30 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
 
     #make a choice argument for wall cavity insulation installation grade
     installgrade_display_names = OpenStudio::StringVector.new
-    installgrade_display_names << "I"
-    installgrade_display_names << "II"
-    installgrade_display_names << "III"
+    installgrade_display_names << "1"
+    installgrade_display_names << "2"
+    installgrade_display_names << "3"
     install_grade = OpenStudio::Measure::OSArgument::makeChoiceArgument("install_grade", installgrade_display_names, true)
     install_grade.setDisplayName("Cavity Install Grade")
     install_grade.setDescription("Installation grade as defined by RESNET standard. 5% of the cavity is considered missing insulation for Grade 3, 2% for Grade 2, and 0% for Grade 1.")
-    install_grade.setDefaultValue("I")
+    install_grade.setDefaultValue("1")
     args << install_grade   
 
-    #make a choice argument for unfinished attic ceiling framing factor
+    #make a choice argument for ceiling framing factor
     framing_factor = OpenStudio::Measure::OSArgument::makeDoubleArgument("framing_factor", true)
     framing_factor.setDisplayName("Framing Factor")
     framing_factor.setUnits("frac")
     framing_factor.setDescription("The fraction of a floor assembly that is comprised of structural framing.")
     framing_factor.setDefaultValue(0.13)
     args << framing_factor
+    
+    #make a choice argument for joist height
+    joist_height_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("joist_height_in", true)
+    joist_height_in.setDisplayName("Joist Height")
+    joist_height_in.setUnits("in")
+    joist_height_in.setDescription("Height of the joist member.")
+    joist_height_in.setDefaultValue(5.5)
+    args << joist_height_in    
     
     return args
   end #end the arguments method
@@ -65,56 +73,34 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
       return false
     end
 
-    surfaces = get_interzonal_floor_surfaces(model)
-    
-    # Continue if no applicable surfaces
-    if surfaces.empty?
-      runner.registerAsNotApplicable("Measure not applied because no applicable surfaces were found.")
-      return true
-    end        
-    
+    floors_by_type = SurfaceTypes.get_floors(model, runner)
+
     # Get Inputs
-    intFloorCavityInsRvalueNominal = runner.getDoubleArgumentValue("cavity_r",user_arguments)
-    intFloorInstallGrade = {"I"=>1, "II"=>2, "III"=>3}[runner.getStringArgumentValue("install_grade",user_arguments)]
-    intFloorFramingFactor = runner.getDoubleArgumentValue("framing_factor",user_arguments)
+    cavity_r = runner.getDoubleArgumentValue("cavity_r",user_arguments)
+    install_grade = runner.getStringArgumentValue("install_grade",user_arguments).to_i
+    framing_factor = runner.getDoubleArgumentValue("framing_factor",user_arguments)
+    joist_height_in = runner.getDoubleArgumentValue("joist_height_in",user_arguments)
     
-    # Validate Inputs
-    if intFloorCavityInsRvalueNominal < 0.0
-        runner.registerError("Cavity Insulation Nominal R-value must be greater than or equal to 0.")
+    # Apply constructions
+    if not FloorConstructions.apply_foundation_ceiling(runner, model,
+                                                       floors_by_type[Constants.SurfaceTypeFloorFinInsUnfin],
+                                                       Constants.SurfaceTypeFloorFinInsUnfin,
+                                                       cavity_r, install_grade, framing_factor, joist_height_in, 
+                                                       0.75, Material.FloorWood, Material.CoveringBare)
         return false
     end
-    if intFloorFramingFactor < 0.0 or intFloorFramingFactor >= 1.0
-        runner.registerError("Framing Factor must be greater than or equal to 0 and less than 1.")
+    
+    if not FloorConstructions.apply_uninsulated(runner, model,
+                                                floors_by_type[Constants.SurfaceTypeFloorFinUninsFin],
+                                                Constants.SurfaceTypeFloorFinUninsFin,
+                                                0.75, 0.5, Material.FloorWood, Material.CoveringBare)
         return false
     end
     
-    # Process the floors
-    
-    # Define Materials
-    if intFloorCavityInsRvalueNominal == 0
-        mat_cavity = Material.AirCavityOpen(thick_in=Material.Stud2x6.thick_in)
-    else
-        mat_cavity = Material.new(name=nil, thick_in=Material.Stud2x6.thick_in, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=Material.Stud2x6.thick_in / intFloorCavityInsRvalueNominal)
-    end
-    mat_framing = Material.new(name=nil, thick_in=Material.Stud2x6.thick_in, mat_base=BaseMaterial.Wood)
-    mat_gap = Material.AirCavityClosed(Material.Stud2x6.thick_in)
-    mat_wood_floor = Material.new(name="Wood Floor", thick_in=0.625, mat_base=nil, k_in=0.8004, rho=34.0, cp=0.29) # wood surface
-    
-    # Set paths
-    izfGapFactor = get_gap_factor(intFloorInstallGrade, intFloorFramingFactor, intFloorCavityInsRvalueNominal)
-    path_fracs = [intFloorFramingFactor, 1 - intFloorFramingFactor - izfGapFactor, izfGapFactor]
-    
-    # Define construction
-    izf_const = Construction.new("UnfinInsFinFloor", path_fracs)
-    izf_const.add_layer(Material.AirFilmFloorReduced)
-    izf_const.add_layer([mat_framing, mat_cavity, mat_gap], "IntFloorIns")
-    izf_const.add_layer(Material.Plywood(0.75)) # sheathing added in separate measure
-    izf_const.add_layer(mat_wood_floor) # thermal mass added in separate measure
-    izf_const.add_layer(Material.CoveringBare) # floor covering added in separate measure
-    izf_const.add_layer(Material.AirFilmFloorReduced)
-    
-    # Create and assign construction to surfaces
-    if not izf_const.create_and_assign_constructions(surfaces, runner, model)
+    if not FloorConstructions.apply_uninsulated(runner, model,
+                                                floors_by_type[Constants.SurfaceTypeFloorUnfinUninsUnfin],
+                                                Constants.SurfaceTypeFloorUnfinUninsUnfin,
+                                                0.75, 0, nil, nil)
         return false
     end
     
@@ -125,31 +111,7 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
 
   end #end the run method
 
-  def get_interzonal_floor_surfaces(model)
-    surfaces = []
-    model.getSpaces.each do |space|
-        next if Geometry.space_is_unfinished(space)
-        next if Geometry.space_is_below_grade(space)
-        next if Geometry.get_pier_beam_spaces([space]).size > 0
-        space.surfaces.each do |surface|
-            next if surface.surfaceType.downcase != "floor"
-            if surface.outsideBoundaryCondition.downcase == "outdoors"
-                # Cantilevered floor between above-grade finished space and outside    
-                surfaces << surface
-            elsif surface.adjacentSurface.is_initialized and surface.adjacentSurface.get.space.is_initialized
-                adjacent_space = surface.adjacentSurface.get.space.get
-                next if Geometry.space_is_finished(adjacent_space)
-                next if Geometry.space_is_below_grade(adjacent_space)
-                next if Geometry.get_pier_beam_spaces([adjacent_space]).size > 0
-                # Floor between above-grade finished space and above-grade unfinished space
-                surfaces << surface
-            end
-        end
-    end
-    return surfaces
-  end
-  
 end #end the measure
 
 #this allows the measure to be use by the application
-ProcessConstructionsFoundationsFloorsInterzonalFloors.new.registerWithApplication
+ProcessConstructionsFloors.new.registerWithApplication

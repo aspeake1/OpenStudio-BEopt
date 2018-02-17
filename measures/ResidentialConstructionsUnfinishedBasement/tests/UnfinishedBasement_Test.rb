@@ -7,125 +7,124 @@ require 'fileutils'
 
 class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
 
-  def test_add_uninsulated
+  def test_uninsulated
     args_hash = {}
     args_hash["wall_ins_height"] = 0
     args_hash["wall_cavity_r"] = 0
-    args_hash["wall_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["wall_cavity_depth"] = 0
-    args_hash["wall_cavity_insfills"] = true
-    args_hash["wall_ff"] = 0
+    args_hash["wall_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["wall_cavity_depth_in"] = 0
+    args_hash["wall_filled_cavity"] = true
+    args_hash["wall_framing_factor"] = 0
     args_hash["wall_rigid_r"] = 0
-    args_hash["wall_rigid_thick_in"] = 0
-    args_hash["ceil_cavity_r"] = 0
-    args_hash["ceil_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
-    args_hash["exposed_perim"] = "134.16407864998726"
+    args_hash["ceiling_cavity_r"] = 0
+    args_hash["ceiling_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["ceiling_framing_factor"] = 0.13
+    args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0.09, "SurfacesWithConstructions"=>7}
+    ceiling_ins_r = 0.23495/2.598173704068639
+    ceiling_plywood_r = 0.01905/0.1154577
+    ceiling_mass_r = 0.015875/0.1154577
+    ceiling_carpet_r = 0.0127/0.0433443509615385
+    ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_add_half_wall_r10
+  def test_half_wall_r10
     args_hash = {}
     args_hash["wall_ins_height"] = 4
     args_hash["wall_cavity_r"] = 0
-    args_hash["wall_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["wall_cavity_depth"] = 0
-    args_hash["wall_cavity_insfills"] = true
-    args_hash["wall_ff"] = 0
+    args_hash["wall_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["wall_cavity_depth_in"] = 0
+    args_hash["wall_filled_cavity"] = true
+    args_hash["wall_framing_factor"] = 0
     args_hash["wall_rigid_r"] = 10
-    args_hash["wall_rigid_thick_in"] = 2
-    args_hash["ceil_cavity_r"] = 0
-    args_hash["ceil_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
+    args_hash["ceiling_cavity_r"] = 0
+    args_hash["ceiling_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["ceiling_framing_factor"] = 0.13
+    args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"WallRValue"=>1.76, "WallDepth"=>1.22, "CeilingRValue"=>0.09, "SurfacesWithConstructions"=>7}
+    ceiling_ins_r = 0.23495/2.598173704068639
+    ceiling_plywood_r = 0.01905/0.1154577
+    ceiling_mass_r = 0.015875/0.1154577
+    ceiling_carpet_r = 0.0127/0.0433443509615385
+    ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
+    expected_values = {"WallRValue"=>1.76, "WallDepth"=>1.22, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_add_whole_wall_r10
+  def test_whole_wall_r10
     args_hash = {}
     args_hash["wall_ins_height"] = 8
     args_hash["wall_cavity_r"] = 0
-    args_hash["wall_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["wall_cavity_depth"] = 0
-    args_hash["wall_cavity_insfills"] = true
-    args_hash["wall_ff"] = 0
+    args_hash["wall_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["wall_cavity_depth_in"] = 0
+    args_hash["wall_filled_cavity"] = true
+    args_hash["wall_framing_factor"] = 0
     args_hash["wall_rigid_r"] = 10
-    args_hash["wall_rigid_thick_in"] = 2
-    args_hash["ceil_cavity_r"] = 0
-    args_hash["ceil_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
+    args_hash["ceiling_cavity_r"] = 0
+    args_hash["ceiling_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["ceiling_framing_factor"] = 0.13
+    args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"WallRValue"=>1.76, "WallDepth"=>2.44, "CeilingRValue"=>0.09, "SurfacesWithConstructions"=>7}
+    ceiling_ins_r = 0.23495/2.598173704068639
+    ceiling_plywood_r = 0.01905/0.1154577
+    ceiling_mass_r = 0.015875/0.1154577
+    ceiling_carpet_r = 0.0127/0.0433443509615385
+    ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
+    expected_values = {"WallRValue"=>1.76, "WallDepth"=>2.44, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_add_whole_wall_r13_plus_r5
+  def test_whole_wall_r13_plus_r5
     args_hash = {}
     args_hash["wall_ins_height"] = 8
     args_hash["wall_cavity_r"] = 13
-    args_hash["wall_cavity_grade"] = "II"
-    args_hash["wall_cavity_depth"] = 3.5
-    args_hash["wall_cavity_insfills"] = true
-    args_hash["wall_ff"] = 0.25
+    args_hash["wall_install_grade"] = "2"
+    args_hash["wall_cavity_depth_in"] = 3.5
+    args_hash["wall_filled_cavity"] = true
+    args_hash["wall_framing_factor"] = 0.25
     args_hash["wall_rigid_r"] = 5
-    args_hash["wall_rigid_thick_in"] = 1
-    args_hash["ceil_cavity_r"] = 0
-    args_hash["ceil_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
+    args_hash["ceiling_cavity_r"] = 0
+    args_hash["ceiling_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["ceiling_framing_factor"] = 0.13
+    args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>5, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"WallRValue"=>1.79+0.88, "WallDepth"=>2.44+2.44, "CeilingRValue"=>0.09, "SurfacesWithConstructions"=>7}
+    ceiling_ins_r = 0.23495/2.598173704068639
+    ceiling_plywood_r = 0.01905/0.1154577
+    ceiling_mass_r = 0.015875/0.1154577
+    ceiling_carpet_r = 0.0127/0.0433443509615385
+    ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
+    expected_values = {"WallRValue"=>1.79+0.88, "WallDepth"=>2.44+2.44, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_add_ceiling_r13_gr3
+  def test_ceiling_r13_gr3
     args_hash = {}
     args_hash["wall_ins_height"] = 0
     args_hash["wall_cavity_r"] = 0
-    args_hash["wall_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["wall_cavity_depth"] = 0
-    args_hash["wall_cavity_insfills"] = true
-    args_hash["wall_ff"] = 0
+    args_hash["wall_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["wall_cavity_depth_in"] = 0
+    args_hash["wall_filled_cavity"] = true
+    args_hash["wall_framing_factor"] = 0
     args_hash["wall_rigid_r"] = 0
-    args_hash["wall_rigid_thick_in"] = 0
-    args_hash["ceil_cavity_r"] = 13
-    args_hash["ceil_cavity_grade"] = "III"
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
+    args_hash["ceiling_cavity_r"] = 13
+    args_hash["ceiling_install_grade"] = "3"
+    args_hash["ceiling_framing_factor"] = 0.13
+    args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>2.01, "SurfacesWithConstructions"=>7}
+    ceiling_ins_r = 0.23495/0.1168615354327202
+    ceiling_plywood_r = 0.01905/0.1154577
+    ceiling_mass_r = 0.015875/0.1154577
+    ceiling_carpet_r = 0.0127/0.0433443509615385
+    ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-
-  def test_add_whole_wall_r10_garage
-    args_hash = {}
-    args_hash["wall_ins_height"] = 8
-    args_hash["wall_cavity_r"] = 0
-    args_hash["wall_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["wall_cavity_depth"] = 0
-    args_hash["wall_cavity_insfills"] = true
-    args_hash["wall_ff"] = 0
-    args_hash["wall_rigid_r"] = 10
-    args_hash["wall_rigid_thick_in"] = 2
-    args_hash["ceil_cavity_r"] = 0
-    args_hash["ceil_cavity_grade"] = "II" # no insulation, shouldn't apply
-    args_hash["ceil_ff"] = 0.13
-    args_hash["ceil_joist_height"] = 9.25
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SurfacesWithConstructions"=>9}
-    _test_measure("SFD_2000sqft_2story_UB_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_wall_ins_height_negative
@@ -142,23 +141,23 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Cavity Insulation Installed R-value must be greater than or equal to 0.")
   end
 
-  def test_argument_error_wall_cavity_depth_negative
+  def test_argument_error_wall_cavity_depth_in_negative
     args_hash = {}
-    args_hash["wall_cavity_depth"] = -1
+    args_hash["wall_cavity_depth_in"] = -1
     result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Cavity Depth must be greater than or equal to 0.")
   end
 
   def test_argument_error_framing_factor_negative
     args_hash = {}
-    args_hash["wall_ff"] = -1
+    args_hash["wall_framing_factor"] = -1
     result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_framing_factor_eq_1
     args_hash = {}
-    args_hash["wall_ff"] = 1.0
+    args_hash["wall_framing_factor"] = 1.0
     result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Framing Factor must be greater than or equal to 0 and less than 1.")
   end
@@ -170,95 +169,34 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Continuous Insulation Nominal R-value must be greater than or equal to 0.")
   end
     
-  def test_argument_error_wall_rigid_thick_in_negative
+  def test_argument_error_ceiling_cavity_r_negative
     args_hash = {}
-    args_hash["wall_rigid_thick_in"] = -1
-    result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Continuous Insulation Thickness must be greater than or equal to 0.")
-  end
-
-  def test_argument_error_ceil_cavity_r_negative
-    args_hash = {}
-    args_hash["ceil_cavity_r"] = -1
+    args_hash["ceiling_cavity_r"] = -1
     result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Cavity Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
-  def test_argument_error_ceil_ff_negative
+  def test_argument_error_ceiling_framing_factor_negative
     args_hash = {}
-    args_hash["ceil_ff"] = -1
+    args_hash["ceiling_framing_factor"] = -1
     result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
-  def test_argument_error_ceil_ff_eq_1
+  def test_argument_error_ceiling_framing_factor_eq_1
     args_hash = {}
-    args_hash["ceil_ff"] = 1
+    args_hash["ceiling_framing_factor"] = 1
     result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
-  def test_argument_error_ceil_joist_height_zero
+  def test_argument_error_ceiling_joist_height_in_zero
     args_hash = {}
-    args_hash["ceil_joist_height"] =0
+    args_hash["ceiling_joist_height_in"] =0
     result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Joist Height must be greater than 0.")
   end
   
-  def test_argument_error_exposed_perimeter_bad_string
-    args_hash = {}
-    args_hash["exposed_perim"] = "bad"
-    result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exposed Perimeter must be auto or a number greater than or equal to 0.")
-  end
-
-  def test_argument_error_exposed_perimeter_negative
-    args_hash = {}
-    args_hash["exposed_perim"] = "-1"
-    result = _test_error("SFD_2000sqft_2story_UB_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exposed Perimeter must be auto or a number greater than or equal to 0.")
-  end
-
-  def test_not_applicable_no_geometry
-    args_hash = {}
-    _test_na(nil, args_hash)
-  end
-
-  def test_not_applicable_slab
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_slab_garage
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_finished_basement
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_FB_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_finished_basement_garage
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
-  end
-  
-  def test_not_applicable_crawl
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_CS_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_crawl_garage
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_CS_GRG_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_pier_beam
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_PB_UA.osm", args_hash)
-  end
-
   private
   
   def _test_error(osm_file, args_hash)
@@ -297,42 +235,6 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     return result
   end
   
-  def _test_na(osm_file, args_hash)
-    # create an instance of the measure
-    measure = ProcessConstructionsUnfinishedBasement.new
-
-    # create an instance of a runner
-    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-
-    model = get_model(File.dirname(__FILE__), osm_file)
-
-    # get arguments
-    arguments = measure.arguments(model)
-    argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
-
-    # populate argument with specified hash value if specified
-    arguments.each do |arg|
-      temp_arg_var = arg.clone
-      if args_hash[arg.name]
-        assert(temp_arg_var.setValue(args_hash[arg.name]))
-      end
-      argument_map[arg.name] = temp_arg_var
-    end
-
-    # run the measure
-    measure.run(model, runner, argument_map)
-    result = runner.result
-
-    # show the output
-    #show_output(result)
-
-    # assert that it returned NA
-    assert_equal("NA", result.value.valueName)
-    assert(result.info.size == 1)
-    
-    return result
-  end
-
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # create an instance of the measure
     measure = ProcessConstructionsUnfinishedBasement.new
@@ -382,10 +284,10 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
     
     # check we have the expected number of new/deleted objects
-    check_num_objects(all_new_objects, expected_num_new_objects, "added")
+    #check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "SurfacesWithConstructions"=>0}
+    actual_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -406,34 +308,34 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
                     actual_values["WallDepth"] += new_object.exteriorVerticalInsulationDepth.get
                 end
             elsif obj_type == "Construction"
-                next if !all_new_objects.keys.include?("Material")
-                model.getSurfaces.each do |surface|
-                  if surface.construction.is_initialized
-                    next unless surface.construction.get == new_object
-                    actual_values["SurfacesWithConstructions"] += 1
-                    if surface.surfaceType.downcase == "roofceiling"
-                      surface.construction.get.to_LayeredConstruction.get.layers.each do |layer|
+                if new_object.name.to_s.start_with? Constants.SurfaceTypeFloorUnfinBInsFin and not new_object.name.to_s.include? "Reversed"
+                    new_object.to_LayeredConstruction.get.layers.each do |layer|
                         mat = layer.to_StandardOpaqueMaterial.get
                         actual_values["CeilingRValue"] +=  mat.thickness/mat.conductivity
-                      end
                     end
-                  end
+                elsif new_object.name.to_s.start_with? Constants.SurfaceTypeFloorFndGrndUnfinB
+                    model.getSurfaces.each do |surface|
+                        next if not surface.construction.is_initialized
+                        next if surface.construction.get.name.to_s != new_object.name.to_s
+                        next if not surface.surfacePropertyExposedFoundationPerimeter.is_initialized
+                        actual_values["ExposedPerimeter"] += UnitConversions.convert(surface.surfacePropertyExposedFoundationPerimeter.get.totalExposedPerimeter.get,"m","ft")
+                    end
                 end
             end
         end
     end
     
     if not expected_values["WallRValue"].nil?
-      assert_in_epsilon(expected_values["WallRValue"], actual_values["WallRValue"], 0.03)
+      assert_in_epsilon(expected_values["WallRValue"], actual_values["WallRValue"], 0.01)
     end
     if not expected_values["WallDepth"].nil?
-      assert_in_epsilon(expected_values["WallDepth"], actual_values["WallDepth"], 0.03)
+      assert_in_epsilon(expected_values["WallDepth"], actual_values["WallDepth"], 0.01)
     end
     if not expected_values["CeilingRValue"].nil?
-      assert_in_epsilon(expected_values["CeilingRValue"], actual_values["CeilingRValue"], 0.05)
+      assert_in_epsilon(expected_values["CeilingRValue"], actual_values["CeilingRValue"], 0.03)
     end
-    if not expected_values["SurfacesWithConstructions"].nil?
-      assert_equal(expected_values["SurfacesWithConstructions"], actual_values["SurfacesWithConstructions"])
+    if not expected_values["ExposedPerimeter"].nil?
+      assert_in_epsilon(expected_values["ExposedPerimeter"], actual_values["ExposedPerimeter"], 0.01)
     end
 
     return model

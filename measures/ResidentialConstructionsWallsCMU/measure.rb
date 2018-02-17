@@ -21,7 +21,7 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calculates and assigns material layer properties of CMU constructions for 1) exterior walls of finished spaces, 2) exterior walls (e.g. gable walls) of unfinished attics under roof insulation, and 3) interior walls (e.g., attic knee walls) between finished and unfinished spaces. Uninsulated constructions will also be assigned to 1) exterior walls of unfinished spaces, 2) interior walls between finished spaces, and 3) interior walls between unfinished spaces. Any existing constructions for these surfaces will be removed."
+    return "Calculates and assigns material layer properties of CMU constructions for 1) exterior walls of finished spaces, 2) exterior walls (e.g. gable walls) of unfinished attics under roof insulation, and 3) interior walls (e.g., attic knee walls) between finished and unfinished spaces. Adds furniture & partition wall mass. Uninsulated constructions will also be assigned to 1) exterior walls of unfinished spaces, 2) interior walls between finished spaces, and 3) interior walls between unfinished spaces. Any existing constructions for these surfaces will be removed."
   end
 
   # define the arguments that the user will input
@@ -108,14 +108,6 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
     rigid_r.setDefaultValue(0.0)
     args << rigid_r
 
-    #make a double argument for Rigid Insulation Thickness
-    rigid_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("rigid_thick_in",true)
-    rigid_thick_in.setDisplayName("Continuous Insulation Thickness")
-    rigid_thick_in.setUnits("in")
-    rigid_thick_in.setDescription("The thickness of the continuous insulation.")
-    rigid_thick_in.setDefaultValue(0.0)
-    args << rigid_thick_in
-    
     #make a choice argument for exterior finish material
     finishes = OpenStudio::StringVector.new
     WallConstructions.get_exterior_finish_materials.each do |mat|
@@ -123,7 +115,7 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
     end
     exterior_finish = OpenStudio::Measure::OSArgument::makeChoiceArgument("exterior_finish", finishes, true)
     exterior_finish.setDisplayName("Exterior Finish")
-    exterior_finish.setDescription("The exterior finish.")
+    exterior_finish.setDescription("The exterior finish material.")
     exterior_finish.setDefaultValue(Material.ExtFinishVinylLight.name)
     args << exterior_finish
         
@@ -139,7 +131,7 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
       return false
     end
     
-    walls_by_type = get_wall_surfaces_by_type(model, runner)
+    walls_by_type = SurfaceTypes.get_walls(model, runner)
     
     # Get inputs
     thick_in = runner.getDoubleArgumentValue("thick_in",user_arguments)
@@ -152,42 +144,49 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
     drywall_thick_in = runner.getDoubleArgumentValue("drywall_thick_in",user_arguments)
     osb_thick_in = runner.getDoubleArgumentValue("osb_thick_in",user_arguments)
     rigid_r = runner.getDoubleArgumentValue("rigid_r",user_arguments)
-    rigid_thick_in = runner.getDoubleArgumentValue("rigid_thick_in",user_arguments)
     mat_ext_finish = WallConstructions.get_exterior_finish_material(runner.getStringArgumentValue("exterior_finish",user_arguments))
 
     # Apply constructions
-    if not WallConstructions.apply_cmu(walls_by_type[Constants.SurfaceTypeWallExtInsFin], 
-                                       runner, model, Constants.SurfaceTypeWallExtInsFin,
+    if not WallConstructions.apply_cmu(runner, model,
+                                       walls_by_type[Constants.SurfaceTypeWallExtInsFin], 
+                                       Constants.SurfaceTypeWallExtInsFin,
                                        thick_in, conductivity, density, framing_factor,
                                        furring_r, furring_cavity_depth, furring_spacing,
                                        drywall_thick_in, osb_thick_in, rigid_r,
-                                       rigid_thick_in, mat_ext_finish)
+                                       mat_ext_finish)
         return false
     end
     
-    if not WallConstructions.apply_cmu(walls_by_type[Constants.SurfaceTypeWallExtInsUnfin], 
-                                       runner, model, Constants.SurfaceTypeWallExtInsUnfin,
+    if not WallConstructions.apply_cmu(runner, model,
+                                       walls_by_type[Constants.SurfaceTypeWallExtInsUnfin], 
+                                       Constants.SurfaceTypeWallExtInsUnfin,
                                        thick_in, conductivity, density, framing_factor,
                                        furring_r, furring_cavity_depth, furring_spacing,
                                        0, osb_thick_in, rigid_r,
-                                       rigid_thick_in, mat_ext_finish)
+                                       mat_ext_finish)
         return false
     end
     
-    if not WallConstructions.apply_cmu(walls_by_type[Constants.SurfaceTypeWallIntFinInsUnfin], 
-                                       runner, model, Constants.SurfaceTypeWallIntFinInsUnfin,
+    if not WallConstructions.apply_cmu(runner, model,
+                                       walls_by_type[Constants.SurfaceTypeWallIntFinInsUnfin], 
+                                       Constants.SurfaceTypeWallIntFinInsUnfin,
                                        thick_in, conductivity, density, framing_factor,
                                        furring_r, furring_cavity_depth, furring_spacing,
                                        0, osb_thick_in, rigid_r,
-                                       rigid_thick_in, nil)
+                                       nil)
         return false
     end
     
-    if not WallConstructions.apply_uninsulated(walls_by_type, runner, model,
+    if not WallConstructions.apply_uninsulated(runner, model, walls_by_type,
                                                osb_thick_in, drywall_thick_in, mat_ext_finish)
         return false
     end
                                                    
+    if not ThermalMassConstructions.apply(runner, model, walls_by_type,
+                                          drywall_thick_in, 1.0, 1.0)
+        return false
+    end
+    
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)
         

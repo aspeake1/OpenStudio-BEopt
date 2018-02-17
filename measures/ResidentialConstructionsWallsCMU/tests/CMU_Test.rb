@@ -17,7 +17,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     args_hash["furring_cavity_depth"] = 1
     args_hash["furring_spacing"] = 24
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
@@ -38,7 +38,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     args_hash["furring_cavity_depth"] = 0
     args_hash["furring_spacing"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
@@ -47,8 +47,8 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     expected_values = {"AssemblyR"=>assembly_r}
     model = _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # Replace
-    expected_num_del_objects = {"Construction"=>2}
-    expected_num_new_objects = {"Construction"=>2}
+    expected_num_del_objects = {"Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_num_new_objects = {"Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -62,7 +62,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     args_hash["furring_cavity_depth"] = 2
     args_hash["furring_spacing"] = 24
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
@@ -85,10 +85,9 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     args_hash["drywall_thick_in"] = 1.0
     args_hash["osb_thick_in"] = 0
     args_hash["rigid_r"] = 10
-    args_hash["rigid_thick_in"] = 2
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>8, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.1016/0.793375
     drywall_r = 0.0254/0.1602906
     cmu_r = 0.1524/0.5895186350785937
@@ -251,7 +250,6 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
             if obj_type == "Construction"
-                puts new_object.name.to_s
                 next if not new_object.name.to_s.start_with? Constants.SurfaceTypeWallExtInsFin
                 new_object.to_LayeredConstruction.get.layers.each do |layer|
                     material = layer.to_StandardOpaqueMaterial.get

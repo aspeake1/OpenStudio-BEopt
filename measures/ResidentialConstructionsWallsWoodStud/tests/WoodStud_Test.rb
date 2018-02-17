@@ -7,7 +7,7 @@ require 'fileutils'
 
 class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
 
-  def test_uninsulated_2x4_and_insulate
+  def test_uninsulated_and_insulate
     args_hash = {}
     args_hash["cavity_r"] = 0
     args_hash["install_grade"] = "3" # no insulation, shouldn't apply
@@ -15,7 +15,7 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
     args_hash["cavity_filled"] = false
     args_hash["framing_factor"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
@@ -27,8 +27,8 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
     args_hash["cavity_r"] = 13
     args_hash["cavity_filled"] = true
     args_hash["install_grade"] = "2"
-    expected_num_del_objects = {"Material"=>1, "Construction"=>2}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>2}
+    expected_num_del_objects = {"Material"=>1, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     cavity_r = 0.0889/0.0569424553543112
     assembly_r = ext_finish_r + osb_r + drywall_r + cavity_r
     expected_values = {"AssemblyR"=>assembly_r}
@@ -43,7 +43,7 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
     args_hash["cavity_filled"] = false
     args_hash["framing_factor"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
@@ -61,7 +61,7 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
     args_hash["cavity_filled"] = true
     args_hash["framing_factor"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
@@ -79,7 +79,7 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
     args_hash["cavity_filled"] = true
     args_hash["framing_factor"] = 0.15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
@@ -99,10 +99,9 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
     args_hash["drywall_thick_in"] = 1.0
     args_hash["osb_thick_in"] = 0
     args_hash["rigid_r"] = 10
-    args_hash["rigid_thick_in"] = 2
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     ext_finish_r = 0.1016/0.793375
     drywall_r = 0.0254/0.1602906
     cavity_r = 0.1397/0.0448317763517687

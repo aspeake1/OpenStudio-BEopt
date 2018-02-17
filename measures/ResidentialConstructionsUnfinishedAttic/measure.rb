@@ -19,7 +19,7 @@ class ProcessConstructionsUnfinishedAttic < OpenStudio::Measure::ModelMeasure
   end
   
   def modeler_description
-    return "Calculates and assigns material layer properties of constructions for 1) floors between unfinished attic and living space and 2) unfinished attic roofs. Uninsulated constructions will also be assigned to other roofs over unfinished space. Any existing constructions for these surfaces will be removed."
+    return "Calculates and assigns material layer properties of constructions for unfinished attic: 1) floors and 2) roofs. Uninsulated constructions will also be assigned to other roofs over unfinished space. Any existing constructions for these surfaces will be removed."
   end    
   
   #define the arguments that the user will input
@@ -132,14 +132,6 @@ class ProcessConstructionsUnfinishedAttic < OpenStudio::Measure::ModelMeasure
     roof_rigid_r.setDefaultValue(0.0)
     args << roof_rigid_r
 
-    #make a double argument for roof rigid insulation thickness
-    roof_rigid_thick_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("roof_rigid_thick_in",true)
-    roof_rigid_thick_in.setDisplayName("Roof Continuous Insulation Thickness")
-    roof_rigid_thick_in.setUnits("in")
-    roof_rigid_thick_in.setDescription("The thickness of the roof continuous insulation.")
-    roof_rigid_thick_in.setDefaultValue(0.0)
-    args << roof_rigid_thick_in
-    
     #make a choice argument for roofing material
     roofings = OpenStudio::StringVector.new
     RoofConstructions.get_roofing_materials.each do |mat|
@@ -170,8 +162,8 @@ class ProcessConstructionsUnfinishedAttic < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    roofs_by_type = get_roof_surfaces_by_type(model, runner)
-    floors_by_type = get_floor_surfaces_by_type(model, runner)
+    roofs_by_type = SurfaceTypes.get_roofs(model, runner)
+    floors_by_type = SurfaceTypes.get_floors(model, runner)
     
     # Get Inputs
     ceiling_r = runner.getDoubleArgumentValue("ceiling_r",user_arguments)
@@ -187,30 +179,32 @@ class ProcessConstructionsUnfinishedAttic < OpenStudio::Measure::ModelMeasure
     roof_framing_thick_in = runner.getDoubleArgumentValue("roof_framing_thick_in",user_arguments)
     roof_osb_thick_in = runner.getDoubleArgumentValue("roof_osb_thick_in",user_arguments)
     roof_rigid_r = runner.getDoubleArgumentValue("roof_rigid_r",user_arguments)
-    roof_rigid_thick_in = runner.getDoubleArgumentValue("roof_rigid_thick_in",user_arguments)
     mat_roofing = RoofConstructions.get_roofing_material(runner.getStringArgumentValue("roofing_material",user_arguments))
     has_radiant_barrier = runner.getBoolArgumentValue("has_radiant_barrier",user_arguments)
     
     # Apply constructions
-    if not FloorConstructions.apply_unfinished_attic(floors_by_type[Constants.SurfaceTypeFloorFinInsUnfin],
-                                                     runner, model, Constants.SurfaceTypeFloorFinInsUnfin,
+    if not FloorConstructions.apply_unfinished_attic(runner, model,
+                                                     floors_by_type[Constants.SurfaceTypeFloorFinInsUnfinAttic],
+                                                     Constants.SurfaceTypeFloorFinInsUnfinAttic,
                                                      ceiling_r, ceiling_install_grade, ceiling_ins_thick_in,
                                                      ceiling_framing_factor, ceiling_joist_height_in,
                                                      ceiling_drywall_thick_in)
         return false
     end
     
-    if not RoofConstructions.apply_unfinished_attic(roofs_by_type[Constants.SurfaceTypeRoofUnfinInsExt],
-                                                    runner, model, Constants.SurfaceTypeRoofUnfinInsExt,
+    if not RoofConstructions.apply_unfinished_attic(runner, model,
+                                                    roofs_by_type[Constants.SurfaceTypeRoofUnfinInsExt],
+                                                    Constants.SurfaceTypeRoofUnfinInsExt,
                                                     roof_cavity_r, roof_install_grade, roof_cavity_ins_thick_in,
                                                     roof_framing_factor, roof_framing_thick_in,
-                                                    roof_osb_thick_in, roof_rigid_r, roof_rigid_thick_in,
+                                                    roof_osb_thick_in, roof_rigid_r,
                                                     mat_roofing, has_radiant_barrier)
         return false
     end
     
-    if not RoofConstructions.apply_uninsulated_roofs(roofs_by_type[Constants.SurfaceTypeRoofUnfinUninsExt],
-                                                     runner, model, Constants.SurfaceTypeRoofUnfinUninsExt,
+    if not RoofConstructions.apply_uninsulated_roofs(runner, model,
+                                                     roofs_by_type[Constants.SurfaceTypeRoofUnfinUninsExt],
+                                                     Constants.SurfaceTypeRoofUnfinUninsExt,
                                                      roof_framing_thick_in, roof_framing_factor, 
                                                      roof_osb_thick_in, mat_roofing)
         return false

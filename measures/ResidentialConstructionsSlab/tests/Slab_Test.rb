@@ -7,78 +7,55 @@ require 'fileutils'
 
 class ProcessConstructionsSlabTest < MiniTest::Test
 
-  def test_add_uninsulated
+  def test_uninsulated
     args_hash = {}
-    args_hash["exposed_perim"] = "134.16407864998726"
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SumRValues"=>0.077, "SumWidths"=>0, "SumDepths"=>0,"SurfacesWithConstructions"=>1}
+    expected_values = {"SumRValues"=>0.077, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>134.165}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_add_2ft_r5_perimeter_r5_gap
+  def test_2ft_r5_perimeter_r5_gap
     args_hash = {}
-    args_hash["perim_r"] = 5
-    args_hash["perim_width"] = 2
+    args_hash["perimeter_r"] = 5
+    args_hash["perimeter_width"] = 2
     args_hash["gap_r"] = 5
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SumRValues"=>0.077+0.88+0.88, "SumWidths"=>0.609, "SumDepths"=>0.1016, "SurfacesWithConstructions"=>1}
+    expected_values = {"SumRValues"=>0.077+0.88+0.88, "SumWidths"=>0.609, "SumDepths"=>0.1016, "ExposedPerimeter"=>134.167}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_add_4ft_r15_exterior
+  def test_4ft_r15_exterior
     args_hash = {}
-    args_hash["ext_depth"] = 4
-    args_hash["ext_r"] = 15
+    args_hash["exterior_depth"] = 4
+    args_hash["exterior_r"] = 15
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SumRValues"=>0.077+2.64, "SumWidths"=>0, "SumDepths"=>1.2192, "SurfacesWithConstructions"=>1}
+    expected_values = {"SumRValues"=>0.077+2.64, "SumWidths"=>0, "SumDepths"=>1.2192, "ExposedPerimeter"=>134.167}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_add_whole_slab_r20_r10_gap
+  def test_whole_slab_r20_r10_gap
     args_hash = {}
     args_hash["whole_r"] = 20
     args_hash["gap_r"] = 10
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>4, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SumRValues"=>0.077+1.76+3.52, "SumWidths"=>0, "SumDepths"=>0.1016, "SurfacesWithConstructions"=>1}
+    expected_values = {"SumRValues"=>0.077+1.76+3.52, "SumWidths"=>0, "SumDepths"=>0.1016, "ExposedPerimeter"=>134.167}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_add_whole_slab_r20_r10_gap_garage
+  def test_argument_error_perimeter_r_negative
     args_hash = {}
-    args_hash["whole_r"] = 20
-    args_hash["gap_r"] = 10
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SurfacesWithConstructions"=>1}
-    _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-  
-  def test_add_whole_slab_r20_r10_gap_garage_windows_doors
-    # This model has multiple front wall surfaces due to the door/window measures,
-    # which makes calculation of the exterior perimeter more complex.
-    args_hash = {}
-    args_hash["whole_r"] = 20
-    args_hash["gap_r"] = 10
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {} # FIXME {"LayerRValue"=>0.0254/0.00743+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
-    _test_measure("SFD_2000sqft_2story_SL_GRG_UA_Windows_Doors.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-
-  def test_argument_error_perim_r_negative
-    args_hash = {}
-    args_hash["perim_r"] = -1
+    args_hash["perimeter_r"] = -1
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Perimeter Insulation Nominal R-value must be greater than or equal to 0.")
   end
     
-  def test_argument_error_perim_width_negative
+  def test_argument_error_perimeter_width_negative
     args_hash = {}
-    args_hash["perim_width"] = -1
+    args_hash["perimeter_width"] = -1
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Perimeter Insulation Width must be greater than or equal to 0.")
   end
@@ -97,125 +74,18 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Gap Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
-  def test_argument_error_ext_r_negative
+  def test_argument_error_exterior_r_negative
     args_hash = {}
-    args_hash["ext_r"] = -1
+    args_hash["exterior_r"] = -1
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exterior Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
-  def test_argument_error_ext_depth_negative
+  def test_argument_error_exterior_depth_negative
     args_hash = {}
-    args_hash["ext_depth"] = -1
+    args_hash["exterior_depth"] = -1
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exterior Insulation Depth must be greater than or equal to 0.")
-  end
-
-  def test_argument_error_mass_thick_in_zero
-    args_hash = {}
-    args_hash["mass_thick_in"] = 0
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mass Thickness must be greater than 0.")
-  end
-
-  def test_argument_error_mass_conductivity_zero
-    args_hash = {}
-    args_hash["mass_conductivity"] = 0
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mass Conductivity must be greater than 0.")
-  end
-
-  def test_argument_error_mass_density_zero
-    args_hash = {}
-    args_hash["mass_density"] = 0
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mass Density must be greater than 0.")
-  end
-
-  def test_argument_error_mass_specific_heat_zero
-    args_hash = {}
-    args_hash["mass_specific_heat"] = 0
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mass Specific Heat must be greater than 0.")
-  end
-  
-  def test_argument_error_perimeter_insulation
-    args_hash = {}
-    args_hash["perim_r"] = 5
-    args_hash["perim_width"] = 0
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Perimeter insulation does not have both properties (R-value and Width) entered.")
-  end
-
-  def test_argument_error_exterior_insulation
-    args_hash = {}
-    args_hash["ext_r"] = 0
-    args_hash["ext_depth"] = 5
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exterior insulation does not have both properties (R-value and Depth) entered.")
-  end
-
-  def test_argument_error_invalid_configuration
-    args_hash = {}
-    args_hash["whole_r"] = 10
-    args_hash["ext_r"] = 10
-    args_hash["ext_depth"] = 10
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Invalid insulation configuration. The only valid configurations are: Exterior, Perimeter+Gap, Whole+Gap, Perimeter, or Whole.")
-  end
-  
-  def test_argument_error_exposed_perimeter_bad_string
-    args_hash = {}
-    args_hash["exposed_perim"] = "bad"
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exposed Perimeter must be auto or a number greater than or equal to 0.")
-  end
-
-  def test_argument_error_exposed_perimeter_negative
-    args_hash = {}
-    args_hash["exposed_perim"] = "-1"
-    result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Exposed Perimeter must be auto or a number greater than or equal to 0.")
-  end
-
-  def test_not_applicable_no_geometry
-    args_hash = {}
-    _test_na(nil, args_hash)
-  end
-
-  def test_not_applicable_crawl
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_CS_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_crawl_garage
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_CS_GRG_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_finished_basement
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_FB_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_finished_basement_garage
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
-  end
-  
-  def test_not_applicable_unfinished_basement
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_UB_UA.osm", args_hash)
-  end
-
-  def test_not_applicable_unfinished_basement_garage
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_UB_GRG_UA.osm", args_hash)
-  end
-  
-  def test_not_applicable_pier_beam
-    args_hash = {}
-    _test_na("SFD_2000sqft_2story_PB_UA.osm", args_hash)
   end
 
   private
@@ -256,42 +126,6 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     return result
   end
   
-  def _test_na(osm_file, args_hash)
-    # create an instance of the measure
-    measure = ProcessConstructionsSlab.new
-
-    # create an instance of a runner
-    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-
-    model = get_model(File.dirname(__FILE__), osm_file)
-
-    # get arguments
-    arguments = measure.arguments(model)
-    argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
-
-    # populate argument with specified hash value if specified
-    arguments.each do |arg|
-      temp_arg_var = arg.clone
-      if args_hash[arg.name]
-        assert(temp_arg_var.setValue(args_hash[arg.name]))
-      end
-      argument_map[arg.name] = temp_arg_var
-    end
-
-    # run the measure
-    measure.run(model, runner, argument_map)
-    result = runner.result
-
-    # show the output
-    #show_output(result)
-
-    # assert that it returned NA
-    assert_equal("NA", result.value.valueName)
-    assert(result.info.size == 1)
-    
-    return result
-  end
-
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # create an instance of the measure
     measure = ProcessConstructionsSlab.new
@@ -325,7 +159,7 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
-
+    
     # show the output
     #show_output(result)
 
@@ -344,7 +178,7 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"SumRValues"=>0, "SumWidths"=>0, "SumDepths"=>0, "SurfacesWithConstructions"=>0}
+    actual_values = {"SumRValues"=>0, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -372,34 +206,33 @@ class ProcessConstructionsSlabTest < MiniTest::Test
                     actual_values["SumDepths"] += new_object.exteriorVerticalInsulationDepth.get
                 end
             elsif obj_type == "Construction"
-                next if !all_new_objects.keys.include?("Material")
-                model.getSurfaces.each do |surface|
-                  if surface.construction.is_initialized
-                    next unless surface.construction.get == new_object
-                    actual_values["SurfacesWithConstructions"] += 1
-                    if surface.surfaceType.downcase == "floor"
-                      surface.construction.get.to_LayeredConstruction.get.layers.each do |layer|
+                if new_object.name.to_s.start_with? Constants.SurfaceTypeFloorFndGrndFinSlab
+                    new_object.to_LayeredConstruction.get.layers.each do |layer|
                         mat = layer.to_StandardOpaqueMaterial.get
-                        actual_values["SumRValues"] += mat.thickness/mat.conductivity
-                      end
+                        actual_values["SumRValues"] +=  mat.thickness/mat.conductivity
                     end
-                  end
-                end                
+                    model.getSurfaces.each do |surface|
+                        next if not surface.construction.is_initialized
+                        next if surface.construction.get.name.to_s != new_object.name.to_s
+                        next if not surface.surfacePropertyExposedFoundationPerimeter.is_initialized
+                        actual_values["ExposedPerimeter"] += UnitConversions.convert(surface.surfacePropertyExposedFoundationPerimeter.get.totalExposedPerimeter.get,"m","ft")
+                    end
+                end
             end
         end
     end
     
     if not expected_values["SumRValues"].nil?
-      assert_in_epsilon(expected_values["SumRValues"], actual_values["SumRValues"], 0.03)
+      assert_in_epsilon(expected_values["SumRValues"], actual_values["SumRValues"], 0.01)
     end
     if not expected_values["SumWidths"].nil?
-      assert_in_epsilon(expected_values["SumWidths"], actual_values["SumWidths"], 0.03)
+      assert_in_epsilon(expected_values["SumWidths"], actual_values["SumWidths"], 0.01)
     end
     if not expected_values["SumDepths"].nil?
-      assert_in_epsilon(expected_values["SumDepths"], actual_values["SumDepths"], 0.03)
+      assert_in_epsilon(expected_values["SumDepths"], actual_values["SumDepths"], 0.01)
     end
-    if not expected_values["SurfacesWithConstructions"].nil?
-        assert_equal(expected_values["SurfacesWithConstructions"], actual_values["SurfacesWithConstructions"])
+    if not expected_values["ExposedPerimeter"].nil?
+      assert_in_epsilon(expected_values["ExposedPerimeter"], actual_values["ExposedPerimeter"], 0.01)
     end
     
     return model

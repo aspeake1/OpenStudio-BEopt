@@ -24,6 +24,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 2
     args_hash["num_units"] = 4
+    args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>80, "ThermalZone"=>2*4+1, "Space"=>(2+1)*4+1, "SpaceType"=>3}

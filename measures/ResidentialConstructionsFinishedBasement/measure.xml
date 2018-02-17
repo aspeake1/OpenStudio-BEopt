@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>process_constructions_finished_basement</name>
   <uid>4b37c726-d6c4-473b-990a-0923c302ed36</uid>
-  <version_id>e9a70cc2-2f02-48f3-b9b5-50f20e9989a0</version_id>
-  <version_modified>20180209T225826Z</version_modified>
+  <version_id>b748cdc6-9cdc-48ef-9d75-9018a6dbca07</version_id>
+  <version_modified>20180217T014049Z</version_modified>
   <xml_checksum>1E963D9C</xml_checksum>
   <class_name>ProcessConstructionsFinishedBasement</class_name>
   <display_name>Set Residential Finished Basement Constructions</display_name>
   <description>This measure assigns constructions to finished basement walls and floors. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Calculates and assigns material layer properties of constructions for: 1) walls between below-grade finished space and ground, and 2) floors below below-grade finished space.</modeler_description>
+  <modeler_description>Calculates and assigns material layer properties of constructions for finished basement: 1) walls, and 2) floors. Any existing constructions for these surfaces will be removed.</modeler_description>
   <arguments>
     <argument>
       <name>wall_ins_height</name>
@@ -31,30 +31,30 @@
       <default_value>0</default_value>
     </argument>
     <argument>
-      <name>wall_cavity_grade</name>
+      <name>wall_install_grade</name>
       <display_name>Wall Cavity Install Grade</display_name>
       <description>Installation grade as defined by RESNET standard. 5% of the cavity is considered missing insulation for Grade 3, 2% for Grade 2, and 0% for Grade 1.</description>
       <type>Choice</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
-      <default_value>I</default_value>
+      <default_value>1</default_value>
       <choices>
         <choice>
-          <value>I</value>
-          <display_name>I</display_name>
+          <value>1</value>
+          <display_name>1</display_name>
         </choice>
         <choice>
-          <value>II</value>
-          <display_name>II</display_name>
+          <value>2</value>
+          <display_name>2</display_name>
         </choice>
         <choice>
-          <value>III</value>
-          <display_name>III</display_name>
+          <value>3</value>
+          <display_name>3</display_name>
         </choice>
       </choices>
     </argument>
     <argument>
-      <name>wall_cavity_depth</name>
+      <name>wall_cavity_depth_in</name>
       <display_name>Wall Cavity Depth</display_name>
       <description>Depth of the stud cavity. 3.5" for 2x4s, 5.5" for 2x6s, etc.</description>
       <type>Double</type>
@@ -64,7 +64,7 @@
       <default_value>0</default_value>
     </argument>
     <argument>
-      <name>wall_cavity_insfills</name>
+      <name>wall_filled_cavity</name>
       <display_name>Wall Insulation Fills Cavity</display_name>
       <description>When the insulation does not completely fill the depth of the cavity, air film resistances are added to the insulation R-value.</description>
       <type>Boolean</type>
@@ -83,7 +83,7 @@
       </choices>
     </argument>
     <argument>
-      <name>wall_ff</name>
+      <name>wall_framing_factor</name>
       <display_name>Wall Framing Factor</display_name>
       <description>The fraction of a basement wall assembly that is comprised of structural framing.</description>
       <type>Double</type>
@@ -103,44 +103,24 @@
       <default_value>10</default_value>
     </argument>
     <argument>
-      <name>wall_rigid_thick_in</name>
-      <display_name>Wall Continuous Insulation Thickness</display_name>
-      <description>The thickness of the continuous insulation.</description>
+      <name>wall_drywall_thick_in</name>
+      <display_name>Wall Drywall Thickness</display_name>
+      <description>Thickness of the wall drywall material.</description>
       <type>Double</type>
       <units>in</units>
       <required>true</required>
       <model_dependent>false</model_dependent>
-      <default_value>2</default_value>
+      <default_value>0.5</default_value>
     </argument>
     <argument>
-      <name>ceil_ff</name>
-      <display_name>Ceiling Framing Factor</display_name>
-      <description>Fraction of ceiling that is framing.</description>
+      <name>slab_whole_r</name>
+      <display_name>Whole Slab Insulation Nominal R-value</display_name>
+      <description>The R-value of the continuous insulation.</description>
       <type>Double</type>
-      <units>frac</units>
+      <units>h-ft^2-R/Btu</units>
       <required>true</required>
       <model_dependent>false</model_dependent>
-      <default_value>0.13</default_value>
-    </argument>
-    <argument>
-      <name>ceil_joist_height</name>
-      <display_name>Ceiling Joist Height</display_name>
-      <description>Height of the joist member.</description>
-      <type>Double</type>
-      <units>in</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>9.25</default_value>
-    </argument>
-    <argument>
-      <name>exposed_perim</name>
-      <display_name>Exposed Perimeter</display_name>
-      <description>Total length of the basement's perimeter that is on the exterior of the building's footprint.</description>
-      <type>String</type>
-      <units>ft</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>auto</default_value>
+      <default_value>0</default_value>
     </argument>
   </arguments>
   <outputs/>
@@ -162,66 +142,6 @@
   </attributes>
   <files>
     <file>
-      <filename>SFD_2000sqft_2story_UB_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>8582F1A0</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_UB_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>B53AFD21</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_PB_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>0BF85167</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>346001F1</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>7702DB6D</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>782A5F97</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_CS_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>9FD99008</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_CS_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>3A3ED0AC</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>6843B59F</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>00369AB2</checksum>
-    </file>
-    <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -234,28 +154,28 @@
       <checksum>B37E7F24</checksum>
     </file>
     <file>
-      <filename>FinishedBasement_Test.rb</filename>
+      <filename>materials.rb</filename>
       <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>8F8526FE</checksum>
+      <usage_type>resource</usage_type>
+      <checksum>D5E9964F</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>73DEEBFE</checksum>
+      <checksum>D636DB8B</checksum>
     </file>
     <file>
-      <filename>constructions.rb</filename>
+      <filename>FinishedBasement_Test.rb</filename>
       <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>2E8CE294</checksum>
+      <usage_type>test</usage_type>
+      <checksum>299C37A1</checksum>
     </file>
     <file>
-      <filename>materials.rb</filename>
+      <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>ADC77BC1</checksum>
+      <checksum>B8962888</checksum>
     </file>
     <file>
       <version>
@@ -266,7 +186,19 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>A1393F77</checksum>
+      <checksum>39B15FB9</checksum>
+    </file>
+    <file>
+      <filename>constructions.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>0190F500</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_UA.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>CFD1F69E</checksum>
     </file>
   </files>
 </measure>

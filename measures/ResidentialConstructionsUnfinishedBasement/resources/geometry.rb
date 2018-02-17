@@ -655,6 +655,16 @@ class Geometry
         return true
     end
     
+    def self.is_pier_beam_surface(surface)
+        if not surface.space.is_initialized
+            return false
+        end
+        if not Geometry.is_pier_beam(surface.space.get)
+            return false
+        end
+        return true
+    end
+    
     # Takes in a list of ground exposed floor surfaces for which to calculate the perimeter; 
     # checks for edges shared by a ground exposed floor and 1) exterior exposed or 2) interzonal wall.
     # TODO: Has not been tested on buildings with multiple foundations 
@@ -683,11 +693,11 @@ class Geometry
             ground_edges = self.get_edges_for_surfaces(surfaces, true)
         end
         
-        # Get bottom edges of exterior exposed walls or interzonal walls
+        # Get bottom edges of exterior exposed walls or interzonal walls or pier & beam walls
         surfaces = []
         model.getSurfaces.each do |surface|
             next if not surface.surfaceType.downcase == "wall"
-            next if not (self.is_exterior_surface(surface) or self.is_interzonal_surface(surface))
+            next if not (self.is_exterior_surface(surface) or self.is_interzonal_surface(surface) or self.is_pier_beam_surface(surface))
             surfaces << surface
         end
         model_edges = self.get_edges_for_surfaces(surfaces, false, true)
