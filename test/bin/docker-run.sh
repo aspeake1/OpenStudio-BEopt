@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Temporary fix; should be done by OpenStudio 2.0.6 installer
-apt-get update
-apt-get install -y libglu1-mesa libjpeg8 libfreetype6 libdbus-glib-1-2 libfontconfig1 libsm6 libxi6 autoconf libtool
-
 export CI=true
 export CIRCLECI=true
 export PATH="$HOME/.rbenv/bin:$PATH"
