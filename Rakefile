@@ -478,6 +478,14 @@ def generate_example_osws(data_hash, include_measures, exclude_measures,
   workflowJSON.setWorkflowSteps(steps)
   workflowJSON.save
   
+  # Strip created_at/updated_at
+  require 'json'
+  file = File.read(osw_path)
+  data_hash = JSON.parse(file)
+  data_hash.delete("created_at")
+  data_hash.delete("updated_at")
+  File.write(osw_path, JSON.pretty_generate(data_hash))
+  
 end
 
 # This method updates the "Measure Order" table in the README.md

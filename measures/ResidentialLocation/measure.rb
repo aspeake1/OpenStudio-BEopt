@@ -182,17 +182,8 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     # Set ground temperatures
     # ----------------  
     
-    # This correlation is the same that is used in DOE-2's src\WTH.f file, subroutine GTEMP.
     annual_temps = Array.new(12, weather.data.AnnualAvgDrybulb)
     annual_temps = annual_temps.map {|i| UnitConversions.convert(i,"F","C")}
-    
-    ground_temps = weather.data.GroundMonthlyTemps
-    ground_temps = ground_temps.map {|i| UnitConversions.convert(i,"F","C")}
-    
-    s_gt_bs = model.getSiteGroundTemperatureBuildingSurface
-    s_gt_bs.resetAllMonths
-    s_gt_bs.setAllMonthlyTemperatures(ground_temps)
-    
     s_gt_d = model.getSiteGroundTemperatureDeep
     s_gt_d.resetAllMonths
     s_gt_d.setAllMonthlyTemperatures(annual_temps)    
