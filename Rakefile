@@ -343,10 +343,48 @@ task :update_measures do
   # and get all_measures name (folders) in the correct order
   data_hash = get_and_proof_measure_order_json()
   
-  generate_example_osws(data_hash, "ResidentialGeometrySingleFamilyDetached", "example_single_family_detached.osw")
-  generate_example_osws(data_hash, "ResidentialGeometrySingleFamilyAttached", "example_single_family_attached.osw")
-  generate_example_osws(data_hash, "ResidentialGeometryMultifamily", "example_multifamily.osw")
-  generate_example_osws(data_hash, "ResidentialGeometryFromFloorspaceJS", "example_from_floorspacejs.osw")
+  exclude_measures = ["ResidentialGeometryOverhangs", 
+                      "ResidentialHotWaterSolar", 
+                      "ResidentialHVACCeilingFan", 
+                      "ResidentialHVACDehumidifier",
+                      "ResidentialMiscExtraRefrigerator",
+                      "ResidentialMiscFreezer",
+                      "ResidentialMiscHotTubHeaterElectric",
+                      "ResidentialMiscHotTubPump",
+                      "ResidentialMiscPoolHeaterElectric",
+                      "ResidentialMiscPoolPump",
+                      "ResidentialMiscWellPump",
+                      "ResidentialMiscGasFireplace",
+                      "ResidentialMiscGasGrill",
+                      "ResidentialMiscGasLighting"]
+  
+  # SFD
+  include_measures = ["ResidentialGeometrySingleFamilyDetached"]
+  generate_example_osws(data_hash, 
+                        include_measures, 
+                        exclude_measures,
+                        "example_single_family_detached.osw")
+  
+  # SFA
+  include_measures = ["ResidentialGeometrySingleFamilyAttached"]
+  generate_example_osws(data_hash, 
+                        include_measures, 
+                        exclude_measures,
+                        "example_single_family_attached.osw")
+  
+  # MF
+  include_measures = ["ResidentialGeometryMultifamily", "ResidentialConstructionsFinishedRoof"]
+  generate_example_osws(data_hash, 
+                        include_measures, 
+                        exclude_measures,
+                        "example_multifamily.osw")
+  
+  # FloorspaceJS
+  #include_measures = ["ResidentialGeometryFromFloorspaceJS"]
+  #generate_example_osws(data_hash,
+  #                      include_measures, 
+  #                      exclude_measures,
+  #                      "example_from_floorspacejs.osw")
   
   # Update README.md
   update_readme(data_hash)
@@ -355,7 +393,8 @@ end
 
 # This function will generate OpenStudio OSWs
 # with all the measures in it, in the order specified in /resources/measure-info.json
-def generate_example_osws(data_hash, geometry_measure, osw_filename)
+def generate_example_osws(data_hash, include_measures, exclude_measures, 
+                          osw_filename, simplify=true)
 
   require 'openstudio'
   require_relative 'resources/meta_measure'
@@ -376,24 +415,50 @@ def generate_example_osws(data_hash, geometry_measure, osw_filename)
   
   steps = OpenStudio::WorkflowStepVector.new
   
+  # Check for invalid measure names
+  all_measures = []
   data_hash.each do |group|
-    group["group_steps"].each_with_index do |group_step, group_step_idx|
-      
-        if group["group_name"].include? "Geometry" and group_step_idx == 0
-            measure = geometry_measure
-        else
-            measure = group_step["measures"][0]
+    group["group_steps"].each do |group_step|
+        group_step["measures"].each do |measure|
+            all_measures << measure
         end
+    end
+  end
+  (include_measures + exclude_measures).each do |m|
+      next if all_measures.include? m
+      puts "Error: No measure found with name '#{m}'."
+      exit
+  end
+  
+  data_hash.each do |group|
+    group["group_steps"].each do |group_step|
+      
+        # Default o first measure in step
+        measure = group_step["measures"][0]
+        
+        # Override with include measure?
+        include_measures.each do |include_measure|
+            if group_step["measures"].include? include_measure
+                measure = include_measure
+            end
+        end
+        
+        # Skip exclude measures
+        if exclude_measures.include? measure
+            next 
+        end
+        
         measure_path = File.expand_path(File.join("../measures", measure), workflowJSON.oswDir.to_s) 
 
         measure_instance = get_measure_instance("#{measure_path}/measure.rb")
         measure_args = measure_instance.arguments(model).sort_by {|arg| arg.name}
         
         step = OpenStudio::MeasureStep.new(measure)
-        step.setName(measure_instance.name)
-        step.setDescription(measure_instance.description)
-        
-        step.setModelerDescription(measure_instance.modeler_description)
+        if not simplify
+            step.setName(measure_instance.name)
+            step.setDescription(measure_instance.description)
+            step.setModelerDescription(measure_instance.modeler_description)
+        end
 
         # Loop on each argument
         measure_args.each do |arg|

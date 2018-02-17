@@ -114,7 +114,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     args = OpenStudio::Measure::OSArgumentVector.new
   
     #make a bool argument for showing debug information
-    show_debug_info = OpenStudio::Measure::OSArgument::makeBoolArgument("show_debug_info", true)
+    show_debug_info = OpenStudio::Measure::OSArgument::makeBoolArgument("show_debug_info", false)
     show_debug_info.setDisplayName("Show Debug Info")
     show_debug_info.setDescription("Displays various intermediate calculation results.")
     show_debug_info.setDefaultValue(false)
@@ -1090,8 +1090,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     Geometry.get_spaces_above_grade_exterior_roofs(thermal_zone.spaces).each do |roof|
     
         roof_color = get_unit_feature(runner, unit, Constants.SizingInfoRoofColor(roof), 'string')
+        return nil if roof_color.nil?
         roof_material = get_unit_feature(runner, unit, Constants.SizingInfoRoofMaterial(roof), 'string')
-        return false if roof_color.nil? or roof_material.nil?
+        return nil if roof_material.nil?
     
         cavity_r = get_unit_feature(runner, unit, Constants.SizingInfoRoofCavityRvalue(roof), 'double')
         return nil if cavity_r.nil?
