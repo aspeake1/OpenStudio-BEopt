@@ -12,11 +12,16 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
     args_hash["cavity_r"] = 0
     args_hash["install_grade"] = "3" # no insulation, shouldn't apply
     args_hash["cavity_depth"] = 5.5
-    args_hash["ins_fills_cavity"] = "false" # no insulation, shouldn't apply
+    args_hash["filled_cavity"] = false # no insulation, shouldn't apply
     args_hash["framing_factor"] = 0.07
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"AssemblyR"=>0}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>1}
+    roofing_r = 0.0094488/0.162714
+    osb_r = 0.01905/0.1154577
+    ins_r = 0.1397/0.6819557830565512
+    drywall_r = 0.0127/0.1602906
+    assembly_r = roofing_r + osb_r + ins_r + drywall_r
+    expected_values = {"AssemblyR"=>assembly_r}
     _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -25,11 +30,16 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
     args_hash["cavity_r"] = 0
     args_hash["install_grade"] = "3" # no insulation, shouldn't apply
     args_hash["cavity_depth"] = 5.5
-    args_hash["ins_fills_cavity"] = "true" # no insulation, shouldn't apply
+    args_hash["filled_cavity"] = true # no insulation, shouldn't apply
     args_hash["framing_factor"] = 0.07
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"AssemblyR"=>0}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>1}
+    roofing_r = 0.0094488/0.162714
+    osb_r = 0.01905/0.1154577
+    ins_r = 0.1397/0.6819557830565512
+    drywall_r = 0.0127/0.1602906
+    assembly_r = roofing_r + osb_r + ins_r + drywall_r
+    expected_values = {"AssemblyR"=>assembly_r}
     _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -38,11 +48,16 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
     args_hash["cavity_r"] = 17.3 # compressed R-value
     args_hash["install_grade"] = "1"
     args_hash["cavity_depth"] = 5.5
-    args_hash["ins_fills_cavity"] = "true"
+    args_hash["filled_cavity"] = true
     args_hash["framing_factor"] = 0.07
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"AssemblyR"=>0}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>1}
+    roofing_r = 0.0094488/0.162714
+    osb_r = 0.01905/0.1154577
+    ins_r = 0.1397/0.0499725655190589
+    drywall_r = 0.0127/0.1602906
+    assembly_r = roofing_r + osb_r + ins_r + drywall_r
+    expected_values = {"AssemblyR"=>assembly_r}
     _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -51,11 +66,16 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
     args_hash["cavity_r"] = 19
     args_hash["install_grade"] = "3"
     args_hash["cavity_depth"] = 9.25
-    args_hash["ins_fills_cavity"] = "false"
+    args_hash["filled_cavity"] = false
     args_hash["framing_factor"] = 0.11
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"AssemblyR"=>0}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>1}
+    roofing_r = 0.0094488/0.162714
+    osb_r = 0.01905/0.1154577
+    ins_r = 0.23495/0.0902761063120803
+    drywall_r = 0.0127/0.1602906
+    assembly_r = roofing_r + osb_r + ins_r + drywall_r
+    expected_values = {"AssemblyR"=>assembly_r}
     _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -112,7 +132,7 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
-      if args_hash[arg.name]
+      if args_hash.has_key?(arg.name)
         assert(temp_arg_var.setValue(args_hash[arg.name]))
       end
       argument_map[arg.name] = temp_arg_var
@@ -156,7 +176,7 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
-      if args_hash[arg.name]
+      if args_hash.has_key?(arg.name)
         assert(temp_arg_var.setValue(args_hash[arg.name]))
       end
       argument_map[arg.name] = temp_arg_var
@@ -190,6 +210,11 @@ class ProcessConstructionsFinishedRoofTest < MiniTest::Test
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
             if obj_type == "Construction"
+                next if not new_object.name.to_s.start_with? Constants.SurfaceTypeRoofFinInsExt
+                new_object.to_LayeredConstruction.get.layers.each do |layer|
+                    material = layer.to_StandardOpaqueMaterial.get
+                    actual_values["AssemblyR"] += material.thickness/material.conductivity
+                end
             end
         end
     end

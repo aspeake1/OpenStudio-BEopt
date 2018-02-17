@@ -6,7 +6,7 @@ require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/constructions"
 
 #start the measure
-class ProcessConstructionsCeilingsRoofsFinishedRoof < OpenStudio::Measure::ModelMeasure
+class ProcessConstructionsFinishedRoof < OpenStudio::Measure::ModelMeasure
 
   #define the name that a user will see, this method may be deprecated as
   #the display name in PAT comes from the name field in measure.xml
@@ -156,4 +156,4 @@ class ProcessConstructionsCeilingsRoofsFinishedRoof < OpenStudio::Measure::Model
 end #end the measure
 
 #this allows the measure to be use by the application
-ProcessConstructionsCeilingsRoofsFinishedRoof.new.registerWithApplication
+ProcessConstructionsFinishedRoof.new.registerWithApplication

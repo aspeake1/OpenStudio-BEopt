@@ -182,6 +182,7 @@ class ProcessConstructionsUnfinishedAttic < OpenStudio::Measure::ModelMeasure
     mat_roofing = RoofConstructions.get_roofing_material(runner.getStringArgumentValue("roofing_material",user_arguments))
     has_radiant_barrier = runner.getBoolArgumentValue("has_radiant_barrier",user_arguments)
     
+    puts "has_radiant_barrier #{has_radiant_barrier}"
     # Apply constructions
     if not FloorConstructions.apply_unfinished_attic(runner, model,
                                                      floors_by_type[Constants.SurfaceTypeFloorFinInsUnfinAttic],
