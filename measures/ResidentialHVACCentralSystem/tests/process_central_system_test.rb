@@ -137,6 +137,16 @@ class ProcessCentralSystemTest < MiniTest::Test
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
 
+  def test_successful_run
+    num_zones = 8
+    args_hash = {}
+    args_hash["system_type"] = "Baseboards"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ControllerWaterCoil"=>2*num_zones, "PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "CoilHeatingWater"=>num_zones, "CoilCoolingWater"=>num_zones, "FanOnOff"=>3*num_zones, "ZoneHVACFourPipeFanCoil"=>num_zones, "ZoneHVACEnergyRecoveryVentilatorController"=>num_zones, "HeatExchangerAirToAirSensibleAndLatent"=>num_zones, "ZoneHVACEnergyRecoveryVentilator"=>num_zones}
+    expected_values = {}
+    _test_measure("central_system_1.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
   private
 
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, num_infos=0, num_warnings=0, debug=false)
@@ -174,8 +184,8 @@ class ProcessCentralSystemTest < MiniTest::Test
     result = runner.result
 
     # save the model to test output directory
-    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
-    # model.save(output_file_path, true)
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    model.save(output_file_path, true)
 
     # show_output(result)
 
