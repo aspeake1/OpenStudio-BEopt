@@ -278,24 +278,6 @@ class ResidentialClothesWasherTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Occupancy hot water multiplier must be greater than or equal to 0.0.")
   end
 
-  def test_error_missing_geometry
-    args_hash = {}
-    result = _test_error(nil, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "No building geometry has been defined.")
-  end
-  
-  def test_error_missing_beds
-    args_hash = {}
-    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
-  end
-  
-  def test_error_missing_location
-    args_hash = {}
-    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mains water temperature has not been set.")
-  end
-
   def test_error_missing_water_heater
     args_hash = {}
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)

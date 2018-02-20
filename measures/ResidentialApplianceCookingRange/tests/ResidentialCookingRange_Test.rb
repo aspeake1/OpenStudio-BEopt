@@ -19,8 +19,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_new_construction_gas
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -30,8 +30,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_new_construction_propane
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["fuel_type"] = Constants.FuelTypePropane
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -41,8 +41,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_new_construction_electric
     args_hash = {}
-    args_hash["c_ef"] = 0.74
-    args_hash["o_ef"] = 0.11
+    args_hash["cooktop_ef"] = 0.74
+    args_hash["oven_ef"] = 0.11
     args_hash["fuel_type"] = Constants.FuelTypeElectric
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -52,8 +52,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_new_construction_electric_induction
     args_hash = {}
-    args_hash["c_ef"] = 0.84
-    args_hash["o_ef"] = 0.11
+    args_hash["cooktop_ef"] = 0.84
+    args_hash["oven_ef"] = 0.11
     args_hash["fuel_type"] = Constants.FuelTypeElectric
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -63,9 +63,9 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_new_construction_no_elec_ignition
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
-    args_hash["e_ignition"] = "false"
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
+    args_hash["has_elec_ignition"] = "false"
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
@@ -75,8 +75,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
 
   def test_new_construction_mult_0_80
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["mult"] = 0.80
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
@@ -87,8 +87,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_new_construction_modified_schedule
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["weekday_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
     args_hash["weekend_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
     args_hash["monthly_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12"
@@ -101,8 +101,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
 
   def test_new_construction_basement
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["location"] = Constants.SpaceTypeFinishedBasement
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
@@ -113,8 +113,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_new_construction_garage
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["location"] = Constants.SpaceTypeGarage
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
@@ -125,16 +125,16 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_retrofit_replace_gas_with_propane
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>80, "Annual_therm"=>28.5, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["c_ef"] = 0.2
-    args_hash["o_ef"] = 0.02
+    args_hash["cooktop_ef"] = 0.2
+    args_hash["oven_ef"] = 0.02
     args_hash["fuel_type"] = Constants.FuelTypePropane
     expected_num_del_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -144,16 +144,16 @@ class ResidentialCookingRangeTest < MiniTest::Test
   
   def test_retrofit_replace_propane_with_gas
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["fuel_type"] = Constants.FuelTypePropane
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>80, "Annual_therm"=>0, "Annual_gal"=>31.1, "FuelType"=>Constants.FuelTypePropane, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["c_ef"] = 0.2
-    args_hash["o_ef"] = 0.02
+    args_hash["cooktop_ef"] = 0.2
+    args_hash["oven_ef"] = 0.02
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -163,18 +163,18 @@ class ResidentialCookingRangeTest < MiniTest::Test
 
   def test_retrofit_replace_add_ignition
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
-    args_hash["e_ignition"] = "false"
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
+    args_hash["has_elec_ignition"] = "false"
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>0, "Annual_therm"=>28.5, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["c_ef"] = 0.2
-    args_hash["o_ef"] = 0.02
-    args_hash["e_ignition"] = "true"
+    args_hash["cooktop_ef"] = 0.2
+    args_hash["oven_ef"] = 0.02
+    args_hash["has_elec_ignition"] = "true"
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -182,20 +182,20 @@ class ResidentialCookingRangeTest < MiniTest::Test
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
-  def test_retrofit_replace_remove_ignition
+  def test_retrofit_replace_removhas_elec_ignition
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
-    args_hash["e_ignition"] = "true"
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
+    args_hash["has_elec_ignition"] = "true"
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>80, "Annual_therm"=>28.5, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["c_ef"] = 0.2
-    args_hash["o_ef"] = 0.02
-    args_hash["e_ignition"] = "false"
+    args_hash["cooktop_ef"] = 0.2
+    args_hash["oven_ef"] = 0.02
+    args_hash["has_elec_ignition"] = "false"
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
@@ -205,16 +205,16 @@ class ResidentialCookingRangeTest < MiniTest::Test
 
   def test_retrofit_replace_electric_with_gas
     args_hash = {}
-    args_hash["c_ef"] = 0.74
-    args_hash["o_ef"] = 0.11
+    args_hash["cooktop_ef"] = 0.74
+    args_hash["oven_ef"] = 0.11
     args_hash["fuel_type"] = Constants.FuelTypeElectric
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>500, "Annual_therm"=>0, "Annual_gal"=>0, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -222,18 +222,18 @@ class ResidentialCookingRangeTest < MiniTest::Test
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
-  def test_retrofit_replace_gas_cooking_range_ignition_with_electric
+  def test_retrofit_replace_gas_cooking_ranghas_elec_ignition_with_electric
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>80, "Annual_therm"=>28.5, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["c_ef"] = 0.74
-    args_hash["o_ef"] = 0.11
+    args_hash["cooktop_ef"] = 0.74
+    args_hash["oven_ef"] = 0.11
 	args_hash["fuel_type"] = Constants.FuelTypeElectric
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -243,8 +243,8 @@ class ResidentialCookingRangeTest < MiniTest::Test
     
   def test_retrofit_remove_gas
     args_hash = {}
-    args_hash["c_ef"] = 0.4
-    args_hash["o_ef"] = 0.058
+    args_hash["cooktop_ef"] = 0.4
+    args_hash["oven_ef"] = 0.058
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -258,44 +258,44 @@ class ResidentialCookingRangeTest < MiniTest::Test
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
-  def test_argument_error_c_ef_lt_0
+  def test_argument_error_cooktop_ef_lt_0
     args_hash = {}
-    args_hash["c_ef"] = -1.0
+    args_hash["cooktop_ef"] = -1.0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cooktop energy factor must be greater than 0 and less than or equal to 1.")
   end
   
-  def test_argument_error_c_ef_eq_0
+  def test_argument_error_cooktop_ef_eq_0
     args_hash = {}
-    args_hash["c_ef"] = 0.0
+    args_hash["cooktop_ef"] = 0.0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cooktop energy factor must be greater than 0 and less than or equal to 1.")
   end
   
-  def test_argument_error_c_ef_gt_1
+  def test_argument_error_cooktop_ef_gt_1
     args_hash = {}
-    args_hash["c_ef"] = 1.1
+    args_hash["cooktop_ef"] = 1.1
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cooktop energy factor must be greater than 0 and less than or equal to 1.")
   end
   
-  def test_argument_error_o_ef_lt_0
+  def test_argument_error_oven_ef_lt_0
     args_hash = {}
-    args_hash["o_ef"] = -1.0
+    args_hash["oven_ef"] = -1.0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Oven energy factor must be greater than 0 and less than or equal to 1.")
   end
   
-  def test_argument_error_o_ef_eq_0
+  def test_argument_error_oven_ef_eq_0
     args_hash = {}
-    args_hash["o_ef"] = 0.0
+    args_hash["oven_ef"] = 0.0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Oven energy factor must be greater than 0 and less than or equal to 1.")
   end
   
-  def test_argument_error_o_ef_gt_1
+  def test_argument_error_oven_ef_gt_1
     args_hash = {}
-    args_hash["o_ef"] = 1.1
+    args_hash["oven_ef"] = 1.1
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Oven energy factor must be greater than 0 and less than or equal to 1.")
   end
@@ -349,12 +349,6 @@ class ResidentialCookingRangeTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
   
-  def test_error_missing_beds
-    args_hash = {}
-    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
-  end
-    
   def test_error_missing_geometry
     args_hash = {}
     result = _test_error(nil, args_hash)

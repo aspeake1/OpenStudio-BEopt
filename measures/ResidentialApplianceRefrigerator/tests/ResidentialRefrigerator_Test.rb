@@ -10,7 +10,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
   def test_new_construction_none1
     # Using rated annual consumption
     args_hash = {}
-    args_hash["fridge_E"] = 0.0
+    args_hash["rated_annual_energy"] = 0.0
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "Location"=>args_hash["location"]}
@@ -29,7 +29,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
   
   def test_new_construction_ef_17_6
     args_hash = {}
-    args_hash["fridge_E"] = 434.0
+    args_hash["rated_annual_energy"] = 434.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>434.0, "Location"=>args_hash["location"]}
@@ -38,7 +38,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
   
   def test_new_construction_mult_0_95
     args_hash = {}
-    args_hash["fridge_E"] = 434.0
+    args_hash["rated_annual_energy"] = 434.0
     args_hash["mult"] = 0.95
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -48,7 +48,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
   
   def test_new_construction_mult_1_05
     args_hash = {}
-    args_hash["fridge_E"] = 434.0
+    args_hash["rated_annual_energy"] = 434.0
     args_hash["mult"] = 1.05
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -58,7 +58,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
   
   def test_new_construction_modified_schedule
     args_hash = {}
-    args_hash["fridge_E"] = 434.0
+    args_hash["rated_annual_energy"] = 434.0
     args_hash["weekday_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
     args_hash["weekend_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
     args_hash["monthly_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12"
@@ -70,7 +70,7 @@ class ResidentialRefrigeratorTest < MiniTest::Test
 
   def test_new_construction_basement
     args_hash = {}
-    args_hash["fridge_E"] = 434.0
+    args_hash["rated_annual_energy"] = 434.0
     args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
@@ -80,13 +80,13 @@ class ResidentialRefrigeratorTest < MiniTest::Test
 
   def test_retrofit_replace
     args_hash = {}
-    args_hash["fridge_E"] = 434.0
+    args_hash["rated_annual_energy"] = 434.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>434.0, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["fridge_E"] = 348.0
+    args_hash["rated_annual_energy"] = 348.0
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>348.0, "Location"=>args_hash["location"]}
@@ -95,22 +95,22 @@ class ResidentialRefrigeratorTest < MiniTest::Test
     
   def test_retrofit_remove
     args_hash = {}
-    args_hash["fridge_E"] = 434.0
+    args_hash["rated_annual_energy"] = 434.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>434.0, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["fridge_E"] = 0.0
+    args_hash["rated_annual_energy"] = 0.0
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "Location"=>args_hash["location"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
-  def test_argument_error_fridge_E_negative
+  def test_argument_error_rated_annual_energy_negative
     args_hash = {}
-    args_hash["fridge_E"] = -1.0
+    args_hash["rated_annual_energy"] = -1.0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated annual consumption must be greater than or equal to 0.")
   end
