@@ -410,7 +410,7 @@ class ClothesWasher
           sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameClothesWasher + " schedule", 
                                      Constants.ObjectNameClothesWasher + " temperature schedule", 
                                      nbeds, sch_unit_index, d_sh, "ClothesWasher", water_temp, 
-                                     File.join(File.dirname(__FILE__), ".."))
+                                     File.expand_path("..", File.dirname(__FILE__)))
           if not sch.validated?
               return false
           end
@@ -1168,7 +1168,7 @@ class Dishwasher
           sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameDishwasher + " schedule", 
                                      Constants.ObjectNameDishwasher + " temperature schedule", 
                                      nbeds, sch_unit_index, d_sh, "Dishwasher", wh_setpoint, 
-                                     File.join(File.dirname(__FILE__), ".."))
+                                     File.expand_path("..", File.dirname(__FILE__)))
           if not sch.validated?
               return false
           end
