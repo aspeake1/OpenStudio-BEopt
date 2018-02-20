@@ -84,7 +84,7 @@ class ClothesWasher
   def self.apply(model, unit, runner, imef, rated_annual_energy, annual_cost,
                  test_date, drum_volume, cold_cycle, thermostatic_control,
                  internal_heater, fill_sensor, mult_e, mult_hw, d_sh, cd_sch,
-                 space, plant_loop, mains_temps)
+                 space, plant_loop, mains_temps, measure_dir)
   
       #Check for valid inputs
       if imef <= 0
@@ -410,7 +410,7 @@ class ClothesWasher
           sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameClothesWasher + " schedule", 
                                      Constants.ObjectNameClothesWasher + " temperature schedule", 
                                      nbeds, sch_unit_index, d_sh, "ClothesWasher", water_temp, 
-                                     File.expand_path("..", File.dirname(__FILE__)))
+                                     measure_dir)
           if not sch.validated?
               return false
           end
@@ -933,7 +933,7 @@ class Dishwasher
   def self.apply(model, unit, runner, num_settings, rated_annual_energy,
                  cold_inlet, has_internal_heater, cold_use, test_date,
                  annual_gas_cost, mult_e, mult_hw, d_sh, space, plant_loop, 
-                 mains_temps)
+                 mains_temps, measure_dir)
                  
       #Check for valid inputs
       if num_settings < 1
@@ -1168,7 +1168,7 @@ class Dishwasher
           sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameDishwasher + " schedule", 
                                      Constants.ObjectNameDishwasher + " temperature schedule", 
                                      nbeds, sch_unit_index, d_sh, "Dishwasher", wh_setpoint, 
-                                     File.expand_path("..", File.dirname(__FILE__)))
+                                     measure_dir)
           if not sch.validated?
               return false
           end
