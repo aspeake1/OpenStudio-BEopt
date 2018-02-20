@@ -365,15 +365,12 @@ class SetResidentialWindowArea < OpenStudio::Measure::ModelMeasure
       return true
     end
 
-    overhangs_added = Geometry.process_overhangs(model, runner, depth, offset, facade_bools_hash)
-
-    final_msg = "The building has been assigned #{tot_win_area.round(1)} ft^2 total window area"
-    if overhangs_added
-      final_msg += " with overhangs"
+    result = Geometry.process_overhangs(model, runner, depth, offset, facade_bools_hash)
+    unless result
+      return false
     end
-    final_msg += "."
 
-    runner.registerFinalCondition(final_msg)
+    runner.registerFinalCondition("The building has been assigned #{tot_win_area.round(1)} ft^2 total window area.")
 
     return true
 

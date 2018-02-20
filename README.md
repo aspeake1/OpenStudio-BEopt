@@ -78,13 +78,12 @@ The order in which these measures are called is important. For example, the Wind
 |:---|:---|:---|
 |1. Location|1. Location||
 |2. Geometry|1. Geometry - Single-Family Detached (or Single-Family Attached or Multifamily)||
-||2. Number of Beds and Baths||
-||3. Number of Occupants|Beds/Baths|
-||4. Orientation||
-||5. Eaves||
-||6. Door Area||
-||7. Window Areas / Overhangs||
-||9. Neighbors||
+||2. Number of Occupants|Beds/Baths|
+||3. Orientation||
+||4. Eaves||
+||5. Door Area||
+||6. Window Areas / Overhangs||
+||7. Neighbors||
 |3. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
 ||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
 ||3. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||

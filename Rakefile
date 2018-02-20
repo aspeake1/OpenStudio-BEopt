@@ -358,28 +358,28 @@ task :update_measures do
                       "ResidentialMiscGasLighting"]
   
   # SFD
-  include_measures = ["ResidentialGeometrySingleFamilyDetached"]
+  include_measures = ["ResidentialGeometryCreateSingleFamilyDetached"]
   generate_example_osws(data_hash, 
                         include_measures, 
                         exclude_measures,
                         "example_single_family_detached.osw")
   
   # SFA
-  include_measures = ["ResidentialGeometrySingleFamilyAttached"]
+  include_measures = ["ResidentialGeometryCreateSingleFamilyAttached"]
   generate_example_osws(data_hash, 
                         include_measures, 
                         exclude_measures,
                         "example_single_family_attached.osw")
   
   # MF
-  include_measures = ["ResidentialGeometryMultifamily", "ResidentialConstructionsFinishedRoof"]
+  include_measures = ["ResidentialGeometryCreateMultifamily", "ResidentialConstructionsFinishedRoof"]
   generate_example_osws(data_hash, 
                         include_measures, 
                         exclude_measures,
                         "example_multifamily.osw")
   
   # FloorspaceJS
-  #include_measures = ["ResidentialGeometryFromFloorspaceJS"]
+  #include_measures = ["ResidentialGeometryCreateFromFloorspaceJS"]
   #generate_example_osws(data_hash,
   #                      include_measures, 
   #                      exclude_measures,

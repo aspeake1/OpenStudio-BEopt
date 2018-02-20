@@ -1,5 +1,6 @@
 require "#{File.dirname(__FILE__)}/constants"
 require "#{File.dirname(__FILE__)}/unit_conversions"
+require "#{File.dirname(__FILE__)}/util"
 
 class Geometry
 
@@ -1237,11 +1238,9 @@ class Geometry
       if num_removed == 0
         runner.registerAsNotApplicable("No overhangs were added or removed.")
       end
-      return false
     end
 
     windows_found = false
-
     sub_surfaces.each do |sub_surface|
 
       windows_found = true
@@ -1258,7 +1257,6 @@ class Geometry
 
     unless windows_found
       runner.registerAsNotApplicable("No windows found for adding overhangs.")
-      return false
     end
 
     return true
@@ -1272,6 +1270,85 @@ class Geometry
       sub_surfaces << sub_surface
     end
     return sub_surfaces
+  end
+
+  def self.process_beds_and_baths(model, runner, num_br, num_ba)
+
+    # error checking
+    if not num_br.all? {|x| MathTools.valid_float?(x)}
+      runner.registerError("Number of bedrooms must be a numerical value.")
+      return false
+    else
+      num_br = num_br.map(&:to_f)
+    end
+    if not num_ba.all? {|x| MathTools.valid_float?(x)}
+      runner.registerError("Number of bathrooms must be a numerical value.")
+      return false
+    else
+      num_ba = num_ba.map(&:to_f)
+    end
+    if num_br.any? {|x| x <= 0 or x % 1 != 0}
+      runner.registerError("Number of bedrooms must be a positive integer.")
+      return false
+    end
+    if num_ba.any? {|x| x <= 0 or x % 0.25 != 0}
+      runner.registerError("Number of bathrooms must be a positive multiple of 0.25.")
+      return false
+    end
+    if num_br.length > 1 and num_ba.length > 1 and num_br.length != num_ba.length
+      runner.registerError("Number of bedroom elements specified inconsistent with number of bathroom elements specified.")
+      return false
+    end
+
+    # Get building units
+    units = Geometry.get_building_units(model, runner)
+    if units.nil?
+      return false
+    end
+
+    # error checking
+    if num_br.length > 1 and num_br.length != units.size
+      runner.registerError("Number of bedroom elements specified inconsistent with number of multifamily units defined in the model.")
+      return false
+    end
+    if num_ba.length > 1 and num_ba.length != units.size
+      runner.registerError("Number of bathroom elements specified inconsistent with number of multifamily units defined in the model.")
+      return false
+    end
+
+    if units.size > 1 and num_br.length == 1
+      if num_br.length == 1
+        num_br = Array.new(units.size, num_br[0])
+      end
+      if num_ba.length == 1
+        num_ba = Array.new(units.size, num_ba[0])
+      end
+    end
+
+    # Update number of bedrooms/bathrooms
+    total_num_br = 0
+    total_num_ba = 0
+    units.each_with_index do |unit, unit_index|
+
+      num_br[unit_index] = num_br[unit_index].to_i
+      num_ba[unit_index] = num_ba[unit_index].to_f
+
+      unit.setFeature(Constants.BuildingUnitFeatureNumBedrooms, num_br[unit_index])
+      unit.setFeature(Constants.BuildingUnitFeatureNumBathrooms, num_ba[unit_index])
+
+      if units.size > 1
+        runner.registerInfo("Unit '#{unit_index}' has been assigned #{num_br[unit_index].to_s} bedroom(s) and #{num_ba[unit_index].round(2).to_s} bathroom(s).")
+      end
+
+      total_num_br += num_br[unit_index]
+      total_num_ba += num_ba[unit_index]
+
+    end
+
+    runner.registerInfo("The building has been assigned #{total_num_br.to_s} bedroom(s) and #{total_num_ba.round(2).to_s} bathroom(s) across #{units.size} unit(s).")
+
+    return true
+
   end
 
 end
