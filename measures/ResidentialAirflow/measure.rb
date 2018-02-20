@@ -2190,11 +2190,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
     spaces.each do |space|
 
-      if space.volume == 0
-        space.f_t_SG = 0 # FIXME: until we figure out how to deal with volumes
-      else
-        space.f_t_SG = wind_speed.site_terrain_multiplier * ((space.height + space.coord_z) / 32.8) ** wind_speed.site_terrain_exponent / (wind_speed.terrain_multiplier * (wind_speed.height / 32.8) ** wind_speed.terrain_exponent)
-      end
+      space.f_t_SG = wind_speed.site_terrain_multiplier * ((space.height + space.coord_z) / 32.8) ** wind_speed.site_terrain_exponent / (wind_speed.terrain_multiplier * (wind_speed.height / 32.8) ** wind_speed.terrain_exponent)
 
       if space.inf_method == @infMethodSG
         space.f_s_SG = 2.0 / 3.0 * (1 + space.hor_lk_frac / 2.0) * (2.0 * space.neutral_level * (1.0 - space.neutral_level)) ** 0.5 / (space.neutral_level ** 0.5 + (1.0 - space.neutral_level) ** 0.5)
@@ -2227,138 +2223,129 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     infil.assumed_inside_temp = Constants.AssumedInsideTemp # deg F, used other places. Make available.
 
     if not infil.InfiltrationLivingSpaceACH50.nil?
-      if unit.living.volume == 0
-          infil.A_o = 0 # FIXME: until we figure out how to deal with volumes
-          unit.living.SLA = 0
-          unit.living.ELA = 0
-          unit.living.ACH = 0
-          unit.living.inf_flow = 0
+      # Living Space Infiltration
+      unit.living.inf_method = @infMethodASHRAE
+
+      # Based on "Field Validation of Algebraic Equations for Stack and
+      # Wind Driven Air Infiltration Calculations" by Walker and Wilson (1998)
+
+      # Pressure Exponent
+      infil.n_i = 0.67
+
+      # Calculate SLA for above-grade portion of the building
+      building.SLA = Airflow.get_infiltration_SLA_from_ACH50(infil.InfiltrationLivingSpaceACH50, infil.n_i, building.above_grade_finished_floor_area, building.above_grade_volume)
+
+      # Effective Leakage Area (ft^2)
+      infil.A_o = building.SLA * building.above_grade_finished_floor_area * (unit.above_grade_exterior_wall_area/building.above_grade_exterior_wall_area)
+
+      # Calculate SLA for unit
+      unit.living.SLA = infil.A_o / unit.above_grade_finished_floor_area
+
+      # Flow Coefficient (cfm/inH2O^n) (based on ASHRAE HoF)
+      infil.C_i = infil.A_o * (2.0 / outside_air_density) ** 0.5 * delta_pref ** (0.5 - infil.n_i) * inf_conv_factor
+
+      has_flue = false
+      if has_hvac_flue or has_water_heater_flue or has_fireplace_chimney
+        has_flue = true
+      end
+
+      if has_flue
+        infil.Y_i = 0.2 # Fraction of leakage through the flue; 0.2 is a "typical" value according to THE ALBERTA AIR INFIL1RATION MODEL, Walker and Wilson, 1990
+        infil.flue_height = building.building_height + 2.0 # ft
+        infil.S_wflue = 1.0 # Flue Shelter Coefficient
       else
-          # Living Space Infiltration
-          unit.living.inf_method = @infMethodASHRAE
+        infil.Y_i = 0.0 # Fraction of leakage through the flu
+        infil.flue_height = 0.0 # ft
+        infil.S_wflue = 0.0 # Flue Shelter Coefficient
+      end
 
-          # Based on "Field Validation of Algebraic Equations for Stack and
-          # Wind Driven Air Infiltration Calculations" by Walker and Wilson (1998)
+      vented_crawl = false
+      if (not building.crawlspace_zone.nil? and building.crawlspace.ACH > 0) or (not building.pierbeam_zone.nil? and building.pierbeam.ACH > 0)
+        vented_crawl = true
+      end
 
-          # Pressure Exponent
-          infil.n_i = 0.67
+      # Leakage distributions per Iain Walker (LBL) recommendations
+      if vented_crawl
+        # 15% ceiling, 35% walls, 50% floor leakage distribution for vented crawl
+        lkage_ceiling = 0.15
+        lkage_walls = 0.35
+        lkage_floor = 0.50
+      else
+        # 25% ceiling, 50% walls, 25% floor leakage distribution for slab/basement/unvented crawl
+        lkage_ceiling = 0.25
+        lkage_walls = 0.50
+        lkage_floor = 0.25
+      end
+      if lkage_ceiling + lkage_walls + lkage_floor !=  1
+        runner.registerError("Invalid air leakage distribution specified (#{lkage_ceiling}, #{lkage_walls}, #{lkage_floor}); does not add up to 1.")
+        return false
+      end
+      infil.R_i = (lkage_ceiling + lkage_floor)
+      infil.X_i = (lkage_ceiling - lkage_floor)
+      infil.R_i = infil.R_i * (1 - infil.Y_i)
+      infil.X_i = infil.X_i * (1 - infil.Y_i)
 
-          # Calculate SLA for above-grade portion of the building
-          building.SLA = Airflow.get_infiltration_SLA_from_ACH50(infil.InfiltrationLivingSpaceACH50, infil.n_i, building.above_grade_finished_floor_area, building.above_grade_volume)
+      unit.living.hor_lk_frac = infil.R_i
+      infil.Z_f = infil.flue_height / (unit.living.height + unit.living.coord_z)
 
-          # Effective Leakage Area (ft^2)
-          infil.A_o = building.SLA * building.above_grade_finished_floor_area * (unit.above_grade_exterior_wall_area/building.above_grade_exterior_wall_area)
+      # Calculate Stack Coefficient
+      infil.M_o = (infil.X_i + (2.0 * infil.n_i + 1.0) * infil.Y_i) ** 2.0 / (2 - infil.R_i)
 
-          # Calculate SLA for unit
-          unit.living.SLA = infil.A_o / unit.above_grade_finished_floor_area
+      if infil.M_o <=  1.0
+        infil.M_i = infil.M_o # eq. 10
+      else
+        infil.M_i = 1.0 # eq. 11
+      end
 
-          # Flow Coefficient (cfm/inH2O^n) (based on ASHRAE HoF)
-          infil.C_i = infil.A_o * (2.0 / outside_air_density) ** 0.5 * delta_pref ** (0.5 - infil.n_i) * inf_conv_factor
+      if has_flue
+        # Eq. 13
+        infil.X_c = infil.R_i + (2.0 * (1.0 - infil.R_i - infil.Y_i)) / (infil.n_i + 1.0) - 2.0 * infil.Y_i * (infil.Z_f - 1.0) ** infil.n_i
+        # Additive flue function, Eq. 12
+        infil.F_i = infil.n_i * infil.Y_i * (infil.Z_f - 1.0) ** ((3.0 * infil.n_i - 1.0) / 3.0) * (1.0 - (3.0 * (infil.X_c - infil.X_i) ** 2.0 * infil.R_i ** (1 - infil.n_i)) / (2.0 * (infil.Z_f + 1.0)))
+      else
+        # Critical value of ceiling-floor leakage difference where the
+        # neutral level is located at the ceiling (eq. 13)
+        infil.X_c = infil.R_i + (2.0 * (1.0 - infil.R_i - infil.Y_i)) / (infil.n_i + 1.0)
+        # Additive flue function (eq. 12)
+        infil.F_i = 0.0
+      end
 
-          has_flue = false
-          if has_hvac_flue or has_water_heater_flue or has_fireplace_chimney
-            has_flue = true
-          end
+      infil.f_s = ((1.0 + infil.n_i * infil.R_i) / (infil.n_i + 1.0)) * (0.5 - 0.5 * infil.M_i ** (1.2)) ** (infil.n_i + 1.0) + infil.F_i
 
-          if has_flue
-            infil.Y_i = 0.2 # Fraction of leakage through the flue; 0.2 is a "typical" value according to THE ALBERTA AIR INFIL1RATION MODEL, Walker and Wilson, 1990
-            infil.flue_height = building.building_height + 2.0 # ft
-            infil.S_wflue = 1.0 # Flue Shelter Coefficient
-          else
-            infil.Y_i = 0.0 # Fraction of leakage through the flu
-            infil.flue_height = 0.0 # ft
-            infil.S_wflue = 0.0 # Flue Shelter Coefficient
-          end
+      infil.stack_coef = infil.f_s * (UnitConversions.convert(outside_air_density * Constants.g * unit.living.height,"lbm/(ft*s^2)","inH2O") / (infil.assumed_inside_temp + 460.0)) ** infil.n_i # inH2O^n/R^n
 
-          vented_crawl = false
-          if (not building.crawlspace_zone.nil? and building.crawlspace.ACH > 0) or (not building.pierbeam_zone.nil? and building.pierbeam.ACH > 0)
-            vented_crawl = true
-          end
+      # Calculate wind coefficient
+      if vented_crawl
 
-          # Leakage distributions per Iain Walker (LBL) recommendations
-          if vented_crawl
-            # 15% ceiling, 35% walls, 50% floor leakage distribution for vented crawl
-            lkage_ceiling = 0.15
-            lkage_walls = 0.35
-            lkage_floor = 0.50
-          else
-            # 25% ceiling, 50% walls, 25% floor leakage distribution for slab/basement/unvented crawl
-            lkage_ceiling = 0.25
-            lkage_walls = 0.50
-            lkage_floor = 0.25
-          end
-          if lkage_ceiling + lkage_walls + lkage_floor !=  1
-            runner.registerError("Invalid air leakage distribution specified (#{lkage_ceiling}, #{lkage_walls}, #{lkage_floor}); does not add up to 1.")
-            return false
-          end
-          infil.R_i = (lkage_ceiling + lkage_floor)
-          infil.X_i = (lkage_ceiling - lkage_floor)
-          infil.R_i = infil.R_i * (1 - infil.Y_i)
-          infil.X_i = infil.X_i * (1 - infil.Y_i)
+        if infil.X_i > 1.0 - 2.0 * infil.Y_i
+          # Critical floor to ceiling difference above which f_w does not change (eq. 25)
+          infil.X_i = 1.0 - 2.0 * infil.Y_i
+        end
 
-          unit.living.hor_lk_frac = infil.R_i
-          infil.Z_f = infil.flue_height / (unit.living.height + unit.living.coord_z)
+        # Redefined R for wind calculations for houses with crawlspaces (eq. 21)
+        infil.R_x = 1.0 - infil.R_i * (infil.n_i / 2.0 + 0.2)
+        # Redefined Y for wind calculations for houses with crawlspaces (eq. 22)
+        infil.Y_x = 1.0 - infil.Y_i / 4.0
+        # Used to calculate X_x (eq.24)
+        infil.X_s = (1.0 - infil.R_i) / 5.0 - 1.5 * infil.Y_i
+        # Redefined X for wind calculations for houses with crawlspaces (eq. 23)
+        infil.X_x = 1.0 - (((infil.X_i - infil.X_s) / (2.0 - infil.R_i)) ** 2.0) ** 0.75
+        # Wind factor (eq. 20)
+        infil.f_w = 0.19 * (2.0 - infil.n_i) * infil.X_x * infil.R_x * infil.Y_x
 
-          # Calculate Stack Coefficient
-          infil.M_o = (infil.X_i + (2.0 * infil.n_i + 1.0) * infil.Y_i) ** 2.0 / (2 - infil.R_i)
+      else
 
-          if infil.M_o <=  1.0
-            infil.M_i = infil.M_o # eq. 10
-          else
-            infil.M_i = 1.0 # eq. 11
-          end
-
-          if has_flue
-            # Eq. 13
-            infil.X_c = infil.R_i + (2.0 * (1.0 - infil.R_i - infil.Y_i)) / (infil.n_i + 1.0) - 2.0 * infil.Y_i * (infil.Z_f - 1.0) ** infil.n_i
-            # Additive flue function, Eq. 12
-            infil.F_i = infil.n_i * infil.Y_i * (infil.Z_f - 1.0) ** ((3.0 * infil.n_i - 1.0) / 3.0) * (1.0 - (3.0 * (infil.X_c - infil.X_i) ** 2.0 * infil.R_i ** (1 - infil.n_i)) / (2.0 * (infil.Z_f + 1.0)))
-          else
-            # Critical value of ceiling-floor leakage difference where the
-            # neutral level is located at the ceiling (eq. 13)
-            infil.X_c = infil.R_i + (2.0 * (1.0 - infil.R_i - infil.Y_i)) / (infil.n_i + 1.0)
-            # Additive flue function (eq. 12)
-            infil.F_i = 0.0
-          end
-
-          infil.f_s = ((1.0 + infil.n_i * infil.R_i) / (infil.n_i + 1.0)) * (0.5 - 0.5 * infil.M_i ** (1.2)) ** (infil.n_i + 1.0) + infil.F_i
-
-          infil.stack_coef = infil.f_s * (UnitConversions.convert(outside_air_density * Constants.g * unit.living.height,"lbm/(ft*s^2)","inH2O") / (infil.assumed_inside_temp + 460.0)) ** infil.n_i # inH2O^n/R^n
-
-          # Calculate wind coefficient
-          if vented_crawl
-
-            if infil.X_i > 1.0 - 2.0 * infil.Y_i
-              # Critical floor to ceiling difference above which f_w does not change (eq. 25)
-              infil.X_i = 1.0 - 2.0 * infil.Y_i
-            end
-
-            # Redefined R for wind calculations for houses with crawlspaces (eq. 21)
-            infil.R_x = 1.0 - infil.R_i * (infil.n_i / 2.0 + 0.2)
-            # Redefined Y for wind calculations for houses with crawlspaces (eq. 22)
-            infil.Y_x = 1.0 - infil.Y_i / 4.0
-            # Used to calculate X_x (eq.24)
-            infil.X_s = (1.0 - infil.R_i) / 5.0 - 1.5 * infil.Y_i
-            # Redefined X for wind calculations for houses with crawlspaces (eq. 23)
-            infil.X_x = 1.0 - (((infil.X_i - infil.X_s) / (2.0 - infil.R_i)) ** 2.0) ** 0.75
-            # Wind factor (eq. 20)
-            infil.f_w = 0.19 * (2.0 - infil.n_i) * infil.X_x * infil.R_x * infil.Y_x
-
-          else
-
-            infil.J_i = (infil.X_i + infil.R_i + 2.0 * infil.Y_i) / 2.0
-            infil.f_w = 0.19 * (2.0 - infil.n_i) * (1.0 - ((infil.X_i + infil.R_i) / 2.0) ** (1.5 - infil.Y_i)) - infil.Y_i / 4.0 * (infil.J_i - 2.0 * infil.Y_i * infil.J_i ** 4.0)
-
-          end
-
-          infil.wind_coef = infil.f_w * UnitConversions.convert(outside_air_density / 2.0,"lbm/ft^3","inH2O/mph^2") ** infil.n_i # inH2O^n/mph^2n
-
-          unit.living.ACH = Airflow.get_infiltration_ACH_from_SLA(unit.living.SLA, building.stories, @weather)
-
-          # Convert living space ACH to cfm:
-          unit.living.inf_flow = unit.living.ACH / UnitConversions.convert(1.0,"hr","min") * unit.living.volume # cfm
+        infil.J_i = (infil.X_i + infil.R_i + 2.0 * infil.Y_i) / 2.0
+        infil.f_w = 0.19 * (2.0 - infil.n_i) * (1.0 - ((infil.X_i + infil.R_i) / 2.0) ** (1.5 - infil.Y_i)) - infil.Y_i / 4.0 * (infil.J_i - 2.0 * infil.Y_i * infil.J_i ** 4.0)
 
       end
+
+      infil.wind_coef = infil.f_w * UnitConversions.convert(outside_air_density / 2.0,"lbm/ft^3","inH2O/mph^2") ** infil.n_i # inH2O^n/mph^2n
+
+      unit.living.ACH = Airflow.get_infiltration_ACH_from_SLA(unit.living.SLA, building.stories, @weather)
+
+      # Convert living space ACH to cfm:
+      unit.living.inf_flow = unit.living.ACH / UnitConversions.convert(1.0,"hr","min") * unit.living.volume # cfm
 
     end
 
@@ -2369,11 +2356,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
     spaces.each do |space|
 
-      if space.volume == 0
-        space.f_t_SG = 0 # FIXME: until we figure out how to deal with volumes
-      else
-        space.f_t_SG = wind_speed.site_terrain_multiplier * ((space.height + space.coord_z) / 32.8) ** wind_speed.site_terrain_exponent / (wind_speed.terrain_multiplier * (wind_speed.height / 32.8) ** wind_speed.terrain_exponent)
-      end
+      space.f_t_SG = wind_speed.site_terrain_multiplier * ((space.height + space.coord_z) / 32.8) ** wind_speed.site_terrain_exponent / (wind_speed.terrain_multiplier * (wind_speed.height / 32.8) ** wind_speed.terrain_exponent)
 
       if space.inf_method == @infMethodSG
         space.f_s_SG = 2.0 / 3.0 * (1 + space.hor_lk_frac / 2.0) * (2.0 * space.neutral_level * (1.0 - space.neutral_level)) ** 0.5 / (space.neutral_level ** 0.5 + (1.0 - space.neutral_level) ** 0.5)
