@@ -83,8 +83,7 @@ The order in which these measures are called is important. For example, the Wind
 ||4. Orientation||
 ||5. Eaves||
 ||6. Door Area||
-||7. Window Areas||
-||8. Overhangs|Window Areas|
+||7. Window Areas / Overhangs||
 ||9. Neighbors||
 |3. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
 ||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||

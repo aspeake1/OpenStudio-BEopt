@@ -343,8 +343,7 @@ task :update_measures do
   # and get all_measures name (folders) in the correct order
   data_hash = get_and_proof_measure_order_json()
   
-  exclude_measures = ["ResidentialGeometryOverhangs", 
-                      "ResidentialHotWaterSolar", 
+  exclude_measures = ["ResidentialHotWaterSolar", 
                       "ResidentialHVACCeilingFan", 
                       "ResidentialHVACDehumidifier",
                       "ResidentialMiscExtraRefrigerator",

@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>set_residential_window_area</name>
   <uid>d05f5b32-1ad6-4c3d-964a-0dbd49a7fde8</uid>
-  <version_id>ce1779f6-5c99-45fc-858e-c193ac9bd08d</version_id>
-  <version_modified>20180220T144306Z</version_modified>
+  <version_id>4a5e94de-bff1-44b0-81ac-ef5fb5908a8d</version_id>
+  <version_modified>20180220T173925Z</version_modified>
   <xml_checksum>9014E219</xml_checksum>
   <class_name>SetResidentialWindowArea</class_name>
   <display_name>Set Residential Window Area</display_name>
-  <description>Sets the window area for the building. Doors with glazing should be set as window area. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Automatically creates and positions standard residential windows based on the specified window area on each building facade. Windows are only added to surfaces between finished space and outside. Any existing windows are removed.</modeler_description>
+  <description>Sets the window area for the building. Doors with glazing should be set as window area. Also, sets presence/dimensions of overhangs for windows on the specified building facade(s). See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>Automatically creates and positions standard residential windows based on the specified window area on each building facade. Windows are only added to surfaces between finished space and outside. Any existing windows are removed. Also, creates overhang shading surfaces for windows on the specified building facade(s) and specified depth/offset. Any existing overhang shading surfaces are removed.</modeler_description>
   <arguments>
     <argument>
       <name>front_wwr</name>
@@ -91,6 +91,102 @@
       <model_dependent>false</model_dependent>
       <default_value>1.333</default_value>
     </argument>
+    <argument>
+      <name>depth</name>
+      <display_name>Depth</display_name>
+      <description>Depth of the overhang. The distance from the wall surface in the direction normal to the wall surface.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>2</default_value>
+    </argument>
+    <argument>
+      <name>offset</name>
+      <display_name>Offset</display_name>
+      <description>Height of the overhangs above windows, relative to the top of the window framing.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.5</default_value>
+    </argument>
+    <argument>
+      <name>front_facade</name>
+      <display_name>Front Facade</display_name>
+      <description>Specifies the presence of overhangs for windows on the front facade.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>true</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>back_facade</name>
+      <display_name>Back Facade</display_name>
+      <description>Specifies the presence of overhangs for windows on the back facade.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>true</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>left_facade</name>
+      <display_name>Left Facade</display_name>
+      <description>Specifies the presence of overhangs for windows on the left facade.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>true</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>right_facade</name>
+      <display_name>Right Facade</display_name>
+      <description>Specifies the presence of overhangs for windows on the right facade.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>true</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
   </arguments>
   <outputs/>
   <provenances/>
@@ -135,17 +231,6 @@
     </attribute>
   </attributes>
   <files>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.9.0</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>F536CA73</checksum>
-    </file>
     <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
@@ -207,16 +292,27 @@
       <checksum>8DEA655A</checksum>
     </file>
     <file>
-      <filename>WindowArea_Test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>8C7653A2</checksum>
-    </file>
-    <file>
       <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>D82EBA56</checksum>
+      <checksum>92F63875</checksum>
+    </file>
+    <file>
+      <filename>WindowArea_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>A4B27674</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.9.0</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>407283E3</checksum>
     </file>
   </files>
 </measure>
