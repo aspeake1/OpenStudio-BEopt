@@ -396,9 +396,6 @@ class Constants
     return "res ds#{s_unit}"
   end  
   def self.ObjectNameEaves(facade="")
-    if facade.nil?
-      facade = ""
-    end
     if facade != ""
       facade = " #{facade}"
     end
@@ -547,9 +544,6 @@ class Constants
     return "res nv#{s_unit}"
   end
   def self.ObjectNameNeighbors(facade="")
-    if facade.nil?
-      facade = ""
-    end
     if facade != ""
       facade = " #{facade}"
     end
@@ -561,6 +555,12 @@ class Constants
       s_unit = "|#{unit_name}"
     end
     return "residential occupants#{s_unit}"
+  end
+  def self.ObjectNameOverhangs(facade="")
+    if facade != ""
+      facade = " #{facade}"
+    end
+    return "residential overhangs#{facade}"
   end
   def self.ObjectNamePhotovoltaics(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""

@@ -218,18 +218,6 @@ class SetResidentialWindowArea < OpenStudio::Measure::ModelMeasure
       runner.registerError("Window Aspect Ratio must be greater than 0.")
       return false
     end
-    if depth < 0
-      runner.registerError("Overhang depth must be greater than or equal to 0.")
-      return false
-    end
-    if offset < 0
-      runner.registerError("Overhang offset must be greater than or equal to 0.")
-      return false
-    end
-    # if width_extension < 0
-        # runner.registerError("Overhang width extension must be greater than or equal to 0.")
-        # return false
-    # end
 
     # Split any surfaces that have doors so that we can ignore them when adding windows
     facades.each do |facade|

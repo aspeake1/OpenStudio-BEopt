@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>create_residential_single_family_detached_geometry</name>
   <uid>a1248ef4-c1ef-46ed-a9ea-4d8fbf719b6f</uid>
-  <version_id>bf89862e-b78d-48b3-9ac1-c2294fda06eb</version_id>
-  <version_modified>20180221T022803Z</version_modified>
+  <version_id>509d11f0-a658-45c0-97e0-82db916a7ca7</version_id>
+  <version_modified>20180221T184547Z</version_modified>
   <xml_checksum>2AF3A68E</xml_checksum>
   <class_name>CreateResidentialSingleFamilyDetachedGeometry</class_name>
   <display_name>Create Residential Single-Family Detached Geometry</display_name>
-  <description>Sets the basic geometry for the building. Building is limited to one foundation type. Garage is tucked within the building, on the front left or front right corners of the building. Sets the number of bedrooms and bathrooms in the building. Sets the number of occupants in the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Gathers living space area, wall height per floor, number of floors, aspect ratio, garage width and depth, garage position, foundation type and wall height, attic and roof type, and roof pitch. Constructs building by calculating footprint and performing a series of affine transformations into living, foundation, and attic spaces. Also, sets (or replaces) BuildingUnit objects that store the number of bedrooms and bathrooms associated with the model. Sets (or replaces) the People object for each finished space in the model.</modeler_description>
+  <description>Sets the basic geometry for the building. Building is limited to one foundation type. Garage is tucked within the building, on the front left or front right corners of the building. Sets the number of bedrooms and bathrooms in the building. Sets the number of occupants in the building. Sets the neighbors (front, back, left, and/or right) of the building for shading purposes. Neighboring buildings will have the same geometry as the model building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>Gathers living space area, wall height per floor, number of floors, aspect ratio, garage width and depth, garage position, foundation type and wall height, attic and roof type, and roof pitch. Constructs building by calculating footprint and performing a series of affine transformations into living, foundation, and attic spaces. Also, sets (or replaces) BuildingUnit objects that store the number of bedrooms and bathrooms associated with the model. Sets (or replaces) the People object for each finished space in the model. Creates shading surfaces by shifting the building's exterior surfaces in the specified directions (front, back, left, and/or right).</modeler_description>
   <arguments>
     <argument>
       <name>total_ffa</name>
@@ -323,6 +323,85 @@
       <model_dependent>false</model_dependent>
       <default_value>1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0</default_value>
     </argument>
+    <argument>
+      <name>roof_structure</name>
+      <display_name>Roof Structure</display_name>
+      <description>The roof structure of the building.</description>
+      <type>Choice</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>truss, cantilever</default_value>
+      <choices>
+        <choice>
+          <value>truss, cantilever</value>
+          <display_name>truss, cantilever</display_name>
+        </choice>
+        <choice>
+          <value>rafter</value>
+          <display_name>rafter</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>eaves_depth</name>
+      <display_name>Eaves Depth</display_name>
+      <description>The eaves depth of the roof.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>2</default_value>
+    </argument>
+    <argument>
+      <name>left_offset</name>
+      <display_name>Left Neighbor Offset</display_name>
+      <description>The minimum distance between the simulated house and the neighboring house to the left (not including eaves). A value of zero indicates no neighbors.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>10</default_value>
+    </argument>
+    <argument>
+      <name>right_offset</name>
+      <display_name>Right Neighbor Offset</display_name>
+      <description>The minimum distance between the simulated house and the neighboring house to the right (not including eaves). A value of zero indicates no neighbors.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>10</default_value>
+    </argument>
+    <argument>
+      <name>back_offset</name>
+      <display_name>Back Neighbor Offset</display_name>
+      <description>The minimum distance between the simulated house and the neighboring house to the back (not including eaves). A value of zero indicates no neighbors.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>front_offset</name>
+      <display_name>Front Neighbor Offset</display_name>
+      <description>The minimum distance between the simulated house and the neighboring house to the front (not including eaves). A value of zero indicates no neighbors.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>orientation</name>
+      <display_name>Azimuth</display_name>
+      <description>The house's azimuth is measured clockwise from due south when viewed from above (e.g., South=0, West=90, North=180, East=270).</description>
+      <type>Double</type>
+      <units>degrees</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>180</default_value>
+    </argument>
   </arguments>
   <outputs/>
   <provenances/>
@@ -359,12 +438,6 @@
       <checksum>B37E7F24</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>D636DB8B</checksum>
-    </file>
-    <file>
       <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -377,6 +450,12 @@
       <checksum>A001EED9</checksum>
     </file>
     <file>
+      <filename>schedules.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>40517196</checksum>
+    </file>
+    <file>
       <version>
         <software_program>OpenStudio</software_program>
         <identifier>1.12.4</identifier>
@@ -385,25 +464,25 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>F3338814</checksum>
+      <checksum>8D51219D</checksum>
     </file>
     <file>
-      <filename>schedules.rb</filename>
+      <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>40517196</checksum>
+      <checksum>E027B465</checksum>
     </file>
     <file>
       <filename>create_residential_single_family_detached_geometry_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>C95F6D0E</checksum>
+      <checksum>A160937A</checksum>
     </file>
     <file>
       <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>56FE774A</checksum>
+      <checksum>2588D37F</checksum>
     </file>
   </files>
 </measure>

@@ -250,6 +250,7 @@ class WindowAreaTest < MiniTest::Test
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
+    puts result.errors.map{ |x| x.logMessage }
     assert_includes(result.errors.map{ |x| x.logMessage }, "Overhang depth must be greater than or equal to 0.")
   end
 

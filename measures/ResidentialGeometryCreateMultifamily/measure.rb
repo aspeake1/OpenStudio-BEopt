@@ -225,6 +225,66 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     monthly_sch.setDefaultValue("1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0")
     args << monthly_sch
 
+    #make a choice argument for model objects
+    roof_structure_display_names = OpenStudio::StringVector.new
+    roof_structure_display_names << Constants.RoofStructureTrussCantilever
+    roof_structure_display_names << Constants.RoofStructureRafter
+
+    #make a choice argument for roof type
+    roof_structure = OpenStudio::Measure::OSArgument::makeChoiceArgument("roof_structure", roof_structure_display_names, true)
+    roof_structure.setDisplayName("Roof Structure")
+    roof_structure.setDescription("The roof structure of the building.")
+    roof_structure.setDefaultValue(Constants.RoofStructureTrussCantilever)
+    args << roof_structure
+
+    #make a choice argument for eaves depth
+    eaves_depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("eaves_depth", true)
+    eaves_depth.setDisplayName("Eaves Depth")
+    eaves_depth.setUnits("ft")
+    eaves_depth.setDescription("The eaves depth of the roof.")
+    eaves_depth.setDefaultValue(2.0)
+    args << eaves_depth
+
+    #make a double argument for left neighbor offset
+    left_neighbor_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("left_offset", false)
+    left_neighbor_offset.setDisplayName("Left Neighbor Offset")
+    left_neighbor_offset.setUnits("ft")
+    left_neighbor_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the left (not including eaves). A value of zero indicates no neighbors.")
+    left_neighbor_offset.setDefaultValue(10.0)
+    args << left_neighbor_offset
+
+    #make a double argument for right neighbor offset
+    right_neighbor_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("right_offset", false)
+    right_neighbor_offset.setDisplayName("Right Neighbor Offset")
+    right_neighbor_offset.setUnits("ft")
+    right_neighbor_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the right (not including eaves). A value of zero indicates no neighbors.")
+    right_neighbor_offset.setDefaultValue(10.0)
+    args << right_neighbor_offset
+
+    #make a double argument for back neighbor offset
+    back_neighbor_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("back_offset", false)
+    back_neighbor_offset.setDisplayName("Back Neighbor Offset")
+    back_neighbor_offset.setUnits("ft")
+    back_neighbor_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the back (not including eaves). A value of zero indicates no neighbors.")
+    back_neighbor_offset.setDefaultValue(0.0)
+    args << back_neighbor_offset
+
+    #make a double argument for front neighbor offset
+    front_neighbor_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("front_offset", false)
+    front_neighbor_offset.setDisplayName("Front Neighbor Offset")
+    front_neighbor_offset.setUnits("ft")
+    front_neighbor_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the front (not including eaves). A value of zero indicates no neighbors.")
+    front_neighbor_offset.setDefaultValue(0.0)
+    args << front_neighbor_offset
+
+    #make a double argument for orientation
+    orientation = OpenStudio::Measure::OSArgument::makeDoubleArgument("orientation", true)
+    orientation.setDisplayName("Azimuth")
+    orientation.setUnits("degrees")
+    orientation.setDescription("The house's azimuth is measured clockwise from due south when viewed from above (e.g., South=0, West=90, North=180, East=270).")
+    orientation.setDefaultValue(180.0)
+    args << orientation
+
     return args
   end
 
@@ -263,6 +323,13 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     weekday_sch = runner.getStringArgumentValue("weekday_sch",user_arguments)
     weekend_sch = runner.getStringArgumentValue("weekend_sch",user_arguments)
     monthly_sch = runner.getStringArgumentValue("monthly_sch",user_arguments)
+    roof_structure = runner.getStringArgumentValue("roof_structure",user_arguments)
+    eaves_depth = UnitConversions.convert(runner.getDoubleArgumentValue("eaves_depth",user_arguments),"ft","m")
+    left_neighbor_offset = UnitConversions.convert(runner.getDoubleArgumentValue("left_offset",user_arguments),"ft","m")
+    right_neighbor_offset = UnitConversions.convert(runner.getDoubleArgumentValue("right_offset",user_arguments),"ft","m")
+    back_neighbor_offset = UnitConversions.convert(runner.getDoubleArgumentValue("back_offset",user_arguments),"ft","m")
+    front_neighbor_offset = UnitConversions.convert(runner.getDoubleArgumentValue("front_offset",user_arguments),"ft","m")
+    orientation = runner.getDoubleArgumentValue("orientation",user_arguments)
 
     if foundation_type == "slab"
       foundation_height = 0.0
@@ -1038,6 +1105,21 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     end
 
     result = Geometry.process_occupants(model, runner, num_occ, occ_gain, sens_frac, lat_frac, weekday_sch, weekend_sch, monthly_sch)
+    unless result
+      return false
+    end
+
+    result = Geometry.process_eaves(model, runner, eaves_depth, roof_structure)
+    unless result
+      return false
+    end
+
+    result = Geometry.process_neighbors(model, runner, left_neighbor_offset, right_neighbor_offset, back_neighbor_offset, front_neighbor_offset)
+    unless result
+      return false
+    end
+
+    result = Geometry.process_orientation(model, runner, orientation)
     unless result
       return false
     end

@@ -1214,6 +1214,20 @@ class Geometry
 
   def self.process_overhangs(model, runner, depth, offset, facade_bools_hash)
 
+    # Error checking
+    if depth < 0
+      runner.registerError("Overhang depth must be greater than or equal to 0.")
+      return false
+    end
+    if offset < 0
+      runner.registerError("Overhang offset must be greater than or equal to 0.")
+      return false
+    end
+    # if width_extension < 0 
+      # runner.registerError("Overhang width extension must be greater than or equal to 0.")
+      # return false
+    # end
+  
     sub_surfaces = self.get_window_sub_surfaces(model)
 
     # Remove existing overhangs
@@ -1221,7 +1235,7 @@ class Geometry
     model.getShadingSurfaceGroups.each do |shading_surface_group|
       remove_group = false
       shading_surface_group.shadingSurfaces.each do |shading_surface|
-        next unless shading_surface.name.to_s.downcase.include? "overhang"
+        next unless shading_surface.name.to_s.downcase.include? Constants.ObjectNameOverhangs
         num_removed += 1
         remove_group = true
       end
@@ -1230,36 +1244,34 @@ class Geometry
       end
     end
     if num_removed > 0
-      runner.registerInfo("#{num_removed} overhang shading surfaces removed.")
+      runner.registerInfo("Removed #{num_removed} #{Constants.ObjectNameOverhangs}.")
     end
 
     # No overhangs to add? Exit here.
     if depth == 0
-      if num_removed == 0
-        runner.registerAsNotApplicable("No overhangs were added or removed.")
-      end
+      runner.registerInfo("No #{Constants.ObjectNameOverhangs} to be added.")
       return true
     end
 
-    windows_found = false
+    num_added = 0
     sub_surfaces.each do |sub_surface|
 
-      windows_found = true
       facade = self.get_facade_for_surface(sub_surface)
       next if facade.nil?
       next if !facade_bools_hash["#{facade} Facade"]
 
       overhang = sub_surface.addOverhang(depth, offset)
-      overhang.get.setName("#{sub_surface.name} - Overhang")
-
-      runner.registerInfo("#{overhang.get.name.to_s} added.")
+      overhang.get.setName("#{sub_surface.name} - #{Constants.ObjectNameOverhangs}")
+      num_added += 1
 
     end
 
-    unless windows_found
-      runner.registerAsNotApplicable("No windows found for adding overhangs.")
+    unless num_added > 0
+      runner.registerInfo("No windows found for adding #{Constants.ObjectNameOverhangs}.")
+      return true
     end
 
+    runner.registerInfo("Added #{num_added} #{Constants.ObjectNameOverhangs}.")
     return true
 
   end
@@ -1275,7 +1287,7 @@ class Geometry
 
   def self.process_beds_and_baths(model, runner, num_br, num_ba)
 
-    # error checking
+    # Error checking
     if not num_br.all? {|x| MathTools.valid_float?(x)}
       runner.registerError("Number of bedrooms must be a numerical value.")
       return false
@@ -1347,7 +1359,6 @@ class Geometry
     end
 
     runner.registerInfo("The building has been assigned #{total_num_br.to_s} bedroom(s) and #{total_num_ba.round(2).to_s} bathroom(s) across #{units.size} unit(s).")
-
     return true
 
   end
@@ -1356,7 +1367,7 @@ class Geometry
 
     num_occ = num_occ.split(",").map(&:strip)
 
-    # error checking
+    # Error checking
     if occ_gain < 0
       runner.registerError("Internal gains cannot be negative.")
       return false
@@ -1381,7 +1392,7 @@ class Geometry
       return false
     end
 
-    # error checking
+    # Error checking
     if num_occ.length > 1 and num_occ.length != units.size
       runner.registerError("Number of occupant elements specified inconsistent with number of multifamily units defined in the model.")
       return false
@@ -1393,7 +1404,7 @@ class Geometry
 
     activity_per_person = UnitConversions.convert(occ_gain, "Btu/hr", "W")
 
-    #hard coded convective, radiative, latent, and lost fractions
+    # Hard-coded convective, radiative, latent, and lost fractions
     occ_lat = lat_frac
     occ_sens = sens_frac
     occ_conv = 0.442*occ_sens
@@ -1539,7 +1550,451 @@ class Geometry
     end
 
     runner.registerInfo("The building has been assigned #{total_num_occ.round(2)} occupant(s) across #{units.size} unit(s).")
+    return true
 
+  end
+
+  def self.process_eaves(model, runner, eaves_depth, roof_structure)
+
+    # Error checking
+    if eaves_depth < 0
+      runner.registerError("Eaves depth must be greater than or equal to 0.")
+      return false
+    end
+  
+    # Remove existing eaves
+    num_removed = 0
+    existing_eaves_depth = nil
+    model.getShadingSurfaceGroups.each do |shading_surface_group|
+      next unless shading_surface_group.name.to_s == Constants.ObjectNameEaves
+      shading_surface_group.shadingSurfaces.each do |shading_surface|
+        num_removed += 1
+        next unless existing_eaves_depth.nil?
+        existing_eaves_depth = self.get_existing_eaves_depth(shading_surface)
+      end
+      shading_surface_group.remove
+    end
+    if num_removed > 0
+      runner.registerInfo("#{num_removed} #{Constants.ObjectNameEaves} removed.")
+    end
+
+    # No eaves to add? Exit here.
+    if eaves_depth == 0 and
+      runner.registerInfo("No #{Constants.ObjectNameEaves} were added.")
+      return true
+    end
+    if existing_eaves_depth.nil?
+      existing_eaves_depth = 0
+    end
+
+    surfaces_modified = false
+    shading_surface_group = OpenStudio::Model::ShadingSurfaceGroup.new(model)
+    shading_surface_group.setName(Constants.ObjectNameEaves)
+
+    model.getSurfaces.each do |roof_surface|
+
+      next unless roof_surface.surfaceType.downcase == "roofceiling"
+      next unless roof_surface.outsideBoundaryCondition.downcase == "outdoors"
+
+      if roof_structure == Constants.RoofStructureTrussCantilever
+
+        l, w, h = self.get_surface_dimensions(roof_surface)
+        lift = (h / [l, w].min) * eaves_depth
+
+        m = self.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+        m[2, 3] = lift
+        transformation = OpenStudio::Transformation.new(m)
+        new_vertices = transformation * roof_surface.vertices
+        roof_surface.setVertices(new_vertices)
+
+      end
+
+      surfaces_modified = true
+
+      if roof_surface.vertices.length > 3
+
+        vertex_dir_backup = roof_surface.vertices[-3]
+        vertex_dir = roof_surface.vertices[-2]
+        vertex_1 = roof_surface.vertices[-1]
+
+        roof_surface.vertices[0..-1].each do |vertex|
+
+          l, w, h = self.get_surface_dimensions(roof_surface)
+          tilt = Math.atan(h / [l, w].min)
+
+          z = eaves_depth / Math.cos(tilt)
+          scale =  z / eaves_depth
+
+          vertex_2 = vertex
+
+          dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir.x, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z) # works if angles are right angles
+
+          if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+            dir_vector = OpenStudio::Vector3d.new(0, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z)
+          end
+
+          if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+            dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir.x, 0, vertex_1.z - vertex_dir.z)
+          end
+
+          if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+            dir_vector = OpenStudio::Vector3d.new(0, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z)
+          end
+
+          if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+            dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir_backup.x, vertex_1.y - vertex_dir_backup.y, vertex_1.z - vertex_dir_backup.z)
+          end
+
+          dir_vector_n = OpenStudio::Vector3d.new(dir_vector.x / dir_vector.length, dir_vector.y / dir_vector.length, dir_vector.z / dir_vector.length) # normalize
+
+          m = self.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+          m[0, 3] = dir_vector_n.x * eaves_depth * scale
+          m[1, 3] = dir_vector_n.y * eaves_depth * scale
+          m[2, 3] = dir_vector_n.z * eaves_depth * scale
+
+          new_vertices = OpenStudio::Point3dVector.new
+          new_vertices << OpenStudio::Transformation.new(m) * vertex_1
+          new_vertices << OpenStudio::Transformation.new(m) * vertex_2
+          new_vertices << vertex_2
+          new_vertices << vertex_1
+
+          vertex_dir_backup = vertex_dir
+          vertex_dir = vertex_1
+          vertex_1 = vertex_2
+
+          next if dir_vector.length == 0
+          next if dir_vector_n.z > 0
+
+          if OpenStudio::getOutwardNormal(new_vertices).get.z < 0
+            transformation = OpenStudio::Transformation.rotation(new_vertices[2], OpenStudio::Vector3d.new(new_vertices[2].x - new_vertices[3].x, new_vertices[2].y - new_vertices[3].y, new_vertices[2].z - new_vertices[3].z), 3.14159)
+            new_vertices = transformation * new_vertices
+          end
+
+          m = self.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+          m[2, 3] = roof_surface.space.get.zOrigin
+          new_vertices = OpenStudio::Transformation.new(m) * new_vertices
+
+          shading_surface = OpenStudio::Model::ShadingSurface.new(new_vertices, model)
+          shading_surface.setName("#{roof_surface.name} - #{Constants.ObjectNameEaves}")
+          shading_surface.setShadingSurfaceGroup(shading_surface_group)
+
+        end
+
+      elsif roof_surface.vertices.length == 3
+
+        zmin = 9e99
+        roof_surface.vertices.each do |vertex|
+          zmin = [vertex.z, zmin].min
+        end
+
+        vertex_1 = nil
+        vertex_2 = nil
+        vertex_dir = nil
+        roof_surface.vertices.each do |vertex|
+          if vertex.z == zmin
+            if vertex_1.nil?
+              vertex_1 = vertex
+            end
+          end
+          if vertex.z == zmin
+            vertex_2 = vertex
+          end
+          if vertex.z != zmin
+            vertex_dir = vertex
+          end
+        end
+
+        l, w, h = self.get_surface_dimensions(roof_surface)
+        tilt = Math.atan(h / [l, w].min)
+
+        z = eaves_depth / Math.cos(tilt)
+        scale =  z / eaves_depth
+
+        dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir.x, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z)
+
+        if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+          dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir.x, 0, vertex_1.z - vertex_dir.z)
+        end
+
+        if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+          dir_vector = OpenStudio::Vector3d.new(0, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z)
+        end
+
+        dir_vector_n = OpenStudio::Vector3d.new(dir_vector.x / dir_vector.length, dir_vector.y / dir_vector.length, dir_vector.z / dir_vector.length) # normalize
+
+        m = self.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+        m[0, 3] = dir_vector_n.x * eaves_depth * scale
+        m[1, 3] = dir_vector_n.y * eaves_depth * scale
+        m[2, 3] = dir_vector_n.z * eaves_depth * scale
+
+        new_vertices = OpenStudio::Point3dVector.new
+        new_vertices << OpenStudio::Transformation.new(m) * vertex_1
+        new_vertices << OpenStudio::Transformation.new(m) * vertex_2
+        new_vertices << vertex_2
+        new_vertices << vertex_1
+
+        next if dir_vector.length == 0
+        next if dir_vector_n.z > 0
+
+        if OpenStudio::getOutwardNormal(new_vertices).get.z < 0
+          transformation = OpenStudio::Transformation.rotation(new_vertices[2], OpenStudio::Vector3d.new(new_vertices[2].x - new_vertices[3].x, new_vertices[2].y - new_vertices[3].y, new_vertices[2].z - new_vertices[3].z), 3.14159)
+          new_vertices = transformation * new_vertices
+        end
+
+        m = self.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+        m[2, 3] = roof_surface.space.get.zOrigin
+        new_vertices = OpenStudio::Transformation.new(m) * new_vertices
+
+        shading_surface = OpenStudio::Model::ShadingSurface.new(new_vertices, model)
+        shading_surface.setName("#{roof_surface.name} - #{Constants.ObjectNameEaves}")
+        shading_surface.setShadingSurfaceGroup(shading_surface_group)
+
+      end
+
+    end
+
+    # Remove eaves overlapping roofceiling
+    shading_surfaces_to_add = []
+    shading_surfaces_to_remove = []
+    model.getShadingSurfaces.each do |shading_surface|
+
+      new_shading_vertices = []
+      shading_surface.vertices.reverse.each do |vertex|
+        new_shading_vertices << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
+      end
+
+      model.getSurfaces.each do |roof_surface|
+
+        next unless roof_surface.surfaceType.downcase == "roofceiling"
+        next unless roof_surface.outsideBoundaryCondition.downcase == "outdoors" or roof_surface.outsideBoundaryCondition.downcase == "adiabatic"
+
+        roof_surface_vertices = []
+        roof_surface.vertices.reverse.each do |vertex|
+          roof_surface_vertices << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
+        end
+
+        polygon = OpenStudio::subtract(roof_surface_vertices, [new_shading_vertices], 0.001)[0]
+
+        if OpenStudio::getArea(roof_surface_vertices).get - OpenStudio::getArea(polygon).get > 0.001
+          shading_surfaces_to_remove << shading_surface
+          polygon = OpenStudio::subtract(new_shading_vertices, [roof_surface_vertices], 0.001)
+          if not polygon.empty? # only a portion of the eave overlaps the roofceiling
+            new_vertices = OpenStudio::Point3dVector.new
+            polygon[0].reverse.each do |vertex|
+              new_vertices << OpenStudio::Point3d.new(vertex.x, vertex.y, shading_surface.vertices[0].z)
+            end
+            if model.getBuilding.standardsBuildingType.get != Constants.BuildingTypeSingleFamilyAttached # avoid eaves between adjacent units with hip roofs
+              shading_surfaces_to_add << new_vertices
+            end
+          end
+        end
+
+      end
+
+    end
+
+    self.add_or_remove_eaves(model, shading_surfaces_to_add, shading_surfaces_to_remove, shading_surface_group)
+
+    # Remove eaves overlapping eaves
+    shading_surfaces_to_add = []
+    shading_surfaces_to_remove = []
+    model.getShadingSurfaces.each do |shading_surface_1|
+
+      new_shading_vertices_1 = []
+      shading_surface_1.vertices.reverse.each do |vertex|
+        new_shading_vertices_1 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
+      end
+
+      model.getShadingSurfaces.each do |shading_surface_2|
+
+        next if shading_surface_1 == shading_surface_2
+        next if shading_surfaces_to_remove.include? shading_surface_1 or shading_surfaces_to_remove.include? shading_surface_2
+
+        shading_vertices_2 = []
+        shading_surface_2.vertices.reverse.each do |vertex|
+          shading_vertices_2 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
+        end
+
+        polygon = OpenStudio::subtract(new_shading_vertices_1, [shading_vertices_2], 0.001)
+        if not polygon.empty?
+          new_vertices = OpenStudio::Point3dVector.new
+          polygon[0].reverse.each do |vertex|
+            new_vertices << OpenStudio::Point3d.new(vertex.x, vertex.y, shading_surface_1.vertices[0].z)
+          end
+
+          if OpenStudio::getArea(new_vertices).get != OpenStudio::getArea(new_shading_vertices_1).get
+            shading_surfaces_to_remove << shading_surface_1
+            shading_surfaces_to_add << new_vertices
+          end
+        end
+
+      end
+    end
+
+    self.add_or_remove_eaves(model, shading_surfaces_to_add, shading_surfaces_to_remove, shading_surface_group)
+
+    unless surfaces_modified
+      runner.registerInfo("No surfaces found for adding #{Constants.ObjectNameEaves}.")
+      return true
+    end
+
+    num_added = shading_surface_group.shadingSurfaces.length
+
+    runner.registerInfo("Added #{num_added} #{Constants.ObjectNameEaves}.")
+    return true
+
+  end
+
+  def self.add_or_remove_eaves(model, shading_surfaces_to_add, shading_surfaces_to_remove, shading_surface_group)
+
+    shading_surfaces_to_remove.uniq.each do |shading_surface|
+      shading_surface.remove
+    end
+
+    shading_surfaces_to_add.uniq.each do |vertices|
+      shading_surface = OpenStudio::Model::ShadingSurface.new(vertices, model)
+      shading_surface.setName("#{Constants.ObjectNameEaves}")
+      shading_surface.setShadingSurfaceGroup(shading_surface_group)
+    end
+
+  end
+
+  def self.get_existing_eaves_depth(shading_surface)
+    existing_eaves_depth = 0
+    min_xs = []
+    (0..3).to_a.each do |i|
+      if (shading_surface.vertices[0].x - shading_surface.vertices[i].x).abs > existing_eaves_depth
+        min_xs << (shading_surface.vertices[0].x - shading_surface.vertices[i].x).abs
+      end
+    end
+    unless min_xs.empty?
+      return min_xs.min
+    end
+    return 0
+  end
+
+  def self.process_neighbors(model, runner, left_neighbor_offset, right_neighbor_offset, back_neighbor_offset, front_neighbor_offset)
+
+    # Error checking
+    if left_neighbor_offset < 0 or right_neighbor_offset < 0 or back_neighbor_offset < 0 or front_neighbor_offset < 0
+      runner.registerError("Neighbor offsets must be greater than or equal to 0.")
+      return false
+    end
+
+    least_x = 9e99
+    greatest_x = -9e99
+    least_y = 9e99
+    greatest_y = -9e99
+
+    surfaces = model.getSurfaces
+    if surfaces.size == 0
+      runner.registerInfo("No surfaces found to copy for neighboring buildings.")
+      return true
+    end
+
+    # Remove existing neighbors
+    num_removed = 0
+    model.getShadingSurfaceGroups.each do |shading_surface_group|
+      next unless shading_surface_group.name.to_s == Constants.ObjectNameNeighbors
+      shading_surface_group.remove
+      num_removed += 1
+    end
+    if num_removed > 0
+      runner.registerInfo("Removed #{num_removed} #{Constants.ObjectNameNeighbors} shading surfaces.")
+    end
+
+    # No neighbor shading surfaces to add? Exit here.
+    if [left_neighbor_offset, right_neighbor_offset, back_neighbor_offset, front_neighbor_offset].all? {|offset| offset == 0}
+      runner.registerInfo("No #{Constants.ObjectNameNeighbors} shading surfaces to be added.")
+      return true
+    end
+
+    # Get x and y minima and maxima of wall surfaces
+    surfaces.each do |surface|
+      if surface.surfaceType.downcase == "wall"
+        vertices = surface.vertices
+        vertices.each do |vertex|
+          if vertex.x > greatest_x
+            greatest_x = vertex.x
+          end
+          if vertex.x < least_x
+            least_x = vertex.x
+          end
+          if vertex.y > greatest_y
+            greatest_y = vertex.y
+          end
+          if vertex.y < least_y
+            least_y = vertex.y
+          end
+        end
+      end
+    end
+
+    # This is maximum building length or width + user specified neighbor offset
+    left_offset = ((greatest_x - least_x) + left_neighbor_offset)
+    right_offset = -((greatest_x - least_x) + right_neighbor_offset)
+    back_offset = -((greatest_y - least_y) + back_neighbor_offset)
+    front_offset = ((greatest_y - least_y) + front_neighbor_offset)
+
+    directions = [[Constants.FacadeLeft, left_neighbor_offset, left_offset, 0], [Constants.FacadeRight, right_neighbor_offset, right_offset, 0], [Constants.FacadeBack, back_neighbor_offset, 0, back_offset], [Constants.FacadeFront, front_neighbor_offset, 0, front_offset]]
+
+    shading_surface_group = OpenStudio::Model::ShadingSurfaceGroup.new(model)
+    shading_surface_group.setName(Constants.ObjectNameNeighbors)
+
+    num_added = 0
+    directions.each do |facade, neighbor_offset, x_offset, y_offset|
+      if neighbor_offset != 0
+        model.getSpaces.each do |space|
+          space.surfaces.each do |existing_surface|
+            next if existing_surface.outsideBoundaryCondition.downcase != "outdoors" and existing_surface.outsideBoundaryCondition.downcase != "adiabatic"
+            next if existing_surface.adjacentSurface.is_initialized
+            next if existing_surface.outsideBoundaryCondition.downcase == "adiabatic" and !Geometry.is_corridor(space)
+            m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+            m[0,3] = -x_offset
+            m[1,3] = -y_offset
+            m[2,3] = space.zOrigin
+            transformation = OpenStudio::Transformation.new(m)
+            new_vertices = transformation * existing_surface.vertices
+            shading_surface = OpenStudio::Model::ShadingSurface.new(new_vertices, model)
+            shading_surface.setName(Constants.ObjectNameNeighbors(facade))
+            shading_surface.setShadingSurfaceGroup(shading_surface_group)
+            num_added += 1
+          end
+        end
+        model.getShadingSurfaces.each do |existing_shading_surface|
+          next unless existing_shading_surface.name.to_s.downcase.include? Constants.ObjectNameEaves
+          m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+          m[0,3] = -x_offset
+          m[1,3] = -y_offset
+          transformation = OpenStudio::Transformation.new(m)
+          new_vertices = transformation * existing_shading_surface.vertices
+          shading_surface = OpenStudio::Model::ShadingSurface.new(new_vertices, model)
+          shading_surface.setName(Constants.ObjectNameNeighbors(facade))
+          shading_surface.setShadingSurfaceGroup(shading_surface_group)
+          num_added += 1
+        end
+      end
+    end
+    
+    runner.registerInfo("Added #{num_added} #{Constants.ObjectNameNeighbors} shading surfaces.")
+    return true
+
+  end
+
+  def self.process_orientation(model, runner, orientation)
+
+    if orientation > 360 or orientation < 0
+      runner.registerError("Invalid orientation entered.")
+      return false
+    end
+
+    building = model.getBuilding
+    unless building.northAxis == orientation
+      runner.registerInfo("The building's initial orientation was #{building.northAxis} azimuth.")
+    end    
+    building.setNorthAxis(orientation) # the shading surfaces representing neighbors have ShadingSurfaceType=Building, and so are oriented along with the building
+    
+    runner.registerInfo("The building's final orientation was #{building.northAxis} azimuth.")
     return true
 
   end
