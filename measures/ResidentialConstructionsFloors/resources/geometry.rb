@@ -1301,7 +1301,7 @@ class Geometry
     end
 
     # Get building units
-    units = Geometry.get_building_units(model, runner)
+    units = self.get_building_units(model, runner)
     if units.nil?
       return false
     end
@@ -1346,6 +1346,198 @@ class Geometry
     end
 
     runner.registerInfo("The building has been assigned #{total_num_br.to_s} bedroom(s) and #{total_num_ba.round(2).to_s} bathroom(s) across #{units.size} unit(s).")
+
+    return true
+
+  end
+
+  def self.process_occupants(model, runner, num_occ, occ_gain, sens_frac, lat_frac, weekday_sch, weekend_sch, monthly_sch)
+
+    num_occ = num_occ.split(",").map(&:strip)
+
+    # error checking
+    if occ_gain < 0
+      runner.registerError("Internal gains cannot be negative.")
+      return false
+    end
+
+    if sens_frac < 0 or sens_frac > 1
+      runner.registerError("Sensible fraction must be greater than or equal to 0 and less than or equal to 1.")
+      return false
+    end
+    if lat_frac < 0 or lat_frac > 1
+      runner.registerError("Latent fraction must be greater than or equal to 0 and less than or equal to 1.")
+      return false
+    end
+    if lat_frac + sens_frac > 1
+      runner.registerError("Sum of sensible and latent fractions must be less than or equal to 1.")
+      return false
+    end
+
+    # Get building units
+    units = self.get_building_units(model, runner)
+    if units.nil?
+      return false
+    end
+
+    # error checking
+    if num_occ.length > 1 and num_occ.length != units.size
+      runner.registerError("Number of occupant elements specified inconsistent with number of multifamily units defined in the model.")
+      return false
+    end
+
+    if units.size > 1 and num_occ.length == 1
+      num_occ = Array.new(units.size, num_occ[0])
+    end
+
+    activity_per_person = UnitConversions.convert(occ_gain, "Btu/hr", "W")
+
+    #hard coded convective, radiative, latent, and lost fractions
+    occ_lat = lat_frac
+    occ_sens = sens_frac
+    occ_conv = 0.442*occ_sens
+    occ_rad = 0.558*occ_sens
+    occ_lost = 1 - occ_lat - occ_conv - occ_rad
+
+    # Update number of occupants
+    total_num_occ = 0
+    people_sch = nil
+    activity_sch = nil
+    units.each_with_index do |unit, unit_index|
+
+      unit_occ = num_occ[unit_index]
+
+      if unit_occ != Constants.Auto
+        if not MathTools.valid_float?(unit_occ)
+          runner.registerError("Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
+          return false
+        elsif unit_occ.to_f < 0
+          runner.registerError("Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
+          return false
+        end
+      end
+
+      # Get number of beds
+      nbeds, nbaths = self.get_unit_beds_baths(model, unit, runner)
+      if nbeds.nil?
+        return false
+      end
+
+      # Calculate number of occupants for this unit
+      if unit_occ == Constants.Auto
+        if units.size > 1 # multifamily equation
+          unit_occ = 0.63 + 0.92 * nbeds
+        else # single-family equation
+          unit_occ = 0.87 + 0.59 * nbeds
+        end
+      else
+        unit_occ = unit_occ.to_f
+      end
+
+      # Get spaces
+      bedroom_ffa_spaces = self.get_bedroom_spaces(unit.spaces)
+      non_bedroom_ffa_spaces = self.get_finished_spaces(unit.spaces) - bedroom_ffa_spaces
+
+      # Get FFA
+      non_bedroom_ffa = self.get_finished_floor_area_from_spaces(non_bedroom_ffa_spaces, false, runner)
+      bedroom_ffa = self.get_finished_floor_area_from_spaces(bedroom_ffa_spaces, false)
+      bedroom_ffa = 0 if bedroom_ffa.nil?
+      ffa = non_bedroom_ffa + bedroom_ffa
+
+      schedules = {}
+      if not bedroom_ffa_spaces.empty?
+        # Split schedules into non-bedroom vs bedroom
+        bedroom_ratios = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75, 0.46, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.33, 1.0]
+
+        living_weekday_sch = weekday_sch.split(",").map(&:to_f).zip(bedroom_ratios).map{|x,y| x*(1-y)}.join(", ")
+        living_weekend_sch = weekend_sch.split(",").map(&:to_f).zip(bedroom_ratios).map{|x,y| x*(1-y)}.join(", ")
+        living_activity_per_person = 420.0/384.0*activity_per_person
+        schedules[non_bedroom_ffa_spaces] = [living_weekday_sch, living_weekend_sch, living_activity_per_person]
+
+        bedroom_weekday_sch = weekday_sch.split(",").map(&:to_f).zip(bedroom_ratios).map{|x,y| x*y}.join(", ")
+        bedroom_weekend_sch = weekend_sch.split(",").map(&:to_f).zip(bedroom_ratios).map{|x,y| x*y}.join(", ")
+        bedroom_activity_per_person = 350.0/384.0*activity_per_person
+        schedules[bedroom_ffa_spaces] = [bedroom_weekday_sch, bedroom_weekend_sch, bedroom_activity_per_person]
+      else
+        schedules[non_bedroom_ffa_spaces] = [weekday_sch, weekend_sch, activity_per_person]
+      end
+
+      # Assign occupants to each space of the unit
+      schedules.each do |spaces, schedule|
+
+        spaces.each do |space|
+
+          space_obj_name = "#{Constants.ObjectNameOccupants(unit.name.to_s)}|#{space.name.to_s}"
+
+          # Remove any existing people
+          objects_to_remove = []
+          space.people.each do |people|
+            objects_to_remove << people
+            objects_to_remove << people.peopleDefinition
+            if people.numberofPeopleSchedule.is_initialized
+              objects_to_remove << people.numberofPeopleSchedule.get
+            end
+            if people.activityLevelSchedule.is_initialized
+              objects_to_remove << people.activityLevelSchedule.get
+            end
+          end
+          if objects_to_remove.size > 0
+            runner.registerInfo("Removed existing people from space '#{space.name.to_s}'.")
+          end
+          objects_to_remove.uniq.each do |object|
+            begin
+              object.remove
+            rescue
+              # no op
+            end
+          end
+
+          space_num_occ = unit_occ * UnitConversions.convert(space.floorArea, "m^2", "ft^2") / ffa
+
+          if space_num_occ > 0
+
+            if people_sch.nil?
+              # Create schedule
+              people_sch = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameOccupants + " schedule", schedule[0], schedule[1], monthly_sch)
+              if not people_sch.validated?
+                return false
+              end
+            end
+
+            if activity_sch.nil?
+              # Create schedule
+              activity_sch = OpenStudio::Model::ScheduleRuleset.new(model, schedule[2])
+            end
+
+            #Add people definition for the occ
+            occ_def = OpenStudio::Model::PeopleDefinition.new(model)
+            occ = OpenStudio::Model::People.new(occ_def)
+            occ.setName(space_obj_name)
+            occ.setSpace(space)
+            occ_def.setName(space_obj_name)
+            occ_def.setNumberOfPeopleCalculationMethod("People",1)
+            occ_def.setNumberofPeople(space_num_occ)
+            occ_def.setFractionRadiant(occ_rad)
+            occ_def.setSensibleHeatFraction(occ_sens)
+            occ_def.setMeanRadiantTemperatureCalculationType("ZoneAveraged")
+            occ_def.setCarbonDioxideGenerationRate(0)
+            occ_def.setEnableASHRAE55ComfortWarnings(false)
+            occ.setActivityLevelSchedule(activity_sch)
+            occ.setNumberofPeopleSchedule(people_sch.schedule)
+
+            total_num_occ += space_num_occ
+
+            runner.registerInfo("#{unit.name.to_s} has been assigned #{space_num_occ.round(2)} occupant(s) for space '#{space.name}'.")
+
+          end
+
+        end
+
+      end
+
+    end
+
+    runner.registerInfo("The building has been assigned #{total_num_occ.round(2)} occupant(s) across #{units.size} unit(s).")
 
     return true
 

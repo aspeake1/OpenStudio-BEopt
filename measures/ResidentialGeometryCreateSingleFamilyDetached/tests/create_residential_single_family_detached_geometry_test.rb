@@ -84,89 +84,98 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   end
 
   def test_change_garage_pitch_when_garage_ridge_higher_than_house_ridge
+    num_finished_spaces = 1
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_protrusion"] = 0.5
     args_hash["garage_width"] = 40
     args_hash["garage_depth"] = 24
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>26, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "GarageAtticHeight"=>35.21/2*0.5, "GarageFloorArea"=>960, "UnfinishedAtticHeight"=>8.8, "UnfinishedAtticFloorArea"=>2960, "BuildingHeight"=>8+8.8, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5, 1)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>26, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "GarageAtticHeight"=>35.21/2*0.5, "GarageFloorArea"=>960, "UnfinishedAtticHeight"=>8.8, "UnfinishedAtticFloorArea"=>2960, "BuildingHeight"=>8+8.8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_fbasement
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/3, "UnfinishedAtticHeight"=>4.56, "UnfinishedAtticFloorArea"=>2000/3, "BuildingHeight"=>8+8+8+4.56, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/3, "UnfinishedAtticHeight"=>4.56, "UnfinishedAtticFloorArea"=>2000/3, "BuildingHeight"=>8+8+8+4.56, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_ufbasement
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "unfinished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+8+5.59, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_crawlspace
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["foundation_type"] = "crawlspace"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>3+8+8+5.59, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>3+8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_pierandbeam
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["foundation_type"] = "pier and beam"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>3+8+8+5.59, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>3+8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_finished_attic_and_finished_basement
+    num_finished_spaces = 4
     args_hash = {}
     args_hash["foundation_height"] = 8.0
     args_hash["attic_type"] = "finished attic"
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>2, "Space"=>4, "SpaceType"=>2}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/4, "FinishedAtticHeight"=>3.95, "FinishedAtticFloorArea"=>2000/4, "BuildingHeight"=>8+8+8+3.95, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>2, "Space"=>4, "SpaceType"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/4, "FinishedAtticHeight"=>3.95, "FinishedAtticFloorArea"=>2000/4, "BuildingHeight"=>8+8+8+3.95, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_hip_finished_attic
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["attic_type"] = "finished attic"
     args_hash["roof_type"] = Constants.RoofTypeHip
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>1, "Space"=>3, "SpaceType"=>1}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedAtticHeight"=>4.56, "FinishedAtticFloorArea"=>2000/3, "BuildingHeight"=>8+8+4.56, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>1, "Space"=>3, "SpaceType"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedAtticHeight"=>4.56, "FinishedAtticFloorArea"=>2000/3, "BuildingHeight"=>8+8+4.56, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_onestory_fbasement_hasgarage_noprotrusion_garageright_gableroof
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>6.22, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+6.22, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>6.22, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+6.22, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_onestory_fbasement_hasgarage_halfprotrusion_garageright_gableroof
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
@@ -174,12 +183,13 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_onestory_fbasement_hasgarage_halfprotrusion_garageright_gableroof_fattic
+    num_finished_spaces = 4
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
@@ -188,12 +198,13 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = "finished attic"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>3, "Space"=>5, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "FinishedAtticHeight"=>4.69, "FinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+4.69, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>3, "Space"=>5, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "FinishedAtticHeight"=>4.69, "FinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+4.69, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_onestory_ubasement_hasgarage_halfprotrusion_garageright_gableroof_fattic
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
@@ -202,12 +213,13 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = "finished attic"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>3, "Space"=>5, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>880, "FinishedAtticHeight"=>5.59, "FinishedAtticFloorArea"=>1120, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>3, "Space"=>5, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>880, "FinishedAtticHeight"=>5.59, "FinishedAtticFloorArea"=>1120, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_onestory_fbasement_hasgarage_fullprotrusion_garageright_gableroof
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
@@ -215,46 +227,50 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_fbasement_hasgarage_noprotrusion_garageright_garagetobackwall_gableroof
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 10
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>30, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>600, "UnfinishedAtticHeight"=>5, "UnfinishedAtticFloorArea"=>800, "GarageAtticHeight"=>3, "GarageFloorArea"=>200, "BuildingHeight"=>8+8+8+5, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>30, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>600, "UnfinishedAtticHeight"=>5, "UnfinishedAtticFloorArea"=>800, "GarageAtticHeight"=>3, "GarageFloorArea"=>200, "BuildingHeight"=>8+8+8+5, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_fbasement_hasgarage_noprotrusion_garageright_gableroof
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>5.08, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+5.08, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>5.08, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+5.08, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_fbasement_hasgarage_halfprotrusion_garageright_gableroof
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.69, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.69, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.69, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.69, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_fbasement_hasgarage_halfprotrusion_garageright_gableroof_fattic
+    num_finished_spaces = 5
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["foundation_height"] = 8.0
@@ -262,12 +278,13 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = "finished attic"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>3, "Space"=>6, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>380, "FinishedAtticHeight"=>3.95, "FinishedAtticFloorArea"=>620, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+3.95, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>3, "Space"=>6, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>380, "FinishedAtticHeight"=>3.95, "FinishedAtticFloorArea"=>620, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+3.95, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_ubasement_hasgarage_halfprotrusion_garageright_gableroof_fattic
+    num_finished_spaces = 4
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["foundation_height"] = 8.0
@@ -275,24 +292,26 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = "finished attic"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>3, "Space"=>6, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>506.66, "FinishedAtticHeight"=>4.43, "FinishedAtticFloorArea"=>746.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.43, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>3, "Space"=>6, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>506.66, "FinishedAtticHeight"=>4.43, "FinishedAtticFloorArea"=>746.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.43, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_fbasement_hasgarage_fullprotrusion_garageright_gableroof
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>38, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.28, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.28, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>38, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.28, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.28, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_onestory_fbasement_hasgarage_noprotrusion_garageleft_gableroof
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
@@ -300,12 +319,13 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>6.22, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+6.22, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>6.22, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+6.22, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_onestory_fbasement_hasgarage_halfprotrusion_garageleft_gableroof
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
@@ -314,12 +334,13 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_onestory_fbasement_hasgarage_fullprotrusion_garageleft_gableroof
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
@@ -328,24 +349,26 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_fbasement_hasgarage_noprotrusion_garageleft_gableroof
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>5.08, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+5.08, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>5.08, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+5.08, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_fbasement_hasgarage_halfprotrusion_garageleft_gableroof
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
@@ -353,12 +376,13 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.69, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.69, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.69, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.69, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_fbasement_hasgarage_fullprotrusion_garageleft_gableroof
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["garage_pos"] = "Left"
@@ -366,38 +390,41 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>38, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>4}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.28, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.28, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>38, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>4, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.28, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.28, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_twostory_slab_hasgarage_noprotrusion_garageright_hiproof
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["garage_width"] = 12
     args_hash["roof_type"] = Constants.RoofTypeHip
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>26, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1120, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>26, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1120, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_gable_ridge_front_to_back
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["aspect_ratio"] = 0.75
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>2, "Space"=>3, "SpaceType"=>2}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>6.84, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.84, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>2, "Space"=>3, "SpaceType"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>6.84, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.84, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_hip_ridge_front_to_back
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["aspect_ratio"] = 0.75
     args_hash["roof_type"] = Constants.RoofTypeHip
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>2, "Space"=>3, "SpaceType"=>2}
-    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>6.84, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.84, "Beds"=>3.0, "Baths"=>2.0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>2, "Space"=>3, "SpaceType"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>6.84, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.84, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_argument_error_beds_not_equal_to_baths
@@ -450,6 +477,98 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bathrooms must be a positive multiple of 0.25.")
   end
 
+  def test_argument_error_num_occ_bad_string
+    args_hash = {}
+    args_hash["num_occ"] = "hello"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
+  end
+
+  def test_argument_error_num_occ_negative
+    args_hash = {}
+    args_hash["num_occ"] = "-1"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
+  end
+
+  def test_argument_error_num_occ_incorrect_num_elements
+    args_hash = {}
+    args_hash["num_occ"] = "2, 3, 4"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of occupant elements specified inconsistent with number of multifamily units defined in the model.")
+  end
+
+  def test_argument_error_weekday_sch_wrong_number_of_values
+    args_hash = {}
+    args_hash["weekday_sch"] = "1,1"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
+  end
+
+  def test_argument_error_weekday_sch_not_number
+    args_hash = {}
+    args_hash["weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
+  end
+
+  def test_argument_error_weekend_sch_wrong_number_of_values
+    args_hash = {}
+    args_hash["weekend_sch"] = "1,1"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
+  end
+
+  def test_argument_error_weekend_sch_not_number
+    args_hash = {}
+    args_hash["weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
+  end
+
+  def test_argument_error_monthly_sch_wrong_number_of_values
+    args_hash = {}
+    args_hash["monthly_sch"] = "1,1"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
+  end
+
+  def test_argument_error_monthly_sch_not_number
+    args_hash = {}
+    args_hash["monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
+  end
+
+  def test_new_construction_none
+    args_hash = {}
+    args_hash["num_occ"] = "0"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Surface"=>17, "Space"=>3, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1}
+    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>0}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+
+  def test_new_construction_auto
+    num_finished_spaces = 2
+    args_hash = {}
+    args_hash["num_occ"] = Constants.Auto
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Surface"=>17, "Space"=>3, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+
+  def test_new_construction_fixed_3
+    num_finished_spaces = 2
+    args_hash = {}
+    args_hash["num_occ"] = "3"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Surface"=>17, "Space"=>3, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"FinishedFloorArea"=>2000, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+5.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>3}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+
   private
 
   def _test_error(osm_file_or_model, args_hash)
@@ -485,7 +604,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     return result
   end
 
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
+  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name)
     # create an instance of the measure
     measure = CreateResidentialSingleFamilyDetachedGeometry.new
 
@@ -519,18 +638,21 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
 
+    # save the model to test output directory
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    # model.save(output_file_path, true)
+
+    # show the output
     # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert_equal(num_infos, result.info.size)
-    assert_equal(num_warnings, result.warnings.size)
 
     # get the final objects in the model
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["PortList", "Node", "ZoneEquipmentList", "SizingZone", "ZoneHVACEquipmentList", "ScheduleTypeLimits", "ScheduleDay", "ScheduleRuleset", "Building"]
+    obj_type_exclusions = ["PortList", "Node", "ZoneEquipmentList", "SizingZone", "ZoneHVACEquipmentList", "Building", "YearDescription", "ScheduleRule", "ScheduleDay", "ScheduleTypeLimits"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 
@@ -614,6 +736,18 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
       assert_equal(expected_values["Beds"], nbeds)
       assert_equal(expected_values["Baths"], nbaths)
     end
+
+    actual_values = {"NumOccupants"=>0}
+    all_new_objects.each do |obj_type, new_objects|
+      new_objects.each do |new_object|
+        next if not new_object.respond_to?("to_#{obj_type}")
+        new_object = new_object.public_send("to_#{obj_type}").get
+        if obj_type == "People"
+          actual_values["NumOccupants"] += new_object.peopleDefinition.numberofPeople.get
+        end
+      end
+    end
+    assert_in_epsilon(expected_values["NumOccupants"], actual_values["NumOccupants"], 0.01)
 
     return model
   end

@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>residential_geometry_from_floorspace_js</name>
   <uid>79d7fbb8-e001-4c65-9444-c7dcb975290f</uid>
-  <version_id>0b5f21ef-ab8e-4e0f-8fed-fb9d6d535fb2</version_id>
-  <version_modified>20180220T230223Z</version_modified>
+  <version_id>3b5e1395-3dcb-41c6-9846-9ca02923d216</version_id>
+  <version_modified>20180221T001235Z</version_modified>
   <xml_checksum>0AD1E2E2</xml_checksum>
   <class_name>ResidentialGeometryFromFloorspaceJS</class_name>
   <display_name>Residential Geometry from FloorspaceJS</display_name>
-  <description>Imports a floorplan JSON file written by the FloorspaceJS tool. Sets the number of bedrooms and bathrooms in the building. For multifamily buildings, the bedrooms/bathrooms can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Currently this measure deletes the existing geometry and replaces it. Also, sets (or replaces) BuildingUnit objects that store the number of bedrooms and bathrooms associated with the model.</modeler_description>
+  <description>Imports a floorplan JSON file written by the FloorspaceJS tool. Sets the number of bedrooms and bathrooms in the building. For multifamily buildings, the bedrooms/bathrooms can be set for all units of the building. Sets the number of occupants in the building. For multifamily buildings, the people can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>Currently this measure deletes the existing geometry and replaces it. Also, sets (or replaces) BuildingUnit objects that store the number of bedrooms and bathrooms associated with the model. Sets (or replaces) the People object for each finished space in the model.</modeler_description>
   <arguments>
     <argument>
       <name>floorplan_path</name>
@@ -36,6 +36,70 @@
       <required>false</required>
       <model_dependent>false</model_dependent>
       <default_value>2</default_value>
+    </argument>
+    <argument>
+      <name>num_occ</name>
+      <display_name>Number of Occupants</display_name>
+      <description>Specify the number of occupants. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. A value of 'auto' will calculate the average number of occupants from the number of bedrooms. Used to specify the internal gains from people only.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
+    </argument>
+    <argument>
+      <name>occ_gain</name>
+      <display_name>Internal Gains</display_name>
+      <description>Occupant heat gain, both sensible and latent.</description>
+      <type>Double</type>
+      <units>Btu/person/hr</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>384</default_value>
+    </argument>
+    <argument>
+      <name>sens_frac</name>
+      <display_name>Sensible Fraction</display_name>
+      <description>Fraction of internal gains that are sensible.</description>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.573</default_value>
+    </argument>
+    <argument>
+      <name>lat_frac</name>
+      <display_name>Latent Fraction</display_name>
+      <description>Fraction of internal gains that are latent.</description>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.427</default_value>
+    </argument>
+    <argument>
+      <name>weekday_sch</name>
+      <display_name>Weekday schedule</display_name>
+      <description>Specify the 24-hour weekday schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00</default_value>
+    </argument>
+    <argument>
+      <name>weekend_sch</name>
+      <display_name>Weekend schedule</display_name>
+      <description>Specify the 24-hour weekend schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00</default_value>
+    </argument>
+    <argument>
+      <name>monthly_sch</name>
+      <display_name>Month schedule</display_name>
+      <description>Specify the 12-month schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0</default_value>
     </argument>
   </arguments>
   <outputs/>
@@ -201,7 +265,13 @@
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>13705C83</checksum>
+      <checksum>A001EED9</checksum>
+    </file>
+    <file>
+      <filename>schedules.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>A299BFF0</checksum>
     </file>
     <file>
       <version>
@@ -212,19 +282,19 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>3E94DCF7</checksum>
+      <checksum>A153071D</checksum>
     </file>
     <file>
       <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>516D7F6F</checksum>
+      <checksum>1A36C31F</checksum>
     </file>
     <file>
       <filename>create_residential_geometry_from_floorspacejs_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>0FDB5C77</checksum>
+      <checksum>340AEBEE</checksum>
     </file>
   </files>
 </measure>

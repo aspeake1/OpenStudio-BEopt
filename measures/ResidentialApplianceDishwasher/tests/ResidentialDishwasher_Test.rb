@@ -21,8 +21,8 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_new_construction_318_rated_kwh
     args_hash = {}
     args_hash["num_settings"] = 8
-    args_hash["dw_E"] = 318
-    args_hash["eg_gas_cost"] = 24
+    args_hash["rated_annual_energy"] = 318
+    args_hash["annual_gas_cost"] = 24
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>111, "HotWater_gpd"=>3.10, "Location"=>args_hash["location"]}
@@ -32,8 +32,8 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_new_construction_290_rated_kwh
     args_hash = {}
     args_hash["num_settings"] = 12
-    args_hash["dw_E"] = 290
-    args_hash["eg_gas_cost"] = 23
+    args_hash["rated_annual_energy"] = 290
+    args_hash["annual_gas_cost"] = 23
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>83.1, "HotWater_gpd"=>1.65, "Location"=>args_hash["location"]}
@@ -43,8 +43,8 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_new_construction_318_rated_kwh_mult_0_80
     args_hash = {}
     args_hash["num_settings"] = 8
-    args_hash["dw_E"] = 318
-    args_hash["eg_gas_cost"] = 24
+    args_hash["rated_annual_energy"] = 318
+    args_hash["annual_gas_cost"] = 24
     args_hash["mult_e"] = 0.8
     args_hash["mult_hw"] = 0.8
     expected_num_del_objects = {}
@@ -56,8 +56,8 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_new_construction_318_rated_kwh_cold_inlet
     args_hash = {}
     args_hash["num_settings"] = 8
-    args_hash["dw_E"] = 318
-    args_hash["eg_gas_cost"] = 24
+    args_hash["rated_annual_energy"] = 318
+    args_hash["annual_gas_cost"] = 24
     args_hash["cold_inlet"] = "true"
     args_hash["cold_use"] = 3.5
     expected_num_del_objects = {}
@@ -69,8 +69,8 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_new_construction_318_rated_kwh_cold_inlet_tankless
     args_hash = {}
     args_hash["num_settings"] = 8
-    args_hash["dw_E"] = 318
-    args_hash["eg_gas_cost"] = 24
+    args_hash["rated_annual_energy"] = 318
+    args_hash["annual_gas_cost"] = 24
     args_hash["cold_inlet"] = "true"
     args_hash["cold_use"] = 3.5
     expected_num_del_objects = {}
@@ -82,9 +82,9 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_new_construction_318_rated_kwh_no_int_heater
     args_hash = {}
     args_hash["num_settings"] = 8
-    args_hash["dw_E"] = 318
-    args_hash["eg_gas_cost"] = 24
-    args_hash["int_htr"] = "false"
+    args_hash["rated_annual_energy"] = 318
+    args_hash["annual_gas_cost"] = 24
+    args_hash["has_internal_heater"] = "false"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>124.8, "HotWater_gpd"=>2.41, "Location"=>args_hash["location"]}
@@ -94,8 +94,8 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_new_construction_basement
     args_hash = {}
     args_hash["num_settings"] = 8
-    args_hash["dw_E"] = 318
-    args_hash["eg_gas_cost"] = 24
+    args_hash["rated_annual_energy"] = 318
+    args_hash["annual_gas_cost"] = 24
     args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
@@ -106,16 +106,16 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_retrofit_replace
     args_hash = {}
     args_hash["num_settings"] = 8
-    args_hash["dw_E"] = 318
-    args_hash["eg_gas_cost"] = 24
+    args_hash["rated_annual_energy"] = 318
+    args_hash["annual_gas_cost"] = 24
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>111, "HotWater_gpd"=>3.10, "Location"=>args_hash["location"]}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["num_settings"] = 12
-    args_hash["dw_E"] = 290
-    args_hash["eg_gas_cost"] = 23
+    args_hash["rated_annual_energy"] = 290
+    args_hash["annual_gas_cost"] = 23
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>83.1, "HotWater_gpd"=>1.65, "Location"=>args_hash["location"]}
@@ -125,8 +125,8 @@ class ResidentialDishwasherTest < MiniTest::Test
   def test_retrofit_remove
     args_hash = {}
     args_hash["num_settings"] = 8
-    args_hash["dw_E"] = 318
-    args_hash["eg_gas_cost"] = 24
+    args_hash["rated_annual_energy"] = 318
+    args_hash["annual_gas_cost"] = 24
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>111, "HotWater_gpd"=>3.10, "Location"=>args_hash["location"]}
@@ -154,9 +154,9 @@ class ResidentialDishwasherTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of place settings must be greater than or equal to 1.")
   end
 
-  def test_argument_error_dw_E_negative
+  def test_argument_error_rated_annual_energy_negative
     args_hash = {}
-    args_hash["dw_E"] = -1.0
+    args_hash["rated_annual_energy"] = -1.0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated annual energy consumption must be greater than or equal to 0.")
   end
@@ -168,30 +168,30 @@ class ResidentialDishwasherTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cold water connection use must be greater than or equal to 0.")
   end
 
-  def test_argument_error_eg_date_negative
+  def test_argument_error_test_date_negative
     args_hash = {}
-    args_hash["eg_date"] = -1
+    args_hash["test_date"] = -1
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Energy Guide date must be greater than or equal to 1900.")
   end
 
-  def test_argument_error_eg_date_zero
+  def test_argument_error_test_date_zero
     args_hash = {}
-    args_hash["eg_date"] = 0
+    args_hash["test_date"] = 0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Energy Guide date must be greater than or equal to 1900.")
   end
 
-  def test_argument_error_eg_gas_cost_negative
+  def test_argument_error_annual_gas_cost_negative
     args_hash = {}
-    args_hash["eg_gas_cost"] = -1
+    args_hash["annual_gas_cost"] = -1
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Energy Guide annual gas cost must be greater than 0.")
   end
 
-  def test_argument_error_eg_gas_cost_zero
+  def test_argument_error_annual_gas_cost_zero
     args_hash = {}
-    args_hash["eg_gas_cost"] = 0
+    args_hash["annual_gas_cost"] = 0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Energy Guide annual gas cost must be greater than 0.")
   end
@@ -216,19 +216,6 @@ class ResidentialDishwasherTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "No building geometry has been defined.")
   end
   
-  def test_error_missing_beds
-    args_hash = {}
-    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
-  end
-  
-  def test_error_missing_location
-    args_hash = {}
-    args_hash["cold_inlet"] = "true"
-    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mains water temperature has not been set.")
-  end
-
   def test_error_missing_water_heater
     args_hash = {}
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)

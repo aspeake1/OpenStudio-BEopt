@@ -78,45 +78,44 @@ The order in which these measures are called is important. For example, the Wind
 |:---|:---|:---|
 |1. Location|1. Location||
 |2. Geometry|1. Geometry - Single-Family Detached (or Single-Family Attached or Multifamily)||
-||2. Number of Occupants|Beds/Baths|
-||3. Orientation||
-||4. Eaves||
-||5. Door Area||
-||6. Window Areas / Overhangs||
-||7. Neighbors||
+||2. Orientation||
+||3. Eaves||
+||4. Door Area||
+||5. Window Areas / Overhangs||
+||6. Neighbors||
 |3. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
 ||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
 ||3. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
 ||4. Floors||
 ||5. Window Construction|Window Areas, Location|
 ||6. Door Construction|Door Area|
-|4. Domestic Hot Water|1. Water Heater - Tank (or Tankless, Heat Pump, etc.)|Beds/Baths|
+|4. Domestic Hot Water|1. Water Heater - Tank (or Tankless, Heat Pump, etc.)||
 ||2. Hot Water Fixtures|Water Heater|
 ||3. Hot Water Distribution|Hot Water Fixtures, Location|
 ||4. Solar Hot Water|Water Heater, Location|
 |5. HVAC|1. Central Air Source Heat Pump (or AC/Furnace, Boiler, MSHP, etc.)||
 ||2. Heating Setpoint|HVAC Equipment, Location|
 ||3. Cooling Setpoint|HVAC Equipment, Location|
-||4. Ceiling Fan|Cooling Setpoint, Beds/Baths|
+||4. Ceiling Fan|Cooling Setpoint|
 ||5. Dehumidifier|HVAC Equipment|
 |6. Major Appliances|1. Refrigerator||
 ||2. Clothes Washer|Water Heater, Location|
-||3. Clothes Dryer|Beds/Baths, Clothes Washer|
+||3. Clothes Dryer|Clothes Washer|
 ||4. Dishwasher|Water Heater, Location|
-||5. Cooking Range|Beds/Baths|
+||5. Cooking Range||
 |7. Lighting|1. Lighting|Location|
-|8. Misc Loads|1. Plug Loads|Beds/Baths|
+|8. Misc Loads|1. Plug Loads||
 ||2. Extra Refrigerator||
 ||3. Freezer||
-||4. Hot Tub Heater - Electric (or Gas)|Beds/Baths|
-||5. Hot Tub Pump|Beds/Baths|
-||6. Pool Heater - Electric (or Gas)|Beds/Baths|
-||7. Pool Pump|Beds/Baths|
-||8. Well Pump|Beds/Baths|
-||9. Gas Fireplace|Beds/Baths|
-||10. Gas Grill|Beds/Baths|
-||11. Gas Lighting|Beds/Baths|
-|9. Airflow|1. Airflow|Location, Beds/Baths, HVAC Equipment, Clothes Dryer|
+||4. Hot Tub Heater - Electric (or Gas)||
+||5. Hot Tub Pump||
+||6. Pool Heater - Electric (or Gas)||
+||7. Pool Pump||
+||8. Well Pump||
+||9. Gas Fireplace||
+||10. Gas Grill||
+||11. Gas Lighting||
+|9. Airflow|1. Airflow|Location, HVAC Equipment, Clothes Dryer|
 |10. Sizing|1. HVAC Sizing|(lots of measures...)|
 <!--- MEASURE_WORKFLOW_END -->
 

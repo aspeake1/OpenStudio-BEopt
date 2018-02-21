@@ -1,9 +1,7 @@
-require "#{File.dirname(__FILE__)}/resources/schedules"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
-require "#{File.dirname(__FILE__)}/resources/util"
-require "#{File.dirname(__FILE__)}/resources/clothesdryer"
+require "#{File.dirname(__FILE__)}/resources/appliances"
 
 #start the measure
 class ResidentialClothesDryer < OpenStudio::Measure::ModelMeasure
@@ -113,19 +111,6 @@ class ResidentialClothesDryer < OpenStudio::Measure::ModelMeasure
     monthly_sch = runner.getStringArgumentValue("monthly_sch",user_arguments)
     location = runner.getStringArgumentValue("location",user_arguments)
 
-    #Check for valid inputs
-    if cef <= 0
-        runner.registerError("Combined energy factor must be greater than 0.0.")
-        return false
-    end
-    if fuel_split < 0 or fuel_split > 1
-        runner.registerError("Assumed fuel electric split must be greater than or equal to 0.0 and less than or equal to 1.0.")
-    end
-    if mult < 0
-        runner.registerError("Occupancy energy multiplier must be greater than or equal to 0.0.")
-        return false
-    end
-    
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?
@@ -135,7 +120,7 @@ class ResidentialClothesDryer < OpenStudio::Measure::ModelMeasure
     # Remove all existing objects
     obj_name = Constants.ObjectNameClothesDryer(nil)
     model.getSpaces.each do |space|
-        ClothesDryer.remove_existing(runner, space, obj_name)
+        ClothesDryer.remove(runner, space, obj_name)
     end
     
     location_hierarchy = [Constants.SpaceTypeLaundryRoom, 

@@ -1,8 +1,6 @@
-require "#{File.dirname(__FILE__)}/resources/schedules"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
-require "#{File.dirname(__FILE__)}/resources/unit_conversions"
-require "#{File.dirname(__FILE__)}/resources/util"
+require "#{File.dirname(__FILE__)}/resources/appliances"
 
 #start the measure
 class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
@@ -35,25 +33,25 @@ class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
     args << fuel_type
 
     #make a double argument for cooktop EF
-    c_ef = OpenStudio::Measure::OSArgument::makeDoubleArgument("c_ef", true)
-    c_ef.setDisplayName("Cooktop Energy Factor")
-    c_ef.setDescription("Cooktop energy factor determined by DOE test procedures for cooking appliances (DOE 1997).")
-    c_ef.setDefaultValue(0.4)
-    args << c_ef
+    cooktop_ef = OpenStudio::Measure::OSArgument::makeDoubleArgument("cooktop_ef", true)
+    cooktop_ef.setDisplayName("Cooktop Energy Factor")
+    cooktop_ef.setDescription("Cooktop energy factor determined by DOE test procedures for cooking appliances (DOE 1997).")
+    cooktop_ef.setDefaultValue(0.4)
+    args << cooktop_ef
 
     #make a double argument for oven EF
-    o_ef = OpenStudio::Measure::OSArgument::makeDoubleArgument("o_ef", true)
-    o_ef.setDisplayName("Oven Energy Factor")
-    o_ef.setDescription("Oven energy factor determined by DOE test procedures for cooking appliances (DOE 1997).")
-    o_ef.setDefaultValue(0.058)
-    args << o_ef
+    oven_ef = OpenStudio::Measure::OSArgument::makeDoubleArgument("oven_ef", true)
+    oven_ef.setDisplayName("Oven Energy Factor")
+    oven_ef.setDescription("Oven energy factor determined by DOE test procedures for cooking appliances (DOE 1997).")
+    oven_ef.setDefaultValue(0.058)
+    args << oven_ef
     
     #make a boolean argument for has electric ignition
-    e_ignition = OpenStudio::Measure::OSArgument::makeBoolArgument("e_ignition", true)
-    e_ignition.setDisplayName("Has Electronic Ignition")
-    e_ignition.setDescription("For fuel cooking ranges with electronic ignition, an extra (40 + 13.3x(#BR)) kWh/yr of electricity will be included. Only used for non-electric ranges.")
-    e_ignition.setDefaultValue(true)
-    args << e_ignition
+    has_elec_ignition = OpenStudio::Measure::OSArgument::makeBoolArgument("has_elec_ignition", true)
+    has_elec_ignition.setDisplayName("Has Electronic Ignition")
+    has_elec_ignition.setDescription("For fuel cooking ranges with electronic ignition, an extra (40 + 13.3x(#BR)) kWh/yr of electricity will be included. Only used for non-electric ranges.")
+    has_elec_ignition.setDefaultValue(true)
+    args << has_elec_ignition
 
     #make a double argument for Occupancy Energy Multiplier
     mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("mult", true)
@@ -109,32 +107,19 @@ class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
 
     #assign the user inputs to variables
     fuel_type = runner.getStringArgumentValue("fuel_type",user_arguments)
-    c_ef = runner.getDoubleArgumentValue("c_ef",user_arguments)
-    o_ef = runner.getDoubleArgumentValue("o_ef",user_arguments)
-    e_ignition = runner.getBoolArgumentValue("e_ignition",user_arguments)
+    cooktop_ef = runner.getDoubleArgumentValue("cooktop_ef",user_arguments)
+    oven_ef = runner.getDoubleArgumentValue("oven_ef",user_arguments)
+    has_elec_ignition = runner.getBoolArgumentValue("has_elec_ignition",user_arguments)
     mult = runner.getDoubleArgumentValue("mult",user_arguments)
     weekday_sch = runner.getStringArgumentValue("weekday_sch",user_arguments)
     weekend_sch = runner.getStringArgumentValue("weekend_sch",user_arguments)
     monthly_sch = runner.getStringArgumentValue("monthly_sch",user_arguments)
     location = runner.getStringArgumentValue("location",user_arguments)
     
-    #check for valid inputs
-    if o_ef <= 0 or o_ef > 1
-        runner.registerError("Oven energy factor must be greater than 0 and less than or equal to 1.")
-        return false
-    end
-    if c_ef <= 0 or c_ef > 1
-        runner.registerError("Cooktop energy factor must be greater than 0 and less than or equal to 1.")
-        return false
-    end
-    if mult < 0
-        runner.registerError("Occupancy energy multiplier must be greater than or equal to 0.")
-        return false
-    end
     if fuel_type == Constants.FuelTypeElectric
-        e_ignition = false
+        has_elec_ignition = false
     end
-
+    
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?
@@ -144,7 +129,7 @@ class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
     # Remove all existing objects
     obj_name = Constants.ObjectNameCookingRange(nil)
     model.getSpaces.each do |space|
-        remove_existing(runner, space, obj_name)
+        CookingRange.remove(runner, space, obj_name)
     end
     
     location_hierarchy = [Constants.SpaceTypeKitchen, 
@@ -153,124 +138,46 @@ class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
                           Constants.SpaceTypeUnfinishedBasement, 
                           Constants.SpaceTypeGarage]
 
-    tot_range_ann_e = 0
-    tot_range_ann_f = 0
-    tot_range_ann_i = 0
+    tot_ann_e = 0
+    tot_ann_f = 0
+    tot_ann_i = 0
     msgs = []
     sch = nil
     units.each_with_index do |unit, unit_index|
     
-        # Get unit beds/baths
-        nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)
-        if nbeds.nil? or nbaths.nil?
-            return false
-        end
-        
         # Get space
         space = Geometry.get_space_from_location(unit, location, location_hierarchy)
         next if space.nil?
 
-        unit_obj_name = Constants.ObjectNameCookingRange(fuel_type, unit.name.to_s)
-
-        #Calculate range daily energy use
-        if fuel_type == Constants.FuelTypeElectric
-            range_ann_e = ((86.5 + 28.9 * nbeds) / c_ef + (14.6 + 4.9 * nbeds) / o_ef)*mult #kWh/yr
-            range_ann_f = 0
-            range_ann_i = 0
-        else
-            range_ann_e = 0
-            range_ann_f = ((2.64 + 0.88 * nbeds) / c_ef + (0.44 + 0.15 * nbeds) / o_ef)*mult # therm/yr
-            if e_ignition == true
-                range_ann_i = (40 + 13.3 * nbeds)*mult #kWh/yr
-            else
-                range_ann_i = 0
-            end
-        end
-
-        if range_ann_f > 0 or range_ann_e > 0
-
-            if sch.nil?
-                # Create schedule
-                sch = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameCookingRange(fuel_type, false) + " schedule", weekday_sch, weekend_sch, monthly_sch)
-                if not sch.validated?
-                    return false
-                end
-            end
-            
-        end
-            
-        if range_ann_f > 0
+        success, ann_e, ann_f, ann_i, sch = CookingRange.apply(model, unit, runner, fuel_type, cooktop_ef, oven_ef,
+                                                               has_elec_ignition, mult, weekday_sch, weekend_sch, monthly_sch,
+                                                               sch, space)
         
-            design_level_f = sch.calcDesignLevelFromDailyTherm(range_ann_f/365.0)
-            design_level_i = sch.calcDesignLevelFromDailykWh(range_ann_i/365.0)
-            
-            #Add equipment for the range
-            if e_ignition == true
-                unit_obj_name_i = Constants.ObjectNameCookingRange(Constants.FuelTypeElectric, unit.name.to_s)
-                
-                rng_def2 = OpenStudio::Model::ElectricEquipmentDefinition.new(model)
-                rng2 = OpenStudio::Model::ElectricEquipment.new(rng_def2)
-                rng2.setName(unit_obj_name_i)
-                rng2.setEndUseSubcategory(unit_obj_name_i)
-                rng2.setSpace(space)
-                rng_def2.setName(unit_obj_name_i)
-                rng_def2.setDesignLevel(design_level_i)
-                rng_def2.setFractionRadiant(0.24)
-                rng_def2.setFractionLatent(0.3)
-                rng_def2.setFractionLost(0.3)
-                rng2.setSchedule(sch.schedule)
-            end
-
-            rng_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
-            rng = OpenStudio::Model::OtherEquipment.new(rng_def)
-            rng.setName(unit_obj_name)
-            rng.setEndUseSubcategory(unit_obj_name)
-            rng.setFuelType(HelperMethods.eplus_fuel_map(fuel_type))
-            rng.setSpace(space)
-            rng_def.setName(unit_obj_name)
-            rng_def.setDesignLevel(design_level_f)
-            rng_def.setFractionRadiant(0.18)
-            rng_def.setFractionLatent(0.2)
-            rng_def.setFractionLost(0.5)
-            rng.setSchedule(sch.schedule)
-
+        if not success
+            return false
+        end
+        
+        if ann_f > 0
             # Report each assignment plus final condition
             s_ann = ""
             if fuel_type == Constants.FuelTypeGas
-                s_ann = "#{range_ann_f.round} therms"
+                s_ann = "#{ann_f.round} therms"
             else
-                s_ann = "#{UnitConversions.convert(UnitConversions.convert(range_ann_f, "therm", "Btu"), "Btu", "gal", fuel_type).round} gallons"
+                s_ann = "#{UnitConversions.convert(UnitConversions.convert(ann_f, "therm", "Btu"), "Btu", "gal", fuel_type).round} gallons"
             end
             s_ignition = ""
-            if e_ignition
-                s_ignition = " and #{range_ann_i.round} kWhs"
+            if has_elec_ignition
+                s_ignition = " and #{ann_i.round} kWhs"
             end
             msgs << "A cooking range with #{s_ann}#{s_ignition} annual energy consumption has been assigned to space '#{space.name.to_s}'."
-            
-            tot_range_ann_f += range_ann_f
-            tot_range_ann_i += range_ann_i
-            
-        elsif range_ann_e > 0
-            design_level_e = sch.calcDesignLevelFromDailykWh(range_ann_e/365.0)
-            
-            #Add equipment for the range
-            rng_def = OpenStudio::Model::ElectricEquipmentDefinition.new(model)
-            rng = OpenStudio::Model::ElectricEquipment.new(rng_def)
-            rng.setName(unit_obj_name)
-            rng.setEndUseSubcategory(unit_obj_name)
-            rng.setSpace(space)
-            rng_def.setName(unit_obj_name)
-            rng_def.setDesignLevel(design_level_e)
-            rng_def.setFractionRadiant(0.24)
-            rng_def.setFractionLatent(0.3)
-            rng_def.setFractionLost(0.3)
-            rng.setSchedule(sch.schedule)
-            
-            msgs << "A cooking range with #{range_ann_e.round} kWhs annual energy consumption has been assigned to space '#{space.name.to_s}'."
-            
-            tot_range_ann_e += range_ann_e
+        else
+            msgs << "A cooking range with #{ann_e.round} kWhs annual energy consumption has been assigned to space '#{space.name.to_s}'."
         end
         
+        tot_ann_e += ann_e
+        tot_ann_f += ann_f
+        tot_ann_i += ann_i
+
     end
           
     # Reporting
@@ -278,20 +185,20 @@ class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
         msgs.each do |msg|
             runner.registerInfo(msg)
         end
-        if tot_range_ann_f > 0
+        if tot_ann_f > 0
             s_ann = ""
             if fuel_type == Constants.FuelTypeGas
-                s_ann = "#{tot_range_ann_f.round} therms"
+                s_ann = "#{tot_ann_f.round} therms"
             else
-                s_ann = "#{UnitConversions.btu2gal(UnitConversions.convert(tot_range_ann_f, "therm", "Btu"), fuel_type).round} gallons"
+                s_ann = "#{UnitConversions.btu2gal(UnitConversions.convert(tot_ann_f, "therm", "Btu"), fuel_type).round} gallons"
             end
             s_ignition = ""
-            if e_ignition
-                s_ignition = " and #{tot_range_ann_i.round} kWhs"
+            if has_elec_ignition
+                s_ignition = " and #{tot_ann_i.round} kWhs"
             end
             runner.registerFinalCondition("The building has been assigned cooking ranges totaling #{s_ann}#{s_ignition} annual energy consumption across #{units.size} units.")
-        elsif tot_range_ann_e > 0
-            runner.registerFinalCondition("The building has been assigned cooking ranges totaling #{tot_range_ann_e.round} kWhs annual energy consumption across #{units.size} units.")
+        elsif tot_ann_e > 0
+            runner.registerFinalCondition("The building has been assigned cooking ranges totaling #{tot_ann_e.round} kWhs annual energy consumption across #{units.size} units.")
         end
     elsif msgs.size == 1
         runner.registerFinalCondition(msgs[0])
@@ -303,37 +210,6 @@ class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
 
   end #end the run method
   
-  def remove_existing(runner, space, obj_name)
-    # Remove any existing cooking range
-    objects_to_remove = []
-    space.electricEquipment.each do |space_equipment|
-        next if not space_equipment.name.to_s.start_with? obj_name
-        objects_to_remove << space_equipment
-        objects_to_remove << space_equipment.electricEquipmentDefinition
-        if space_equipment.schedule.is_initialized
-            objects_to_remove << space_equipment.schedule.get
-        end
-    end
-    space.otherEquipment.each do |space_equipment|
-        next if not space_equipment.name.to_s.start_with? obj_name
-        objects_to_remove << space_equipment
-        objects_to_remove << space_equipment.otherEquipmentDefinition
-        if space_equipment.schedule.is_initialized
-            objects_to_remove << space_equipment.schedule.get
-        end
-    end
-    if objects_to_remove.size > 0
-        runner.registerInfo("Removed existing cooking range from space '#{space.name.to_s}'.")
-    end
-    objects_to_remove.uniq.each do |object|
-        begin
-            object.remove
-        rescue
-            # no op
-        end
-    end
-  end
-
 end #end the measure
 
 #this allows the measure to be use by the application
