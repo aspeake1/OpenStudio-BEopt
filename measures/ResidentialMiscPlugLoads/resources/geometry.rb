@@ -155,19 +155,19 @@ class Geometry
   end
 
   def self.get_unit_beds_baths(model, unit, runner=nil)
-      # Returns a list with #beds, #baths, a list of spaces, and the unit name
-      nbeds = unit.getFeatureAsInteger(Constants.BuildingUnitFeatureNumBedrooms)
-      nbaths = unit.getFeatureAsDouble(Constants.BuildingUnitFeatureNumBathrooms)
-      if not (nbeds.is_initialized or nbaths.is_initialized)
-          if !runner.nil?
-              runner.registerError("Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
-          end
-          return [nil, nil]
-      else
-          nbeds = nbeds.get.to_f
-          nbaths = nbaths.get
+    # Returns a list with #beds, #baths, a list of spaces, and the unit name
+    nbeds = unit.getFeatureAsInteger(Constants.BuildingUnitFeatureNumBedrooms)
+    nbaths = unit.getFeatureAsDouble(Constants.BuildingUnitFeatureNumBathrooms)
+    if not (nbeds.is_initialized or nbaths.is_initialized)
+      if !runner.nil?
+        runner.registerError("Could not determine number of bedrooms or bathrooms.")
       end
-      return [nbeds, nbaths]
+      return [nil, nil]
+    else
+      nbeds = nbeds.get.to_f
+      nbaths = nbaths.get
+    end
+    return [nbeds, nbaths]
   end
 
   def self.get_unit_dhw_sched_index(model, unit, runner=nil)

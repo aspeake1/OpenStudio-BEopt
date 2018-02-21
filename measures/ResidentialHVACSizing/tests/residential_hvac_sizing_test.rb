@@ -2157,12 +2157,6 @@ class ProcessHVACSizingTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Construction not assigned to 'Surface 13'.")
   end
 
-  def test_error_missing_beds
-    args_hash = {}
-    result = _test_error("SFD_HVACSizing_Equip_MissingBeds.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
-  end
-
   private
 
   def _test_error(osm_file_or_model, args_hash)

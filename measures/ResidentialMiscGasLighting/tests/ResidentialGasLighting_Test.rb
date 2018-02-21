@@ -153,12 +153,6 @@ class ResidentialGasLightingTest < MiniTest::Test
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
-  
-  def test_error_missing_beds
-    args_hash = {}
-    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
-  end
     
   def test_error_missing_geometry
     args_hash = {}
