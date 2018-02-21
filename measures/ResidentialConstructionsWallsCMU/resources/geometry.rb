@@ -1230,7 +1230,7 @@ class Geometry
       end
     end
     if num_removed > 0
-        runner.registerInfo("#{num_removed} overhang shading surfaces removed.")
+      runner.registerInfo("#{num_removed} overhang shading surfaces removed.")
     end
 
     # No overhangs to add? Exit here.
@@ -1238,6 +1238,7 @@ class Geometry
       if num_removed == 0
         runner.registerAsNotApplicable("No overhangs were added or removed.")
       end
+      return true
     end
 
     windows_found = false

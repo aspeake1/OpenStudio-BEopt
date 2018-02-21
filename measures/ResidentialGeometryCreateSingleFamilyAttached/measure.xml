@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>create_residential_single_family_attached_geometry</name>
   <uid>fb4e4db8-1b29-4cbf-abcd-6af194ad945c</uid>
-  <version_id>9d43cf82-c0e3-4134-8af9-044d89d8f048</version_id>
-  <version_modified>20180220T234823Z</version_modified>
+  <version_id>c7bbdaff-c536-4d3f-b41d-7ff8151de64b</version_id>
+  <version_modified>20180221T022803Z</version_modified>
   <xml_checksum>2AF3A68E</xml_checksum>
   <class_name>CreateResidentialSingleFamilyAttachedGeometry</class_name>
   <display_name>Create Residential Single-Family Attached Geometry</display_name>
-  <description>Sets the basic geometry for the building. Sets the number of bedrooms and bathrooms in the building. The bedrooms/bathrooms can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Creates single-family attached geometry. Also, sets (or replaces) BuildingUnit objects that store the number of bedrooms and bathrooms associated with the model.</modeler_description>
+  <description>Sets the basic geometry for the building. Sets the number of bedrooms and bathrooms in the building. The bedrooms/bathrooms can be set for all units of the building. Sets the number of occupants in the building. The people can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>Creates single-family attached geometry. Also, sets (or replaces) BuildingUnit objects that store the number of bedrooms and bathrooms associated with the model. Sets (or replaces) the People object for each finished space in the model.</modeler_description>
   <arguments>
     <argument>
       <name>unit_ffa</name>
@@ -245,6 +245,70 @@
       <model_dependent>false</model_dependent>
       <default_value>2</default_value>
     </argument>
+    <argument>
+      <name>num_occ</name>
+      <display_name>Number of Occupants</display_name>
+      <description>Specify the number of occupants. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. A value of 'auto' will calculate the average number of occupants from the number of bedrooms. Used to specify the internal gains from people only.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
+    </argument>
+    <argument>
+      <name>occ_gain</name>
+      <display_name>Internal Gains</display_name>
+      <description>Occupant heat gain, both sensible and latent.</description>
+      <type>Double</type>
+      <units>Btu/person/hr</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>384</default_value>
+    </argument>
+    <argument>
+      <name>sens_frac</name>
+      <display_name>Sensible Fraction</display_name>
+      <description>Fraction of internal gains that are sensible.</description>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.573</default_value>
+    </argument>
+    <argument>
+      <name>lat_frac</name>
+      <display_name>Latent Fraction</display_name>
+      <description>Fraction of internal gains that are latent.</description>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.427</default_value>
+    </argument>
+    <argument>
+      <name>weekday_sch</name>
+      <display_name>Weekday schedule</display_name>
+      <description>Specify the 24-hour weekday schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00</default_value>
+    </argument>
+    <argument>
+      <name>weekend_sch</name>
+      <display_name>Weekend schedule</display_name>
+      <description>Specify the 24-hour weekend schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00</default_value>
+    </argument>
+    <argument>
+      <name>monthly_sch</name>
+      <display_name>Month schedule</display_name>
+      <description>Specify the 12-month schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0</default_value>
+    </argument>
   </arguments>
   <outputs/>
   <provenances/>
@@ -293,6 +357,12 @@
       <checksum>9BFC0E46</checksum>
     </file>
     <file>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>A001EED9</checksum>
+    </file>
+    <file>
       <version>
         <software_program>OpenStudio</software_program>
         <identifier>1.12.2</identifier>
@@ -301,25 +371,25 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>342BBC5A</checksum>
+      <checksum>DD7A2213</checksum>
+    </file>
+    <file>
+      <filename>schedules.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>40517196</checksum>
     </file>
     <file>
       <filename>create_residential_single_family_attached_geometry_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>CA43D007</checksum>
-    </file>
-    <file>
-      <filename>util.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>A001EED9</checksum>
+      <checksum>A312B908</checksum>
     </file>
     <file>
       <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>1A36C31F</checksum>
+      <checksum>56FE774A</checksum>
     </file>
   </files>
 </measure>

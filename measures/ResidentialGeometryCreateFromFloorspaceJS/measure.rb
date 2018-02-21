@@ -258,8 +258,6 @@ class ResidentialGeometryFromFloorspaceJS < OpenStudio::Measure::ModelMeasure
       surface.setOutsideBoundaryCondition("Adiabatic")
     end
 
-    model.getYearDescription # schedules look for this, even if it's empty
-
     result = Geometry.process_beds_and_baths(model, runner, num_br, num_ba)
     unless result
       return false

@@ -62,11 +62,11 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
   end
 
   def test_no_zones_assigned_to_spaces
-    num_finished_spaces = 3
+    num_finished_spaces = 2
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_spaces_assigned_to_zones.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>4, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>2, "People"=>2, "ScheduleRuleset"=>2}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>4, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
@@ -363,7 +363,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["PortList", "ZoneHVACEquipmentList", "Node", "SizingZone", "RenderingColor", "YearDescription", "ScheduleRule", "ScheduleDay", "ScheduleTypeLimits"]
+    obj_type_exclusions = ["PortList", "ZoneHVACEquipmentList", "Node", "SizingZone", "RenderingColor", "ScheduleRule", "ScheduleDay", "ScheduleTypeLimits", "YearDescription"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 

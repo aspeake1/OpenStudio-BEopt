@@ -238,7 +238,7 @@ class WindowAreaTest < MiniTest::Test
     args_hash = {}
     args_hash["front_wwr"] = 0.12
     args_hash["left_wwr"] = 0.12
-    expected_num_del_objects = {"SubSurface"=>36}
+    expected_num_del_objects = {"SubSurface"=>36, "ShadingSurface"=>36, "ShadingSurfaceGroup"=>36}
     expected_num_new_objects = {"SubSurface"=>30, "ShadingSurface"=>30, "ShadingSurfaceGroup"=>30}
     expected_values = {"Constructions"=>1, "OverhangDepth"=>2}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows_OneConstruction.osm", args_hash, [128.8, 128.8, 64.6, 64.4], [85.9, 128.8, 42.9, 64.6], expected_num_del_objects, expected_num_new_objects, expected_values)

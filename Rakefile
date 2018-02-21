@@ -146,7 +146,7 @@ namespace :test do
     if File.exists?(File.expand_path("../log", __FILE__))
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
-    
+
     # Print warnings about unused OSWs
     osw_files.each do |osw|
         next if not osw_map[osw].nil?

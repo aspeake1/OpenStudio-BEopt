@@ -44,13 +44,13 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     arg.setDescription("Set to 'NA' if no daylight saving.")
     arg.setDefaultValue("April 7")
     args << arg
-    
+
     arg = OpenStudio::Measure::OSArgument.makeStringArgument("dst_end_date", true)
     arg.setDisplayName("Daylight Saving End Date")
     arg.setDescription("Set to 'NA' if no daylight saving.")
     arg.setDefaultValue("October 26")
     args << arg
-    
+
     return args
   end
 
@@ -67,12 +67,12 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     weather_directory = runner.getStringArgumentValue("weather_directory", user_arguments)
     weather_file_name = runner.getStringArgumentValue("weather_file_name", user_arguments)
     dst_start_date = runner.getStringArgumentValue("dst_start_date", user_arguments)
-    dst_end_date = runner.getStringArgumentValue("dst_end_date", user_arguments)   
-    
+    dst_end_date = runner.getStringArgumentValue("dst_end_date", user_arguments)
+
     # ----------------
     # Set weather file
     # ----------------
-    
+
     unless (Pathname.new weather_directory).absolute?
       weather_directory = File.expand_path(File.join(File.dirname(__FILE__), weather_directory))
     end
@@ -83,7 +83,7 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
       runner.registerError("'#{weather_file}' does not exist or is not an .epw file.")
       return false
     end
-    
+
     if model.getSite.weatherFile.is_initialized
       runner.registerInfo("Found an existing weather file.")
     end
@@ -94,11 +94,11 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     if weather.error?
       return false
     end
-    
+
     # -------------------
     # Set model site data
     # -------------------
-    
+
     site = model.getSite
     site.setName("#{epw_file.city}_#{epw_file.stateProvinceRegion}_#{epw_file.country}")
     site.setLatitude(epw_file.latitude)
@@ -127,19 +127,19 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     if not File.exist? ddy_file
       runner.registerWarning("Could not find DDY file at #{ddy_file}. As a backup, design day information will be calculated from the EPW file.")
     end
-    
+
     # ----------------------------
     # Set mains water temperatures
     # ----------------------------
-    
+
     avgOAT = UnitConversions.convert(weather.data.AnnualAvgDrybulb,"F","C")
     monthlyOAT = weather.data.MonthlyAvgDrybulbs
-    
+
     min_temp = monthlyOAT.min
     max_temp = monthlyOAT.max
-    
+
     maxDiffOAT = UnitConversions.convert(max_temp,"F","C") - UnitConversions.convert(min_temp,"F","C")
-    
+
     #Calc annual average mains temperature to report
     swmt = model.getSiteWaterMainsTemperature
     swmt.setCalculationMethod "Correlation"
@@ -150,11 +150,11 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     # ----------------
     # Set the actual year
     # ----------------
-    yd = model.getYearDescription
+    year_description = model.getYearDescription
     if epw_file.startDateActualYear.is_initialized
-      yd.setCalendarYear(epw_file.startDateActualYear.get)
+      year_description.setCalendarYear(epw_file.startDateActualYear.get)
     end
-    
+
     # ----------------
     # Set daylight saving time
     # ----------------
@@ -164,11 +164,11 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
             dst_start_date_month = OpenStudio::monthOfYear(dst_start_date.split[0])
             dst_start_date_day = dst_start_date.split[1].to_i
             dst_end_date_month = OpenStudio::monthOfYear(dst_end_date.split[0])
-            dst_end_date_day = dst_end_date.split[1].to_i    
-            
+            dst_end_date_day = dst_end_date.split[1].to_i
+
             dst = model.getRunPeriodControlDaylightSavingTime
             dst.setStartDate(dst_start_date_month, dst_start_date_day)
-            dst.setEndDate(dst_end_date_month, dst_end_date_day)  
+            dst.setEndDate(dst_end_date_month, dst_end_date_day)
             runner.registerInfo("Set daylight saving time from #{dst.startDate.to_s} to #{dst.endDate.to_s}.")
         rescue
             runner.registerError("Invalid daylight saving date specified.")
@@ -180,13 +180,13 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
 
     # ----------------
     # Set ground temperatures
-    # ----------------  
-    
+    # ----------------
+
     annual_temps = Array.new(12, weather.data.AnnualAvgDrybulb)
     annual_temps = annual_temps.map {|i| UnitConversions.convert(i,"F","C")}
     s_gt_d = model.getSiteGroundTemperatureDeep
     s_gt_d.resetAllMonths
-    s_gt_d.setAllMonthlyTemperatures(annual_temps)    
+    s_gt_d.setAllMonthlyTemperatures(annual_temps)
 
     # report final condition
     final_design_days = model.getDesignDays
@@ -200,7 +200,7 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     return true
 
   end
-  
+
   def get_climate_zone_ba(wmo)
       ba_zone = "NA"
 
@@ -216,7 +216,7 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
           break
         end
       end
-      
+
       return ba_zone
   end
 

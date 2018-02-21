@@ -652,7 +652,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["PortList", "Node", "ZoneEquipmentList", "SizingZone", "ZoneHVACEquipmentList", "Building", "YearDescription", "ScheduleRule", "ScheduleDay", "ScheduleTypeLimits"]
+    obj_type_exclusions = ["PortList", "Node", "ZoneEquipmentList", "SizingZone", "ZoneHVACEquipmentList", "Building", "ScheduleRule", "ScheduleDay", "ScheduleTypeLimits", "YearDescription"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 
@@ -660,7 +660,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 
-    actual_values = {"FinishedFloorArea"=>0, "GarageFloorArea"=>0, "FinishedBasementFloorArea"=>0, "UnfinishedBasementFloorArea"=>0, "CrawlspaceFloorArea"=>0, "UnfinishedAtticFloorArea"=>0, "FinishedAtticFloorArea"=>0, "BuildingHeight"=>0, "GarageAtticHeight"=>0, "FinishedBasementHeight"=>0, "UnfinishedBasementHeight"=>0, "CrawlspaceHeight"=>0, "UnfinishedAtticHeight"=>0, "FinishedAtticHeight"=>0}
+    actual_values = {"FinishedFloorArea"=>0, "GarageFloorArea"=>0, "FinishedBasementFloorArea"=>0, "UnfinishedBasementFloorArea"=>0, "CrawlspaceFloorArea"=>0, "UnfinishedAtticFloorArea"=>0, "FinishedAtticFloorArea"=>0, "BuildingHeight"=>0, "GarageAtticHeight"=>0, "FinishedBasementHeight"=>0, "UnfinishedBasementHeight"=>0, "CrawlspaceHeight"=>0, "UnfinishedAtticHeight"=>0, "FinishedAtticHeight"=>0, "NumOccupants"=>0}
     new_spaces = []
     all_new_objects.each do |obj_type, new_objects|
       new_objects.each do |new_object|
@@ -694,6 +694,8 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
             actual_values["FinishedFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
           end
           new_spaces << new_object
+        elsif obj_type == "People"
+          actual_values["NumOccupants"] += new_object.peopleDefinition.numberofPeople.get
         end
       end
     end
@@ -725,6 +727,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     end
     assert_in_epsilon(expected_values["FinishedFloorArea"], actual_values["FinishedFloorArea"], 0.01)
     assert_in_epsilon(expected_values["BuildingHeight"], Geometry.get_height_of_spaces(new_spaces), 0.01)
+    assert_in_epsilon(expected_values["NumOccupants"], actual_values["NumOccupants"], 0.01)
 
     # Ensure no surfaces adjacent to "ground" (should be Kiva "foundation")
     model.getSurfaces.each do |surface|
@@ -736,18 +739,6 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
       assert_equal(expected_values["Beds"], nbeds)
       assert_equal(expected_values["Baths"], nbaths)
     end
-
-    actual_values = {"NumOccupants"=>0}
-    all_new_objects.each do |obj_type, new_objects|
-      new_objects.each do |new_object|
-        next if not new_object.respond_to?("to_#{obj_type}")
-        new_object = new_object.public_send("to_#{obj_type}").get
-        if obj_type == "People"
-          actual_values["NumOccupants"] += new_object.peopleDefinition.numberofPeople.get
-        end
-      end
-    end
-    assert_in_epsilon(expected_values["NumOccupants"], actual_values["NumOccupants"], 0.01)
 
     return model
   end
