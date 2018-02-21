@@ -405,7 +405,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
           side_point = OpenStudio::Point3d.new(x, inset_depth - y, wall_height)
           se_point = OpenStudio::Point3d.new(x, inset_depth - y - balcony_depth, wall_height)
           front_point = OpenStudio::Point3d.new(x - inset_width, inset_depth - y - balcony_depth, wall_height)
-          shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([inset_point, side_point, se_point, front_point]), model)
+          shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([front_point, se_point, side_point, inset_point]), model)
         end
       else
         # unit footprint
@@ -419,7 +419,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
           side_point = OpenStudio::Point3d.new(0, inset_depth - y, wall_height)
           sw_point = OpenStudio::Point3d.new(0, inset_depth - y - balcony_depth, wall_height)
           front_point = OpenStudio::Point3d.new(inset_width, inset_depth - y - balcony_depth, wall_height)
-          shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([inset_point, front_point, sw_point, side_point]), model)
+          shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([front_point, sw_point, side_point, inset_point]), model)
         end
       end
     else
@@ -494,7 +494,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
             side_point = OpenStudio::Point3d.new(x, y - inset_depth + interior_corridor_width, wall_height)
             ne_point = OpenStudio::Point3d.new(x, y - inset_depth + balcony_depth + interior_corridor_width, wall_height)
             front_point = OpenStudio::Point3d.new(x - inset_width, y - inset_depth + balcony_depth + interior_corridor_width, wall_height)
-            shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([inset_point, front_point, ne_point, side_point]), model)
+            shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([side_point, ne_point, front_point, inset_point]), model)
           end
         else
           # unit footprint
@@ -508,7 +508,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
             side_point = OpenStudio::Point3d.new(0, y - inset_depth + interior_corridor_width, wall_height)
             nw_point = OpenStudio::Point3d.new(0, y - inset_depth + balcony_depth + interior_corridor_width, wall_height)
             front_point = OpenStudio::Point3d.new(inset_width, y - inset_depth + balcony_depth + interior_corridor_width, wall_height)
-            shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([inset_point, side_point, nw_point, front_point]), model)
+            shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([side_point, nw_point, front_point, inset_point]), model)
           end
         end
       else
@@ -670,7 +670,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
               se_point = OpenStudio::Point3d.new(x * ((num_units_per_floor + 1) / 2), -y - corridor_width, floor * wall_height)
             end
 
-            shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([nw_point, ne_point, se_point, sw_point]), model)
+            shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([sw_point, se_point, ne_point, nw_point]), model)
 
             shading_surface_group = OpenStudio::Model::ShadingSurfaceGroup.new(model)
             shading_surface.setShadingSurfaceGroup(shading_surface_group)
@@ -685,7 +685,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
             ne_point = OpenStudio::Point3d.new(x * (num_units_per_floor / 2), y + corridor_width, floor * wall_height)
             se_point = OpenStudio::Point3d.new(x * (num_units_per_floor / 2), y, floor * wall_height)
 
-            shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([nw_point, ne_point, se_point, sw_point]), model)
+            shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([sw_point, se_point, ne_point, nw_point]), model)
 
             shading_surface_group = OpenStudio::Model::ShadingSurfaceGroup.new(model)
             shading_surface.setShadingSurfaceGroup(shading_surface_group)
@@ -754,7 +754,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
           sw_point = OpenStudio::Point3d.new(0, -y - corridor_width, floor * wall_height)
           se_point = OpenStudio::Point3d.new(x * num_units_per_floor, -y - corridor_width, floor * wall_height)
 
-          shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([nw_point, ne_point, se_point, sw_point]), model)
+          shading_surface = OpenStudio::Model::ShadingSurface.new(OpenStudio::Point3dVector.new([sw_point, se_point, ne_point, nw_point]), model)
 
           shading_surface_group = OpenStudio::Model::ShadingSurfaceGroup.new(model)
           shading_surface.setShadingSurfaceGroup(shading_surface_group)

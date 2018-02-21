@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>create_residential_single_family_attached_geometry</name>
   <uid>fb4e4db8-1b29-4cbf-abcd-6af194ad945c</uid>
-  <version_id>ab9d1f92-9dce-465c-84dc-ddb3a1205777</version_id>
-  <version_modified>20180221T184547Z</version_modified>
+  <version_id>d722ed6f-7ed3-4e4f-bb83-0d171be19ece</version_id>
+  <version_modified>20180221T205520Z</version_modified>
   <xml_checksum>2AF3A68E</xml_checksum>
   <class_name>CreateResidentialSingleFamilyAttachedGeometry</class_name>
   <display_name>Create Residential Single-Family Attached Geometry</display_name>
@@ -309,6 +309,85 @@
       <model_dependent>false</model_dependent>
       <default_value>1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0</default_value>
     </argument>
+    <argument>
+      <name>roof_structure</name>
+      <display_name>Roof Structure</display_name>
+      <description>The roof structure of the building.</description>
+      <type>Choice</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>truss, cantilever</default_value>
+      <choices>
+        <choice>
+          <value>truss, cantilever</value>
+          <display_name>truss, cantilever</display_name>
+        </choice>
+        <choice>
+          <value>rafter</value>
+          <display_name>rafter</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>eaves_depth</name>
+      <display_name>Eaves Depth</display_name>
+      <description>The eaves depth of the roof.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>2</default_value>
+    </argument>
+    <argument>
+      <name>left_offset</name>
+      <display_name>Left Neighbor Offset</display_name>
+      <description>The minimum distance between the simulated house and the neighboring house to the left (not including eaves). A value of zero indicates no neighbors.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>10</default_value>
+    </argument>
+    <argument>
+      <name>right_offset</name>
+      <display_name>Right Neighbor Offset</display_name>
+      <description>The minimum distance between the simulated house and the neighboring house to the right (not including eaves). A value of zero indicates no neighbors.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>10</default_value>
+    </argument>
+    <argument>
+      <name>back_offset</name>
+      <display_name>Back Neighbor Offset</display_name>
+      <description>The minimum distance between the simulated house and the neighboring house to the back (not including eaves). A value of zero indicates no neighbors.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>front_offset</name>
+      <display_name>Front Neighbor Offset</display_name>
+      <description>The minimum distance between the simulated house and the neighboring house to the front (not including eaves). A value of zero indicates no neighbors.</description>
+      <type>Double</type>
+      <units>ft</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>orientation</name>
+      <display_name>Azimuth</display_name>
+      <description>The house's azimuth is measured clockwise from due south when viewed from above (e.g., South=0, West=90, North=180, East=270).</description>
+      <type>Double</type>
+      <units>degrees</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>180</default_value>
+    </argument>
   </arguments>
   <outputs/>
   <provenances/>
@@ -357,27 +436,10 @@
       <checksum>A001EED9</checksum>
     </file>
     <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.12.2</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>DD7A2213</checksum>
-    </file>
-    <file>
       <filename>schedules.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>40517196</checksum>
-    </file>
-    <file>
-      <filename>create_residential_single_family_attached_geometry_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>A312B908</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
@@ -386,10 +448,27 @@
       <checksum>E027B465</checksum>
     </file>
     <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.12.2</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>F28FB6D8</checksum>
+    </file>
+    <file>
+      <filename>create_residential_single_family_attached_geometry_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>36F90ADC</checksum>
+    </file>
+    <file>
       <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>2588D37F</checksum>
+      <checksum>0B1E9BF7</checksum>
     </file>
   </files>
 </measure>

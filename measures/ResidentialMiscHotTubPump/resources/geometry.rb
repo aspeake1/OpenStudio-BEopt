@@ -1619,33 +1619,37 @@ class Geometry
 
         roof_surface.vertices[0..-1].each do |vertex|
 
-          l, w, h = self.get_surface_dimensions(roof_surface)
-          tilt = Math.atan(h / [l, w].min)
-
-          z = eaves_depth / Math.cos(tilt)
-          scale =  z / eaves_depth
-
           vertex_2 = vertex
 
           dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir.x, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z) # works if angles are right angles
 
-          if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+          if dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) != 0 # ensure perpendicular
             dir_vector = OpenStudio::Vector3d.new(0, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z)
           end
 
-          if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+          if dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) != 0 # ensure perpendicular
             dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir.x, 0, vertex_1.z - vertex_dir.z)
           end
 
-          if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+          if dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) != 0 # ensure perpendicular
             dir_vector = OpenStudio::Vector3d.new(0, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z)
           end
 
-          if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+          if dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) != 0 # ensure perpendicular
             dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir_backup.x, vertex_1.y - vertex_dir_backup.y, vertex_1.z - vertex_dir_backup.z)
           end
 
           dir_vector_n = OpenStudio::Vector3d.new(dir_vector.x / dir_vector.length, dir_vector.y / dir_vector.length, dir_vector.z / dir_vector.length) # normalize
+
+          l, w, h = self.get_surface_dimensions(roof_surface)
+          tilt = Math.atan(h / [l, w].min)
+
+          z = eaves_depth / Math.cos(tilt)
+          if dir_vector_n.z == 0
+            scale = 1
+          else
+            scale =  z / eaves_depth
+          end
 
           m = self.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
           m[0, 3] = dir_vector_n.x * eaves_depth * scale
@@ -1712,11 +1716,11 @@ class Geometry
 
         dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir.x, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z)
 
-        if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+        if dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) != 0 # ensure perpendicular
           dir_vector = OpenStudio::Vector3d.new(vertex_1.x - vertex_dir.x, 0, vertex_1.z - vertex_dir.z)
         end
 
-        if not dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) == 0 # ensure perpendicular
+        if dir_vector.dot(OpenStudio::Vector3d.new(vertex_1.x - vertex_2.x, vertex_1.y - vertex_2.y, vertex_1.z - vertex_2.z)) != 0 # ensure perpendicular
           dir_vector = OpenStudio::Vector3d.new(0, vertex_1.y - vertex_dir.y, vertex_1.z - vertex_dir.z)
         end
 
@@ -1754,9 +1758,9 @@ class Geometry
     end
 
     # Remove eaves overlapping roofceiling
-    shading_surfaces_to_add = []
     shading_surfaces_to_remove = []
     model.getShadingSurfaces.each do |shading_surface|
+      next unless shading_surface.name.to_s.include? Constants.ObjectNameEaves
 
       new_shading_vertices = []
       shading_surface.vertices.reverse.each do |vertex|
@@ -1777,61 +1781,15 @@ class Geometry
 
         if OpenStudio::getArea(roof_surface_vertices).get - OpenStudio::getArea(polygon).get > 0.001
           shading_surfaces_to_remove << shading_surface
-          polygon = OpenStudio::subtract(new_shading_vertices, [roof_surface_vertices], 0.001)
-          if not polygon.empty? # only a portion of the eave overlaps the roofceiling
-            new_vertices = OpenStudio::Point3dVector.new
-            polygon[0].reverse.each do |vertex|
-              new_vertices << OpenStudio::Point3d.new(vertex.x, vertex.y, shading_surface.vertices[0].z)
-            end
-            if model.getBuilding.standardsBuildingType.get != Constants.BuildingTypeSingleFamilyAttached # avoid eaves between adjacent units with hip roofs
-              shading_surfaces_to_add << new_vertices
-            end
-          end
         end
 
       end
 
     end
 
-    self.add_or_remove_eaves(model, shading_surfaces_to_add, shading_surfaces_to_remove, shading_surface_group)
-
-    # Remove eaves overlapping eaves
-    shading_surfaces_to_add = []
-    shading_surfaces_to_remove = []
-    model.getShadingSurfaces.each do |shading_surface_1|
-
-      new_shading_vertices_1 = []
-      shading_surface_1.vertices.reverse.each do |vertex|
-        new_shading_vertices_1 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
-      end
-
-      model.getShadingSurfaces.each do |shading_surface_2|
-
-        next if shading_surface_1 == shading_surface_2
-        next if shading_surfaces_to_remove.include? shading_surface_1 or shading_surfaces_to_remove.include? shading_surface_2
-
-        shading_vertices_2 = []
-        shading_surface_2.vertices.reverse.each do |vertex|
-          shading_vertices_2 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
-        end
-
-        polygon = OpenStudio::subtract(new_shading_vertices_1, [shading_vertices_2], 0.001)
-        if not polygon.empty?
-          new_vertices = OpenStudio::Point3dVector.new
-          polygon[0].reverse.each do |vertex|
-            new_vertices << OpenStudio::Point3d.new(vertex.x, vertex.y, shading_surface_1.vertices[0].z)
-          end
-
-          if OpenStudio::getArea(new_vertices).get != OpenStudio::getArea(new_shading_vertices_1).get
-            shading_surfaces_to_remove << shading_surface_1
-            shading_surfaces_to_add << new_vertices
-          end
-        end
-
-      end
+    shading_surfaces_to_remove.uniq.each do |shading_surface|
+      shading_surface.remove
     end
-
-    self.add_or_remove_eaves(model, shading_surfaces_to_add, shading_surfaces_to_remove, shading_surface_group)
 
     unless surfaces_modified
       runner.registerInfo("No surfaces found for adding #{Constants.ObjectNameEaves}.")
@@ -1842,20 +1800,6 @@ class Geometry
 
     runner.registerInfo("Added #{num_added} #{Constants.ObjectNameEaves}.")
     return true
-
-  end
-
-  def self.add_or_remove_eaves(model, shading_surfaces_to_add, shading_surfaces_to_remove, shading_surface_group)
-
-    shading_surfaces_to_remove.uniq.each do |shading_surface|
-      shading_surface.remove
-    end
-
-    shading_surfaces_to_add.uniq.each do |vertices|
-      shading_surface = OpenStudio::Model::ShadingSurface.new(vertices, model)
-      shading_surface.setName("#{Constants.ObjectNameEaves}")
-      shading_surface.setShadingSurfaceGroup(shading_surface_group)
-    end
 
   end
 

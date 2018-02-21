@@ -58,7 +58,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     args_hash["inset_depth"] = 6
     args_hash["balcony_depth"] = 6
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>2*4, "Surface"=>68, "ThermalZone"=>2*4, "Space"=>2*4, "ShadingSurfaceGroup"=>12, "ShadingSurface"=>12, "SpaceType"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>66}
+    expected_num_new_objects = {"BuildingUnit"=>2*4, "Surface"=>68, "ThermalZone"=>2*4, "Space"=>2*4, "SpaceType"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>14, "ShadingSurface"=>140}
     expected_values = {"FinishedFloorArea"=>900*2*4, "BuildingHeight"=>2*8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>27.12, "EavesDepth"=>2}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
@@ -73,7 +73,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "unfinished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>8*6, "Surface"=>538, "ThermalZone"=>8*6+1+1, "Space"=>8*6+1+8, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>666}
+    expected_num_new_objects = {"BuildingUnit"=>8*6, "Surface"=>538, "ThermalZone"=>8*6+1+1, "Space"=>8*6+1+8, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>654}
     expected_values = {"FinishedFloorArea"=>900*8*6, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>6*900+3*21.77*10, "BuildingHeight"=>8+8*8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>162.72, "EavesDepth"=>2}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
@@ -90,7 +90,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "unfinished basement"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>8*6, "Surface"=>538, "ThermalZone"=>8*6+1+1, "Space"=>8*6+1+8, "ShadingSurface"=>8*6, "ShadingSurfaceGroup"=>8*6, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>66}
+    expected_num_new_objects = {"BuildingUnit"=>8*6, "Surface"=>538, "ThermalZone"=>8*6+1+1, "Space"=>8*6+1+8, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>50, "ShadingSurface"=>702}
     expected_values = {"FinishedFloorArea"=>900*8*6, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>6*900+3*21.77*10, "BuildingHeight"=>8+8*8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>162.72, "EavesDepth"=>2}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
@@ -103,7 +103,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     args_hash["corridor_position"] = "Single Exterior (Front)"
     args_hash["foundation_type"] = "crawlspace"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>2*12, "Surface"=>194, "ThermalZone"=>2*12+1, "Space"=>2*12+1, "ShadingSurface"=>2, "ShadingSurfaceGroup"=>2, "SpaceType"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>66}
+    expected_num_new_objects = {"BuildingUnit"=>2*12, "Surface"=>194, "ThermalZone"=>2*12+1, "Space"=>2*12+1, "SpaceType"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>4, "ShadingSurface"=>208}
     expected_values = {"FinishedFloorArea"=>900*2*12, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>12*900, "BuildingHeight"=>3+2*8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>81.36, "EavesDepth"=>2}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
@@ -114,7 +114,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     args_hash["num_units_per_floor"] = 4
     args_hash["foundation_type"] = "crawlspace"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>46}
+    expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>64}
     expected_values = {"FinishedFloorArea"=>900*1*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>4*900, "BuildingHeight"=>3+8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
@@ -492,7 +492,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
           next unless new_object.name.to_s.include? Constants.ObjectNameEaves
           l, w, h = Geometry.get_surface_dimensions(new_object)
           actual_values["EavesDepth"] = [UnitConversions.convert(l,"m","ft"), UnitConversions.convert(w,"m","ft")].min
-          # assert_in_epsilon(expected_values["EavesDepth"], actual_values["EavesDepth"], 0.01)
+          assert_in_epsilon(expected_values["EavesDepth"], actual_values["EavesDepth"], 0.01)
         end
       end
     end

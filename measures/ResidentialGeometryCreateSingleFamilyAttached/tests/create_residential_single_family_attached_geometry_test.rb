@@ -81,7 +81,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = "crawlspace"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>50, "ThermalZone"=>4+1+1, "Space"=>4+1+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>46}
-    expected_values = {"FinishedFloorArea"=>900*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>900*4, "UnfinishedAtticHeight"=>11.61, "UnfinishedAtticFloorArea"=>900*4, "BuildingHeight"=>3+8+11.61, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56}
+    expected_values = {"FinishedFloorArea"=>900*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>900*4, "UnfinishedAtticHeight"=>11.61, "UnfinishedAtticFloorArea"=>900*4, "BuildingHeight"=>3+8+11.61, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -489,7 +489,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
           next unless new_object.name.to_s.include? Constants.ObjectNameEaves
           l, w, h = Geometry.get_surface_dimensions(new_object)
           actual_values["EavesDepth"] = [UnitConversions.convert(l,"m","ft"), UnitConversions.convert(w,"m","ft")].min
-          # assert_in_epsilon(expected_values["EavesDepth"], actual_values["EavesDepth"], 0.01)
+          assert_in_epsilon(expected_values["EavesDepth"], actual_values["EavesDepth"], 0.01)
         end
       end
     end
