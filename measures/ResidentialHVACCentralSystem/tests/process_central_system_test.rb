@@ -137,14 +137,31 @@ class ProcessCentralSystemTest < MiniTest::Test
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
 
-  def test_successful_run
-    num_zones = 8
+  def test_simulation_baseboards # then change weather file path to: C:/OpenStudio/OpenStudio-BEopt/measures/ResidentialLocation/resources/USA_CO_Denver_Intl_AP_725650_TMY3.epw
     args_hash = {}
     args_hash["system_type"] = "Baseboards"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ControllerWaterCoil"=>2*num_zones, "PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "CoilHeatingWater"=>num_zones, "CoilCoolingWater"=>num_zones, "FanOnOff"=>3*num_zones, "ZoneHVACFourPipeFanCoil"=>num_zones, "ZoneHVACEnergyRecoveryVentilatorController"=>num_zones, "HeatExchangerAirToAirSensibleAndLatent"=>num_zones, "ZoneHVACEnergyRecoveryVentilator"=>num_zones}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>2, "ZoneHVACBaseboardConvectiveWater"=>2}
     expected_values = {}
-    _test_measure("central_system_1.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("apply_central_system_to_this.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+  
+  def test_simulation_unit_heaters # then change weather file path to: C:/OpenStudio/OpenStudio-BEopt/measures/ResidentialLocation/resources/USA_CO_Denver_Intl_AP_725650_TMY3.epw
+    args_hash = {}
+    args_hash["system_type"] = "Unit Heaters"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ZoneHVACUnitHeater"=>2, "FanConstantVolume"=>2, "CoilHeatingGas"=>2}
+    expected_values = {}
+    _test_measure("apply_central_system_to_this.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+  
+  def test_simulation_fan_coil # then change weather file path to: C:/OpenStudio/OpenStudio-BEopt/measures/ResidentialLocation/resources/USA_CO_Denver_Intl_AP_725650_TMY3.epw
+    args_hash = {}
+    args_hash["system_type"] = "Fan Coil"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "CoilCoolingWater"=>2, "ControllerWaterCoil"=>4, "CoilHeatingWater"=>2, "FanOnOff"=>2, "ZoneHVACFourPipeFanCoil"=>2}
+    expected_values = {}
+    _test_measure("apply_central_system_to_this.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
 
   private
@@ -183,11 +200,11 @@ class ProcessCentralSystemTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
 
+    show_output(result)
+    
     # save the model to test output directory
     output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
     model.save(output_file_path, true)
-
-    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
