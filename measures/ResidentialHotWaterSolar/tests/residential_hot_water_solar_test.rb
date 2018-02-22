@@ -424,6 +424,8 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
 
+    # show_output(result)
+    
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     assert_equal(num_infos, result.info.size)
@@ -442,46 +444,46 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 
     all_new_objects.each do |obj_type, new_objects|
-        new_objects.each do |new_object|
-            next if not new_object.respond_to?("to_#{obj_type}")
-            new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "WaterHeaterStratified"
-              assert_in_epsilon(expected_values["TankVolume"], UnitConversions.convert(new_object.tankVolume.get,"m^3","gal"), 0.01)
-              assert_in_epsilon(expected_values["Heater1Setpoint"], UnitConversions.convert(new_object.heater1SetpointTemperatureSchedule.to_ScheduleConstant.get.value,"C","F"), 0.01)
-              assert_in_epsilon(expected_values["Heater2Setpoint"], UnitConversions.convert(new_object.heater2SetpointTemperatureSchedule.to_ScheduleConstant.get.value,"C","F"), 0.01)
-              assert_in_epsilon(expected_values["CollectorFlowRate"], UnitConversions.convert(new_object.sourceSideDesignFlowRate.get,"",""), 0.01)
-            elsif obj_type == "ShadingSurface"
-              coorddir = nil
-              if new_object.outwardNormal.z == 1
-                coorddir = "StraightUp"
-              elsif new_object.outwardNormal.x < 0 and new_object.outwardNormal.y < 0
-                coorddir = "Southwest"
-              elsif new_object.outwardNormal.x < 0 and new_object.outwardNormal.y == 0
-                coorddir = "West"
-              elsif new_object.outwardNormal.x < 0 and new_object.outwardNormal.y > 0
-                coorddir = "Northwest"
-              elsif new_object.outwardNormal.x == 0 and new_object.outwardNormal.y > 0
-                coorddir = "North"
-              elsif new_object.outwardNormal.x > 0 and new_object.outwardNormal.y > 0
-                coorddir = "Northeast"
-              elsif new_object.outwardNormal.x > 0 and new_object.outwardNormal.y == 0
-                coorddir = "East"
-              elsif new_object.outwardNormal.x > 0 and new_object.outwardNormal.y < 0
-                coorddir = "Southeast"
-              elsif new_object.outwardNormal.x == 0 and new_object.outwardNormal.y < 0
-                coorddir = "South"
-              end
-              assert_equal(expected_values["CoordDir"], coorddir)
-              if new_object.outwardNormal.z == 1
-                assert_in_epsilon(expected_values["Tilt"], 0, 0.01)
-              else
-                assert_in_epsilon(expected_values["Tilt"], UnitConversions.convert(Math.atan(Math.sqrt(new_object.outwardNormal.x ** 2 + new_object.outwardNormal.y ** 2) / new_object.outwardNormal.z),"rad","deg"), 0.01)
-              end
-              assert_in_epsilon(expected_values["CollectorArea"], UnitConversions.convert(new_object.grossArea,"m^2","ft^2"), 0.01)
-            elsif obj_type == "PlantLoop"
-              assert_in_epsilon(expected_values["GlycolFrac"], new_object.glycolConcentration * 0.01, 0.01)
-            end
+      new_objects.each do |new_object|
+        next if not new_object.respond_to?("to_#{obj_type}")
+        new_object = new_object.public_send("to_#{obj_type}").get
+        if obj_type == "WaterHeaterStratified"
+          assert_in_epsilon(expected_values["TankVolume"], UnitConversions.convert(new_object.tankVolume.get,"m^3","gal"), 0.01)
+          assert_in_epsilon(expected_values["Heater1Setpoint"], UnitConversions.convert(new_object.heater1SetpointTemperatureSchedule.to_ScheduleConstant.get.value,"C","F"), 0.01)
+          assert_in_epsilon(expected_values["Heater2Setpoint"], UnitConversions.convert(new_object.heater2SetpointTemperatureSchedule.to_ScheduleConstant.get.value,"C","F"), 0.01)
+          assert_in_epsilon(expected_values["CollectorFlowRate"], UnitConversions.convert(new_object.sourceSideDesignFlowRate.get,"",""), 0.01)
+        elsif obj_type == "ShadingSurface"
+          coorddir = nil
+          if new_object.outwardNormal.z == 1
+            coorddir = "StraightUp"
+          elsif new_object.outwardNormal.x < 0 and new_object.outwardNormal.y < 0
+            coorddir = "Southwest"
+          elsif new_object.outwardNormal.x < 0 and new_object.outwardNormal.y == 0
+            coorddir = "West"
+          elsif new_object.outwardNormal.x < 0 and new_object.outwardNormal.y > 0
+            coorddir = "Northwest"
+          elsif new_object.outwardNormal.x == 0 and new_object.outwardNormal.y > 0
+            coorddir = "North"
+          elsif new_object.outwardNormal.x > 0 and new_object.outwardNormal.y > 0
+            coorddir = "Northeast"
+          elsif new_object.outwardNormal.x > 0 and new_object.outwardNormal.y == 0
+            coorddir = "East"
+          elsif new_object.outwardNormal.x > 0 and new_object.outwardNormal.y < 0
+            coorddir = "Southeast"
+          elsif new_object.outwardNormal.x == 0 and new_object.outwardNormal.y < 0
+            coorddir = "South"
+          end
+          assert_equal(expected_values["CoordDir"], coorddir)
+          if new_object.outwardNormal.z == 1
+            assert_in_epsilon(expected_values["Tilt"], 0, 0.01)
+          else
+            assert_in_epsilon(expected_values["Tilt"], UnitConversions.convert(Math.atan(Math.sqrt(new_object.outwardNormal.x ** 2 + new_object.outwardNormal.y ** 2) / new_object.outwardNormal.z),"rad","deg"), 0.01)
+          end
+          assert_in_epsilon(expected_values["CollectorArea"], UnitConversions.convert(new_object.grossArea,"m^2","ft^2"), 0.01)
+        elsif obj_type == "PlantLoop"
+          assert_in_epsilon(expected_values["GlycolFrac"], new_object.glycolConcentration * 0.01, 0.01)
         end
+      end
     end
     
     return model

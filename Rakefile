@@ -181,7 +181,7 @@ namespace :test do
         next if osw_map[osw].nil?
         num_osws += 1
     end
-    
+
     osw_files.each do |osw|
     
         next if osw_map[osw].nil?
