@@ -16,7 +16,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
 
   # human readable description
   def description
-    return "Sets the basic geometry for the building. Building is limited to one foundation type. Garage is tucked within the building, on the front left or front right corners of the building. Sets the number of bedrooms and bathrooms in the building. Sets the number of occupants in the building. Sets the neighbors (front, back, left, and/or right) of the building for shading purposes. Neighboring buildings will have the same geometry as the model building.#{Constants.WorkflowDescription}"
+    return "Sets the basic geometry for the single-family detached building. Building is limited to one foundation type. Garage is tucked within the building, on the front left or front right corners of the building. Sets the number of bedrooms, bathrooms, and occupants in the building. Sets the neighbors (front, back, left, and/or right) of the building for shading purposes. Neighboring buildings will have the same geometry as the model building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach
@@ -46,7 +46,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
 
     #make an argument for number of floors
     num_floors = OpenStudio::Measure::OSArgument::makeIntegerArgument("num_floors",true)
-    num_floors.setDisplayName("Num Floors")
+    num_floors.setDisplayName("Number of Floors")
     num_floors.setUnits("#")
     num_floors.setDescription("The number of floors above grade.")
     num_floors.setDefaultValue(2)
@@ -85,16 +85,16 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     args << garage_protrusion
 
     #make a choice argument for model objects
-    garage_pos_display_names = OpenStudio::StringVector.new
-    garage_pos_display_names << "Right"
-    garage_pos_display_names << "Left"
+    garage_position_display_names = OpenStudio::StringVector.new
+    garage_position_display_names << "Right"
+    garage_position_display_names << "Left"
 
     #make a choice argument for garage position
-    garage_pos = OpenStudio::Measure::OSArgument::makeChoiceArgument("garage_pos", garage_pos_display_names, true)
-    garage_pos.setDisplayName("Garage Position")
-    garage_pos.setDescription("The position of the garage.")
-    garage_pos.setDefaultValue("Right")
-    args << garage_pos
+    garage_position = OpenStudio::Measure::OSArgument::makeChoiceArgument("garage_position", garage_position_display_names, true)
+    garage_position.setDisplayName("Garage Position")
+    garage_position.setDescription("The position of the garage.")
+    garage_position.setDefaultValue("Right")
+    args << garage_position
 
     #make a choice argument for model objects
     foundation_display_names = OpenStudio::StringVector.new
@@ -127,7 +127,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     #make a choice argument for attic type
     attic_type = OpenStudio::Measure::OSArgument::makeChoiceArgument("attic_type", attic_type_display_names, true)
     attic_type.setDisplayName("Attic Type")
-    attic_type.setDescription("The attic type of the building.")
+    attic_type.setDescription("The attic type of the building. Ignored if the building has a flat roof.")
     attic_type.setDefaultValue("unfinished attic")
     args << attic_type
 
@@ -162,74 +162,10 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     #make a choice argument for roof pitch
     roof_pitch = OpenStudio::Measure::OSArgument::makeChoiceArgument("roof_pitch", roof_pitch_display_names, true)
     roof_pitch.setDisplayName("Roof Pitch")
-    roof_pitch.setDescription("The roof pitch of the attic.")
+    roof_pitch.setDescription("The roof pitch of the attic. Ignored if the building has a flat roof.")
     roof_pitch.setDefaultValue("6:12")
     args << roof_pitch
-
-    #make a string argument for number of bedrooms
-    num_br = OpenStudio::Measure::OSArgument::makeStringArgument("num_bedrooms", false)
-    num_br.setDisplayName("Number of Bedrooms")
-    num_br.setDescription("Specify the number of bedrooms. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. Used to determine the energy usage of appliances and plug loads, hot water usage, mechanical ventilation rate, etc.")
-    num_br.setDefaultValue("3")
-    args << num_br
-
-    #make a string argument for number of bathrooms
-    num_ba = OpenStudio::Measure::OSArgument::makeStringArgument("num_bathrooms", false)
-    num_ba.setDisplayName("Number of Bathrooms")
-    num_ba.setDescription("Specify the number of bathrooms. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. Used to determine the hot water usage, etc.")
-    num_ba.setDefaultValue("2")
-    args << num_ba
-
-    #Make a string argument for occupants (auto or number)
-    num_occ = OpenStudio::Measure::OSArgument::makeStringArgument("num_occ", true)
-    num_occ.setDisplayName("Number of Occupants")
-    num_occ.setDescription("Specify the number of occupants. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. A value of '#{Constants.Auto}' will calculate the average number of occupants from the number of bedrooms. Used to specify the internal gains from people only.")
-    num_occ.setDefaultValue(Constants.Auto)
-    args << num_occ
-
-    # Make a double argument for occupant gains
-    occ_gain = OpenStudio::Measure::OSArgument::makeDoubleArgument("occ_gain", true)
-    occ_gain.setDisplayName("Internal Gains")
-    occ_gain.setDescription("Occupant heat gain, both sensible and latent.")
-    occ_gain.setUnits("Btu/person/hr")
-    occ_gain.setDefaultValue(384.0)
-    args << occ_gain
-
-    # Make a double argument for sensible fraction
-    sens_frac = OpenStudio::Measure::OSArgument::makeDoubleArgument("sens_frac", true)
-    sens_frac.setDisplayName("Sensible Fraction")
-    sens_frac.setDescription("Fraction of internal gains that are sensible.")
-    sens_frac.setDefaultValue(0.573)
-    args << sens_frac
-
-    # Make a double argument for latent fraction
-    lat_frac = OpenStudio::Measure::OSArgument::makeDoubleArgument("lat_frac", true)
-    lat_frac.setDisplayName("Latent Fraction")
-    lat_frac.setDescription("Fraction of internal gains that are latent.")
-    lat_frac.setDefaultValue(0.427)
-    args << lat_frac
-
-    #Make a string argument for 24 weekday schedule values
-    weekday_sch = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_sch", true)
-    weekday_sch.setDisplayName("Weekday schedule")
-    weekday_sch.setDescription("Specify the 24-hour weekday schedule.")
-    weekday_sch.setDefaultValue("1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00")
-    args << weekday_sch
-
-    #Make a string argument for 24 weekend schedule values
-    weekend_sch = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_sch", true)
-    weekend_sch.setDisplayName("Weekend schedule")
-    weekend_sch.setDescription("Specify the 24-hour weekend schedule.")
-    weekend_sch.setDefaultValue("1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00")
-    args << weekend_sch
-
-    #Make a string argument for 12 monthly schedule values
-    monthly_sch = OpenStudio::Measure::OSArgument::makeStringArgument("monthly_sch", true)
-    monthly_sch.setDisplayName("Month schedule")
-    monthly_sch.setDescription("Specify the 12-month schedule.")
-    monthly_sch.setDefaultValue("1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0")
-    args << monthly_sch
-
+    
     #make a choice argument for model objects
     roof_structure_display_names = OpenStudio::StringVector.new
     roof_structure_display_names << Constants.RoofStructureTrussCantilever
@@ -250,37 +186,79 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     eaves_depth.setDefaultValue(2.0)
     args << eaves_depth
 
+    #make a string argument for number of bedrooms
+    num_br = OpenStudio::Measure::OSArgument::makeStringArgument("num_bedrooms", false)
+    num_br.setDisplayName("Number of Bedrooms")
+    num_br.setDescription("Specify the number of bedrooms. Used to determine the energy usage of appliances and plug loads, hot water usage, mechanical ventilation rate, etc.")
+    num_br.setDefaultValue("3")
+    args << num_br
+
+    #make a string argument for number of bathrooms
+    num_ba = OpenStudio::Measure::OSArgument::makeStringArgument("num_bathrooms", false)
+    num_ba.setDisplayName("Number of Bathrooms")
+    num_ba.setDescription("Specify the number of bathrooms. Used to determine the hot water usage, etc.")
+    num_ba.setDefaultValue("2")
+    args << num_ba
+
+    #Make a string argument for occupants (auto or number)
+    num_occupants = OpenStudio::Measure::OSArgument::makeStringArgument("num_occupants", true)
+    num_occupants.setDisplayName("Number of Occupants")
+    num_occupants.setDescription("Specify the number of occupants. A value of '#{Constants.Auto}' will calculate the average number of occupants from the number of bedrooms. Used to specify the internal gains from people only.")
+    num_occupants.setDefaultValue(Constants.Auto)
+    args << num_occupants
+
+    #Make a string argument for 24 weekday schedule values
+    occupants_weekday_sch = OpenStudio::Measure::OSArgument::makeStringArgument("occupants_weekday_sch", true)
+    occupants_weekday_sch.setDisplayName("Occupants Weekday schedule")
+    occupants_weekday_sch.setDescription("Specify the 24-hour weekday schedule.")
+    occupants_weekday_sch.setDefaultValue("1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00")
+    args << occupants_weekday_sch
+
+    #Make a string argument for 24 weekend schedule values
+    occupants_weekend_sch = OpenStudio::Measure::OSArgument::makeStringArgument("occupants_weekend_sch", true)
+    occupants_weekend_sch.setDisplayName("Occupants Weekend schedule")
+    occupants_weekend_sch.setDescription("Specify the 24-hour weekend schedule.")
+    occupants_weekend_sch.setDefaultValue("1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00")
+    args << occupants_weekend_sch
+
+    #Make a string argument for 12 monthly schedule values
+    occupants_monthly_sch = OpenStudio::Measure::OSArgument::makeStringArgument("occupants_monthly_sch", true)
+    occupants_monthly_sch.setDisplayName("Occupants Month schedule")
+    occupants_monthly_sch.setDescription("Specify the 12-month schedule.")
+    occupants_monthly_sch.setDefaultValue("1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0")
+    args << occupants_monthly_sch
+
     #make a double argument for left neighbor offset
-    left_neighbor_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("left_offset", false)
-    left_neighbor_offset.setDisplayName("Left Neighbor Offset")
-    left_neighbor_offset.setUnits("ft")
-    left_neighbor_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the left (not including eaves). A value of zero indicates no neighbors.")
-    left_neighbor_offset.setDefaultValue(10.0)
-    args << left_neighbor_offset
+    neighbor_left_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("neighbor_left_offset", false)
+    neighbor_left_offset.setDisplayName("Neighbor Left Offset")
+    neighbor_left_offset.setUnits("ft")
+    neighbor_left_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the left (not including eaves). A value of zero indicates no neighbors.")
+    neighbor_left_offset.setDefaultValue(10.0)
+    args << neighbor_left_offset
 
     #make a double argument for right neighbor offset
-    right_neighbor_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("right_offset", false)
-    right_neighbor_offset.setDisplayName("Right Neighbor Offset")
-    right_neighbor_offset.setUnits("ft")
-    right_neighbor_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the right (not including eaves). A value of zero indicates no neighbors.")
-    right_neighbor_offset.setDefaultValue(10.0)
-    args << right_neighbor_offset
+    neighbor_right_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("neighbor_right_offset", false)
+    neighbor_right_offset.setDisplayName("Neighbor Right Offset")
+    neighbor_right_offset.setUnits("ft")
+    neighbor_right_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the right (not including eaves). A value of zero indicates no neighbors.")
+    neighbor_right_offset.setDefaultValue(10.0)
+    args << neighbor_right_offset
 
     #make a double argument for back neighbor offset
-    back_neighbor_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("back_offset", false)
-    back_neighbor_offset.setDisplayName("Back Neighbor Offset")
-    back_neighbor_offset.setUnits("ft")
-    back_neighbor_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the back (not including eaves). A value of zero indicates no neighbors.")
-    back_neighbor_offset.setDefaultValue(0.0)
-    args << back_neighbor_offset
+    neighbor_back_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("neighbor_back_offset", false)
+    neighbor_back_offset.setDisplayName("Neighbor Back Offset")
+    neighbor_back_offset.setUnits("ft")
+    neighbor_back_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the back (not including eaves). A value of zero indicates no neighbors.")
+    neighbor_back_offset.setDefaultValue(0.0)
+    args << neighbor_back_offset
 
     #make a double argument for front neighbor offset
-    front_neighbor_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("front_offset", false)
-    front_neighbor_offset.setDisplayName("Front Neighbor Offset")
-    front_neighbor_offset.setUnits("ft")
-    front_neighbor_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the front (not including eaves). A value of zero indicates no neighbors.")
-    front_neighbor_offset.setDefaultValue(0.0)
-    args << front_neighbor_offset
+    neighbor_front_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("neighbor_front_offset", false)
+    neighbor_front_offset.setDisplayName("Neighbor Front Offset")
+    neighbor_front_offset.setUnits("ft")
+    neighbor_front_offset.setDescription("The minimum distance between the simulated house and the neighboring house to the front (not including eaves). A value of zero indicates no neighbors.")
+    neighbor_front_offset.setDefaultValue(0.0)
+    args << neighbor_front_offset
 
     #make a double argument for orientation
     orientation = OpenStudio::Measure::OSArgument::makeDoubleArgument("orientation", true)
@@ -309,27 +287,24 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     garage_width = runner.getDoubleArgumentValue("garage_width",user_arguments)
     garage_depth = runner.getDoubleArgumentValue("garage_depth",user_arguments)
     garage_protrusion = runner.getDoubleArgumentValue("garage_protrusion",user_arguments)
-    garage_pos = runner.getStringArgumentValue("garage_pos",user_arguments)
+    garage_position = runner.getStringArgumentValue("garage_position",user_arguments)
     foundation_type = runner.getStringArgumentValue("foundation_type",user_arguments)
     foundation_height = runner.getDoubleArgumentValue("foundation_height",user_arguments)
     attic_type = runner.getStringArgumentValue("attic_type",user_arguments)
     roof_type = runner.getStringArgumentValue("roof_type",user_arguments)
     roof_pitch = {"1:12"=>1.0/12.0, "2:12"=>2.0/12.0, "3:12"=>3.0/12.0, "4:12"=>4.0/12.0, "5:12"=>5.0/12.0, "6:12"=>6.0/12.0, "7:12"=>7.0/12.0, "8:12"=>8.0/12.0, "9:12"=>9.0/12.0, "10:12"=>10.0/12.0, "11:12"=>11.0/12.0, "12:12"=>12.0/12.0}[runner.getStringArgumentValue("roof_pitch",user_arguments)]
-    num_br = runner.getStringArgumentValue("num_bedrooms", user_arguments).split(",").map(&:strip)
-    num_ba = runner.getStringArgumentValue("num_bathrooms", user_arguments).split(",").map(&:strip)
-    num_occ = runner.getStringArgumentValue("num_occ",user_arguments)
-    occ_gain = runner.getDoubleArgumentValue("occ_gain",user_arguments)
-    sens_frac = runner.getDoubleArgumentValue("sens_frac",user_arguments)
-    lat_frac = runner.getDoubleArgumentValue("lat_frac",user_arguments)
-    weekday_sch = runner.getStringArgumentValue("weekday_sch",user_arguments)
-    weekend_sch = runner.getStringArgumentValue("weekend_sch",user_arguments)
-    monthly_sch = runner.getStringArgumentValue("monthly_sch",user_arguments)
     roof_structure = runner.getStringArgumentValue("roof_structure",user_arguments)
     eaves_depth = UnitConversions.convert(runner.getDoubleArgumentValue("eaves_depth",user_arguments),"ft","m")
-    left_neighbor_offset = UnitConversions.convert(runner.getDoubleArgumentValue("left_offset",user_arguments),"ft","m")
-    right_neighbor_offset = UnitConversions.convert(runner.getDoubleArgumentValue("right_offset",user_arguments),"ft","m")
-    back_neighbor_offset = UnitConversions.convert(runner.getDoubleArgumentValue("back_offset",user_arguments),"ft","m")
-    front_neighbor_offset = UnitConversions.convert(runner.getDoubleArgumentValue("front_offset",user_arguments),"ft","m")
+    num_br = runner.getStringArgumentValue("num_bedrooms", user_arguments).split(",").map(&:strip)
+    num_ba = runner.getStringArgumentValue("num_bathrooms", user_arguments).split(",").map(&:strip)
+    num_occupants = runner.getStringArgumentValue("num_occupants",user_arguments)
+    occupants_weekday_sch = runner.getStringArgumentValue("occupants_weekday_sch",user_arguments)
+    occupants_weekend_sch = runner.getStringArgumentValue("occupants_weekend_sch",user_arguments)
+    occupants_monthly_sch = runner.getStringArgumentValue("occupants_monthly_sch",user_arguments)
+    neighbor_left_offset = UnitConversions.convert(runner.getDoubleArgumentValue("neighbor_left_offset",user_arguments),"ft","m")
+    neighbor_right_offset = UnitConversions.convert(runner.getDoubleArgumentValue("neighbor_right_offset",user_arguments),"ft","m")
+    neighbor_back_offset = UnitConversions.convert(runner.getDoubleArgumentValue("neighbor_back_offset",user_arguments),"ft","m")
+    neighbor_front_offset = UnitConversions.convert(runner.getDoubleArgumentValue("neighbor_front_offset",user_arguments),"ft","m")
     orientation = runner.getDoubleArgumentValue("orientation",user_arguments)
 
     if foundation_type == "slab"
@@ -438,13 +413,13 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         garage_zone.setName("garage zone")
 
         # make points and polygons
-        if garage_pos == "Right"
+        if garage_position == "Right"
           garage_sw_point = OpenStudio::Point3d.new(length-garage_width,-garage_protrusion*garage_depth,z)
           garage_nw_point = OpenStudio::Point3d.new(length-garage_width,garage_depth-garage_protrusion*garage_depth,z)
           garage_ne_point = OpenStudio::Point3d.new(length,garage_depth-garage_protrusion*garage_depth,z)
           garage_se_point = OpenStudio::Point3d.new(length,-garage_protrusion*garage_depth,z)
           garage_polygon = Geometry.make_polygon(garage_sw_point, garage_nw_point, garage_ne_point, garage_se_point)
-        elsif garage_pos == "Left"
+        elsif garage_position == "Left"
           garage_sw_point = OpenStudio::Point3d.new(0,-garage_protrusion*garage_depth,z)
           garage_nw_point = OpenStudio::Point3d.new(0,garage_depth-garage_protrusion*garage_depth,z)
           garage_ne_point = OpenStudio::Point3d.new(garage_width,garage_depth-garage_protrusion*garage_depth,z)
@@ -476,7 +451,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         m[2,3] = z
         garage_space.changeTransformation(OpenStudio::Transformation.new(m))
 
-        if garage_pos == "Right"
+        if garage_position == "Right"
           sw_point = OpenStudio::Point3d.new(0,0,z)
           nw_point = OpenStudio::Point3d.new(0,width,z)
           ne_point = OpenStudio::Point3d.new(length,width,z)
@@ -489,7 +464,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
           else # garage fully protrudes
             living_polygon = Geometry.make_polygon(sw_point, nw_point, ne_point, se_point)
           end
-        elsif garage_pos == "Left"
+        elsif garage_position == "Left"
           sw_point = OpenStudio::Point3d.new(0,0,z)
           nw_point = OpenStudio::Point3d.new(0,width,z)
           ne_point = OpenStudio::Point3d.new(length,width,z)
@@ -512,7 +487,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
           garage_sw_point = OpenStudio::Point3d.new(garage_sw_point.x, garage_sw_point.y, wall_height * floor + foundation_offset)
           garage_nw_point = OpenStudio::Point3d.new(garage_nw_point.x, garage_nw_point.y, wall_height * floor + foundation_offset)
           garage_ne_point = OpenStudio::Point3d.new(garage_ne_point.x, garage_ne_point.y, wall_height * floor + foundation_offset)
-          if garage_pos == "Right"
+          if garage_position == "Right"
             sw_point = OpenStudio::Point3d.new(0,0,z)
             nw_point = OpenStudio::Point3d.new(0,width,z)
             ne_point = OpenStudio::Point3d.new(length,width,z)
@@ -523,7 +498,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
             else # garage does not protrude
               living_polygon = Geometry.make_polygon(sw_point, nw_point, ne_point, se_point)
             end
-          elsif garage_pos == "Left"
+          elsif garage_position == "Left"
             sw_point = OpenStudio::Point3d.new(0,0,z)
             nw_point = OpenStudio::Point3d.new(0,width,z)
             ne_point = OpenStudio::Point3d.new(length,width,z)
@@ -966,7 +941,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       return false
     end
 
-    result = Geometry.process_occupants(model, runner, num_occ, occ_gain, sens_frac, lat_frac, weekday_sch, weekend_sch, monthly_sch)
+    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch)
     unless result
       return false
     end
@@ -976,7 +951,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       return false
     end
 
-    result = Geometry.process_neighbors(model, runner, left_neighbor_offset, right_neighbor_offset, back_neighbor_offset, front_neighbor_offset)
+    result = Geometry.process_neighbors(model, runner, neighbor_left_offset, neighbor_right_offset, neighbor_back_offset, neighbor_front_offset)
     unless result
       return false
     end

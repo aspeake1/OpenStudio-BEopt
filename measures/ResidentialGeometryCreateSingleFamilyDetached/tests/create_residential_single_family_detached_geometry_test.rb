@@ -315,7 +315,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
-    args_hash["garage_pos"] = "Left"
+    args_hash["garage_position"] = "Left"
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
@@ -329,7 +329,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
-    args_hash["garage_pos"] = "Left"
+    args_hash["garage_position"] = "Left"
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
@@ -344,7 +344,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["num_floors"] = 1
     args_hash["garage_width"] = 12
-    args_hash["garage_pos"] = "Left"
+    args_hash["garage_position"] = "Left"
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
@@ -358,7 +358,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
-    args_hash["garage_pos"] = "Left"
+    args_hash["garage_position"] = "Left"
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     expected_num_del_objects = {}
@@ -371,7 +371,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
-    args_hash["garage_pos"] = "Left"
+    args_hash["garage_position"] = "Left"
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 0.5
@@ -385,7 +385,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     num_finished_spaces = 3
     args_hash = {}
     args_hash["garage_width"] = 12
-    args_hash["garage_pos"] = "Left"
+    args_hash["garage_position"] = "Left"
     args_hash["foundation_height"] = 8.0
     args_hash["foundation_type"] = "finished basement"
     args_hash["garage_protrusion"] = 1
@@ -479,70 +479,70 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
 
   def test_argument_error_num_occ_bad_string
     args_hash = {}
-    args_hash["num_occ"] = "hello"
+    args_hash["num_occupants"] = "hello"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
   end
 
   def test_argument_error_num_occ_negative
     args_hash = {}
-    args_hash["num_occ"] = "-1"
+    args_hash["num_occupants"] = "-1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
   end
 
   def test_argument_error_num_occ_incorrect_num_elements
     args_hash = {}
-    args_hash["num_occ"] = "2, 3, 4"
+    args_hash["num_occupants"] = "2, 3, 4"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Number of occupant elements specified inconsistent with number of multifamily units defined in the model.")
   end
 
   def test_argument_error_weekday_sch_wrong_number_of_values
     args_hash = {}
-    args_hash["weekday_sch"] = "1,1"
+    args_hash["occupants_weekday_sch"] = "1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
   end
 
   def test_argument_error_weekday_sch_not_number
     args_hash = {}
-    args_hash["weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+    args_hash["occupants_weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
   end
 
   def test_argument_error_weekend_sch_wrong_number_of_values
     args_hash = {}
-    args_hash["weekend_sch"] = "1,1"
+    args_hash["occupants_weekend_sch"] = "1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
   end
 
   def test_argument_error_weekend_sch_not_number
     args_hash = {}
-    args_hash["weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+    args_hash["occupants_weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
   end
 
   def test_argument_error_monthly_sch_wrong_number_of_values
     args_hash = {}
-    args_hash["monthly_sch"] = "1,1"
+    args_hash["occupants_monthly_sch"] = "1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
 
   def test_argument_error_monthly_sch_not_number
     args_hash = {}
-    args_hash["monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
+    args_hash["occupants_monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
 
   def test_new_construction_none
     args_hash = {}
-    args_hash["num_occ"] = "0"
+    args_hash["num_occupants"] = "0"
     expected_num_del_objects = {}
     expected_num_new_objects = {"Surface"=>17, "Space"=>3, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>42}
     expected_values = {"FinishedFloorArea"=>2000, "UnfinishedAtticHeight"=>6.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>0, "EavesDepth"=>2}
@@ -552,7 +552,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   def test_new_construction_auto
     num_finished_spaces = 2
     args_hash = {}
-    args_hash["num_occ"] = Constants.Auto
+    args_hash["num_occupants"] = Constants.Auto
     expected_num_del_objects = {}
     expected_num_new_objects = {"Surface"=>17, "Space"=>3, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>42}
     expected_values = {"FinishedFloorArea"=>2000, "UnfinishedAtticHeight"=>6.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64, "EavesDepth"=>2}
@@ -562,7 +562,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   def test_new_construction_fixed_3
     num_finished_spaces = 2
     args_hash = {}
-    args_hash["num_occ"] = "3"
+    args_hash["num_occupants"] = "3"
     expected_num_del_objects = {}
     expected_num_new_objects = {"Surface"=>17, "Space"=>3, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>42}
     expected_values = {"FinishedFloorArea"=>2000, "UnfinishedAtticHeight"=>6.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.59, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>3, "EavesDepth"=>2}
@@ -580,7 +580,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
   
   def test_error_invalid_neighbor_offset
     args_hash = {}
-    args_hash["left_offset"] = -10
+    args_hash["neighbor_left_offset"] = -10
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)

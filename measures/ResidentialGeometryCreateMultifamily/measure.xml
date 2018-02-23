@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>create_residential_multifamily_geometry</name>
   <uid>9bc07973-98a4-46fc-b643-e280628817c5</uid>
-  <version_id>0f37a49c-7a74-4a19-8937-5111199b047d</version_id>
-  <version_modified>20180222T235903Z</version_modified>
+  <version_id>4f659a12-31d7-4f4e-a141-3d96e09e4f06</version_id>
+  <version_modified>20180223T034059Z</version_modified>
   <xml_checksum>2AF3A68E</xml_checksum>
   <class_name>CreateResidentialMultifamilyGeometry</class_name>
   <display_name>Create Residential Multifamily Geometry</display_name>
-  <description>Sets the basic geometry for the building. Sets the number of bedrooms and bathrooms in the building. The bedrooms/bathrooms can be set for all units of the building. Sets the number of occupants in the building. The people can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <description>Sets the basic geometry for the multifamily building, where all units are 1 story and stacked if the building is multiple stories. Sets the number of bedrooms, bathrooms, and occupants in the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Creates multifamily geometry. Also, sets (or replaces) BuildingUnit objects that store the number of bedrooms and bathrooms associated with the model. Sets (or replaces) the People object for each finished space in the model.</modeler_description>
   <arguments>
     <argument>
@@ -32,7 +32,7 @@
     </argument>
     <argument>
       <name>num_floors</name>
-      <display_name>Building Num Floors</display_name>
+      <display_name>Building Number of Floors</display_name>
       <description>The number of floors above grade.</description>
       <type>Integer</type>
       <units>#</units>
@@ -180,107 +180,6 @@
       <default_value>3</default_value>
     </argument>
     <argument>
-      <name>num_bedrooms</name>
-      <display_name>Number of Bedrooms</display_name>
-      <description>Specify the number of bedrooms. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. Used to determine the energy usage of appliances and plug loads, hot water usage, mechanical ventilation rate, etc.</description>
-      <type>String</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-      <default_value>3</default_value>
-    </argument>
-    <argument>
-      <name>num_bathrooms</name>
-      <display_name>Number of Bathrooms</display_name>
-      <description>Specify the number of bathrooms. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. Used to determine the hot water usage, etc.</description>
-      <type>String</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-      <default_value>2</default_value>
-    </argument>
-    <argument>
-      <name>num_occ</name>
-      <display_name>Number of Occupants</display_name>
-      <description>Specify the number of occupants. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. A value of 'auto' will calculate the average number of occupants from the number of bedrooms. Used to specify the internal gains from people only.</description>
-      <type>String</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>auto</default_value>
-    </argument>
-    <argument>
-      <name>occ_gain</name>
-      <display_name>Internal Gains</display_name>
-      <description>Occupant heat gain, both sensible and latent.</description>
-      <type>Double</type>
-      <units>Btu/person/hr</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>384</default_value>
-    </argument>
-    <argument>
-      <name>sens_frac</name>
-      <display_name>Sensible Fraction</display_name>
-      <description>Fraction of internal gains that are sensible.</description>
-      <type>Double</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>0.573</default_value>
-    </argument>
-    <argument>
-      <name>lat_frac</name>
-      <display_name>Latent Fraction</display_name>
-      <description>Fraction of internal gains that are latent.</description>
-      <type>Double</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>0.427</default_value>
-    </argument>
-    <argument>
-      <name>weekday_sch</name>
-      <display_name>Weekday schedule</display_name>
-      <description>Specify the 24-hour weekday schedule.</description>
-      <type>String</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00</default_value>
-    </argument>
-    <argument>
-      <name>weekend_sch</name>
-      <display_name>Weekend schedule</display_name>
-      <description>Specify the 24-hour weekend schedule.</description>
-      <type>String</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00</default_value>
-    </argument>
-    <argument>
-      <name>monthly_sch</name>
-      <display_name>Month schedule</display_name>
-      <description>Specify the 12-month schedule.</description>
-      <type>String</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0</default_value>
-    </argument>
-    <argument>
-      <name>roof_structure</name>
-      <display_name>Roof Structure</display_name>
-      <description>The roof structure of the building.</description>
-      <type>Choice</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>truss, cantilever</default_value>
-      <choices>
-        <choice>
-          <value>truss, cantilever</value>
-          <display_name>truss, cantilever</display_name>
-        </choice>
-        <choice>
-          <value>rafter</value>
-          <display_name>rafter</display_name>
-        </choice>
-      </choices>
-    </argument>
-    <argument>
       <name>eaves_depth</name>
       <display_name>Eaves Depth</display_name>
       <description>The eaves depth of the roof.</description>
@@ -291,8 +190,62 @@
       <default_value>2</default_value>
     </argument>
     <argument>
-      <name>left_offset</name>
-      <display_name>Left Neighbor Offset</display_name>
+      <name>num_bedrooms</name>
+      <display_name>Number of Bedrooms</display_name>
+      <description>Specify the number of bedrooms. Used to determine the energy usage of appliances and plug loads, hot water usage, mechanical ventilation rate, etc.</description>
+      <type>String</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>3</default_value>
+    </argument>
+    <argument>
+      <name>num_bathrooms</name>
+      <display_name>Number of Bathrooms</display_name>
+      <description>Specify the number of bathrooms. Used to determine the hot water usage, etc.</description>
+      <type>String</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>2</default_value>
+    </argument>
+    <argument>
+      <name>num_occupants</name>
+      <display_name>Number of Occupants</display_name>
+      <description>Specify the number of occupants. A value of 'auto' will calculate the average number of occupants from the number of bedrooms. Used to specify the internal gains from people only.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
+    </argument>
+    <argument>
+      <name>occupants_weekday_sch</name>
+      <display_name>Occupants Weekday schedule</display_name>
+      <description>Specify the 24-hour weekday schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00</default_value>
+    </argument>
+    <argument>
+      <name>occupants_weekend_sch</name>
+      <display_name>Occupants Weekend schedule</display_name>
+      <description>Specify the 24-hour weekend schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.88, 0.41, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.29, 0.55, 0.90, 0.90, 0.90, 1.00, 1.00, 1.00</default_value>
+    </argument>
+    <argument>
+      <name>occupants_monthly_sch</name>
+      <display_name>Occupants Month schedule</display_name>
+      <description>Specify the 12-month schedule.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0</default_value>
+    </argument>
+    <argument>
+      <name>neighbor_left_offset</name>
+      <display_name>Neighbor Left Offset</display_name>
       <description>The minimum distance between the simulated house and the neighboring house to the left (not including eaves). A value of zero indicates no neighbors.</description>
       <type>Double</type>
       <units>ft</units>
@@ -301,8 +254,8 @@
       <default_value>10</default_value>
     </argument>
     <argument>
-      <name>right_offset</name>
-      <display_name>Right Neighbor Offset</display_name>
+      <name>neighbor_right_offset</name>
+      <display_name>Neighbor Right Offset</display_name>
       <description>The minimum distance between the simulated house and the neighboring house to the right (not including eaves). A value of zero indicates no neighbors.</description>
       <type>Double</type>
       <units>ft</units>
@@ -311,8 +264,8 @@
       <default_value>10</default_value>
     </argument>
     <argument>
-      <name>back_offset</name>
-      <display_name>Back Neighbor Offset</display_name>
+      <name>neighbor_back_offset</name>
+      <display_name>Neighbor Back Offset</display_name>
       <description>The minimum distance between the simulated house and the neighboring house to the back (not including eaves). A value of zero indicates no neighbors.</description>
       <type>Double</type>
       <units>ft</units>
@@ -321,8 +274,8 @@
       <default_value>0</default_value>
     </argument>
     <argument>
-      <name>front_offset</name>
-      <display_name>Front Neighbor Offset</display_name>
+      <name>neighbor_front_offset</name>
+      <display_name>Neighbor Front Offset</display_name>
       <description>The minimum distance between the simulated house and the neighboring house to the front (not including eaves). A value of zero indicates no neighbors.</description>
       <type>Double</type>
       <units>ft</units>
@@ -394,23 +347,6 @@
       <checksum>E027B465</checksum>
     </file>
     <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.12.2</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>86F59E99</checksum>
-    </file>
-    <file>
-      <filename>create_residential_multifamily_geometry_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>ACE5F4AB</checksum>
-    </file>
-    <file>
       <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -421,6 +357,23 @@
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>2319A5BE</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.12.2</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>65723314</checksum>
+    </file>
+    <file>
+      <filename>create_residential_multifamily_geometry_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>D29845F8</checksum>
     </file>
   </files>
 </measure>
