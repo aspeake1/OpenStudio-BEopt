@@ -77,15 +77,15 @@ The order in which these measures are called is important. For example, the Wind
 |Group|Measure|Dependencies*|
 |:---|:---|:---|
 |1. Location|1. Location||
-|2. Geometry|1. Geometry - Single-Family Detached (or Single-Family Attached or Multifamily)||
+|2. Geometry|1. Geometry - Create Single-Family Detached (or Single-Family Attached or Multifamily)||
 ||2. Door Area||
-||3. Window Areas / Overhangs||
+||3. Window Area||
 |3. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
 ||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
 ||3. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
 ||4. Floors||
-||5. Window Construction|Window Areas, Location|
-||6. Door Construction|Door Area|
+||5. Windows|Window Area, Location|
+||6. Doors|Door Area|
 |4. Domestic Hot Water|1. Water Heater - Tank (or Tankless, Heat Pump, etc.)||
 ||2. Hot Water Fixtures|Water Heater|
 ||3. Hot Water Distribution|Hot Water Fixtures, Location|

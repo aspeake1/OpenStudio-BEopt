@@ -193,70 +193,70 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
 
   def test_argument_error_num_occ_bad_string
     args_hash = {}
-    args_hash["num_occ"] = "hello"
+    args_hash["num_occupants"] = "hello"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
   end
 
   def test_argument_error_num_occ_negative
     args_hash = {}
-    args_hash["num_occ"] = "-1"
+    args_hash["num_occupants"] = "-1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
   end
 
   def test_argument_error_num_occ_incorrect_num_elements
     args_hash = {}
-    args_hash["num_occ"] = "2, 3, 4"
+    args_hash["num_occupants"] = "2, 3, 4"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Number of occupant elements specified inconsistent with number of multifamily units defined in the model.")
   end
 
   def test_argument_error_weekday_sch_wrong_number_of_values
     args_hash = {}
-    args_hash["weekday_sch"] = "1,1"
+    args_hash["occupants_weekday_sch"] = "1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
   end
 
   def test_argument_error_weekday_sch_not_number
     args_hash = {}
-    args_hash["weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+    args_hash["occupants_weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
   end
 
   def test_argument_error_weekend_sch_wrong_number_of_values
     args_hash = {}
-    args_hash["weekend_sch"] = "1,1"
+    args_hash["occupants_weekend_sch"] = "1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
   end
 
   def test_argument_error_weekend_sch_not_number
     args_hash = {}
-    args_hash["weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+    args_hash["occupants_weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
   end
 
   def test_argument_error_monthly_sch_wrong_number_of_values
     args_hash = {}
-    args_hash["monthly_sch"] = "1,1"
+    args_hash["occupants_monthly_sch"] = "1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
 
   def test_argument_error_monthly_sch_not_number
     args_hash = {}
-    args_hash["monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
+    args_hash["occupants_monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
 
   def test_new_construction_none
     args_hash = {}
-    args_hash["num_occ"] = "0"
+    args_hash["num_occupants"] = "0"
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>0}
@@ -266,7 +266,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
   def test_new_construction_auto
     num_finished_spaces = 10
     args_hash = {}
-    args_hash["num_occ"] = Constants.Auto
+    args_hash["num_occupants"] = Constants.Auto
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
@@ -276,7 +276,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
   def test_new_construction_fixed_3
     num_finished_spaces = 10
     args_hash = {}
-    args_hash["num_occ"] = "3"
+    args_hash["num_occupants"] = "3"
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>3}
