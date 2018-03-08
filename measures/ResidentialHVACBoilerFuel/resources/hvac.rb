@@ -405,6 +405,11 @@ class HVAC
         runner.registerInfo("Found ground source heat pump in #{thermal_zone.name}.")
         cooling_equipment << system
       end
+      if self.has_fan_coil(model, runner, thermal_zone)
+        runner.registerInfo("Found four pipe fan coil in #{thermal_zone.name}.")
+        fcu = self.get_fan_coil(model, runner, thermal_zone)
+        cooling_equipment << fcu
+      end
       return cooling_equipment
     end
 
@@ -453,6 +458,11 @@ class HVAC
         ptac = self.get_ptac(model, runner, thermal_zone)
         heating_equipment << ptac
       end
+      if self.has_fan_coil(model, runner, thermal_zone)
+        runner.registerInfo("Found four pipe fan coil in #{thermal_zone.name}.")
+        fcu = self.get_fan_coil(model, runner, thermal_zone)
+        heating_equipment << fcu
+      end
       return heating_equipment
     end
 
@@ -471,6 +481,9 @@ class HVAC
       elsif hvac_equip.is_a? OpenStudio::Model::ZoneHVACBaseboardConvectiveWater
         htg_coil = HVAC.get_coil_from_hvac_component(hvac_equip.heatingCoil)
       elsif hvac_equip.is_a? OpenStudio::Model::ZoneHVACPackagedTerminalAirConditioner
+        htg_coil = HVAC.get_coil_from_hvac_component(hvac_equip.heatingCoil)
+        clg_coil = HVAC.get_coil_from_hvac_component(hvac_equip.coolingCoil)
+      elsif hvac_equip.is_a? OpenStudio::Model::ZoneHVACFourPipeFanCoil
         htg_coil = HVAC.get_coil_from_hvac_component(hvac_equip.heatingCoil)
         clg_coil = HVAC.get_coil_from_hvac_component(hvac_equip.coolingCoil)
       end
@@ -495,6 +508,8 @@ class HVAC
         return hvac_component.to_CoilCoolingDXVariableRefrigerantFlow.get
       elsif hvac_component.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
         return hvac_component.to_CoilCoolingWaterToAirHeatPumpEquationFit.get
+      elsif hvac_component.to_CoilCoolingWater.is_initialized
+        return hvac_component.to_CoilCoolingWater.get
       end
 
       # Heating coils
@@ -617,6 +632,15 @@ class HVAC
       return nil
     end
 
+    def self.get_fan_coil(model, runner, thermal_zone)
+      # Returns the central PTAC if available
+      model.getZoneHVACFourPipeFanCoils.each do |fcu|
+        next unless thermal_zone.handle.to_s == fcu.thermalZone.get.handle.to_s
+        return fcu
+      end
+      return nil
+    end
+
     # Has Equipment methods
 
     def self.has_central_ac(model, runner, thermal_zone)
@@ -733,6 +757,14 @@ class HVAC
     def self.has_central_ptac(model, runner, thermal_zone)
       ptac = self.get_central_ptac(model, runner, thermal_zone)
       if not ptac.nil?
+        return true
+      end
+      return false
+    end
+
+    def self.has_fan_coil(model, runner, thermal_zone)
+      fcu = self.get_fan_coil(model, runner, thermal_zone)
+      if not fcu.nil?
         return true
       end
       return false

@@ -109,25 +109,16 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
   end
 
   def test_simulation_baseboards
-    num_units = 4
+    num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
     expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
-    _test_measure("test_simulation_baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
+    _test_measure("test_simulation_baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*3)
   end
-  
-  def test_simulation_unit_heaters
-    num_units = 4
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
-    _test_measure("test_simulation_unit_heaters.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
-  end
-  
+
   def test_simulation_fan_coil
-    num_units = 4
+    num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
@@ -232,7 +223,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
 
-    # show_output(result)
+    show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

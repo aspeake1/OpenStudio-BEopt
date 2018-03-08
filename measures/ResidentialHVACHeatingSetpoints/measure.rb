@@ -150,7 +150,8 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
         supp_htg_obj = nil
         if (htg_equip.is_a? OpenStudio::Model::AirLoopHVACUnitarySystem or
             htg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow or
-            htg_equip.is_a? OpenStudio::Model::ZoneHVACPackagedTerminalAirConditioner)
+            htg_equip.is_a? OpenStudio::Model::ZoneHVACPackagedTerminalAirConditioner or
+            htg_equip.is_a? OpenStudio::Model::ZoneHVACFourPipeFanCoil)
           clg_obj, htg_obj, supp_htg_obj = HVAC.get_coils_from_hvac_equip(htg_equip)
         elsif htg_equip.to_ZoneHVACComponent.is_initialized
           htg_obj = htg_equip

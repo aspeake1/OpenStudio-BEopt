@@ -146,15 +146,6 @@ class ProcessCentralSystemTest < MiniTest::Test
     _test_measure("apply_central_system_to_this.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
   
-  def test_simulation_unit_heaters # then change weather file path to: C:/OpenStudio/OpenStudio-BEopt/measures/ResidentialLocation/resources/USA_CO_Denver_Intl_AP_725650_TMY3.epw
-    args_hash = {}
-    args_hash["system_type"] = "Unit Heaters"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ZoneHVACUnitHeater"=>2, "FanConstantVolume"=>2, "CoilHeatingGas"=>2}
-    expected_values = {}
-    _test_measure("apply_central_system_to_this.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
-  end
-  
   def test_simulation_fan_coil # then change weather file path to: C:/OpenStudio/OpenStudio-BEopt/measures/ResidentialLocation/resources/USA_CO_Denver_Intl_AP_725650_TMY3.epw
     args_hash = {}
     args_hash["system_type"] = "Fan Coil"
@@ -201,7 +192,7 @@ class ProcessCentralSystemTest < MiniTest::Test
     result = runner.result
 
     show_output(result)
-    
+
     # save the model to test output directory
     output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
     model.save(output_file_path, true)

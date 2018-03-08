@@ -146,10 +146,10 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     model_zones.each do |thermal_zone|
       cooling_equipment = HVAC.existing_cooling_equipment(model, runner, thermal_zone)
       cooling_equipment.each do |clg_equip|
-        clg_coil, htg_coil, supp_htg_coil = HVAC.get_coils_from_hvac_equip(clg_equip)
-        unless clg_coil.nil? or clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
-          clg_coil.setAvailabilitySchedule(coolingseasonschedule.schedule)
-          runner.registerInfo("Added availability schedule to #{clg_coil.name}.")
+        clg_obj, htg_obj, supp_htg_obj = HVAC.get_coils_from_hvac_equip(clg_equip)
+        unless clg_obj.nil? or clg_obj.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
+          clg_obj.setAvailabilitySchedule(coolingseasonschedule.schedule)
+          runner.registerInfo("Added availability schedule to #{clg_obj.name}.")
         end
       end
     end

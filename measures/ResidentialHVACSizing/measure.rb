@@ -74,7 +74,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                   :HasCentralAirConditioner, :HasRoomAirConditioner, :HasUnitHeater,
                   :HasFurnace, :HasBoiler, :HasElecBaseboard, :HasDehumidifier,
                   :HasAirSourceHeatPump, :HasMiniSplitHeatPump, :HasGroundSourceHeatPump,
-                  :NumSpeedsCooling, :NumSpeedsHeating, :CoolingCFMs, :HeatingCFMs, 
+                  :HasFanCoil, :NumSpeedsCooling, :NumSpeedsHeating, :CoolingCFMs, :HeatingCFMs, 
                   :COOL_CAP_FT_SPEC, :HEAT_CAP_FT_SPEC, :COOL_SH_FT_SPEC, :COIL_BF_FT_SPEC,
                   :HtgSupplyAirTemp, :SHRRated, :CapacityRatioCooling, :CapacityRatioHeating, 
                   :MinOutdoorTemp, :HeatingCapacityOffset, :OverSizeLimit, :HPSizedForMaxLoad,
@@ -2000,6 +2000,12 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                                        (1 + (1 - hvac.CoilBF * unit_final.BypassFactor_CurveValue) * 
                                        (80 - mj8.cool_setpoint) / (mj8.cool_setpoint - unit_init.LAT)))
             unit_final.Cool_Airflow = (cool_Load_SensCap_Design / (1.1 * mj8.acf * (mj8.cool_setpoint - unit_init.LAT)))
+
+        elsif hvac.HasFanCoil
+        
+            unit_final.Cool_Capacity = @minCoolingCapacity # FIXME
+            unit_final.Cool_Airflow = 500.0 # FIXME
+
         else
         
             runner.registerError("Unexpected cooling system.")
@@ -3006,6 +3012,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     hvac.HasAirSourceHeatPump = HVAC.has_ashp(model, runner, control_zone)
     hvac.HasGroundSourceHeatPump = HVAC.has_gshp(model, runner, control_zone)
     hvac.HasMiniSplitHeatPump = HVAC.has_mshp(model, runner, control_zone)
+    hvac.HasFanCoil = HVAC.has_fan_coil(model, runner, control_zone)
     has_ducted_mshp = HVAC.has_ducted_mshp(model, runner, control_zone)
     
     if hvac.HasAirSourceHeatPump or hvac.HasMiniSplitHeatPump
@@ -3171,6 +3178,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             
             hvac.CoolingEIR = 1.0 / clg_coil.ratedCoolingCoefficientofPerformance
             
+        elsif clg_coil.is_a? OpenStudio::Model::CoilCoolingWater
+        
         else
             runner.registerError("Unexpected cooling coil: #{clg_coil.name}.")
             return nil
@@ -3218,7 +3227,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                 hvac.HasDuctedHeating = true
             end
         end
-        
+
         # Heating coil
         if htg_coil.is_a? OpenStudio::Model::CoilHeatingElectric
             hvac.NumSpeedsHeating = 1
@@ -3293,6 +3302,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             end
             
             hvac.HeatingEIR = 1.0 / htg_coil.ratedHeatingCoefficientofPerformance
+
+        elsif htg_coil.is_a? OpenStudio::Model::CoilHeatingWater
             
         elsif not htg_coil.nil?
             runner.registerError("Unexpected heating coil: #{htg_coil.name}.")
@@ -4293,7 +4304,21 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             end
         end
     end
-    
+
+    # Fan Coil
+    thermal_zones.each do |thermal_zone|
+        fcu = HVAC.get_fan_coil(model, runner, thermal_zone)
+        next if fcu.nil?
+        
+        # Coils
+        setCoilsObjectValues(runner, unit, hvac, fcu, unit_final, 1.0)
+        
+        fcu.setMaximumSupplyAirFlowRate(UnitConversions.convert(unit_final.Cool_Airflow,"cfm","m^3/s")) # FIXME
+        fcu.setMaximumColdWaterFlowRate(100) # FIXME
+        fcu.setMaximumHotWaterFlowRate(100) # FIXME
+      
+    end
+
     # Dehumidifier
     thermal_zones.each do |thermal_zone|
         dehum = HVAC.get_dehumidifier(model, runner, thermal_zone)
@@ -4387,6 +4412,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         clg_coil.setRatedTotalCoolingCapacity(zone_ratio * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","W") * hvac.CapacityRatioCooling[mshp_index])
         clg_coil.setRatedAirFlowRate(zone_ratio * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") * UnitConversions.convert(hvac.CoolingCFMs[mshp_index],"cfm","m^3/s"))
     
+    elsif clg_coil.is_a? OpenStudio::Model::CoilCoolingWater
+        clg_coil.setDesignAirFlowRate(UnitConversions.convert(unit_final.Cool_Airflow,"cfm","m^3/s"))
+    
     end
     
     # Heating coil
@@ -4428,6 +4456,10 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     elsif htg_coil.is_a? OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow
         htg_coil.setRatedTotalHeatingCapacity(zone_ratio * UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") * hvac.CapacityRatioHeating[mshp_index])
         htg_coil.setRatedAirFlowRate(zone_ratio * UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","ton") * UnitConversions.convert(hvac.HeatingCFMs[mshp_index],"cfm","m^3/s"))
+
+    elsif htg_coil.is_a? OpenStudio::Model::CoilHeatingWater
+        htg_coil.setMaximumWaterFlowRate(100) # FIXME
+        htg_coil.setRatedCapacity(100) # FIXME
     
     end
     
