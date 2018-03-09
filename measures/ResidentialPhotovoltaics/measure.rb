@@ -13,9 +13,9 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
   class PVSystem
     def initialize
     end
-    attr_accessor(:size, :module_type, :inv_eff, :losses)   
+    attr_accessor(:size, :module_type, :inv_eff, :losses)
   end
-  
+
   class PVAzimuth
     def initialize
     end
@@ -23,7 +23,7 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
   end
 
   class PVTilt
-    def initialize   
+    def initialize
     end
     attr_accessor(:abs)
   end
@@ -40,7 +40,7 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
 
   # human readable description of modeling approach
   def modeler_description
-    return "Any generators and electric load center distribution objects are removed. An electric load center distribution object is added with a track schedule equal to the hourly output from SAM's PVWatts v5 model. A micro turbine generator object is added to the electric load center distribution object. The fuel used to make the electricity is zeroed out."
+    return "Any generators, inverters, or electric load center distribution objects are removed. An electric load center distribution object is created, along with pvwatts generator and inverter objects. The generator is added to the electric load center distribution object and the inverter is set."
   end
 
   # define the arguments that the user will input
@@ -54,7 +54,7 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     size.setDescription("Size (power) per unit of the photovoltaic array in kW DC.")
     size.setDefaultValue(2.5)
     args << size
-    
+
     #make a choice arguments for module type
     module_types_names = OpenStudio::StringVector.new
     module_types_names << Constants.PVModuleTypeStandard
@@ -73,7 +73,7 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     system_losses.setDescription("Difference between theoretical module-level and actual PV system performance due to wiring resistance losses, dust, module mismatch, etc.")
     system_losses.setDefaultValue(0.14)
     args << system_losses
-    
+
     #make a double argument for inverter efficiency
     inverter_efficiency = OpenStudio::Measure::OSArgument::makeDoubleArgument("inverter_efficiency", false)
     inverter_efficiency.setDisplayName("Inverter Efficiency")
@@ -81,7 +81,7 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     inverter_efficiency.setDescription("The efficiency of the inverter.")
     inverter_efficiency.setDefaultValue(0.96)
     args << inverter_efficiency
-    
+
     #make a choice arguments for azimuth type
     azimuth_types_names = OpenStudio::StringVector.new
     azimuth_types_names << Constants.CoordRelative
@@ -90,8 +90,8 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     azimuth_type.setDisplayName("Azimuth Type")
     azimuth_type.setDescription("Relative azimuth angle is measured clockwise from the front of the house. Absolute azimuth angle is measured clockwise from due south.")
     azimuth_type.setDefaultValue(Constants.CoordRelative)
-    args << azimuth_type    
-    
+    args << azimuth_type
+
     #make a double argument for azimuth
     azimuth = OpenStudio::Measure::OSArgument::makeDoubleArgument("azimuth", false)
     azimuth.setDisplayName("Azimuth")
@@ -99,7 +99,7 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     azimuth.setDescription("The azimuth angle is measured clockwise, based on the azimuth type specified.")
     azimuth.setDefaultValue(180.0)
     args << azimuth
-    
+
     #make a choice arguments for tilt type
     tilt_types_names = OpenStudio::StringVector.new
     tilt_types_names << Constants.TiltPitch
@@ -109,8 +109,8 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     tilt_type.setDisplayName("Tilt Type")
     tilt_type.setDescription("Type of tilt angle referenced.")
     tilt_type.setDefaultValue(Constants.TiltPitch)
-    args << tilt_type      
-    
+    args << tilt_type
+
     #make a double argument for tilt
     tilt = OpenStudio::Measure::OSArgument::makeDoubleArgument("tilt", false)
     tilt.setDisplayName("Tilt")
@@ -118,7 +118,7 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     tilt.setDescription("Angle of the tilt.")
     tilt.setDefaultValue(0)
     args << tilt
-    
+
     return args
   end
 
@@ -131,13 +131,6 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
-      unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
-      unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"))
-    end
-
-    require "#{File.dirname(__FILE__)}/resources/ssc_api"
-    
     size = runner.getDoubleArgumentValue("size",user_arguments)
     module_type = runner.getStringArgumentValue("module_type",user_arguments)
     system_losses = runner.getDoubleArgumentValue("system_losses",user_arguments)
@@ -146,119 +139,68 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     azimuth = runner.getDoubleArgumentValue("azimuth",user_arguments)
     tilt_type = runner.getStringArgumentValue("tilt_type",user_arguments)
     tilt = runner.getDoubleArgumentValue("tilt",user_arguments)
-        
+
     if azimuth > 360 or azimuth < 0
       runner.registerError("Invalid azimuth entered.")
       return false
     end
-    
+
     pv_system = PVSystem.new
     pv_azimuth = PVAzimuth.new
     pv_tilt = PVTilt.new
-    
+
     weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
     if weather.error?
       return false
     end
-    
-    obj_name = Constants.ObjectNamePhotovoltaics
-    
+
     roof_tilt = Geometry.get_roof_pitch(model.getSurfaces)
-    
-    pv_system.size = size
-    pv_system.module_type = {Constants.PVModuleTypeStandard=>0, Constants.PVModuleTypePremium=>1, Constants.PVModuleTypeThinFilm=>2}[module_type]
-    pv_system.inv_eff = inverter_efficiency * 100.0
-    pv_system.losses = system_losses * 100.0
-    pv_azimuth.abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, model.getBuilding.northAxis)
+
+    pv_system.size = UnitConversions.convert(size, "kW", "W")
+    pv_system.module_type = module_type
+    pv_system.inv_eff = inverter_efficiency
+    pv_system.losses = system_losses
     pv_tilt.abs = Geometry.get_abs_tilt(tilt_type, tilt, roof_tilt, weather.header.Latitude)
-                
-    p_data = SscApi.create_data_object
-    SscApi.set_number(p_data, 'system_capacity', pv_system.size)
-    SscApi.set_number(p_data, 'module_type', pv_system.module_type)
-    SscApi.set_number(p_data, 'array_type', 0)
-    SscApi.set_number(p_data, 'inv_eff', pv_system.inv_eff)
-    SscApi.set_number(p_data, 'losses', pv_system.losses)
-    SscApi.set_number(p_data, 'azimuth', pv_azimuth.abs)
-    SscApi.set_number(p_data, 'tilt', pv_tilt.abs)    
-    SscApi.set_number(p_data, 'adjust:constant', 0)
-    SscApi.set_string(p_data, 'solar_resource_file', weather.epw_path)
-    p_mod = SscApi.create_module("pvwattsv5")
-    SscApi.set_print(false)
-    SscApi.execute_module(p_mod, p_data)
-      
+    pv_azimuth.abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, model.getBuilding.northAxis)
+
     obj_name = Constants.ObjectNamePhotovoltaics
-      
+
     # Remove existing photovoltaics
     curves_to_remove = []
     model.getElectricLoadCenterDistributions.each do |electric_load_center_dist|
-      next unless electric_load_center_dist.name.to_s == obj_name + " elec load center dist"
+      next unless electric_load_center_dist.name.to_s == "#{obj_name} elec load center dist"
       electric_load_center_dist.generators.each do |generator|
-        micro_turbine = generator.to_GeneratorMicroTurbine.get
-        micro_turbine.remove
+        generator = generator.to_GeneratorPVWatts.get
+        generator.remove
       end
-      electric_load_center_dist.trackScheduleSchemeSchedule.get.remove
+      if electric_load_center_dist.inverter.is_initialized
+        inverter = electric_load_center_dist.inverter.get
+        inverter.remove
+      end
       electric_load_center_dist.remove
     end
-      
-    runner.registerInfo("#{(SscApi.get_array(p_data, "ac").inject(0){ |sum, x| sum + x }).round(2)} W-h")
-    values = OpenStudio::Vector.new(8760)
-    SscApi.get_array(p_data, "ac").each_with_index do |wh, i|
-      values[i] = wh.to_f
-    end
-    start_date = model.getYearDescription.makeDate(1, 1)
-    time_step = OpenStudio::Time.new(0, 0, 60, 0)
-    timeseries = OpenStudio::TimeSeries.new(start_date, time_step, values, "W")
-    schedule = OpenStudio::Model::ScheduleInterval.fromTimeSeries(timeseries, model).get
-    schedule.setName(obj_name + " watt-hours")
-      
+
     electric_load_center_dist = OpenStudio::Model::ElectricLoadCenterDistribution.new(model)
-    electric_load_center_dist.setName(obj_name + " elec load center dist")
-    electric_load_center_dist.setGeneratorOperationSchemeType("TrackSchedule")
-    electric_load_center_dist.setTrackScheduleSchemeSchedule(schedule)
-    electric_load_center_dist.setDemandLimitSchemePurchasedElectricDemandLimit(0)
-    electric_load_center_dist.setElectricalBussType("AlternatingCurrent")
-      
-    micro_turbine = OpenStudio::Model::GeneratorMicroTurbine.new(model)
-    micro_turbine.setName(obj_name + " generator")
-    micro_turbine.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
+    electric_load_center_dist.setName("#{obj_name} elec load center dist")
+
+    generator = OpenStudio::Model::GeneratorPVWatts.new(model, pv_system.size)
+    generator.setName("#{obj_name} generator")
+    generator.setModuleType(pv_system.module_type)
+    generator.setSystemLosses(pv_system.losses)
+    generator.setTiltAngle(pv_tilt.abs)
+    generator.setAzimuthAngle(pv_azimuth.abs)
     
-    curve_biquadratic = micro_turbine.electricalPowerFunctionofTemperatureandElevationCurve.to_CurveBiquadratic.get
-    curve_biquadratic.setName("null input curve biquadratic")    
-    curve_biquadratic.setCoefficient1Constant(1)
-    curve_biquadratic.setCoefficient2x(0)
-    curve_biquadratic.setCoefficient3xPOW2(0)
-    curve_biquadratic.setCoefficient4y(0)
-    curve_biquadratic.setCoefficient5yPOW2(0)
-    curve_biquadratic.setCoefficient6xTIMESY(0)
-    curve_biquadratic.setMinimumValueofx(0)
-    curve_biquadratic.setMaximumValueofx(0)
-    curve_biquadratic.setMinimumValueofy(0)
-    curve_biquadratic.setMaximumValueofy(1)    
-    
-    curve_cubic = micro_turbine.electricalEfficiencyFunctionofTemperatureCurve.to_CurveCubic.get
-    curve_cubic.setName("null input curve cubic 1")
-    curve_cubic.setCoefficient1Constant(10000000000000000000000000000)
-    curve_cubic.setCoefficient2x(0)
-    curve_cubic.setCoefficient3xPOW2(0)
-    curve_cubic.setCoefficient4xPOW3(0)
-    curve_cubic.setMinimumValueofx(0)
-    curve_cubic.setMaximumValueofx(1)
-    
-    curve_cubic = micro_turbine.electricalEfficiencyFunctionofPartLoadRatioCurve.to_CurveCubic.get
-    curve_cubic.setName("null input curve cubic 2")
-    curve_cubic.setCoefficient1Constant(10000000000000000000000000000)
-    curve_cubic.setCoefficient2x(0)
-    curve_cubic.setCoefficient3xPOW2(0)
-    curve_cubic.setCoefficient4xPOW3(0)
-    curve_cubic.setMinimumValueofx(0)
-    curve_cubic.setMaximumValueofx(1)
-          
-    electric_load_center_dist.addGenerator(micro_turbine)
-      
+    inverter = OpenStudio::Model::ElectricLoadCenterInverterPVWatts.new(model)
+    inverter.setName("#{obj_name} inverter")
+    inverter.setInverterEfficiency(pv_system.inv_eff)
+
+    electric_load_center_dist.addGenerator(generator)
+    electric_load_center_dist.setInverter(inverter)
+
     return true
 
   end
-  
+
 end
 
 # register the measure to be used by the application

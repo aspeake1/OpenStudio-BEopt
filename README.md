@@ -134,6 +134,7 @@ The order in which these measures are called is important. For example, the Wind
 ||11. Gas Lighting|Beds/Baths|
 |9. Airflow|1. Airflow|Location, Beds/Baths, HVAC Equipment, Clothes Dryer|
 |10. Sizing|1. HVAC Sizing|(lots of measures...)|
+|11. Photovoltaics|1. Photovoltaics||
 <!--- MEASURE_WORKFLOW_END -->
 
 <!---

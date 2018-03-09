@@ -330,13 +330,13 @@ class Constants
     return 'ResExtWallSheathing'
   end
   def self.PVModuleTypeStandard
-    return 'standard'
+    return 'Standard'
   end
   def self.PVModuleTypePremium
-    return 'premium'
+    return 'Premium'
   end
   def self.PVModuleTypeThinFilm
-    return 'thin film'
+    return 'ThinFilm'
   end
   def self.PVNetMetering
     return 'Net Metering'
