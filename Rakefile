@@ -114,6 +114,8 @@ namespace :test do
   desc 'regenerate test osm files from osw files'
   task :regenerate_osms do
 
+    require 'openstudio'
+  
     start_time = Time.now
     num_tot = 0
     num_success = 0
@@ -251,6 +253,8 @@ end
 
 desc 'update all measures (resources, xmls, workflows, README)'
 task :update_measures do
+
+  require 'openstudio'
 
   puts "Updating measure resources..."
   measures_dir = File.expand_path("../measures/", __FILE__)
