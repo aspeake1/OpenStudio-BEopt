@@ -102,16 +102,7 @@ The order in which these measures are called is important. For example, the Wind
 ||5. Cooking Range||
 |7. Lighting|1. Lighting|Location|
 |8. Misc Loads|1. Plug Loads||
-||2. Extra Refrigerator||
-||3. Freezer||
-||4. Hot Tub Heater - Electric (or Gas)||
-||5. Hot Tub Pump||
-||6. Pool Heater - Electric (or Gas)||
-||7. Pool Pump||
-||8. Well Pump||
-||9. Gas Fireplace||
-||10. Gas Grill||
-||11. Gas Lighting||
+||2. Large, Uncommon Loads||
 |9. Airflow|1. Airflow|Location, HVAC Equipment, Clothes Dryer|
 |10. Sizing|1. HVAC Sizing|(lots of measures...)|
 <!--- MEASURE_WORKFLOW_END -->

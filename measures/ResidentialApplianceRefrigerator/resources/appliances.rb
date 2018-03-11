@@ -1,6 +1,7 @@
 require "#{File.dirname(__FILE__)}/constants"
 require "#{File.dirname(__FILE__)}/unit_conversions"
 require "#{File.dirname(__FILE__)}/weather"
+require "#{File.dirname(__FILE__)}/schedules"
 require "#{File.dirname(__FILE__)}/waterheater"
 
 class Refrigerator

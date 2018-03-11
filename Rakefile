@@ -346,16 +346,7 @@ task :update_measures do
   exclude_measures = ["ResidentialHotWaterSolar", 
                       "ResidentialHVACCeilingFan", 
                       "ResidentialHVACDehumidifier",
-                      "ResidentialMiscExtraRefrigerator",
-                      "ResidentialMiscFreezer",
-                      "ResidentialMiscHotTubHeaterElectric",
-                      "ResidentialMiscHotTubPump",
-                      "ResidentialMiscPoolHeaterElectric",
-                      "ResidentialMiscPoolPump",
-                      "ResidentialMiscWellPump",
-                      "ResidentialMiscGasFireplace",
-                      "ResidentialMiscGasGrill",
-                      "ResidentialMiscGasLighting"]
+                      "ResidentialMiscLargeUncommonLoads"]
   
   # SFD
   include_measures = ["ResidentialGeometryCreateSingleFamilyDetached"]
