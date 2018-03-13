@@ -103,7 +103,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     pv_annual_excess_sellback_rate_types << Constants.RetailElectricityCost
     pv_annual_excess_sellback_rate_types << Constants.UserSpecified
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("pv_annual_excess_sellback_rate_type", pv_annual_excess_sellback_rate_types, true)
-    arg.setDisplayName("PV: Annual Excess Sellback Rate Type")
+    arg.setDisplayName("PV: Net Metering Annual Excess Sellback Rate Type")
     arg.setDescription("The type of annual excess sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVNetMetering}'.")
     arg.setDefaultValue(Constants.UserSpecified)
     args << arg
@@ -111,7 +111,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("pv_sellback_rate", true)
     arg.setDisplayName("PV: Net Metering Annual Excess Sellback Rate")
     arg.setUnits("$/kWh")
-    arg.setDescription("The annual excess/net sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVNetMetering}'.")
+    arg.setDescription("The annual excess sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVNetMetering}' and the PV annual excess sellback rate type is '#{Constants.UserSpecified}'.")
     arg.setDefaultValue("0.03")
     args << arg
 

@@ -1036,7 +1036,7 @@ class Constants
     return 'latitude'
   end
   def self.UserSpecified
-    return 'user specified'
+    return 'user-specified'
   end
   def self.VentTypeExhaust
     return 'exhaust'
