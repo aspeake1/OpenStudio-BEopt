@@ -98,6 +98,26 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
 
+  def test_calculations_10kW_pv_net_metering_retail_sellback
+    args_hash = {}
+    args_hash["elec_fixed"] = "8.0"
+    args_hash["elec_rate"] = Constants.Auto
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = Constants.PVNetMetering
+    args_hash["pv_annual_excess_sellback_rate_type"] = Constants.RetailElectricityCost
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    weather_file_state = "CO"
+    timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {Constants.FuelTypeElectric=>-883, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+  end
+
   def test_calculations_0kW_pv_feed_in_tariff
     args_hash = {}
     args_hash["elec_fixed"] = "8.0"
@@ -135,7 +155,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     expected_values = {Constants.FuelTypeElectric=>724-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
-  
+
   def test_calculations_10kW_pv_feed_in_tariff
     args_hash = {}
     args_hash["elec_fixed"] = "8.0"
@@ -154,7 +174,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     expected_values = {Constants.FuelTypeElectric=>724-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
-  
+
   private
 
   def model_in_path_default(osm_file_or_model)
@@ -330,7 +350,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     marginal_rates = {Constants.FuelTypeElectric=>args_hash["elec_rate"], Constants.FuelTypeGas=>args_hash["gas_rate"], Constants.FuelTypeOil=>args_hash["oil_rate"], Constants.FuelTypePropane=>args_hash["prop_rate"]}
     fixed_rates = {Constants.FuelTypeElectric=>args_hash["elec_fixed"].to_f, Constants.FuelTypeGas=>args_hash["gas_fixed"].to_f}
-    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
+    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_annual_excess_sellback_rate_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
 
     result = runner.result
     # show_output(result)
@@ -373,7 +393,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     marginal_rates = {Constants.FuelTypeElectric=>args_hash["elec_rate"], Constants.FuelTypeGas=>args_hash["gas_rate"], Constants.FuelTypeOil=>args_hash["oil_rate"], Constants.FuelTypePropane=>args_hash["prop_rate"]}
     fixed_rates = {Constants.FuelTypeElectric=>args_hash["elec_fixed"].to_f, Constants.FuelTypeGas=>args_hash["gas_fixed"].to_f}
-    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
+    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_annual_excess_sellback_rate_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
 
     result = runner.result
     # show_output(result)

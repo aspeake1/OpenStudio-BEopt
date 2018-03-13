@@ -68,21 +68,21 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg.setDescription("Monthly fixed charge for natural gas.")
     arg.setDefaultValue("8.0")
     args << arg
-    
+
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("gas_rate", true)
     arg.setDisplayName("Natural Gas: Marginal Rate")
     arg.setUnits("$/therm")
     arg.setDescription("Price per therm for natural gas. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
-    
+
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("oil_rate", true)
     arg.setDisplayName("Oil: Marginal Rate")
     arg.setUnits("$/gal")
     arg.setDescription("Price per gallon for fuel oil. Use '#{Constants.Auto} for state-average value from EIA.")
     arg.setDefaultValue(Constants.Auto)
     args << arg
-    
+
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("prop_rate", true)
     arg.setDisplayName("Propane: Marginal Rate")
     arg.setUnits("$/gal")
@@ -97,8 +97,17 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg.setDisplayName("PV: Compensation Type")
     arg.setDescription("The type of compensation for PV.")
     arg.setDefaultValue(Constants.PVNetMetering)
-    args << arg    
-    
+    args << arg
+
+    pv_annual_excess_sellback_rate_types = OpenStudio::StringVector.new
+    pv_annual_excess_sellback_rate_types << Constants.RetailElectricityCost
+    pv_annual_excess_sellback_rate_types << Constants.UserSpecified
+    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("pv_annual_excess_sellback_rate_type", pv_annual_excess_sellback_rate_types, true)
+    arg.setDisplayName("PV: Annual Excess Sellback Rate Type")
+    arg.setDescription("The type of annual excess sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVNetMetering}'.")
+    arg.setDefaultValue(Constants.UserSpecified)
+    args << arg
+
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("pv_sellback_rate", true)
     arg.setDisplayName("PV: Net Metering Annual Excess Sellback Rate")
     arg.setUnits("$/kWh")
@@ -112,7 +121,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg.setDescription("The annual full/gross tariff rate for PV. Only applies if the PV compensation type is '#{Constants.PVFeedInTariff}'.")
     arg.setDefaultValue("0.12")
     args << arg
-    
+
     return args
   end
   
@@ -164,6 +173,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     elec_fixed = runner.getStringArgumentValue("elec_fixed", user_arguments)
     gas_fixed = runner.getStringArgumentValue("gas_fixed", user_arguments)
     pv_compensation_type = runner.getStringArgumentValue("pv_compensation_type", user_arguments)
+    pv_annual_excess_sellback_rate_type = runner.getStringArgumentValue("pv_annual_excess_sellback_rate_type", user_arguments)
     pv_sellback_rate = runner.getStringArgumentValue("pv_sellback_rate", user_arguments)
     pv_tariff_rate = runner.getStringArgumentValue("pv_tariff_rate", user_arguments)
     
@@ -194,7 +204,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
       weather_file_state = HelperMethods.state_code_map[weather_file_state]
     end
 
-    # Get the last sql file      
+    # Get the last sql file
     sql = runner.lastEnergyPlusSqlFile
     if sql.empty?
       runner.registerError("Cannot find last sql file.")
@@ -248,13 +258,13 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
       end
     end
     
-    result = calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
+    result = calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate)
 
     return result
  
   end
   
-  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
+  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate)
   
     if marginal_rates.values.include? Constants.Auto
       unless HelperMethods.state_code_map.values.include? weather_file_state
@@ -300,6 +310,9 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
           require "#{File.dirname(__FILE__)}/resources/ssc_api"
           timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
           timeseries["ElectricityProduced:Facility"] = UtilityBill.remove_leap_day(timeseries["ElectricityProduced:Facility"])
+          if pv_annual_excess_sellback_rate_type == Constants.RetailElectricityCost
+            pv_sellback_rate = marginal_rate
+          end
           elec_bill = UtilityBill.calculate_simple_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], fixed_rates[fuel], marginal_rate, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
           runner.registerValue(fuel, elec_bill)
           total_bill += elec_bill
