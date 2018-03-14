@@ -353,7 +353,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_annual_excess_sellback_rate_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
 
     result = runner.result
-    # show_output(result)
+    show_output(result)
     
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

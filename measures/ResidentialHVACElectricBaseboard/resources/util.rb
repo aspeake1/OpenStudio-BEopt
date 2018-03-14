@@ -1798,6 +1798,7 @@ class UtilityBill
     ur_enable_net_metering = 1
     if pv_compensation_type == Constants.PVNetMetering
       ur_nm_yearend_sell_rate = pv_sellback_rate.to_f
+      ur_excess_monthly_energy_or_dollars = 0
     elsif pv_compensation_type == Constants.PVFeedInTariff
       ur_enable_net_metering = 0
       ur_flat_sell_rate = pv_tariff_rate.to_f
@@ -1815,6 +1816,7 @@ class UtilityBill
     SscApi.set_number(p_data, "ur_enable_net_metering", ur_enable_net_metering)
     SscApi.set_number(p_data, "ur_nm_yearend_sell_rate", ur_nm_yearend_sell_rate)
     SscApi.set_number(p_data, "ur_monthly_fixed_charge", ur_monthly_fixed_charge)
+    SscApi.set_number(p_data, "ur_excess_monthly_energy_or_dollars", ur_excess_monthly_energy_or_dollars)
     
     p_mod = SscApi.create_module("utilityrate3")
     SscApi.execute_module(p_mod, p_data)
@@ -1836,6 +1838,7 @@ class UtilityBill
     ur_flat_sell_rate = 0
     ur_nm_yearend_sell_rate = 0
     ur_enable_net_metering = 1
+    ur_excess_monthly_energy_or_dollars = 0
     if pv_compensation_type == Constants.PVNetMetering
       ur_nm_yearend_sell_rate = pv_sellback_rate.to_f
     elsif pv_compensation_type == Constants.PVFeedInTariff
@@ -1854,6 +1857,7 @@ class UtilityBill
     SscApi.set_number(p_data, "ur_flat_sell_rate", ur_flat_sell_rate)
     SscApi.set_number(p_data, "ur_enable_net_metering", ur_enable_net_metering)
     SscApi.set_number(p_data, "ur_nm_yearend_sell_rate", ur_nm_yearend_sell_rate)
+    SscApi.set_number(p_data, "ur_excess_monthly_energy_or_dollars", ur_excess_monthly_energy_or_dollars)
 
     unless tariff[:fixedmonthlycharge].nil?
       SscApi.set_number(p_data, "ur_monthly_fixed_charge", tariff[:fixedmonthlycharge])
