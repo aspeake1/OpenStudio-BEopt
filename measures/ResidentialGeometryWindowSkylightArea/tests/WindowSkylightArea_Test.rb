@@ -7,7 +7,7 @@ require 'fileutils'
 require_relative '../resources/geometry'
 require_relative '../resources/constants'
 
-class WindowAreaTest < MiniTest::Test
+class WindowSkylightAreaTest < MiniTest::Test
 
   def test_no_window_area
     args_hash = {}
@@ -325,7 +325,7 @@ class WindowAreaTest < MiniTest::Test
 
   def _test_error(osm_file, args_hash)
     # create an instance of the measure
-    measure = SetResidentialWindowArea.new
+    measure = SetResidentialWindowSkylightArea.new
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
@@ -355,7 +355,7 @@ class WindowAreaTest < MiniTest::Test
 
   def _test_measure(osm_file_or_model, args_hash, expected_fblr_win_area_removed, expected_fblr_win_area_added, expected_num_del_objects, expected_num_new_objects, expected_values)
     # create an instance of the measure
-    measure = SetResidentialWindowArea.new
+    measure = SetResidentialWindowSkylightArea.new
 
     # check for standard methods
     assert(!measure.name.empty?)

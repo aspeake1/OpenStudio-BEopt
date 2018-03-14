@@ -6,7 +6,7 @@ require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 # start the measure
-class SetResidentialWindowArea < OpenStudio::Measure::ModelMeasure
+class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
 
   # human readable name
   def name
@@ -125,6 +125,34 @@ class SetResidentialWindowArea < OpenStudio::Measure::ModelMeasure
       arg.setDefaultValue(true)
       args << arg
     end
+
+    #make a double argument for front area
+    front_roof_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("front_roof_area", true)
+    front_roof_area.setDisplayName("Skylights: Front Roof Area")
+    front_roof_area.setDescription("The amount of roof area on the building's front facade. Enter 0 if specifying Front Window-to-Wall Ratio instead.")
+    front_roof_area.setDefaultValue(0)
+    args << front_roof_area
+
+    #make a double argument for back area
+    back_roof_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("back_roof_area", true)
+    back_roof_area.setDisplayName("Skylights: Back Roof Area")
+    back_roof_area.setDescription("The amount of roof area on the building's back facade. Enter 0 if specifying Back Window-to-Wall Ratio instead.")
+    back_roof_area.setDefaultValue(0)
+    args << back_roof_area
+
+    #make a double argument for left area
+    left_roof_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("left_roof_area", true)
+    left_roof_area.setDisplayName("Skylights: Left Roof Area")
+    left_roof_area.setDescription("The amount of roof area on the building's left facade. Enter 0 if specifying Left Window-to-Wall Ratio instead.")
+    left_roof_area.setDefaultValue(0)
+    args << left_roof_area
+
+    #make a double argument for right area
+    right_roof_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("right_roof_area", true)
+    right_roof_area.setDisplayName("Skylights: Right Roof Area")
+    right_roof_area.setDescription("The amount of roof area on the building's right facade. Enter 0 if specifying Right Window-to-Wall Ratio instead.")
+    right_roof_area.setDefaultValue(0)
+    args << right_roof_area
 
     return args
   end
@@ -490,4 +518,4 @@ class SetResidentialWindowArea < OpenStudio::Measure::ModelMeasure
 end
 
 # register the measure to be used by the application
-SetResidentialWindowArea.new.registerWithApplication
+SetResidentialWindowSkylightArea.new.registerWithApplication
