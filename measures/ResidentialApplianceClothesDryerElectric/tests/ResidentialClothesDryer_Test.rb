@@ -41,7 +41,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash = {}
     args_hash["cef"] = 3.1 / 1.15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>1026.4, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -50,7 +50,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash = {}
     args_hash["cef"] = 3.93 / 1.15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>809.6, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -59,7 +59,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash = {}
     args_hash["cef"] = 4.2 / 1.15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>757.6, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -69,20 +69,8 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash["cef"] = 3.1 / 1.15
     args_hash["mult"] = 0.8
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>821.1, "Annual_therm"=>0, "Location"=>args_hash["location"]}
-    _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-
-  def test_new_construction_modified_schedule
-    args_hash = {}
-    args_hash["cef"] = 3.1 / 1.15
-    args_hash["weekday_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
-    args_hash["weekend_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
-    args_hash["monthly_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
-    expected_values = {"Annual_kwh"=>1026.4, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -91,7 +79,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash["cef"] = 3.1 / 1.15
     args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>1026.4, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -101,7 +89,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash["cef"] = 3.1 / 1.15
     args_hash["location"] = Constants.SpaceTypeGarage
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>1026.4, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -110,13 +98,13 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash = {}
     args_hash["cef"] = 3.1 / 1.15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>1026.4, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     model = _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["cef"] = 3.93 / 1.15
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>809.6, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -124,8 +112,8 @@ class ResidentialClothesDryerTest < MiniTest::Test
   def test_retrofit_replace_gas_clothes_dryer
     args_hash = {}
     args_hash["cef"] = 3.93 / 1.15
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>809.6, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw_gasdryer, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -133,8 +121,8 @@ class ResidentialClothesDryerTest < MiniTest::Test
   def test_retrofit_replace_propane_clothes_dryer
     args_hash = {}
     args_hash["cef"] = 3.93 / 1.15
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>809.6, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw_propanedryer, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -143,12 +131,12 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash = {}
     args_hash["cef"] = 3.1 / 1.15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>1026.4, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     model = _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["mult"] = 0.0
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
@@ -175,48 +163,6 @@ class ResidentialClothesDryerTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Occupancy energy multiplier must be greater than or equal to 0.0.")
   end
   
-  def test_argument_error_weekday_sch_wrong_number_of_values
-    args_hash = {}
-    args_hash["weekday_sch"] = "1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
-  end  
-
-  def test_argument_error_weekday_sch_not_number
-    args_hash = {}
-    args_hash["weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
-  end
-    
-  def test_argument_error_weekend_sch_wrong_number_of_values
-    args_hash = {}
-    args_hash["weekend_sch"] = "1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
-  end
-    
-  def test_argument_error_weekend_sch_not_number
-    args_hash = {}
-    args_hash["weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
-  end
-  
-  def test_argument_error_monthly_sch_wrong_number_of_values  
-    args_hash = {}
-    args_hash["monthly_sch"] = "1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
-  end
-  
-  def test_argument_error_monthly_sch_not_number
-    args_hash = {}
-    args_hash["monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
-  end
-  
   def test_error_missing_beds
     args_hash = {}
     result = _test_error(osm_geo, args_hash)
@@ -239,7 +185,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>num_units*1026.19, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
@@ -249,7 +195,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash = {}
     args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>num_units*1026.19, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end 
@@ -259,7 +205,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     args_hash = {}
     args_hash["location"] = Constants.SpaceTypeUnfinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>num_units*1026.19, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end 
@@ -268,7 +214,7 @@ class ResidentialClothesDryerTest < MiniTest::Test
     num_units = 8
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>8209.53, "Annual_therm"=>0, "Location"=>args_hash["location"]}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end

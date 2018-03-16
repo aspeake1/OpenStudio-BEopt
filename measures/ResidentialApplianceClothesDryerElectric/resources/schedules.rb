@@ -451,6 +451,14 @@ class HotWaterSchedule
         return UnitConversions.convert(@totflow * peak_flow / @maxflow, "m^3/s", "gal/min")
     end
     
+    def calcDesignLevelFromDailyTherm(daily_therm)
+        return calcDesignLevelFromDailykWh(UnitConversions.convert(daily_therm, "therm", "kWh"))
+    end
+    
+    def calcClothesDryerAirflowRateNormalization
+        return (@maxflow / @totflow)
+    end
+    
     def schedule
         return @schedule
     end
@@ -473,9 +481,15 @@ class HotWaterSchedule
             if @file_prefix.nil?
                 return data
             end
+            
+            if @file_prefix == "ClothesDryer"
+                file_prefix = "ClothesWasher"
+            else
+                file_prefix = @file_prefix
+            end
 
             # Get appropriate file
-            minute_draw_profile = "#{measure_dir}/resources/#{@file_prefix}Schedule_#{@nbeds}bed.csv"
+            minute_draw_profile = "#{measure_dir}/resources/#{file_prefix}Schedule_#{@nbeds}bed.csv"
             if not File.file?(minute_draw_profile)
                 @runner.registerError("Unable to find file: #{minute_draw_profile}")
                 return nil
@@ -521,6 +535,9 @@ class HotWaterSchedule
             ontime = 0
             
             column_header = @file_prefix
+            if column_header == "ClothesDryer"
+                column_header = "ClothesWasher"
+            end
             
             totflow_column_header = "#{column_header} Sum"
             maxflow_column_header = "#{column_header} Max"
