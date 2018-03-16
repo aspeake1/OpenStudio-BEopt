@@ -1646,135 +1646,143 @@ class SubsurfaceConstructions
         return true
     end
     
-    def self.apply_window(runner, model, subsurfaces, constr_name,
-                          weather, cooling_season, ufactor, shgc,
-                          heat_shade_mult, cool_shade_mult)
-    
-        return true if subsurfaces.empty?
-        
-        # Validate Inputs
-        if ufactor <= 0
-          runner.registerError("Window U-factor must be greater than zero.")
-          return false
-        end
-        if shgc <= 0
-          runner.registerError("Window SHGC must be greater than zero.")
-          return false
-        end      
-        if heat_shade_mult < 0 or heat_shade_mult > 1
-          runner.registerError("Heating Shade Multiplier must be greater than or equal to zero and less than or equal to one.")
-          return false
-        end      
-        if cool_shade_mult < 0 or cool_shade_mult > 1
-          runner.registerError("Cooling Shade Multiplier must be greater than or equal to zero and less than or equal to one.")
-          return false
-        end      
-    
-        # Define shade and schedule
-        sc = nil
-        if cool_shade_mult < 1 or heat_shade_mult < 1
-            # EnergyPlus doesn't like shades that absorb no heat, transmit no heat or reflect no heat.
-            if cool_shade_mult == 1
-                cool_shade_mult = 0.999
-            end
-            if heat_shade_mult == 1
-                heat_shade_mult = 0.999
-            end
+    def self.apply_window_skylight(runner, model, subsurfaces_dict, weather, cooling_season)
 
-            total_shade_trans = cool_shade_mult / heat_shade_mult * 0.999
-            total_shade_abs = 0.00001
-            total_shade_ref = 1 - total_shade_trans - total_shade_abs
+        subsurfaces_dict.each do |constr_name, props|
+          subsurfaces = props["subsurfaces"]
+          ufactor = props["ufactor"]
+          shgc = props["shgc"]
+          heat_shade_mult = props["heat_shade_mult"]
+          cool_shade_mult = props["cool_shade_mult"]
+          int_shading_sch_name = props["int_shading_sch_name"]
 
-            day_startm = [0, 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
-            day_endm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]    
+          next if subsurfaces.empty?
 
-            # WindowShadingSchedule
-            sched_type = OpenStudio::Model::ScheduleTypeLimits.new(model)
-            sched_type.setName("FRACTION")
-            sched_type.setLowerLimitValue(0)
-            sched_type.setUpperLimitValue(1)
-            sched_type.setNumericType("Continuous")
-            
-            # Interior Shading Schedule
-            sch = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameWindowShading + " schedule", Array.new(24, 1), Array.new(24, 1), cooling_season)
-            if not sch.validated?
-                return false
-            end
-
-            # CoolingShade
-            sm = OpenStudio::Model::Shade.new(model)
-            sm.setName("CoolingShade")
-            sm.setSolarTransmittance(total_shade_trans)
-            sm.setSolarReflectance(total_shade_ref)
-            sm.setVisibleTransmittance(total_shade_trans)
-            sm.setVisibleReflectance(total_shade_ref)
-            sm.setThermalHemisphericalEmissivity(total_shade_abs)
-            sm.setThermalTransmittance(total_shade_trans)
-            sm.setThickness(0.0001)
-            sm.setConductivity(10000)
-            sm.setShadetoGlassDistance(0.001)
-            sm.setTopOpeningMultiplier(0)
-            sm.setBottomOpeningMultiplier(0)
-            sm.setLeftSideOpeningMultiplier(0)
-            sm.setRightSideOpeningMultiplier(0)
-            sm.setAirflowPermeability(0)
-
-            # WindowShadingControl
-            sc = OpenStudio::Model::ShadingControl.new(sm)
-            sc.setName("WindowShadingControl")
-            sc.setShadingType("InteriorShade")
-            sc.setShadingControlType("OnIfScheduleAllows")
-            sc.setSchedule(sch.schedule)
-            
-        end
-
-        # Define materials
-        glaz_mat = GlazingMaterial.new(name="WindowMaterial", ufactor=ufactor, shgc=shgc * heat_shade_mult)
-        
-        # Set paths
-        path_fracs = [1]
-        
-        # Define construction
-        constr = Construction.new(constr_name, path_fracs)
-        constr.add_layer(glaz_mat)
-        
-        # Create and assign construction to subsurfaces
-        if not constr.create_and_assign_constructions(subsurfaces, runner, model)
+          # Validate Inputs
+          if ufactor <= 0
+            runner.registerError("#{constr_name.gsub("Construction", "")} U-factor must be greater than zero.")
             return false
+          end
+          if shgc <= 0
+            runner.registerError("#{constr_name.gsub("Construction", "")} SHGC must be greater than zero.")
+            return false
+          end      
+          if heat_shade_mult < 0 or heat_shade_mult > 1
+            runner.registerError("Heating Shade Multiplier must be greater than or equal to zero and less than or equal to one.")
+            return false
+          end      
+          if cool_shade_mult < 0 or cool_shade_mult > 1
+            runner.registerError("Cooling Shade Multiplier must be greater than or equal to zero and less than or equal to one.")
+            return false
+          end      
+      
+          # Define shade and schedule
+          sc = nil
+          if cool_shade_mult < 1 or heat_shade_mult < 1
+              # EnergyPlus doesn't like shades that absorb no heat, transmit no heat or reflect no heat.
+              if cool_shade_mult == 1
+                  cool_shade_mult = 0.999
+              end
+              if heat_shade_mult == 1
+                  heat_shade_mult = 0.999
+              end
+
+              total_shade_trans = cool_shade_mult / heat_shade_mult * 0.999
+              total_shade_abs = 0.00001
+              total_shade_ref = 1 - total_shade_trans - total_shade_abs
+
+              day_startm = [0, 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
+              day_endm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]    
+
+              # WindowShadingSchedule
+              sched_type = OpenStudio::Model::ScheduleTypeLimits.new(model)
+              sched_type.setName("FRACTION")
+              sched_type.setLowerLimitValue(0)
+              sched_type.setUpperLimitValue(1)
+              sched_type.setNumericType("Continuous")
+              
+              # Interior Shading Schedule
+              sch = MonthWeekdayWeekendSchedule.new(model, runner, int_shading_sch_name, Array.new(24, 1), Array.new(24, 1), cooling_season)
+              if not sch.validated?
+                  return false
+              end
+
+              # CoolingShade
+              sm = OpenStudio::Model::Shade.new(model)
+              sm.setName("CoolingShade")
+              sm.setSolarTransmittance(total_shade_trans)
+              sm.setSolarReflectance(total_shade_ref)
+              sm.setVisibleTransmittance(total_shade_trans)
+              sm.setVisibleReflectance(total_shade_ref)
+              sm.setThermalHemisphericalEmissivity(total_shade_abs)
+              sm.setThermalTransmittance(total_shade_trans)
+              sm.setThickness(0.0001)
+              sm.setConductivity(10000)
+              sm.setShadetoGlassDistance(0.001)
+              sm.setTopOpeningMultiplier(0)
+              sm.setBottomOpeningMultiplier(0)
+              sm.setLeftSideOpeningMultiplier(0)
+              sm.setRightSideOpeningMultiplier(0)
+              sm.setAirflowPermeability(0)
+
+              # WindowShadingControl
+              sc = OpenStudio::Model::ShadingControl.new(sm)
+              sc.setName("#{constr_name.gsub("Construction", "")}ShadingControl")
+              sc.setShadingType("InteriorShade")
+              sc.setShadingControlType("OnIfScheduleAllows")
+              sc.setSchedule(sch.schedule)
+              
+          end
+
+          # Define materials
+          glaz_mat = GlazingMaterial.new(name="#{constr_name.gsub("Construction", "")}Material", ufactor=ufactor, shgc=shgc * heat_shade_mult)
+          
+          # Set paths
+          path_fracs = [1]
+          
+          # Define construction
+          constr = Construction.new(constr_name, path_fracs)
+          constr.add_layer(glaz_mat)
+          
+          # Create and assign construction to subsurfaces
+          if not constr.create_and_assign_constructions(subsurfaces, runner, model)
+              return false
+          end
+          
+          sc_msg = ""
+          if sc.nil?
+              # Remove any existing shading controls
+              objects_to_remove = []
+              subsurfaces.each do |subsurface|
+                  next if not subsurface.shadingControl.is_initialized
+                  shade_control = subsurface.shadingControl.get
+                  if shade_control.shadingMaterial.is_initialized
+                      objects_to_remove << shade_control.shadingMaterial.get
+                  end
+                  if shade_control.schedule.is_initialized
+                      objects_to_remove << shade_control.schedule.get
+                  end
+                  objects_to_remove << shade_control
+                  subsurface.resetShadingControl
+              end
+              objects_to_remove.uniq.each do |object|
+                  begin
+                      object.remove
+                  rescue
+                      # no op
+                  end
+              end
+          else
+              # Add shading controls
+              sc_msg = " and interior shades"
+              subsurfaces.each do |subsurface|
+                  subsurface.setShadingControl(sc)
+              end
+          end
+          
+          runner.registerInfo("Construction#{sc_msg} added to #{subsurfaces.size.to_s} #{constr_name.gsub("Construction", "").downcase}(s).")
+          
         end
-        
-        sc_msg = ""
-        if sc.nil?
-            # Remove any existing shading controls
-            objects_to_remove = []
-            subsurfaces.each do |subsurface|
-                next if not subsurface.shadingControl.is_initialized
-                shade_control = subsurface.shadingControl.get
-                if shade_control.shadingMaterial.is_initialized
-                    objects_to_remove << shade_control.shadingMaterial.get
-                end
-                if shade_control.schedule.is_initialized
-                    objects_to_remove << shade_control.schedule.get
-                end
-                objects_to_remove << shade_control
-                subsurface.resetShadingControl
-            end
-            objects_to_remove.uniq.each do |object|
-                begin
-                    object.remove
-                rescue
-                    # no op
-                end
-            end
-        else
-            # Add shading controls
-            sc_msg = " and interior shades"
-            subsurfaces.each do |subsurface|
-                subsurface.setShadingControl(sc)
-            end
-        end
-        
-        runner.registerInfo("Construction#{sc_msg} added to #{subsurfaces.size.to_s} window(s).")
 
         return true
     end

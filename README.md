@@ -84,7 +84,7 @@ The order in which these measures are called is important. For example, the Wind
 ||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
 ||3. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
 ||4. Floors||
-||5. Windows|Window Area, Location|
+||5. Windows/Skylights|Window/Skylight Area, Location|
 ||6. Doors|Door Area|
 |4. Domestic Hot Water|1. Water Heater - Tank (or Tankless, Heat Pump, etc.)||
 ||2. Hot Water Fixtures|Water Heater|

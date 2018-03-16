@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require_relative '../measure.rb'
 require 'fileutils'
 
-class ProcessConstructionsWindowsTest < MiniTest::Test
+class ProcessConstructionsWindowsSkylightsTest < MiniTest::Test
 
   def test_no_solar_gain_reduction
     args_hash = {}
@@ -49,7 +49,7 @@ class ProcessConstructionsWindowsTest < MiniTest::Test
     result = _test_error("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Window SHGC must be greater than zero.")    
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Window SHGC must be greater than zero.")
   end
   
   def test_error_no_weather
@@ -58,13 +58,23 @@ class ProcessConstructionsWindowsTest < MiniTest::Test
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Model has not been assigned a weather file.")    
-  end  
+  end
+  
+  def test_windows_and_skylights
+    args_hash = {}
+    args_hash["skylight_ufactor"] = 0.20
+    args_hash["skylight_shgc"] = 0.5
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"SimpleGlazing"=>2, "Construction"=>2, "ShadingControl"=>2, "WindowMaterialShade"=>1, "ScheduleRuleset"=>2}
+    expected_values = {"shgc"=>0.3*0.7+0.5*0.7, "ufactor"=>0.37+0.20, "SubSurfacesWithConstructions"=>34}
+    result = _test_measure("SFD_2000sqft_2story_SL_FA_Denver_Windows_Skylights.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
   
   private
   
   def _test_error(osm_file, args_hash)
     # create an instance of the measure
-    measure = ProcessConstructionsWindows.new
+    measure = ProcessConstructionsWindowsSkylights.new
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
@@ -94,7 +104,7 @@ class ProcessConstructionsWindowsTest < MiniTest::Test
   
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # create an instance of the measure
-    measure = ProcessConstructionsWindows.new
+    measure = ProcessConstructionsWindowsSkylights.new
 
     # check for standard methods
     assert(!measure.name.empty?)
@@ -127,7 +137,7 @@ class ProcessConstructionsWindowsTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
     
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -159,7 +169,7 @@ class ProcessConstructionsWindowsTest < MiniTest::Test
                     next unless sub_surface.construction.get == new_object
                     actual_values["SubSurfacesWithConstructions"] += 1
                   end
-                end            
+                end
             end
         end
     end
