@@ -3,7 +3,7 @@ require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/misc_loads"
 
 #start the measure
-class ResidentialLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
+class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
   
   def name
     return "Set Residential Large Uncommon Loads"
@@ -908,4 +908,4 @@ class ResidentialLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
 end #end the measure
 
 #this allows the measure to be use by the application
-ResidentialLargeUncommonLoads.new.registerWithApplication
+ResidentialMiscLargeUncommonLoads.new.registerWithApplication

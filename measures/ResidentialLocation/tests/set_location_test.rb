@@ -48,7 +48,7 @@ class SetResidentialEPWFileTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"StartDate"=>"2009-Apr-08", "EndDate"=>"2009-Oct-27", "Year"=>""}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)      
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)      
   end
   
   private
@@ -78,6 +78,8 @@ class SetResidentialEPWFileTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+    
+    #show_output(result)
       
     return result
     
@@ -117,7 +119,7 @@ class SetResidentialEPWFileTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    # show_output(result)
+    #show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
