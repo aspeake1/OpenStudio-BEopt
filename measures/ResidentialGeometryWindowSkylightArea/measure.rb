@@ -29,7 +29,7 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
 
     #make a double argument for front wwr
     front_wwr = OpenStudio::Measure::OSArgument::makeDoubleArgument("front_wwr", true)
-    front_wwr.setDisplayName("Front Window-to-Wall Ratio")
+    front_wwr.setDisplayName("Windows: Front Window-to-Wall Ratio")
     front_wwr.setDescription("The ratio of window area to wall area for the building's front facade. Enter 0 if specifying Front Window Area instead.")
     front_wwr.setDefaultValue(0.18)
     args << front_wwr
@@ -43,62 +43,62 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
 
     #make a double argument for left wwr
     left_wwr = OpenStudio::Measure::OSArgument::makeDoubleArgument("left_wwr", true)
-    left_wwr.setDisplayName("Left Window-to-Wall Ratio")
+    left_wwr.setDisplayName("Windows: Left Window-to-Wall Ratio")
     left_wwr.setDescription("The ratio of window area to wall area for the building's left facade. Enter 0 if specifying Left Window Area instead.")
     left_wwr.setDefaultValue(0.18)
     args << left_wwr
 
     #make a double argument for right wwr
     right_wwr = OpenStudio::Measure::OSArgument::makeDoubleArgument("right_wwr", true)
-    right_wwr.setDisplayName("Right Window-to-Wall Ratio")
+    right_wwr.setDisplayName("Windows: Right Window-to-Wall Ratio")
     right_wwr.setDescription("The ratio of window area to wall area for the building's right facade. Enter 0 if specifying Right Window Area instead.")
     right_wwr.setDefaultValue(0.18)
     args << right_wwr
 
     #make a double argument for front area
-    front_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("front_area", true)
-    front_area.setDisplayName("Front Window Area")
-    front_area.setDescription("The amount of window area on the building's front facade. Enter 0 if specifying Front Window-to-Wall Ratio instead.")
-    front_area.setDefaultValue(0)
-    args << front_area
+    front_window_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("front_window_area", true)
+    front_window_area.setDisplayName("Windows: Front Window Area")
+    front_window_area.setDescription("The amount of window area on the building's front facade. Enter 0 if specifying Front Window-to-Wall Ratio instead.")
+    front_window_area.setDefaultValue(0)
+    args << front_window_area
 
     #make a double argument for back area
-    back_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("back_area", true)
-    back_area.setDisplayName("Back Window Area")
-    back_area.setDescription("The amount of window area on the building's back facade. Enter 0 if specifying Back Window-to-Wall Ratio instead.")
-    back_area.setDefaultValue(0)
-    args << back_area
+    back_window_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("back_window_area", true)
+    back_window_area.setDisplayName("Windows: Back Window Area")
+    back_window_area.setDescription("The amount of window area on the building's back facade. Enter 0 if specifying Back Window-to-Wall Ratio instead.")
+    back_window_area.setDefaultValue(0)
+    args << back_window_area
 
     #make a double argument for left area
-    left_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("left_area", true)
-    left_area.setDisplayName("Left Window Area")
-    left_area.setDescription("The amount of window area on the building's left facade. Enter 0 if specifying Left Window-to-Wall Ratio instead.")
-    left_area.setDefaultValue(0)
-    args << left_area
+    left_window_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("left_window_area", true)
+    left_window_area.setDisplayName("Windows: Left Window Area")
+    left_window_area.setDescription("The amount of window area on the building's left facade. Enter 0 if specifying Left Window-to-Wall Ratio instead.")
+    left_window_area.setDefaultValue(0)
+    args << left_window_area
 
     #make a double argument for right area
-    right_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("right_area", true)
-    right_area.setDisplayName("Right Window Area")
-    right_area.setDescription("The amount of window area on the building's right facade. Enter 0 if specifying Right Window-to-Wall Ratio instead.")
-    right_area.setDefaultValue(0)
-    args << right_area
+    right_window_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("right_window_area", true)
+    right_window_area.setDisplayName("Windows: Right Window Area")
+    right_window_area.setDescription("The amount of window area on the building's right facade. Enter 0 if specifying Right Window-to-Wall Ratio instead.")
+    right_window_area.setDefaultValue(0)
+    args << right_window_area
 
     #make a double argument for aspect ratio
     aspect_ratio = OpenStudio::Measure::OSArgument::makeDoubleArgument("aspect_ratio", true)
-    aspect_ratio.setDisplayName("Window Aspect Ratio")
+    aspect_ratio.setDisplayName("Windows: Aspect Ratio")
     aspect_ratio.setDescription("Ratio of window height to width.")
     aspect_ratio.setDefaultValue(1.333)
     args << aspect_ratio
 
     depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("depth", true)
-    depth.setDisplayName("Depth")
+    depth.setDisplayName("Overhangs: Depth")
     depth.setUnits("ft")
     depth.setDescription("Depth of the overhang. The distance from the wall surface in the direction normal to the wall surface.")
     depth.setDefaultValue(2.0)
     args << depth
 
     offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("offset", true)
-    offset.setDisplayName("Offset")
+    offset.setDisplayName("Overhangs: Offset")
     offset.setUnits("ft")
     offset.setDescription("Height of the overhangs above windows, relative to the top of the window framing.")
     offset.setDefaultValue(0.5)
@@ -121,38 +121,38 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
       facade = facade_bool.split(' ')[0]
       arg = OpenStudio::Measure::OSArgument::makeBoolArgument(facade_bool.downcase.gsub(" ", "_"), true)
       arg.setDisplayName(facade_bool)
-      arg.setDescription("Specifies the presence of overhangs for windows on the #{facade.downcase} facade.")
+      arg.setDescription("Overhangs: Specifies the presence of overhangs for windows on the #{facade.downcase} facade.")
       arg.setDefaultValue(true)
       args << arg
     end
 
     #make a double argument for front area
-    front_roof_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("front_roof_area", true)
-    front_roof_area.setDisplayName("Skylights: Front Roof Area")
-    front_roof_area.setDescription("The amount of roof area on the building's front facade. Enter 0 if specifying Front Window-to-Wall Ratio instead.")
-    front_roof_area.setDefaultValue(0)
-    args << front_roof_area
+    front_skylight_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("front_skylight_area", true)
+    front_skylight_area.setDisplayName("Skylights: Front Roof Area")
+    front_skylight_area.setDescription("The amount of skylight area on the building's front facade. Enter 0 if specifying Front Window-to-Wall Ratio instead.")
+    front_skylight_area.setDefaultValue(0)
+    args << front_skylight_area
 
     #make a double argument for back area
-    back_roof_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("back_roof_area", true)
-    back_roof_area.setDisplayName("Skylights: Back Roof Area")
-    back_roof_area.setDescription("The amount of roof area on the building's back facade. Enter 0 if specifying Back Window-to-Wall Ratio instead.")
-    back_roof_area.setDefaultValue(0)
-    args << back_roof_area
+    back_skylight_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("back_skylight_area", true)
+    back_skylight_area.setDisplayName("Skylights: Back Roof Area")
+    back_skylight_area.setDescription("The amount of skylight area on the building's back facade. Enter 0 if specifying Back Window-to-Wall Ratio instead.")
+    back_skylight_area.setDefaultValue(0)
+    args << back_skylight_area
 
     #make a double argument for left area
-    left_roof_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("left_roof_area", true)
-    left_roof_area.setDisplayName("Skylights: Left Roof Area")
-    left_roof_area.setDescription("The amount of roof area on the building's left facade. Enter 0 if specifying Left Window-to-Wall Ratio instead.")
-    left_roof_area.setDefaultValue(0)
-    args << left_roof_area
+    left_skylight_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("left_skylight_area", true)
+    left_skylight_area.setDisplayName("Skylights: Left Roof Area")
+    left_skylight_area.setDescription("The amount of skylight area on the building's left facade. Enter 0 if specifying Left Window-to-Wall Ratio instead.")
+    left_skylight_area.setDefaultValue(0)
+    args << left_skylight_area
 
     #make a double argument for right area
-    right_roof_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("right_roof_area", true)
-    right_roof_area.setDisplayName("Skylights: Right Roof Area")
-    right_roof_area.setDescription("The amount of roof area on the building's right facade. Enter 0 if specifying Right Window-to-Wall Ratio instead.")
-    right_roof_area.setDefaultValue(0)
-    args << right_roof_area
+    right_skylight_area = OpenStudio::Measure::OSArgument::makeDoubleArgument("right_skylight_area", true)
+    right_skylight_area.setDisplayName("Skylights: Right Roof Area")
+    right_skylight_area.setDescription("The amount of skylight area on the building's right facade. Enter 0 if specifying Right Window-to-Wall Ratio instead.")
+    right_skylight_area.setDefaultValue(0)
+    args << right_skylight_area
 
     return args
   end
@@ -173,11 +173,11 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     wwrs[Constants.FacadeBack] = runner.getDoubleArgumentValue("back_wwr",user_arguments)
     wwrs[Constants.FacadeLeft] = runner.getDoubleArgumentValue("left_wwr",user_arguments)
     wwrs[Constants.FacadeRight] = runner.getDoubleArgumentValue("right_wwr",user_arguments)
-    areas = {}
-    areas[Constants.FacadeFront] = runner.getDoubleArgumentValue("front_area",user_arguments)
-    areas[Constants.FacadeBack] = runner.getDoubleArgumentValue("back_area",user_arguments)
-    areas[Constants.FacadeLeft] = runner.getDoubleArgumentValue("left_area",user_arguments)
-    areas[Constants.FacadeRight] = runner.getDoubleArgumentValue("right_area",user_arguments)
+    window_areas = {}
+    window_areas[Constants.FacadeFront] = runner.getDoubleArgumentValue("front_window_area",user_arguments)
+    window_areas[Constants.FacadeBack] = runner.getDoubleArgumentValue("back_window_area",user_arguments)
+    window_areas[Constants.FacadeLeft] = runner.getDoubleArgumentValue("left_window_area",user_arguments)
+    window_areas[Constants.FacadeRight] = runner.getDoubleArgumentValue("right_window_area",user_arguments)
     aspect_ratio = runner.getDoubleArgumentValue("aspect_ratio",user_arguments)
     depth = UnitConversions.convert(runner.getDoubleArgumentValue("depth",user_arguments), "ft", "m")
     offset = UnitConversions.convert(runner.getDoubleArgumentValue("offset",user_arguments), "ft", "m")
@@ -191,54 +191,92 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     facade_bools.each do |facade_bool|
       facade_bools_hash[facade_bool] = runner.getBoolArgumentValue(facade_bool.downcase.gsub(" ", "_"),user_arguments)
     end
+    skylight_areas = {}
+    skylight_areas[Constants.FacadeFront] = runner.getDoubleArgumentValue("front_skylight_area",user_arguments)
+    skylight_areas[Constants.FacadeBack] = runner.getDoubleArgumentValue("back_skylight_area",user_arguments)
+    skylight_areas[Constants.FacadeLeft] = runner.getDoubleArgumentValue("left_skylight_area",user_arguments)
+    skylight_areas[Constants.FacadeRight] = runner.getDoubleArgumentValue("right_skylight_area",user_arguments)
 
     # Remove existing windows and store surfaces that should get windows by facade
-    surfaces = {Constants.FacadeFront=>[], Constants.FacadeBack=>[],
-                Constants.FacadeLeft=>[], Constants.FacadeRight=>[]}
+    wall_surfaces = {Constants.FacadeFront=>[], Constants.FacadeBack=>[],
+                     Constants.FacadeLeft=>[], Constants.FacadeRight=>[]}
+    roof_surfaces = {Constants.FacadeFront=>[], Constants.FacadeBack=>[],
+                     Constants.FacadeLeft=>[], Constants.FacadeRight=>[]}
     constructions = {}
-    warn_msg = nil
+    window_warn_msg = nil
+    skylight_warn_msg = nil
     Geometry.get_finished_spaces(model.getSpaces).each do |space|
       space.surfaces.each do |surface|
-        next if not (surface.surfaceType.downcase == "wall" and surface.outsideBoundaryCondition.downcase == "outdoors")
-        next if (90 - surface.tilt*180/Math::PI).abs > 0.01 # Not a vertical wall
-        win_removed = false
-        construction = nil
-        surface.subSurfaces.each do |sub_surface|
-          next if sub_surface.subSurfaceType.downcase != "fixedwindow"
-          if sub_surface.construction.is_initialized
-            if not construction.nil? and construction != sub_surface.construction.get
-              warn_msg = "Multiple constructions found. An arbitrary construction may be assigned to new window(s)."
+        if surface.surfaceType.downcase == "wall" and surface.outsideBoundaryCondition.downcase == "outdoors"
+          next if (90 - surface.tilt*180/Math::PI).abs > 0.01 # Not a vertical wall
+          win_removed = false
+          construction = nil
+          surface.subSurfaces.each do |sub_surface|
+            next if sub_surface.subSurfaceType.downcase != "fixedwindow"
+            if sub_surface.construction.is_initialized
+              if not construction.nil? and construction != sub_surface.construction.get
+                window_warn_msg = "Multiple constructions found. An arbitrary construction may be assigned to new window(s)."
+              end
+              construction = sub_surface.construction.get
             end
-            construction = sub_surface.construction.get
+            sub_surface.remove
+            win_removed = true
           end
-          sub_surface.remove
-          win_removed = true
-        end
-        if win_removed
-          runner.registerInfo("Removed fixed window(s) from #{surface.name}.")
-        end
-        facade = Geometry.get_facade_for_surface(surface)
-        next if facade.nil?
-        surfaces[facade] << surface
-        if not construction.nil? and not constructions.keys.include? facade
-          constructions[facade] = construction
+          if win_removed
+            runner.registerInfo("Removed fixed window(s) from #{surface.name}.")
+          end
+          facade = Geometry.get_facade_for_surface(surface)
+          next if facade.nil?
+          wall_surfaces[facade] << surface
+          if not construction.nil? and not constructions.keys.include? facade
+            constructions[facade] = construction
+          end
+        elsif surface.surfaceType.downcase == "roofceiling" and surface.outsideBoundaryCondition.downcase == "outdoors"
+          sky_removed = false
+          construction = nil
+          surface.subSurfaces.each do |sub_surface|
+            next if sub_surface.subSurfaceType.downcase != "fixedwindow"
+            if sub_surface.construction.is_initialized
+              if not construction.nil? and construction != sub_surface.construction.get
+                skylight_warn_msg = "Multiple constructions found. An arbitrary construction may be assigned to new skylight(s)."
+              end
+              construction = sub_surface.construction.get
+            end
+            sub_surface.remove
+            sky_removed = true
+          end
+          if sky_removed
+            runner.registerInfo("Removed fixed skylight(s) from #{surface.name}.")
+          end
+          facade = Geometry.get_facade_for_surface(surface)
+          next if facade.nil?
+          roof_surfaces[facade] << surface
+          if not construction.nil? and not constructions.keys.include? facade
+            constructions[facade] = construction
+          end
         end
       end
     end
-    if not warn_msg.nil?
-      runner.registerWarning(warn_msg)
+    if not window_warn_msg.nil?
+      runner.registerWarning(window_warn_msg)
+    end
+    if not skylight_warn_msg.nil?
+      runner.registerWarning(skylight_warn_msg)
     end
 
     # error checking
     facades.each do |facade|
-      if wwrs[facade] > 0 and areas[facade] > 0
+      if wwrs[facade] > 0 and window_areas[facade] > 0
         runner.registerError("Both #{facade} window-to-wall ratio and #{facade} window area are specified.")
         return false
       elsif wwrs[facade] < 0 or wwrs[facade] >= 1
         runner.registerError("#{facade.capitalize} window-to-wall ratio must be greater than or equal to 0 and less than 1.")
         return false
-      elsif areas[facade] < 0
+      elsif window_areas[facade] < 0
         runner.registerError("#{facade.capitalize} window area must be greater than or equal to 0.")
+        return false
+      elsif skylight_areas[facade] < 0
+        runner.registerError("#{facade.capitalize} skylight area must be greater than or equal to 0.")
         return false
       end
     end
@@ -250,7 +288,7 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     # Split any surfaces that have doors so that we can ignore them when adding windows
     facades.each do |facade|
       surfaces_to_add = []
-      surfaces[facade].each do |surface|
+      wall_surfaces[facade].each do |surface|
         next if surface.subSurfaces.size == 0
         new_surfaces = surface.splitSurfaceForSubSurfaces
         new_surfaces.each do |new_surface|
@@ -259,9 +297,11 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
         end
       end
       surfaces_to_add.each do |surface_to_add|
-        surfaces[facade] << surface_to_add
+        wall_surfaces[facade] << surface_to_add
       end
     end
+
+    # Windows
 
     # Default assumptions
     min_single_window_area = 5.333 # sqft
@@ -270,13 +310,13 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     window_gap_x = 0.2 # ft; distance between windows in a two-window group
     min_wall_height_for_window = Math.sqrt(max_single_window_area * aspect_ratio) + window_gap_y * 1.05 # allow some wall area above/below
     min_window_width = Math.sqrt(min_single_window_area / aspect_ratio) * 1.05 # allow some wall area to the left/right
-
+    
     # Calculate available area for each wall, facade
     surface_avail_area = {}
     facade_avail_area = {}
     facades.each do |facade|
       facade_avail_area[facade] = 0
-      surfaces[facade].each do |surface|
+      wall_surfaces[facade].each do |surface|
         if not surface_avail_area.include? surface
           surface_avail_area[surface] = 0
         end
@@ -286,13 +326,13 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
         facade_avail_area[facade] += area
       end
     end
-
+    
     surface_window_area = {}
     target_facade_areas = {}
     facades.each do |facade|
 
       # Initialize
-      surfaces[facade].each do |surface|
+      wall_surfaces[facade].each do |surface|
         surface_window_area[surface] = 0
       end
 
@@ -300,12 +340,12 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
       target_facade_areas[facade] = 0.0
       if wwrs[facade] > 0
         wall_area = 0
-        surfaces[facade].each do |surface|
+        wall_surfaces[facade].each do |surface|
           wall_area += UnitConversions.convert(surface.grossArea, "m^2", "ft^2")
         end
         target_facade_areas[facade] = wall_area * wwrs[facade]
       else
-        target_facade_areas[facade] = areas[facade]
+        target_facade_areas[facade] = window_areas[facade]
       end
 
       next if target_facade_areas[facade] == 0
@@ -319,14 +359,14 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
       end
 
       # Initial guess for wall of this facade
-      surfaces[facade].each do |surface|
+      wall_surfaces[facade].each do |surface|
         surface_window_area[surface] = surface_avail_area[surface] / facade_avail_area[facade] * target_facade_areas[facade]
       end
 
       # If window area for a surface is less than the minimum window area,
       # set the window area to zero and proportionally redistribute to the
       # other surfaces.
-      surfaces[facade].each_with_index do |surface, surface_num|
+      wall_surfaces[facade].each_with_index do |surface, surface_num|
         next if surface_window_area[surface] >= min_single_window_area
 
         removed_window_area = surface_window_area[surface]
@@ -334,13 +374,13 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
 
         # Future surfaces are those that have not yet been compared to min_single_window_area
         future_surfaces_area = 0
-        surfaces[facade].each_with_index do |future_surface, future_surface_num|
+        wall_surfaces[facade].each_with_index do |future_surface, future_surface_num|
           next if future_surface_num <= surface_num
           future_surfaces_area += surface_avail_area[future_surface]
         end
         next if future_surfaces_area == 0
 
-        surfaces[facade].each_with_index do |future_surface, future_surface_num|
+        wall_surfaces[facade].each_with_index do |future_surface, future_surface_num|
           next if future_surface_num <= surface_num
           surface_window_area[future_surface] += removed_window_area * surface_window_area[future_surface] / future_surfaces_area
         end
@@ -350,20 +390,20 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
       # that we have less area for this facade than we should. If so, redistribute proportionally
       # to all surfaces that have window area.
       sum_window_area = 0
-      surfaces[facade].each do |surface|
+      wall_surfaces[facade].each do |surface|
         sum_window_area += surface_window_area[surface]
       end
       next if sum_window_area == 0
-      surfaces[facade].each do |surface|
+      wall_surfaces[facade].each do |surface|
         surface_window_area[surface] += surface_window_area[surface] / sum_window_area * (target_facade_areas[facade] - sum_window_area)
       end
 
     end
-
+    
     tot_win_area = 0
     facades.each do |facade|
       facade_win_area = 0
-      surfaces[facade].each do |surface|
+      wall_surfaces[facade].each do |surface|
         next if surface_window_area[surface] == 0
         if not add_windows_to_wall(surface, surface_window_area[surface], window_gap_y, window_gap_x, aspect_ratio, max_single_window_area, facade, constructions, model, runner)
           return false
@@ -376,14 +416,93 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
       end
     end
 
-    if tot_win_area == 0
-      runner.registerFinalCondition("No windows added.")
-      return true
+    # Skylights
+    tot_sky_area = 0
+    skylight_areas.each do |facade, skylight_area|
+      next if skylight_area == 0
+      surfaces = roof_surfaces[facade]
+      if surfaces.empty?
+        runner.registerError("")
+        return false
+      end
+
+      surface = surfaces[0] # arbitrary surface for this facade
+  
+      if ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) > Geometry.get_surface_length(surface)
+        skylight_aspect_ratio = Geometry.get_surface_length(surface) / ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) # aspect ratio of the roof surface
+      else
+        skylight_aspect_ratio = ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) / Geometry.get_surface_length(surface) # aspect ratio of the roof surface
+      end
+
+      skylight_width = Math.sqrt(UnitConversions.convert(skylight_area, "ft^2", "m^2") / skylight_aspect_ratio)
+      skylight_length = UnitConversions.convert(skylight_area, "ft^2", "m^2") / skylight_width
+
+      skylight_offset = 1 # m
+
+      if facade == Constants.FacadeFront
+        leftx = UnitConversions.convert(Geometry.getSurfaceXValues([surface]).min, "ft", "m")
+        lefty = UnitConversions.convert(Geometry.getSurfaceYValues([surface]).min, "ft", "m")
+      elsif facade == Constants.FacadeBack
+        leftx = UnitConversions.convert(Geometry.getSurfaceXValues([surface]).max, "ft", "m")
+        lefty = UnitConversions.convert(Geometry.getSurfaceYValues([surface]).max, "ft", "m")
+      elsif facade == Constants.FacadeLeft
+        leftx = UnitConversions.convert(Geometry.getSurfaceYValues([surface]).max, "ft", "m")
+        lefty = UnitConversions.convert(Geometry.getSurfaceXValues([surface]).min, "ft", "m")
+      elsif facade == Constants.FacadeRight
+        leftx = UnitConversions.convert(Geometry.getSurfaceXValues([surface]).max, "ft", "m")
+        lefty = UnitConversions.convert(Geometry.getSurfaceYValues([surface]).min, "ft", "m")
+      end
+      bottomz = UnitConversions.convert(Geometry.getSurfaceZValues([surface]).min, "ft", "m")
+
+      skylight_polygon = OpenStudio::Point3dVector.new
+      if facade == Constants.FacadeFront
+        skylight_bottom_left = OpenStudio::Point3d.new(leftx + skylight_offset, lefty + Math.cos(surface.tilt) * skylight_offset, bottomz + Math.sin(surface.tilt) * skylight_offset)
+        skylight_top_left = OpenStudio::Point3d.new(leftx + skylight_offset, lefty + Math.cos(surface.tilt) * ( skylight_offset + skylight_length ), bottomz + Math.sin(surface.tilt) * skylight_offset + bottomz + Math.sin(surface.tilt) * skylight_length)
+        skylight_top_right = OpenStudio::Point3d.new(leftx + skylight_offset + skylight_width, lefty + Math.cos(surface.tilt) * ( skylight_offset + skylight_length), bottomz + Math.sin(surface.tilt) * skylight_offset + bottomz + Math.sin(surface.tilt) * skylight_length)
+        skylight_bottom_right = OpenStudio::Point3d.new(leftx + skylight_offset + skylight_width, lefty + Math.cos(surface.tilt) * skylight_offset, bottomz + Math.sin(surface.tilt) * skylight_offset)
+      elsif facade == Constants.FacadeBack
+        skylight_bottom_left = OpenStudio::Point3d.new(leftx - skylight_offset, lefty - Math.cos(surface.tilt) * skylight_offset, bottomz + Math.sin(surface.tilt) * skylight_offset)
+        skylight_top_left = OpenStudio::Point3d.new(leftx - skylight_offset, lefty - Math.cos(surface.tilt) * ( skylight_offset + skylight_length ), bottomz + Math.sin(surface.tilt) * skylight_offset + bottomz + Math.sin(surface.tilt) * skylight_length)
+        skylight_top_right = OpenStudio::Point3d.new(leftx - skylight_offset - skylight_width, lefty - Math.cos(surface.tilt) * ( skylight_offset + skylight_length ), bottomz + Math.sin(surface.tilt) * skylight_offset + bottomz + Math.sin(surface.tilt) * skylight_length)
+        skylight_bottom_right = OpenStudio::Point3d.new(leftx - skylight_offset - skylight_width, lefty - Math.cos(surface.tilt) * skylight_offset, bottomz + Math.sin(surface.tilt) * skylight_offset)
+      elsif facade == Constants.FacadeLeft
+        skylight_bottom_left = OpenStudio::Point3d.new(lefty + Math.cos(surface.tilt) * skylight_offset, leftx - skylight_offset, bottomz + Math.sin(surface.tilt) * skylight_offset)
+        skylight_top_left = OpenStudio::Point3d.new(lefty + Math.cos(surface.tilt) * ( skylight_offset + skylight_length ), leftx - skylight_offset, bottomz + Math.sin(surface.tilt) * skylight_offset + bottomz + Math.sin(surface.tilt) * skylight_length)
+        skylight_top_right = OpenStudio::Point3d.new(lefty + Math.cos(surface.tilt) * ( skylight_offset + skylight_length ), leftx - skylight_offset - skylight_width, bottomz + Math.sin(surface.tilt) * skylight_offset + bottomz + Math.sin(surface.tilt) * skylight_length)
+        skylight_bottom_right = OpenStudio::Point3d.new(lefty + Math.cos(surface.tilt) * skylight_offset, leftx - skylight_offset - skylight_width, bottomz + Math.sin(surface.tilt) * skylight_offset)
+      elsif facade == Constants.FacadeRight
+        skylight_bottom_left = OpenStudio::Point3d.new(leftx - Math.cos(surface.tilt) * skylight_offset, lefty + skylight_offset, bottomz + Math.sin(surface.tilt) * skylight_offset)
+        skylight_top_left = OpenStudio::Point3d.new(leftx - Math.cos(surface.tilt) * ( skylight_offset + skylight_length ), lefty + skylight_offset, bottomz + Math.sin(surface.tilt) * skylight_offset + bottomz + Math.sin(surface.tilt) * skylight_length)
+        skylight_top_right = OpenStudio::Point3d.new(leftx - Math.cos(surface.tilt) * ( skylight_offset + skylight_length ), lefty + skylight_offset + skylight_width, bottomz + Math.sin(surface.tilt) * skylight_offset + bottomz + Math.sin(surface.tilt) * skylight_length)
+        skylight_bottom_right = OpenStudio::Point3d.new(leftx - Math.cos(surface.tilt) * skylight_offset, lefty + skylight_offset + skylight_width, bottomz + Math.sin(surface.tilt) * skylight_offset)
+      end
+      [skylight_bottom_left, skylight_bottom_right, skylight_top_right, skylight_top_left].each do |skylight_vertex|
+        skylight_polygon << skylight_vertex
+      end
+      
+      sub_surface = OpenStudio::Model::SubSurface.new(skylight_polygon, model)
+      sub_surface.setName("#{surface.name} - Skylight")
+      sub_surface.setSurface(surface)
+
+      runner.registerInfo("Added a skylight, totaling #{skylight_area.round(1).to_s} ft^2, to #{surface.name}.")
+
+      if not constructions[facade].nil?
+        sub_surface.setConstruction(constructions[facade])
+      end
     end
 
-    result = Geometry.process_overhangs(model, runner, depth, offset, facade_bools_hash)
-    unless result
-      return false
+    if tot_win_area == 0 and tot_sky_area == 0
+      runner.registerFinalCondition("No windows or skylights added.")
+      return true
+    end
+    
+    runner.registerFinalCondition("The building has been assigned #{tot_win_area.round(1)} ft^2 total window area, and #{tot_sky_area.round(1)} ft^2 total skylight area.")
+
+    if tot_win_area > 0
+      result = Geometry.process_overhangs(model, runner, depth, offset, facade_bools_hash)
+      unless result
+        return false
+      end
     end
 
     runner.registerFinalCondition("The building has been assigned #{tot_win_area.round(1)} ft^2 total window area.")
@@ -416,7 +535,7 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
 
     return UnitConversions.convert(surface.grossArea, "m^2", "ft^2")
   end
-
+  
   def add_windows_to_wall(surface, window_area, window_gap_y, window_gap_x, aspect_ratio, max_single_window_area, facade, constructions, model, runner)
     wall_width = Geometry.get_surface_length(surface)
     wall_height = Geometry.get_surface_height(surface)

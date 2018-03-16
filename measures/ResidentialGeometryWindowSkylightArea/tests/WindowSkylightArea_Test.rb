@@ -18,7 +18,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 0)
     assert_equal("Success", result.value.valueName)
-    assert_equal(result.finalCondition.get.logMessage, "No windows added.")
+    assert_equal(result.finalCondition.get.logMessage, "No windows or skylights added.")
   end
 
   def test_sfd_new_construction_rotated
@@ -136,7 +136,7 @@ class WindowSkylightAreaTest < MiniTest::Test
   def test_argument_error_both_front
     args_hash = {}
     args_hash["front_wwr"] = 0.5
-    args_hash["front_area"] = 50
+    args_hash["front_window_area"] = 50
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
@@ -146,7 +146,7 @@ class WindowSkylightAreaTest < MiniTest::Test
   def test_argument_error_both_back
     args_hash = {}
     args_hash["back_wwr"] = 0.5
-    args_hash["back_area"] = 50
+    args_hash["back_window_area"] = 50
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
@@ -156,7 +156,7 @@ class WindowSkylightAreaTest < MiniTest::Test
   def test_argument_error_both_left
     args_hash = {}
     args_hash["left_wwr"] = 0.5
-    args_hash["left_area"] = 50
+    args_hash["left_window_area"] = 50
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
@@ -166,7 +166,7 @@ class WindowSkylightAreaTest < MiniTest::Test
   def test_argument_error_both_right
     args_hash = {}
     args_hash["right_wwr"] = 0.5
-    args_hash["right_area"] = 50
+    args_hash["right_window_area"] = 50
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
@@ -191,10 +191,10 @@ class WindowSkylightAreaTest < MiniTest::Test
     args_hash["back_wwr"] = 0.0
     args_hash["left_wwr"] = 0.0
     args_hash["right_wwr"] = 0.0
-    args_hash["front_area"] = 86.4
-    args_hash["back_area"] = 57.6
-    args_hash["left_area"] = 43.2
-    args_hash["right_area"] = 28.8
+    args_hash["front_window_area"] = 86.4
+    args_hash["back_window_area"] = 57.6
+    args_hash["left_window_area"] = 43.2
+    args_hash["right_window_area"] = 28.8
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>23, "ShadingSurface"=>23, "ShadingSurfaceGroup"=>23}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
@@ -321,6 +321,30 @@ class WindowSkylightAreaTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63], expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
+  def test_sfd_new_construction_gable_roof_skylights_front_back
+    args_hash = {}
+    args_hash["front_skylight_area"] = 10
+    args_hash["back_skylight_area"] = 10
+    args_hash["left_skylight_area"] = 0
+    args_hash["right_skylight_area"] = 0
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"SubSurface"=>34, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
+    expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
+    model = _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 60.1, 60.1], expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+
+  def test_sfd_new_construction_gable_roof_skylights_left_right
+    args_hash = {}
+    args_hash["front_skylight_area"] = 0
+    args_hash["back_skylight_area"] = 0
+    args_hash["left_skylight_area"] = 10
+    args_hash["right_skylight_area"] = 10
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"SubSurface"=>34, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
+    expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
+    model = _test_measure("SFD_2000sqft_2story_SL_FA_LeftRight.osm", args_hash, [0, 0, 0, 0], [60.1, 60.1, 105.2, 105.2], expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+
   private
 
   def _test_error(osm_file, args_hash)
@@ -394,6 +418,10 @@ class WindowSkylightAreaTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
 
+    # save the model to test output directory
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/test.osm")
+    model.save(output_file_path, true)
+    
     # show the output
     # show_output(result)
 
