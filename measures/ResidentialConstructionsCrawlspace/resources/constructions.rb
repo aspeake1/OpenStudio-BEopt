@@ -1649,6 +1649,7 @@ class SubsurfaceConstructions
     def self.apply_window_skylight(runner, model, subsurfaces_dict, weather, cooling_season)
 
         subsurfaces_dict.each do |constr_name, props|
+          type = constr_name.gsub("Construction", "")
           subsurfaces = props["subsurfaces"]
           ufactor = props["ufactor"]
           shgc = props["shgc"]
@@ -1660,11 +1661,11 @@ class SubsurfaceConstructions
 
           # Validate Inputs
           if ufactor <= 0
-            runner.registerError("#{constr_name.gsub("Construction", "")} U-factor must be greater than zero.")
+            runner.registerError("#{type} U-factor must be greater than zero.")
             return false
           end
           if shgc <= 0
-            runner.registerError("#{constr_name.gsub("Construction", "")} SHGC must be greater than zero.")
+            runner.registerError("#{type} SHGC must be greater than zero.")
             return false
           end      
           if heat_shade_mult < 0 or heat_shade_mult > 1
@@ -1692,7 +1693,7 @@ class SubsurfaceConstructions
               total_shade_ref = 1 - total_shade_trans - total_shade_abs
 
               day_startm = [0, 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
-              day_endm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]    
+              day_endm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
 
               # WindowShadingSchedule
               sched_type = OpenStudio::Model::ScheduleTypeLimits.new(model)
@@ -1725,17 +1726,26 @@ class SubsurfaceConstructions
               sm.setRightSideOpeningMultiplier(0)
               sm.setAirflowPermeability(0)
 
-              # WindowShadingControl
-              sc = OpenStudio::Model::ShadingControl.new(sm)
-              sc.setName("#{constr_name.gsub("Construction", "")}ShadingControl")
-              sc.setShadingType("InteriorShade")
-              sc.setShadingControlType("OnIfScheduleAllows")
-              sc.setSchedule(sch.schedule)
+              if type == "Window"
+                # WindowShadingControl
+                sc = OpenStudio::Model::ShadingControl.new(sm)
+                sc.setName("#{type}ShadingControl")
+                sc.setShadingType("InteriorShade")
+                sc.setShadingControlType("OnIfScheduleAllows")
+                sc.setSchedule(sch.schedule)
+              elsif type == "Skylight"
+                # SkylightShadingControl
+                sc = OpenStudio::Model::ShadingControl.new(sm)
+                sc.setName("#{type}ShadingControl")
+                sc.setShadingType("InteriorShade")
+                sc.setShadingControlType("AlwaysOff")
+                # sc.setSchedule(model.alwaysOffDiscreteSchedule)
+              end
               
           end
 
           # Define materials
-          glaz_mat = GlazingMaterial.new(name="#{constr_name.gsub("Construction", "")}Material", ufactor=ufactor, shgc=shgc * heat_shade_mult)
+          glaz_mat = GlazingMaterial.new(name="#{type}Material", ufactor=ufactor, shgc=shgc * heat_shade_mult)
           
           # Set paths
           path_fracs = [1]

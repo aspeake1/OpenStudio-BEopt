@@ -26,7 +26,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_sfd_new_construction_door_area
@@ -34,7 +34,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Surface"=>2, "SubSurface"=>10, "ShadingSurface"=>10, "ShadingSurfaceGroup"=>10}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    model = _test_measure("SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm", args_hash, [0, 0, 0, 0], [0.0, 59.0, 32.8, 15.5], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm", args_hash, [0, 0, 0, 0], [0.0, 59.0, 32.8, 15.5], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_sfd_retrofit_replace
@@ -42,14 +42,14 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["front_wwr"] = 0.12
     args_hash["left_wwr"] = 0.12
     expected_num_del_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_num_new_objects = {"SubSurface"=>27, "ShadingSurface"=>27, "ShadingSurfaceGroup"=>27}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure(model, args_hash, [81.5, 110.3, 70.0, 55.1], [54.3, 110.3, 46.4, 55.1], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(model, args_hash, [81.5, 110.3, 70.0, 55.1], [54.3, 110.3, 46.4, 55.1], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_invalid_window_area_front_lt_0
@@ -181,7 +181,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>23, "ShadingSurface"=>23, "ShadingSurfaceGroup"=>23}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_single_family_attached_new_construction_areas
@@ -198,7 +198,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>23, "ShadingSurface"=>23, "ShadingSurfaceGroup"=>23}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_single_family_attached_new_construction_offset
@@ -209,7 +209,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>36, "ShadingSurface"=>36, "ShadingSurfaceGroup"=>36}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("SFA_4units_1story_SL_UA_Offset.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 87.01, 58.0], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFA_4units_1story_SL_UA_Offset.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 87.01, 58.0], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_multifamily_new_construction
@@ -220,7 +220,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>40, "ShadingSurface"=>40, "ShadingSurfaceGroup"=>40}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 122.19, 81.46], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 122.19, 81.46], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_multifamily_new_construction_inset
@@ -231,7 +231,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>56, "ShadingSurface"=>56, "ShadingSurfaceGroup"=>56}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_sfd_retrofit_replace_one_construction
@@ -241,7 +241,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {"SubSurface"=>36, "ShadingSurface"=>36, "ShadingSurfaceGroup"=>36}
     expected_num_new_objects = {"SubSurface"=>30, "ShadingSurface"=>30, "ShadingSurfaceGroup"=>30}
     expected_values = {"Constructions"=>1, "OverhangDepth"=>2}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows_OneConstruction.osm", args_hash, [128.8, 128.8, 64.6, 64.4], [85.9, 128.8, 42.9, 64.6], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows_OneConstruction.osm", args_hash, [128.8, 128.8, 64.6, 64.4], [85.9, 128.8, 42.9, 64.6], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_error_invalid_overhang_depth
@@ -250,7 +250,6 @@ class WindowSkylightAreaTest < MiniTest::Test
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    puts result.errors.map{ |x| x.logMessage }
     assert_includes(result.errors.map{ |x| x.logMessage }, "Overhang depth must be greater than or equal to 0.")
   end
 
@@ -269,12 +268,12 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>1}
-    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["depth"] = 2
     expected_num_del_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_num_new_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure(model, args_hash, [81.5, 110.3, 70.0, 55.1], [81.5, 110.3, 70.0, 55.1], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(model, args_hash, [81.5, 110.3, 70.0, 55.1], [81.5, 110.3, 70.0, 55.1], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_single_family_attached_new_construction_overhangs
@@ -285,7 +284,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>23, "ShadingSurface"=>23, "ShadingSurfaceGroup"=>23}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_single_family_attached_new_construction_offset_overhangs
@@ -296,7 +295,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>36, "ShadingSurface"=>36, "ShadingSurfaceGroup"=>36}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("SFA_4units_1story_SL_UA_Offset.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 87.01, 58.0], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFA_4units_1story_SL_UA_Offset.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 87.01, 58.0], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_multifamily_new_construction_overhangs
@@ -307,7 +306,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>40, "ShadingSurface"=>40, "ShadingSurfaceGroup"=>40}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 122.19, 81.46], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 122.19, 81.46], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_multifamily_new_construction_inset_overhangs
@@ -318,7 +317,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>56, "ShadingSurface"=>56, "ShadingSurfaceGroup"=>56}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_sfd_new_construction_gable_roof_skylights_front_back
@@ -330,7 +329,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>34, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    model = _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 60.1, 60.1], [0]*4, [15, 15, 0, 0], expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_FA.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 60.1, 60.1], [0]*5, [15, 15, 0, 0, 0], expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_error_sfd_new_construction_gable_roof_skylights_front_back_left_nonzero
@@ -354,7 +353,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>34, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    model = _test_measure("SFD_2000sqft_2story_SL_FA_LeftRight.osm", args_hash, [0, 0, 0, 0], [60.1, 60.1, 105.2, 105.2], [0]*4, [0, 0, 12, 12], expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_FA_LeftRight.osm", args_hash, [0, 0, 0, 0], [60.1, 60.1, 105.2, 105.2], [0]*5, [0, 0, 12, 12, 0], expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_sfd_new_construction_hip_roof_skylights
@@ -366,7 +365,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>36, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    model = _test_measure("SFD_2000sqft_2story_SL_FA_HipRoof.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 52.6, 52.6], [0]*4, [5]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_FA_HipRoof.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 52.6, 52.6], [0]*5, [5, 5, 5, 5, 0], expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_sfd_retrofit_hip_roof_skylights
@@ -378,7 +377,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>36, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    model = _test_measure("SFD_2000sqft_2story_SL_FA_HipRoof.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 52.6, 52.6], [0]*4, [5]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_FA_HipRoof.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 52.6, 52.6], [0]*5, [5, 5, 5, 5, 0], expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["front_skylight_area"] = 6
     args_hash["back_skylight_area"] = 6
@@ -387,7 +386,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {"SubSurface"=>36, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
     expected_num_new_objects = {"SubSurface"=>36, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    _test_measure(model, args_hash, [105.2, 105.2, 52.6, 52.6], [105.2, 105.2, 52.6, 52.6], [5]*4, [6]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(model, args_hash, [105.2, 105.2, 52.6, 52.6], [105.2, 105.2, 52.6, 52.6], [5, 5, 5, 5, 0], [6, 6, 6, 6, 0], expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_sfd_new_construction_flat_roof_skylights
@@ -399,9 +398,24 @@ class WindowSkylightAreaTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>33, "ShadingSurface"=>32, "ShadingSurfaceGroup"=>32}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
-    model = _test_measure("SFD_2000sqft_2story_SL_FA_FlatRoof.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 52.6, 52.6], [0]*4, [0]*4, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_SL_FA_FlatRoof.osm", args_hash, [0, 0, 0, 0], [105.2, 105.2, 52.6, 52.6], [0, 0, 0, 0, 0], [0, 0, 0, 0, 40], expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
+  def test_multifamily_new_construction_overhangs_skylights
+    num_units = 8
+    args_hash = {}
+    args_hash["back_wwr"] = 0.12
+    args_hash["right_wwr"] = 0.12
+    args_hash["front_skylight_area"] = 11
+    args_hash["back_skylight_area"] = 8
+    args_hash["left_skylight_area"] = 0
+    args_hash["right_skylight_area"] = 12
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"SubSurface"=>48, "ShadingSurface"=>40, "ShadingSurfaceGroup"=>40}
+    expected_values = {"Constructions"=>0, "OverhangDepth"=>2}
+    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 122.19, 81.46], [0, 0, 0, 0, 0], [0, 0, 0, 0, 31], expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
   private
 
   def _test_error(osm_file, args_hash)
@@ -541,7 +555,7 @@ class WindowSkylightAreaTest < MiniTest::Test
     model.getSubSurfaces.each do |sub_surface|
       next if sub_surface.subSurfaceType.downcase != "skylight"
       next if orig_skylights.include?(sub_surface)
-      next if sub_surface.tilt == 0
+      # next if sub_surface.tilt == 0
       new_sky_objects << sub_surface
     end
     del_objects = []
@@ -556,26 +570,38 @@ class WindowSkylightAreaTest < MiniTest::Test
     end
 
     new_sky_area = {Constants.FacadeFront=>0, Constants.FacadeBack=>0,
-                    Constants.FacadeLeft=>0, Constants.FacadeRight=>0}
+                    Constants.FacadeLeft=>0, Constants.FacadeRight=>0,
+                    Constants.FacadeNone=>0}
     new_sky_objects.each do |skylight|
-      new_sky_area[Geometry.get_facade_for_surface(skylight)] += UnitConversions.convert(skylight.grossArea, "m^2", "ft^2")
+      facade = Geometry.get_facade_for_surface(skylight)
+      if facade.nil?
+        facade = Constants.FacadeNone
+      end
+      new_sky_area[facade] += UnitConversions.convert(skylight.grossArea, "m^2", "ft^2")
     end
 
     del_sky_area = {Constants.FacadeFront=>0, Constants.FacadeBack=>0,
-                    Constants.FacadeLeft=>0, Constants.FacadeRight=>0}
+                    Constants.FacadeLeft=>0, Constants.FacadeRight=>0,
+                    Constants.FacadeNone=>0}
     del_objects.each do |skylight|
-      del_sky_area[Geometry.get_facade_for_surface(skylight)] += UnitConversions.convert(skylight.grossArea, "m^2", "ft^2")
+      facade = Geometry.get_facade_for_surface(skylight)
+      if facade.nil?
+        facade = Constants.FacadeNone
+      end
+      del_sky_area[facade] += UnitConversions.convert(skylight.grossArea, "m^2", "ft^2")
     end
 
     assert_in_epsilon(expected_fblr_sky_area_added[0], new_sky_area[Constants.FacadeFront], 0.01)
     assert_in_epsilon(expected_fblr_sky_area_added[1], new_sky_area[Constants.FacadeBack], 0.01)
     assert_in_epsilon(expected_fblr_sky_area_added[2], new_sky_area[Constants.FacadeLeft], 0.01)
     assert_in_epsilon(expected_fblr_sky_area_added[3], new_sky_area[Constants.FacadeRight], 0.01)
+    assert_in_epsilon(expected_fblr_sky_area_added[4], new_sky_area[Constants.FacadeNone], 0.01)
 
     assert_in_epsilon(expected_fblr_sky_area_removed[0], del_sky_area[Constants.FacadeFront], 0.01)
     assert_in_epsilon(expected_fblr_sky_area_removed[1], del_sky_area[Constants.FacadeBack], 0.01)
     assert_in_epsilon(expected_fblr_sky_area_removed[2], del_sky_area[Constants.FacadeLeft], 0.01)
     assert_in_epsilon(expected_fblr_sky_area_removed[3], del_sky_area[Constants.FacadeRight], 0.01)
+    assert_in_epsilon(expected_fblr_sky_area_removed[4], del_sky_area[Constants.FacadeNone], 0.01)
 
     model.getSurfaces.each do |surface|
       assert(surface.netArea > 0)

@@ -196,13 +196,15 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     skylight_areas[Constants.FacadeBack] = runner.getDoubleArgumentValue("back_skylight_area",user_arguments)
     skylight_areas[Constants.FacadeLeft] = runner.getDoubleArgumentValue("left_skylight_area",user_arguments)
     skylight_areas[Constants.FacadeRight] = runner.getDoubleArgumentValue("right_skylight_area",user_arguments)
+    skylight_areas[Constants.FacadeNone] = 0
 
     # Remove existing windows and store surfaces that should get windows by facade
     wall_surfaces = {Constants.FacadeFront=>[], Constants.FacadeBack=>[],
                      Constants.FacadeLeft=>[], Constants.FacadeRight=>[]}
     roof_surfaces = {Constants.FacadeFront=>[], Constants.FacadeBack=>[],
-                     Constants.FacadeLeft=>[], Constants.FacadeRight=>[]}
-    flat_roof_surfaces = []
+                     Constants.FacadeLeft=>[], Constants.FacadeRight=>[],
+                     Constants.FacadeNone=>[]}
+    # flat_roof_surfaces = []
     constructions = {}
     window_warn_msg = nil
     skylight_warn_msg = nil
@@ -251,8 +253,8 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
           end
           facade = Geometry.get_facade_for_surface(surface)
           if facade.nil?
-            if surface.tilt == 0
-              flat_roof_surfaces << surface
+            if surface.tilt == 0 # flat roof
+              roof_surfaces[Constants.FacadeNone] << surface
             end
             next
           end
@@ -423,70 +425,76 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     end
 
     # Skylights
+    unless roof_surfaces[Constants.FacadeNone].empty?
+      tot_sky_area = 0
+      skylight_areas.each do |facade, skylight_area|
+        next if facade == Constants.FacadeNone
+        skylight_area /= roof_surfaces[Constants.FacadeNone].length
+        skylight_areas[Constants.FacadeNone] += skylight_area
+        skylight_areas[facade] = 0
+      end
+    end
+
     tot_sky_area = 0
     skylight_areas.each do |facade, skylight_area|
 
       next if skylight_area == 0
       surfaces = roof_surfaces[facade]
-      if surfaces.empty? and flat_roof_surfaces.empty?
+      if surfaces.empty? and not facade == Constants.FacadeNone
         runner.registerError("There are no #{facade} roof surfaces, but #{skylight_area} ft^2 of skylights were specified.")
         return false
       end
-      surfaces += flat_roof_surfaces
-      surface = surfaces[0] # arbitrary surface for this facade
 
-      if surface.tilt == 0 # flat roof
-        skylight_area = skylight_areas.values.inject(0) { |a, b| a + b }
+      surfaces.each do |surface|
+
+        if ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) > Geometry.get_surface_length(surface)
+          skylight_aspect_ratio = Geometry.get_surface_length(surface) / ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) # aspect ratio of the roof surface
+        else
+          skylight_aspect_ratio = ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) / Geometry.get_surface_length(surface) # aspect ratio of the roof surface
+        end
+
+        skylight_width = Math.sqrt(UnitConversions.convert(skylight_area, "ft^2", "m^2") / skylight_aspect_ratio)
+        skylight_length = UnitConversions.convert(skylight_area, "ft^2", "m^2") / skylight_width
+
+        skylight_bottom_left = OpenStudio::getCentroid(surface.vertices).get
+        leftx = skylight_bottom_left.x
+        lefty = skylight_bottom_left.y
+        bottomz = skylight_bottom_left.z
+        if facade == Constants.FacadeFront or facade == Constants.FacadeNone
+          skylight_top_left = OpenStudio::Point3d.new(leftx, lefty + Math.cos(surface.tilt) * skylight_length, bottomz + Math.sin(surface.tilt) * skylight_length)
+          skylight_top_right = OpenStudio::Point3d.new(leftx + skylight_width, lefty + Math.cos(surface.tilt) * skylight_length, bottomz + Math.sin(surface.tilt) * skylight_length)
+          skylight_bottom_right = OpenStudio::Point3d.new(leftx + skylight_width, lefty, bottomz)
+        elsif facade == Constants.FacadeBack
+          skylight_top_left = OpenStudio::Point3d.new(leftx, lefty - Math.cos(surface.tilt) * skylight_length, bottomz + Math.sin(surface.tilt) * skylight_length)
+          skylight_top_right = OpenStudio::Point3d.new(leftx - skylight_width, lefty - Math.cos(surface.tilt) * skylight_length, bottomz + Math.sin(surface.tilt) * skylight_length)
+          skylight_bottom_right = OpenStudio::Point3d.new(leftx - skylight_width, lefty, bottomz)
+        elsif facade == Constants.FacadeLeft
+          skylight_top_left = OpenStudio::Point3d.new(leftx + Math.cos(surface.tilt) * skylight_length, lefty, bottomz + Math.sin(surface.tilt) * skylight_length)
+          skylight_top_right = OpenStudio::Point3d.new(leftx + Math.cos(surface.tilt) * skylight_length, lefty - skylight_width, bottomz + Math.sin(surface.tilt) * skylight_length)
+          skylight_bottom_right = OpenStudio::Point3d.new(leftx, lefty - skylight_width, bottomz)
+        elsif facade == Constants.FacadeRight
+          skylight_top_left = OpenStudio::Point3d.new(leftx - Math.cos(surface.tilt) * skylight_length, lefty, bottomz + Math.sin(surface.tilt) * skylight_length)
+          skylight_top_right = OpenStudio::Point3d.new(leftx - Math.cos(surface.tilt) * skylight_length, lefty + skylight_width, bottomz + Math.sin(surface.tilt) * skylight_length)
+          skylight_bottom_right = OpenStudio::Point3d.new(leftx, lefty + skylight_width, bottomz)
+        end
+
+        skylight_polygon = OpenStudio::Point3dVector.new
+        [skylight_bottom_left, skylight_bottom_right, skylight_top_right, skylight_top_left].each do |skylight_vertex|
+          skylight_polygon << skylight_vertex
+        end
+        
+        sub_surface = OpenStudio::Model::SubSurface.new(skylight_polygon, model)
+        sub_surface.setName("#{surface.name} - Skylight")
+        sub_surface.setSurface(surface)
+
+        runner.registerInfo("Added a skylight, totaling #{skylight_area.round(1).to_s} ft^2, to #{surface.name}.")
+
+        if not constructions[facade].nil?
+          sub_surface.setConstruction(constructions[facade])
+        end
+
+        tot_sky_area += skylight_area
       end
-
-      if ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) > Geometry.get_surface_length(surface)
-        skylight_aspect_ratio = Geometry.get_surface_length(surface) / ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) # aspect ratio of the roof surface
-      else
-        skylight_aspect_ratio = ( UnitConversions.convert(surface.grossArea, "m^2", "ft^2") / Geometry.get_surface_length(surface)) / Geometry.get_surface_length(surface) # aspect ratio of the roof surface
-      end
-
-      skylight_width = Math.sqrt(UnitConversions.convert(skylight_area, "ft^2", "m^2") / skylight_aspect_ratio)
-      skylight_length = UnitConversions.convert(skylight_area, "ft^2", "m^2") / skylight_width
-
-      skylight_bottom_left = OpenStudio::getCentroid(surface.vertices).get
-      leftx = skylight_bottom_left.x
-      lefty = skylight_bottom_left.y
-      bottomz = skylight_bottom_left.z
-      if facade == Constants.FacadeFront
-        skylight_top_left = OpenStudio::Point3d.new(leftx, lefty + Math.cos(surface.tilt) * skylight_length, bottomz + Math.sin(surface.tilt) * skylight_length)
-        skylight_top_right = OpenStudio::Point3d.new(leftx + skylight_width, lefty + Math.cos(surface.tilt) * skylight_length, bottomz + Math.sin(surface.tilt) * skylight_length)
-        skylight_bottom_right = OpenStudio::Point3d.new(leftx + skylight_width, lefty, bottomz)
-      elsif facade == Constants.FacadeBack
-        skylight_top_left = OpenStudio::Point3d.new(leftx, lefty - Math.cos(surface.tilt) * skylight_length, bottomz + Math.sin(surface.tilt) * skylight_length)
-        skylight_top_right = OpenStudio::Point3d.new(leftx - skylight_width, lefty - Math.cos(surface.tilt) * skylight_length, bottomz + Math.sin(surface.tilt) * skylight_length)
-        skylight_bottom_right = OpenStudio::Point3d.new(leftx - skylight_width, lefty, bottomz)
-      elsif facade == Constants.FacadeLeft
-        skylight_top_left = OpenStudio::Point3d.new(leftx + Math.cos(surface.tilt) * skylight_length, lefty, bottomz + Math.sin(surface.tilt) * skylight_length)
-        skylight_top_right = OpenStudio::Point3d.new(leftx + Math.cos(surface.tilt) * skylight_length, lefty - skylight_width, bottomz + Math.sin(surface.tilt) * skylight_length)
-        skylight_bottom_right = OpenStudio::Point3d.new(leftx, lefty - skylight_width, bottomz)
-      elsif facade == Constants.FacadeRight
-        skylight_top_left = OpenStudio::Point3d.new(leftx - Math.cos(surface.tilt) * skylight_length, lefty, bottomz + Math.sin(surface.tilt) * skylight_length)
-        skylight_top_right = OpenStudio::Point3d.new(leftx - Math.cos(surface.tilt) * skylight_length, lefty + skylight_width, bottomz + Math.sin(surface.tilt) * skylight_length)
-        skylight_bottom_right = OpenStudio::Point3d.new(leftx, lefty + skylight_width, bottomz)
-      end
-
-      skylight_polygon = OpenStudio::Point3dVector.new
-      [skylight_bottom_left, skylight_bottom_right, skylight_top_right, skylight_top_left].each do |skylight_vertex|
-        skylight_polygon << skylight_vertex
-      end
-      
-      sub_surface = OpenStudio::Model::SubSurface.new(skylight_polygon, model)
-      sub_surface.setName("#{surface.name} - Skylight")
-      sub_surface.setSurface(surface)
-
-      runner.registerInfo("Added a skylight, totaling #{skylight_area.round(1).to_s} ft^2, to #{surface.name}.")
-
-      if not constructions[facade].nil?
-        sub_surface.setConstruction(constructions[facade])
-      end
-
-      tot_sky_area += skylight_area
-      break if surface.tilt == 0
     end
 
     if tot_win_area == 0 and tot_sky_area == 0
