@@ -310,10 +310,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
           require "#{File.dirname(__FILE__)}/resources/ssc_api"
           timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
           timeseries["ElectricityProduced:Facility"] = UtilityBill.remove_leap_day(timeseries["ElectricityProduced:Facility"])
-          if pv_annual_excess_sellback_rate_type == Constants.RetailElectricityCost
-            pv_sellback_rate = marginal_rate
-          end
-          elec_bill = UtilityBill.calculate_simple_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], fixed_rates[fuel], marginal_rate, pv_compensation_type, pv_sellback_rate, pv_tariff_rate)
+          elec_bill = UtilityBill.calculate_simple_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], fixed_rates[fuel], marginal_rate, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate)
           runner.registerValue(fuel, elec_bill)
           total_bill += elec_bill
         elsif fuel == Constants.FuelTypeGas and not timeseries["Gas:Facility"].empty?

@@ -9,19 +9,13 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
   
   def test_functionality_net_metering
     args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 1, 1)
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 1, 1)
   end
   
   def test_functionality_feed_in_tariff
     args_hash = {}
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 1, 1)
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, __method__, "DuPage_17043_725300_880860.epw", 1, 1)
   end
 
   def test_error_invalid_location
@@ -51,13 +45,9 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["prop_rate"] = Constants.Auto
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
-    args_hash["pv_tariff_rate"] = "0.12"
-    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>724, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
   def test_calculations_1kW_pv_net_metering
@@ -70,13 +60,9 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["prop_rate"] = Constants.Auto
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
-    args_hash["pv_tariff_rate"] = "0.12"
-    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>564, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
   def test_calculations_10kW_pv_net_metering
@@ -89,13 +75,9 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["prop_rate"] = Constants.Auto
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
-    args_hash["pv_tariff_rate"] = "0.12"
-    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>-176, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
   def test_calculations_10kW_pv_net_metering_retail_sellback
@@ -109,13 +91,9 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_annual_excess_sellback_rate_type"] = Constants.RetailElectricityCost
     args_hash["pv_sellback_rate"] = "0.03"
-    args_hash["pv_tariff_rate"] = "0.12"
-    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>-883, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
   def test_calculations_0kW_pv_feed_in_tariff
@@ -127,14 +105,10 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
-    args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
-    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>724, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
   def test_calculations_1kW_pv_feed_in_tariff
@@ -146,14 +120,10 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
-    args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
-    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>724-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
   def test_calculations_10kW_pv_feed_in_tariff
@@ -165,14 +135,12 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
-    args_hash["pv_sellback_rate"] = "0.03"
     args_hash["pv_tariff_rate"] = "0.12"
-    weather_file_state = "CO"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {Constants.FuelTypeElectric=>724-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
+    _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
   private
@@ -258,7 +226,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     return model    
   end
   
-  def _test_measure_functionality(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, debug=false)
+  def _test_measure_functionality(osm_file_or_model, args_hash, test_name, epw_name, num_infos=0, num_warnings=0)
     # create an instance of the measure
     measure = UtilityBillCalculationsSimple.new
 
@@ -323,7 +291,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     return model
   end
   
-  def _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, num_infos=0, num_warnings=0, debug=false)  
+  def _test_measure_calculations(timeseries, args_hash, expected_values, weather_file_state="CO")
     # create an instance of the measure
     measure = UtilityBillCalculationsSimple.new
 
@@ -353,20 +321,19 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_annual_excess_sellback_rate_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
 
     result = runner.result
-    show_output(result)
+    # show_output(result)
     
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert(result.info.size == num_infos)
-    assert(result.warnings.size == num_warnings)
+    assert(result.info.size > 0)
 
     result.stepValues.each do |arg|
       next unless expected_values.keys.include? arg.name
-      assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.005)
+      assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.01)
     end 
   end
   
-  def _test_error(timeseries, args_hash, weather_file_state)
+  def _test_error(timeseries, args_hash, weather_file_state="CO")
     # create an instance of the measure
     measure = UtilityBillCalculationsSimple.new
 

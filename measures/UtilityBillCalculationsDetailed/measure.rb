@@ -323,14 +323,14 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     fuels = {Constants.FuelTypeGas=>"Natural gas", Constants.FuelTypeOil=>"Oil", Constants.FuelTypePropane=>"Propane"}
     fuels.each do |fuel, file|
  
-      cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{file}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose      
+      cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{file}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
       cols[0].each_with_index do |rate_state, i|
 
         next unless rate_state == weather_file_state
 
         marginal_rate = marginal_rates[fuel]
         if marginal_rate == Constants.Auto
-          average_rate = cols[1][i].to_f            
+          average_rate = cols[1][i].to_f
           marginal_rate = average_rate
           if [Constants.FuelTypeGas].include? fuel
             household_consumption = cols[2][i].to_f
@@ -376,10 +376,7 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
 
         utility_name = get_utility_and_name_from_label(cols, label)
         if UtilityBill.validate_tariff(tariff)
-          if pv_annual_excess_sellback_rate_type == Constants.RetailElectricityCost
-            pv_sellback_rate = 0
-          end
-          elec_bill = UtilityBill.calculate_detailed_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], pv_compensation_type, pv_sellback_rate, pv_tariff_rate, tariff)
+          elec_bill = UtilityBill.calculate_detailed_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, tariff)
           unless elec_bills.keys.include? tariff[:eiaid]
             elec_bills[tariff[:eiaid]] = []
           end
