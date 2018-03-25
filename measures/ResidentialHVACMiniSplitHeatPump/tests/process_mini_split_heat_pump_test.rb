@@ -253,7 +253,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_cooling_capacity"] = 1.5
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirConditionerVariableRefrigerantFlow"=>num_units, "FanOnOff"=>num_units, "ZoneHVACTerminalUnitVariableRefrigerantFlow"=>num_units, "CoilHeatingDXVariableRefrigerantFlow"=>num_units, "CoilCoolingDXVariableRefrigerantFlow"=>num_units, "ZoneHVACBaseboardConvectiveElectric"=>num_units, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1, "EnergyManagementSystemSensor"=>num_units*2, "EnergyManagementSystemActuator"=>num_units*1, "EnergyManagementSystemProgram"=>num_units*1, "EnergyManagementSystemProgramCallingManager"=>num_units*1, "OutputVariable"=>2}
+    expected_num_new_objects = {"AirConditionerVariableRefrigerantFlow"=>num_units, "FanOnOff"=>num_units, "ZoneHVACTerminalUnitVariableRefrigerantFlow"=>num_units, "CoilHeatingDXVariableRefrigerantFlow"=>num_units, "CoilCoolingDXVariableRefrigerantFlow"=>num_units, "ZoneHVACBaseboardConvectiveElectric"=>num_units, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1, "EnergyManagementSystemSensor"=>num_units*2, "EnergyManagementSystemActuator"=>num_units*1, "EnergyManagementSystemProgram"=>num_units*1, "EnergyManagementSystemProgramCallingManager"=>num_units*1, "OutputVariable"=>num_units*2}
     expected_values = {"CoolingCOP"=>2.34, "HeatingCOP"=>2.84, "hvac_priority"=>1, "is_ducted"=>false}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*2)
   end
