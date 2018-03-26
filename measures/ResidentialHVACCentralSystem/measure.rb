@@ -114,6 +114,11 @@ class ProcessCentralSystem < OpenStudio::Measure::ModelMeasure
     system_type = runner.getStringArgumentValue("system_type", user_arguments)
 
     std = Standard.build("90.1-2013")
+    # std = Standard.build("DOE Ref Pre-1980")
+    # std = Standard.build("DOE Ref 1980-2004")
+    # std = Standard.build("90.1-2010")
+    # std = Standard.build("90.1-2007")
+    # std = Standard.build("90.1-2004_MidriseApartment")
 
     if system_type == "Inferred"
       climate_zone_and_building_type = std.model_get_building_climate_zone_and_building_type(model)
