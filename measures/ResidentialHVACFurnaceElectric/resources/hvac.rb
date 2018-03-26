@@ -749,7 +749,6 @@ class HVAC
       return true
     end
     
-    
     def self.remove_ashp(model, runner, thermal_zone)
       # Returns true if the object was removed
       return false if not self.has_ashp(model, runner, thermal_zone)
@@ -766,6 +765,7 @@ class HVAC
       # Returns true if the object was removed
       return false if not self.has_gshp(model, runner, thermal_zone)
       system, clg_coil, htg_coil, air_loop = self.get_unitary_system_air_loop(model, runner, thermal_zone)
+      self.remove_boiler_and_gshp_loops(model, runner, thermal_zone)
       runner.registerInfo("Removed '#{clg_coil.name}' and '#{htg_coil.name}' from '#{air_loop.name}'.")
       system.resetHeatingCoil
       system.resetCoolingCoil              
@@ -852,6 +852,7 @@ class HVAC
     def self.remove_boiler(model, runner, thermal_zone)
       # Returns true if the object was removed
       return false if not self.has_boiler(model, runner, thermal_zone)
+      self.remove_boiler_and_gshp_loops(model, runner, thermal_zone)
       baseboard = self.get_baseboard_water(model, runner, thermal_zone)
       runner.registerInfo("Removed '#{baseboard.name}' from #{thermal_zone.name}.")
       baseboard.remove
@@ -881,10 +882,38 @@ class HVAC
       return true
     end
     
-    def self.remove_boiler_and_gshp_loops(model, runner)
-      # TODO: Add a BuildingUnit argument
+    def self.remove_boiler_and_gshp_loops(model, runner, thermal_zone)
       model.getPlantLoops.each do |plant_loop|
         remove = false
+        
+        # Ensure we're operating on the right plant loop
+        is_specified_zone = false
+        plant_loop.demandComponents.each do |demand_component|
+          demand_coil = nil
+          if demand_component.to_CoilHeatingWaterBaseboard.is_initialized
+            demand_coil = demand_component.to_CoilHeatingWaterBaseboard.get
+          elsif demand_component.to_CoilHeatingWaterToAirHeatPumpEquationFit.is_initialized
+            demand_coil = demand_component.to_CoilHeatingWaterToAirHeatPumpEquationFit.get
+          elsif demand_component.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
+            demand_coil = demand_component.to_CoilCoolingWaterToAirHeatPumpEquationFit.get
+          end
+          next if demand_coil.nil?
+          if demand_coil.containingZoneHVACComponent.is_initialized
+            demand_hvac = demand_coil.containingZoneHVACComponent.get
+            next if not demand_hvac.thermalZone.is_initialized or demand_hvac.thermalZone.get != thermal_zone
+            is_specified_zone = true
+          elsif demand_coil.containingHVACComponent.is_initialized
+            demand_hvac = demand_coil.containingHVACComponent.get
+            next if not demand_hvac.airLoopHVAC.is_initialized
+            demand_air_loop = demand_hvac.airLoopHVAC.get
+            demand_air_loop.thermalZones.each do |thermalZone|
+              next if thermal_zone.handle.to_s != thermalZone.handle.to_s
+              is_specified_zone = true
+            end
+          end
+        end
+        next if not is_specified_zone
+        
         plant_loop.supplyComponents.each do |supply_component|
           if supply_component.to_BoilerHotWater.is_initialized or supply_component.to_GroundHeatExchangerVertical.is_initialized or supply_component.to_GroundHeatExchangerHorizontalTrench.is_initialized
             remove = true
@@ -970,9 +999,6 @@ class HVAC
         if counterpart_equip or removed_ac or removed_ashp or removed_gshp
           self.remove_air_loop(model, runner, thermal_zone)
         end
-        if removed_gshp
-          self.remove_boiler_and_gshp_loops(model, runner)
-        end
       when Constants.ObjectNameRoomAirConditioner
         removed_ashp = self.remove_ashp(model, runner, thermal_zone)
         removed_mshp = self.remove_mshp(model, runner, thermal_zone, unit)
@@ -985,9 +1011,6 @@ class HVAC
         if removed_ac or removed_ashp or removed_gshp
           self.remove_air_loop(model, runner, thermal_zone)
         end
-        if removed_gshp
-          self.remove_boiler_and_gshp_loops(model, runner)
-        end        
       when Constants.ObjectNameFurnace
         removed_ashp = self.remove_ashp(model, runner, thermal_zone)
         removed_mshp = self.remove_mshp(model, runner, thermal_zone, unit)
