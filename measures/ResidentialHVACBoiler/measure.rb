@@ -1,11 +1,9 @@
 # see the URL below for information on how to write OpenStudio measures
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
-require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/hvac"
-require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 # start the measure
 class ProcessBoiler < OpenStudio::Measure::ModelMeasure
@@ -35,11 +33,11 @@ class ProcessBoiler < OpenStudio::Measure::ModelMeasure
     fuel_display_names << Constants.FuelTypeOil
     fuel_display_names << Constants.FuelTypePropane
     fuel_display_names << Constants.FuelTypeElectric
-    boilerFuelType = OpenStudio::Measure::OSArgument::makeChoiceArgument("fuel_type", fuel_display_names, true)
-    boilerFuelType.setDisplayName("Fuel Type")
-    boilerFuelType.setDescription("Type of fuel used for heating.")
-    boilerFuelType.setDefaultValue(Constants.FuelTypeGas)
-    args << boilerFuelType    
+    fuel_type = OpenStudio::Measure::OSArgument::makeChoiceArgument("fuel_type", fuel_display_names, true)
+    fuel_type.setDisplayName("Fuel Type")
+    fuel_type.setDescription("Type of fuel used for heating.")
+    fuel_type.setDefaultValue(Constants.FuelTypeGas)
+    args << fuel_type    
     
     #make a string argument for boiler system type
     boiler_display_names = OpenStudio::StringVector.new
@@ -47,84 +45,84 @@ class ProcessBoiler < OpenStudio::Measure::ModelMeasure
     boiler_display_names << Constants.BoilerTypeCondensing
     boiler_display_names << Constants.BoilerTypeNaturalDraft
     #boiler_display_names << Constants.BoilerTypeSteam
-    boilerType = OpenStudio::Measure::OSArgument::makeChoiceArgument("system_type", boiler_display_names, true)
-    boilerType.setDisplayName("System Type")
-    boilerType.setDescription("The system type of the boiler.")
-    boilerType.setDefaultValue(Constants.BoilerTypeForcedDraft)
-    args << boilerType
+    system_type = OpenStudio::Measure::OSArgument::makeChoiceArgument("system_type", boiler_display_names, true)
+    system_type.setDisplayName("System Type")
+    system_type.setDescription("The system type of the boiler.")
+    system_type.setDefaultValue(Constants.BoilerTypeForcedDraft)
+    args << system_type
     
     #make an argument for entering boiler installed afue
-    boilerInstalledAFUE = OpenStudio::Measure::OSArgument::makeDoubleArgument("afue",true)
-    boilerInstalledAFUE.setDisplayName("Installed AFUE")
-    boilerInstalledAFUE.setUnits("Btu/Btu")
-    boilerInstalledAFUE.setDescription("The installed Annual Fuel Utilization Efficiency (AFUE) of the boiler, which can be used to account for performance derating or degradation relative to the rated value.")
-    boilerInstalledAFUE.setDefaultValue(0.80)
-    args << boilerInstalledAFUE
+    afue = OpenStudio::Measure::OSArgument::makeDoubleArgument("afue",true)
+    afue.setDisplayName("Installed AFUE")
+    afue.setUnits("Btu/Btu")
+    afue.setDescription("The installed Annual Fuel Utilization Efficiency (AFUE) of the boiler, which can be used to account for performance derating or degradation relative to the rated value.")
+    afue.setDefaultValue(0.80)
+    args << afue
     
     #make a bool argument for whether the boiler OAT enabled
-    boilerOATResetEnabled = OpenStudio::Measure::OSArgument::makeBoolArgument("oat_reset_enabled", true)
-    boilerOATResetEnabled.setDisplayName("Outside Air Reset Enabled")
-    boilerOATResetEnabled.setDescription("Outside Air Reset Enabled on Hot Water Supply Temperature.")
-    boilerOATResetEnabled.setDefaultValue(false)
-    args << boilerOATResetEnabled    
+    oat_reset_enabled = OpenStudio::Measure::OSArgument::makeBoolArgument("oat_reset_enabled", true)
+    oat_reset_enabled.setDisplayName("Outside Air Reset Enabled")
+    oat_reset_enabled.setDescription("Outside Air Reset Enabled on Hot Water Supply Temperature.")
+    oat_reset_enabled.setDefaultValue(false)
+    args << oat_reset_enabled    
     
     #make an argument for entering boiler OAT high
-    boilerOATHigh = OpenStudio::Measure::OSArgument::makeDoubleArgument("oat_high",false)
-    boilerOATHigh.setDisplayName("High Outside Air Temp")
-    boilerOATHigh.setUnits("degrees F")
-    boilerOATHigh.setDescription("High Outside Air Temperature.")
-    args << boilerOATHigh    
+    oat_high = OpenStudio::Measure::OSArgument::makeDoubleArgument("oat_high",false)
+    oat_high.setDisplayName("High Outside Air Temp")
+    oat_high.setUnits("degrees F")
+    oat_high.setDescription("High Outside Air Temperature.")
+    args << oat_high    
     
     #make an argument for entering boiler OAT low
-    boilerOATLow = OpenStudio::Measure::OSArgument::makeDoubleArgument("oat_low",false)
-    boilerOATLow.setDisplayName("Low Outside Air Temp")
-    boilerOATLow.setUnits("degrees F")
-    boilerOATLow.setDescription("Low Outside Air Temperature.")
-    args << boilerOATLow
+    oat_low = OpenStudio::Measure::OSArgument::makeDoubleArgument("oat_low",false)
+    oat_low.setDisplayName("Low Outside Air Temp")
+    oat_low.setUnits("degrees F")
+    oat_low.setDescription("Low Outside Air Temperature.")
+    args << oat_low
     
     #make an argument for entering boiler OAT high HWST
-    boilerOATHighHWST = OpenStudio::Measure::OSArgument::makeDoubleArgument("oat_hwst_high",false)
-    boilerOATHighHWST.setDisplayName("Hot Water Supply Temp High Outside Air")
-    boilerOATHighHWST.setUnits("degrees F")
-    boilerOATHighHWST.setDescription("Hot Water Supply Temperature corresponding to High Outside Air Temperature.")
-    args << boilerOATHighHWST
+    oat_hwst_high = OpenStudio::Measure::OSArgument::makeDoubleArgument("oat_hwst_high",false)
+    oat_hwst_high.setDisplayName("Hot Water Supply Temp High Outside Air")
+    oat_hwst_high.setUnits("degrees F")
+    oat_hwst_high.setDescription("Hot Water Supply Temperature corresponding to High Outside Air Temperature.")
+    args << oat_hwst_high
     
     #make an argument for entering boiler OAT low HWST
-    boilerOATLowHWST = OpenStudio::Measure::OSArgument::makeDoubleArgument("oat_hwst_low",false)
-    boilerOATLowHWST.setDisplayName("Hot Water Supply Temp Low Outside Air")
-    boilerOATLowHWST.setUnits("degrees F")
-    boilerOATLowHWST.setDescription("Hot Water Supply Temperature corresponding to Low Outside Air Temperature.")
-    args << boilerOATLowHWST        
+    oat_hwst_low = OpenStudio::Measure::OSArgument::makeDoubleArgument("oat_hwst_low",false)
+    oat_hwst_low.setDisplayName("Hot Water Supply Temp Low Outside Air")
+    oat_hwst_low.setUnits("degrees F")
+    oat_hwst_low.setDescription("Hot Water Supply Temperature corresponding to Low Outside Air Temperature.")
+    args << oat_hwst_low        
     
     #make an argument for entering boiler design temp
-    boilerDesignTemp = OpenStudio::Measure::OSArgument::makeDoubleArgument("design_temp",true)
-    boilerDesignTemp.setDisplayName("Design Temperature")
-    boilerDesignTemp.setUnits("degrees F")
-    boilerDesignTemp.setDescription("Temperature of the outlet water.")
-    boilerDesignTemp.setDefaultValue(180.0)
-    args << boilerDesignTemp     
+    design_temp = OpenStudio::Measure::OSArgument::makeDoubleArgument("design_temp",true)
+    design_temp.setDisplayName("Design Temperature")
+    design_temp.setUnits("degrees F")
+    design_temp.setDescription("Temperature of the outlet water.")
+    design_temp.setDefaultValue(180.0)
+    args << design_temp     
     
     #make an argument for whether the boiler is modulating or not
-    boilerModulation = OpenStudio::Measure::OSArgument::makeBoolArgument("modulation", true)
-    boilerModulation.setDisplayName("Modulating Boiler")
-    boilerModulation.setDescription("Whether the burner on the boiler can fully modulate or not. Typically modulating boilers are higher efficiency units (such as condensing boilers). Only used for non-electric boilers.")
-    boilerModulation.setDefaultValue(false)
-    args << boilerModulation
+    is_modulating = OpenStudio::Measure::OSArgument::makeBoolArgument("is_modulating", true)
+    is_modulating.setDisplayName("Modulating Boiler")
+    is_modulating.setDescription("Whether the burner on the boiler can fully modulate or not. Typically modulating boilers are higher efficiency units (such as condensing boilers). Only used for non-electric boilers.")
+    is_modulating.setDefaultValue(false)
+    args << is_modulating
 
     #make a string argument for furnace heating output capacity
-    boilerOutputCapacity = OpenStudio::Measure::OSArgument::makeStringArgument("capacity", true)
-    boilerOutputCapacity.setDisplayName("Heating Capacity")
-    boilerOutputCapacity.setDescription("The output heating capacity of the boiler. If using '#{Constants.SizingAuto}', the autosizing algorithm will use ACCA Manual S to set the capacity.")
-    boilerOutputCapacity.setUnits("kBtu/hr")
-    boilerOutputCapacity.setDefaultValue(Constants.SizingAuto)
-    args << boilerOutputCapacity  
+    capacity = OpenStudio::Measure::OSArgument::makeStringArgument("capacity", true)
+    capacity.setDisplayName("Heating Capacity")
+    capacity.setDescription("The output heating capacity of the boiler. If using '#{Constants.SizingAuto}', the autosizing algorithm will use ACCA Manual S to set the capacity.")
+    capacity.setUnits("kBtu/hr")
+    capacity.setDefaultValue(Constants.SizingAuto)
+    args << capacity  
     
     #make a string argument for distribution system efficiency
-    dist_system_eff = OpenStudio::Measure::OSArgument::makeStringArgument("dse", true)
-    dist_system_eff.setDisplayName("Distribution System Efficiency")
-    dist_system_eff.setDescription("Defines the energy losses associated with the delivery of energy from the equipment to the source of the load.")
-    dist_system_eff.setDefaultValue("NA")
-    args << dist_system_eff  
+    dse = OpenStudio::Measure::OSArgument::makeStringArgument("dse", true)
+    dse.setDisplayName("Distribution System Efficiency")
+    dse.setDescription("Defines the energy losses associated with the delivery of energy from the equipment to the source of the load.")
+    dse.setDefaultValue("NA")
+    args << dse  
     
     return args
   end
@@ -138,24 +136,24 @@ class ProcessBoiler < OpenStudio::Measure::ModelMeasure
       return false
     end
     
-    boilerFuelType = runner.getStringArgumentValue("fuel_type",user_arguments)
-    boilerType = runner.getStringArgumentValue("system_type",user_arguments)
-    boilerInstalledAFUE = runner.getDoubleArgumentValue("afue",user_arguments)
-    boilerOATResetEnabled = runner.getBoolArgumentValue("oat_reset_enabled",user_arguments)    
-    boilerOATHigh = runner.getOptionalDoubleArgumentValue("oat_high", user_arguments)
-    boilerOATHigh.is_initialized ? boilerOATHigh = boilerOATHigh.get : boilerOATHigh = nil    
-    boilerOATLow = runner.getOptionalDoubleArgumentValue("oat_low", user_arguments)
-    boilerOATLow.is_initialized ? boilerOATLow = boilerOATLow.get : boilerOATLow = nil     
-    boilerOATHighHWST = runner.getOptionalDoubleArgumentValue("oat_hwst_high", user_arguments)
-    boilerOATHighHWST.is_initialized ? boilerOATHighHWST = boilerOATHighHWST.get : boilerOATHighHWST = nil
-    boilerOATLowHWST = runner.getOptionalDoubleArgumentValue("oat_hwst_low", user_arguments)
-    boilerOATLowHWST.is_initialized ? boilerOATLowHWST = boilerOATLowHWST.get : boilerOATLowHWST = nil      
-    boilerOutputCapacity = runner.getStringArgumentValue("capacity",user_arguments)
-    if not boilerOutputCapacity == Constants.SizingAuto
-      boilerOutputCapacity = UnitConversions.convert(boilerOutputCapacity.to_f,"kBtu/hr","Btu/hr")
+    fuel_type = runner.getStringArgumentValue("fuel_type",user_arguments)
+    system_type = runner.getStringArgumentValue("system_type",user_arguments)
+    afue = runner.getDoubleArgumentValue("afue",user_arguments)
+    oat_reset_enabled = runner.getBoolArgumentValue("oat_reset_enabled",user_arguments)    
+    oat_high = runner.getOptionalDoubleArgumentValue("oat_high", user_arguments)
+    oat_high.is_initialized ? oat_high = oat_high.get : oat_high = nil    
+    oat_low = runner.getOptionalDoubleArgumentValue("oat_low", user_arguments)
+    oat_low.is_initialized ? oat_low = oat_low.get : oat_low = nil     
+    oat_hwst_high = runner.getOptionalDoubleArgumentValue("oat_hwst_high", user_arguments)
+    oat_hwst_high.is_initialized ? oat_hwst_high = oat_hwst_high.get : oat_hwst_high = nil
+    oat_hwst_low = runner.getOptionalDoubleArgumentValue("oat_hwst_low", user_arguments)
+    oat_hwst_low.is_initialized ? oat_hwst_low = oat_hwst_low.get : oat_hwst_low = nil      
+    capacity = runner.getStringArgumentValue("capacity",user_arguments)
+    if not capacity == Constants.SizingAuto
+      capacity = UnitConversions.convert(capacity.to_f,"kBtu/hr","Btu/hr")
     end
-    boilerDesignTemp = runner.getDoubleArgumentValue("design_temp",user_arguments)
-    boilerIsModulating = runner.getBoolArgumentValue("modulation",user_arguments)
+    design_temp = runner.getDoubleArgumentValue("design_temp",user_arguments)
+    is_modulating = runner.getBoolArgumentValue("is_modulating",user_arguments)
     dse = runner.getStringArgumentValue("dse",user_arguments)
     if dse.to_f > 0
       dse = dse.to_f
@@ -163,213 +161,23 @@ class ProcessBoiler < OpenStudio::Measure::ModelMeasure
       dse = 1.0
     end
     
-    boilerIsCondensing = false
-    if boilerType == Constants.BoilerTypeCondensing
-      boilerIsCondensing = true
-    end
-    
-    if boilerFuelType != Constants.FuelTypeElectric and boilerIsCondensing and not boilerIsModulating
-      runner.registerWarning("A non modulating, condensing fuel boiler has been selected. These types of units are very uncommon, double check inputs.")
-    end
-    
-    # _processHydronicSystem
-    
-    if boilerType == Constants.BoilerTypeSteam
-      runner.registerError("Cannot currently model steam boilers.")
-      return false
-    end
-    
-    # Installed equipment adjustments
-    boiler_hir = get_boiler_hir(boilerInstalledAFUE)
-    
-    if boilerType == Constants.BoilerTypeCondensing
-      # Efficiency curves are normalized using 80F return water temperature, at 0.254PLR
-      condensingBlr_TE_FT_coefficients = [1.058343061, 0.052650153, 0.0087272, 0.001742217, 0.00000333715, 0.000513723]
-    end
-        
-    if boilerOATResetEnabled
-      if boilerOATHigh.nil? or boilerOATLow.nil? or boilerOATLowHWST.nil? or boilerOATHighHWST.nil?
-        runner.registerWarning("Boiler outdoor air temperature (OAT) reset is enabled but no setpoints were specified so OAT reset is being disabled.")
-        boilerOATResetEnabled = false
-      end
-    end
-    
-    # Parasitic Electricity (Source: DOE. (2007). Technical Support Document: Energy Efficiency Program for Consumer Products: "Energy Conservation Standards for Residential Furnaces and Boilers". www.eere.energy.gov/buildings/appliance_standards/residential/furnaces_boilers.html)
-    boilerParasiticElecDict = {Constants.FuelTypeGas=>76.0, # W during operation
-                               Constants.FuelTypePropane=>76.0,
-                               Constants.FuelTypeOil=>220.0,
-                               Constants.FuelTypeElectric=>0.0}
-    boiler_aux = boilerParasiticElecDict[boilerFuelType]
-    
-    # _processCurvesBoiler
-    
-    boiler_eff_curve = HVAC.get_boiler_curve(model, boilerIsCondensing)
-    
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?
-        return false
+      return false
     end
     
     units.each do |unit|
       
-      obj_name = Constants.ObjectNameBoiler(boilerFuelType, unit.name.to_s)
-      
-      # _processSystemHydronic
-      
-      plant_loop = OpenStudio::Model::PlantLoop.new(model)
-      plant_loop.setName(obj_name + " hydronic heat loop")
-      plant_loop.setFluidType("Water")
-      plant_loop.setMaximumLoopTemperature(100)
-      plant_loop.setMinimumLoopTemperature(0)
-      plant_loop.setMinimumLoopFlowRate(0)
-      plant_loop.autocalculatePlantLoopVolume()
-      runner.registerInfo("Added '#{plant_loop.name}' to model.")
-      
-      loop_sizing = plant_loop.sizingPlant
-      loop_sizing.setLoopType("Heating")
-      loop_sizing.setDesignLoopExitTemperature(UnitConversions.convert(boilerDesignTemp - 32.0,"R","K"))
-      loop_sizing.setLoopDesignTemperatureDifference(UnitConversions.convert(20.0,"R","K"))
-      
-      pump = OpenStudio::Model::PumpVariableSpeed.new(model)
-      pump.setName(obj_name + " hydronic pump")
-      pump.setRatedPumpHead(179352)
-      pump.setMotorEfficiency(dse * 0.9)
-      pump.setFractionofMotorInefficienciestoFluidStream(0)
-      pump.setCoefficient1ofthePartLoadPerformanceCurve(0)
-      pump.setCoefficient2ofthePartLoadPerformanceCurve(1)
-      pump.setCoefficient3ofthePartLoadPerformanceCurve(0)
-      pump.setCoefficient4ofthePartLoadPerformanceCurve(0)
-      pump.setPumpControlType("Intermittent")
-          
-      boiler = OpenStudio::Model::BoilerHotWater.new(model)
-      boiler.setName(obj_name)
-      boiler.setFuelType(HelperMethods.eplus_fuel_map(boilerFuelType))
-      if boilerOutputCapacity != Constants.SizingAuto
-        boiler.setNominalCapacity(UnitConversions.convert(boilerOutputCapacity,"Btu/hr","W")) # Used by HVACSizing measure
-      end
-      if boilerType == Constants.BoilerTypeCondensing
-        # Convert Rated Efficiency at 80F and 1.0PLR where the performance curves are derived from to Design condition as input
-        boiler_RatedHWRT = UnitConversions.convert(80.0-32.0,"R","K")
-        plr_Rated = 1.0
-        plr_Design = 1.0
-        boiler_DesignHWRT = UnitConversions.convert(boilerDesignTemp - 20.0 - 32.0,"R","K")
-        condBlr_TE_Coeff = condensingBlr_TE_FT_coefficients   # The coefficients are normalized at 80F HWRT
-        boilerEff_Norm = 1.0 / boiler_hir / (condBlr_TE_Coeff[0] - condBlr_TE_Coeff[1] * plr_Rated - condBlr_TE_Coeff[2] * plr_Rated**2 - condBlr_TE_Coeff[3] * boiler_RatedHWRT + condBlr_TE_Coeff[4] * boiler_RatedHWRT**2 + condBlr_TE_Coeff[5] * boiler_RatedHWRT * plr_Rated)
-        boilerEff_Design = boilerEff_Norm * (condBlr_TE_Coeff[0] - condBlr_TE_Coeff[1] * plr_Design - condBlr_TE_Coeff[2] * plr_Design**2 - condBlr_TE_Coeff[3] * boiler_DesignHWRT + condBlr_TE_Coeff[4] * boiler_DesignHWRT**2 + condBlr_TE_Coeff[5] * boiler_DesignHWRT * plr_Design)
-        boiler.setNominalThermalEfficiency(dse * boilerEff_Design)
-        boiler.setEfficiencyCurveTemperatureEvaluationVariable("EnteringBoiler")
-        boiler.setNormalizedBoilerEfficiencyCurve(boiler_eff_curve)
-        boiler.setDesignWaterOutletTemperature(UnitConversions.convert(boilerDesignTemp - 32.0,"R","K"))
-        if hasBoilerModulating
-          boiler.setMinimumPartLoadRatio(0.0) 
-          boiler.setMaximumPartLoadRatio(1.0)
-          boiler.setBoilerFlowMode("LeavingSetpointModulated")
-        else
-          boiler.setMinimumPartLoadRatio(0.99) 
-          boiler.setMaximumPartLoadRatio(1.0)
-          boiler.setBoilerFlowMode("ConstantFlow")
-        end
-      else
-        boiler.setNominalThermalEfficiency(dse / boiler_hir)
-        boiler.setEfficiencyCurveTemperatureEvaluationVariable("LeavingBoiler")
-        boiler.setNormalizedBoilerEfficiencyCurve(boiler_eff_curve)
-        boiler.setDesignWaterOutletTemperature(UnitConversions.convert(boilerDesignTemp - 32.0,"R","K"))
-        if hasBoilerModulating
-          boiler.setMinimumPartLoadRatio(0.0) 
-          boiler.setMaximumPartLoadRatio(1.0)
-          boiler.setBoilerFlowMode("LeavingSetpointModulated")
-        else
-          boiler.setMinimumPartLoadRatio(0.99) 
-          boiler.setMaximumPartLoadRatio(1.0)
-          boiler.setBoilerFlowMode("ConstantFlow")
-        end
-      end
-      boiler.setOptimumPartLoadRatio(1.0)
-      boiler.setWaterOutletUpperTemperatureLimit(99.9)
-      boiler.setParasiticElectricLoad(boiler_aux)
-         
-      if boilerType == Constants.BoilerTypeCondensing and boilerOATResetEnabled
-        setpoint_manager_oar = OpenStudio::Model::SetpointManagerOutdoorAirReset.new(model)
-        setpoint_manager_oar.setName(obj_name + " outdoor reset")
-        setpoint_manager_oar.setControlVariable("Temperature")
-        setpoint_manager_oar.setSetpointatOutdoorLowTemperature(UnitConversions.convert(boilerOATLowHWST,"F","C"))
-        setpoint_manager_oar.setOutdoorLowTemperature(UnitConversions.convert(boilerOATLow,"F","C"))
-        setpoint_manager_oar.setSetpointatOutdoorHighTemperature(UnitConversions.convert(boilerOATHighHWST,"F","C"))
-        setpoint_manager_oar.setOutdoorHighTemperature(UnitConversions.convert(boilerOATHigh,"F","C"))
-        setpoint_manager_oar.addToNode(plant_loop.supplyOutletNode)      
-      end
-      
-      hydronic_heat_supply_setpoint = OpenStudio::Model::ScheduleConstant.new(model)
-      hydronic_heat_supply_setpoint.setName(obj_name + " hydronic heat supply setpoint")
-      hydronic_heat_supply_setpoint.setValue(UnitConversions.convert(boilerDesignTemp,"F","C"))    
-      
-      setpoint_manager_scheduled = OpenStudio::Model::SetpointManagerScheduled.new(model, hydronic_heat_supply_setpoint)
-      setpoint_manager_scheduled.setName(obj_name + " hydronic heat loop setpoint manager")
-      setpoint_manager_scheduled.setControlVariable("Temperature")
-      
-      pipe_supply_bypass = OpenStudio::Model::PipeAdiabatic.new(model)
-      pipe_supply_outlet = OpenStudio::Model::PipeAdiabatic.new(model)
-      pipe_demand_bypass = OpenStudio::Model::PipeAdiabatic.new(model)
-      pipe_demand_inlet = OpenStudio::Model::PipeAdiabatic.new(model)
-      pipe_demand_outlet = OpenStudio::Model::PipeAdiabatic.new(model)    
-      
-      plant_loop.addSupplyBranchForComponent(boiler)
-      plant_loop.addSupplyBranchForComponent(pipe_supply_bypass)
-      pump.addToNode(plant_loop.supplyInletNode)
-      pipe_supply_outlet.addToNode(plant_loop.supplyOutletNode)
-      setpoint_manager_scheduled.addToNode(plant_loop.supplyOutletNode)
-      plant_loop.addDemandBranchForComponent(pipe_demand_bypass)
-      pipe_demand_inlet.addToNode(plant_loop.demandInletNode)
-      pipe_demand_outlet.addToNode(plant_loop.demandOutletNode)
-    
-      thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
-
-      control_slave_zones_hash = HVAC.get_control_and_slave_zones(thermal_zones)
-      control_slave_zones_hash.each do |control_zone, slave_zones|
-
-        ([control_zone] + slave_zones).each do |zone|
-      
-          # Remove existing equipment
-          HVAC.remove_existing_hvac_equipment(model, runner, Constants.ObjectNameBoiler, zone, false, unit)
-        
-          baseboard_coil = OpenStudio::Model::CoilHeatingWaterBaseboard.new(model)
-          baseboard_coil.setName(obj_name + " #{zone.name} heating coil")
-          if boilerOutputCapacity != Constants.SizingAuto
-            baseboard_coil.setHeatingDesignCapacity(UnitConversions.convert(boilerOutputCapacity,"Btu/hr","W")) # Used by HVACSizing measure
-          end
-          baseboard_coil.setConvergenceTolerance(0.001)
-          
-          baseboard_heater = OpenStudio::Model::ZoneHVACBaseboardConvectiveWater.new(model, model.alwaysOnDiscreteSchedule, baseboard_coil)
-          baseboard_heater.setName(obj_name + " #{zone.name} convective water")
-          baseboard_heater.addToThermalZone(zone)
-          runner.registerInfo("Added '#{baseboard_heater.name}' to '#{zone.name}' of #{unit.name}")
-          
-          HVAC.prioritize_zone_hvac(model, runner, zone)
-          
-          plant_loop.addDemandBranchForComponent(baseboard_coil)
-          
-        end
-        
-      end
+      success = HVAC.apply_boiler(model, unit, runner, fuel_type, system_type, afue,
+                                  oat_reset_enabled, oat_high, oat_low, oat_hwst_high, oat_hwst_low,
+                                  capacity, design_temp, is_modulating, dse)
+      return false if not success
       
     end
     
     return true
 
-  end
-  
-  def get_boiler_hir(boilerInstalledAFUE)
-    # Based on DOE2 Volume 5 Compliance Analysis manual. 
-    # This is not used until we have a better way of disaggregating AFUE
-    # if BoilerInstalledAFUE < 0.8 and BoilerInstalledAFUE >= 0.75:
-    #     hir = 1 / (0.1 * BoilerInstalledAFUE + 0.725)
-    # elif BoilerInstalledAFUE >= 0.8:
-    #     hir = 1 / (0.875 * BoilerInstalledAFUE + 0.105)
-    # else:
-    #     hir = 1 / BoilerInstalledAFUE
-    hir = 1.0 / boilerInstalledAFUE
-    return hir
   end
   
 end

@@ -12,7 +12,7 @@ class ProcessBoilerTest < MiniTest::Test
     args_hash["system_type"] = Constants.BoilerTypeCondensing
     args_hash["oat_reset_enabled"] = "true"
     args_hash["capacity"] = "20"
-    args_hash["modulation"] = true
+    args_hash["is_modulating"] = true
     args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
@@ -28,7 +28,7 @@ class ProcessBoilerTest < MiniTest::Test
     args_hash["oat_hwst_low"] = 180.0
     args_hash["oat_high"] = 68.0
     args_hash["oat_hwst_high"] = 95.0
-    args_hash["modulation"] =  true
+    args_hash["is_modulating"] =  true
     expected_num_del_objects = {}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
     expected_values = {"Efficiency"=>0.76, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
@@ -46,7 +46,7 @@ class ProcessBoilerTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
     expected_values = {"Efficiency"=>0.96*0.8, "NominalCapacity"=>5861.42, "FuelType"=>Constants.FuelTypeElectric, "hvac_priority"=>1}
-    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2, 1)
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3, 1)
   end
       
   def test_condensing_boiler_oat_reset_enabled_elec
@@ -62,7 +62,7 @@ class ProcessBoilerTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
     expected_values = {"Efficiency"=>0.96, "FuelType"=>Constants.FuelTypeElectric, "hvac_priority"=>1}
-    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_retrofit_replace_furnace
@@ -126,17 +126,17 @@ class ProcessBoilerTest < MiniTest::Test
     args_hash["system_type"] = Constants.BoilerTypeCondensing
     args_hash["oat_reset_enabled"] = "true"
     args_hash["capacity"] = "20"
-    args_hash["modulation"] = true
+    args_hash["is_modulating"] = true
     args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
     expected_values = {"Efficiency"=>0.76*0.8, "NominalCapacity"=>5861.42, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
-    model = _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2, 1)
+    model = _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3, 1)
     args_hash = {}
     expected_num_del_objects = {"BoilerHotWater"=>1, "PumpVariableSpeed"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "SetpointManagerScheduled"=>1, "CoilHeatingWaterBaseboard"=>2, "PlantLoop"=>1}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
     expected_values = {"Efficiency"=>0.8, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end
   
   def test_retrofit_replace_unit_heater
