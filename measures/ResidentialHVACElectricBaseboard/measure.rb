@@ -66,9 +66,6 @@ class ProcessElectricBaseboard < OpenStudio::Measure::ModelMeasure
       capacity = UnitConversions.convert(capacity.to_f,"kBtu/hr","Btu/hr")
     end
    
-    # Remove boiler hot water loop if it exists
-    HVAC.remove_boiler_and_gshp_loops(model, runner)
-   
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?

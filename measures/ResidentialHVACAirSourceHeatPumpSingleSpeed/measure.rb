@@ -262,9 +262,6 @@ class ProcessSingleSpeedAirSourceHeatPump < OpenStudio::Measure::ModelMeasure
       dse = 1.0
     end
     
-    # Remove boiler hot water loop if it exists
-    HVAC.remove_boiler_and_gshp_loops(model, runner)    
-    
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?
