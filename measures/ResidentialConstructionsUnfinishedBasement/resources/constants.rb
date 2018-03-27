@@ -598,7 +598,7 @@ class Constants
     if unit_name != self.ObjectNameBuildingUnit
       s_unit = "|#{unit_name}"
     end
-    return 'residential rh setpoint#{s_unit}'
+    return "residential rh setpoint#{s_unit}"
   end
   def self.ObjectNameRoomAirConditioner(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""

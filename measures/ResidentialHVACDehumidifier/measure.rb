@@ -76,10 +76,6 @@ class ProcessDehumidifier < OpenStudio::Measure::ModelMeasure
     air_flow_rate = runner.getStringArgumentValue("air_flow_rate",user_arguments)
     humidity_setpoint = runner.getDoubleArgumentValue("humidity_setpoint",user_arguments)
     
-    model.getThermalZones.each do |zone|
-      HVAC.remove_dehumidifier(runner, model, zone)
-    end
-    
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?
@@ -87,6 +83,10 @@ class ProcessDehumidifier < OpenStudio::Measure::ModelMeasure
     end
     
     units.each do |unit|
+    
+      Geometry.get_thermal_zones_from_spaces(unit.spaces).each do |zone|
+        HVAC.remove_dehumidifier(runner, model, zone, unit)
+      end
     
       success = HVAC.apply_dehumidifier(model, unit, runner, energy_factor, 
                                         water_removal_rate, air_flow_rate, humidity_setpoint)
