@@ -1475,9 +1475,6 @@ class HVAC
       control_slave_zones_hash = get_control_and_slave_zones(thermal_zones)
       control_slave_zones_hash.each do |control_zone, slave_zones|
       
-        # Remove existing equipment
-        remove_hvac_equipment(model, runner, Constants.ObjectNameGroundSourceHeatPumpVerticalBore, control_zone, false, unit)
-
         gshp_HEAT_CAP_fT_coeff = convert_curve_gshp(hEAT_CAP_FT_SEC, false)
         gshp_HEAT_POWER_fT_coeff = convert_curve_gshp(hEAT_POWER_FT_SPEC, false)
         
