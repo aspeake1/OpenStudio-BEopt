@@ -287,6 +287,14 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
     
     units.each do |unit|
     
+      thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
+      HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
+        ([control_zone] + slave_zones).each do |zone|
+          HVAC.remove_hvac_equipment(model, runner, zone, unit,
+                                     Constants.ObjectNameGroundSourceHeatPumpVerticalBore)
+        end
+      end
+      
       success = HVAC.apply_gshp(model, unit, runner, weather, cop, eer, shr,
                                 ground_conductivity, grout_conductivity,
                                 bore_config, bore_holes, bore_depth,

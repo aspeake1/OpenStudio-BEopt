@@ -165,7 +165,7 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
       dse = dse.to_f
     else
       dse = 1.0
-    end    
+    end
     
     # Get building units
     units = Geometry.get_building_units(model, runner)
@@ -175,10 +175,20 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
     
     units.each do |unit|
     
+      existing_objects = {}
+      thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
+      HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
+        ([control_zone] + slave_zones).each do |zone|
+          existing_objects[zone] = HVAC.remove_hvac_equipment(model, runner, zone, unit,
+                                                              Constants.ObjectNameCentralAirConditioner)
+        end
+      end
+    
       success = HVAC.apply_central_ac_1speed(model, unit, runner, seer, eers, shrs,
                                              fan_power_rated, fan_power_installed,
                                              crankcase_capacity, crankcase_temp,
-                                             eer_capacity_derates, capacity, dse)
+                                             eer_capacity_derates, capacity, dse,
+                                             existing_objects)
       return false if not success
       
     end # unit

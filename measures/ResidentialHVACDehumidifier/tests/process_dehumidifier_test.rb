@@ -63,7 +63,7 @@ class ProcessDehumidifierTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleConstant"=>2, "ZoneHVACDehumidifierDX"=>num_units, "ZoneControlHumidistat"=>num_units}
+    expected_num_new_objects = {"ScheduleConstant"=>5, "ZoneHVACDehumidifierDX"=>num_units, "ZoneControlHumidistat"=>num_units}
     expected_values = {"water_removal_rate"=>autosize, "energy_factor"=>autosize, "air_flow_rate"=>autosize, "hvac_priority"=>1}
     _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
@@ -72,7 +72,7 @@ class ProcessDehumidifierTest < MiniTest::Test
     num_units = 8
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleConstant"=>2, "ZoneHVACDehumidifierDX"=>num_units, "ZoneControlHumidistat"=>num_units}
+    expected_num_new_objects = {"ScheduleConstant"=>9, "ZoneHVACDehumidifierDX"=>num_units, "ZoneControlHumidistat"=>num_units}
     expected_values = {"water_removal_rate"=>autosize, "energy_factor"=>autosize, "air_flow_rate"=>autosize, "hvac_priority"=>1}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end

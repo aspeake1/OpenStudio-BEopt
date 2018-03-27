@@ -593,8 +593,12 @@ class Constants
     end
     return "residential refrigerator#{s_unit}"
   end
-  def self.ObjectNameRelativeHumiditySetpoint
-    return 'residential relative humidity setpoint'
+  def self.ObjectNameRelativeHumiditySetpoint(unit_name=self.ObjectNameBuildingUnit)
+    s_unit = ""
+    if unit_name != self.ObjectNameBuildingUnit
+      s_unit = "|#{unit_name}"
+    end
+    return 'residential rh setpoint#{s_unit}'
   end
   def self.ObjectNameRoomAirConditioner(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""

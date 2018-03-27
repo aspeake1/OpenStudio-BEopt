@@ -169,6 +169,14 @@ class ProcessBoiler < OpenStudio::Measure::ModelMeasure
     
     units.each do |unit|
       
+      thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
+      HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
+        ([control_zone] + slave_zones).each do |zone|
+          HVAC.remove_hvac_equipment(model, runner, zone, unit,
+                                     Constants.ObjectNameBoiler)
+        end
+      end
+    
       success = HVAC.apply_boiler(model, unit, runner, fuel_type, system_type, afue,
                                   oat_reset_enabled, oat_high, oat_low, oat_hwst_high, oat_hwst_low,
                                   capacity, design_temp, is_modulating, dse)

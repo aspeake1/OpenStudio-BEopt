@@ -109,8 +109,18 @@ class ProcessFurnace < OpenStudio::Measure::ModelMeasure
     
     units.each do |unit|
     
+      existing_objects = {}
+      thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
+      HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
+        ([control_zone] + slave_zones).each do |zone|
+          existing_objects[zone] = HVAC.remove_hvac_equipment(model, runner, zone, unit,
+                                                              Constants.ObjectNameFurnace)
+        end
+      end
+    
       success = HVAC.apply_furnace(model, unit, runner, fuel_type, afue,
-                                   capacity, fan_power_installed, dse)
+                                   capacity, fan_power_installed, dse,
+                                   existing_objects)
       return false if not success
       
     end
