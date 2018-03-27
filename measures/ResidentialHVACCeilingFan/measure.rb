@@ -239,7 +239,7 @@ class ProcessCeilingFan < OpenStudio::Measure::ModelMeasure
         # User has chosen to specify the number of fans by indicating
         # % coverage, where it is assumed that 100% coverage requires 1 fan
         # per 300 square feet.
-        ceiling_fan_num = get_ceiling_fan_number(unit.above_grade_finished_floor_area, coverage)
+        ceiling_fan_num = (unit.above_grade_finished_floor_area * coverage / 300.0).round(1)
       elsif not specified_num.nil?
         ceiling_fan_num = specified_num
       else
@@ -472,10 +472,6 @@ class ProcessCeilingFan < OpenStudio::Measure::ModelMeasure
     return true
 
   end
-  
-  def get_ceiling_fan_number(above_grade_finished_floor_area, coverage)
-    return (above_grade_finished_floor_area * coverage / 300.0).round(1)
-  end 
   
 end
 

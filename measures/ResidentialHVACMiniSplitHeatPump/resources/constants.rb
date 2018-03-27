@@ -663,12 +663,6 @@ class Constants
     end
     return "residential well pump#{s_unit}"
   end
-  def self.ObjectNameWindowShading
-    return 'residential window shading'
-  end
-  def self.ObjectNameSkylightShading
-    return 'residential skylight shading'
-  end
   def self.OptionTypeLightingFractions
     return 'Lamp Fractions'
   end

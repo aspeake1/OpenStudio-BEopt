@@ -9,8 +9,8 @@ class ProcessConstructionsWindowsSkylightsTest < MiniTest::Test
 
   def test_no_solar_gain_reduction
     args_hash = {}
-    args_hash["heat_shade_mult"] = 1
-    args_hash["cool_shade_mult"] = 1
+    args_hash["window_heat_shade_mult"] = 1
+    args_hash["window_cool_shade_mult"] = 1
     expected_num_del_objects = {}
     expected_num_new_objects = {"SimpleGlazing"=>1, "Construction"=>1}
     expected_values = {"shgc"=>0.3, "ufactor"=>0.37, "SubSurfacesWithConstructions"=>36}
@@ -24,11 +24,11 @@ class ProcessConstructionsWindowsSkylightsTest < MiniTest::Test
     expected_values = {"shgc"=>0.3*0.7, "ufactor"=>0.37, "SubSurfacesWithConstructions"=>36}
     model = _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["ufactor"] = 0.20
-    args_hash["shgc"] = 0.5
-    args_hash["heat_shade_mult"] = 1
-    args_hash["cool_shade_mult"] = 1
-    expected_num_del_objects = {"SimpleGlazing"=>1, "Construction"=>1, "ShadingControl"=>1, "WindowMaterialShade"=>1, "ScheduleRuleset"=>1}
+    args_hash["window_ufactor"] = 0.20
+    args_hash["window_shgc"] = 0.5
+    args_hash["window_heat_shade_mult"] = 1
+    args_hash["window_cool_shade_mult"] = 1
+    expected_num_del_objects = expected_num_new_objects
     expected_num_new_objects = {"SimpleGlazing"=>1, "Construction"=>1}
     expected_values = {"shgc"=>0.5, "ufactor"=>0.20, "SubSurfacesWithConstructions"=>36}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
@@ -36,7 +36,7 @@ class ProcessConstructionsWindowsSkylightsTest < MiniTest::Test
   
   def test_argument_error_invalid_ufactor
     args_hash = {}
-    args_hash["ufactor"] = 0
+    args_hash["window_ufactor"] = 0
     result = _test_error("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
@@ -45,7 +45,7 @@ class ProcessConstructionsWindowsSkylightsTest < MiniTest::Test
   
   def test_argument_error_invalid_shgc
     args_hash = {}
-    args_hash["shgc"] = 0
+    args_hash["window_shgc"] = 0
     result = _test_error("SFD_2000sqft_2story_SL_UA_Denver_Windows.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)

@@ -10,7 +10,6 @@
 require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/weather"
-require "#{File.dirname(__FILE__)}/resources/schedules"
 require "#{File.dirname(__FILE__)}/resources/hvac"
 require "#{File.dirname(__FILE__)}/resources/constructions"
 
@@ -36,62 +35,62 @@ class ProcessConstructionsWindowsSkylights < OpenStudio::Measure::ModelMeasure
     args = OpenStudio::Measure::OSArgumentVector.new
 
     #make an argument for entering front window u-factor
-    ufactor = OpenStudio::Measure::OSArgument::makeDoubleArgument("ufactor",true)
-    ufactor.setDisplayName("Windows: U-Factor")
-    ufactor.setUnits("Btu/hr-ft^2-R")
-    ufactor.setDescription("The heat transfer coefficient of the windows.")
-    ufactor.setDefaultValue(0.37)
-    args << ufactor
+    window_ufactor = OpenStudio::Measure::OSArgument::makeDoubleArgument("window_ufactor",true)
+    window_ufactor.setDisplayName("Windows: U-Factor")
+    window_ufactor.setUnits("Btu/hr-ft^2-R")
+    window_ufactor.setDescription("The heat transfer coefficient of the windows.")
+    window_ufactor.setDefaultValue(0.37)
+    args << window_ufactor
 
     #make an argument for entering front window shgc
-    shgc = OpenStudio::Measure::OSArgument::makeDoubleArgument("shgc",true)
-    shgc.setDisplayName("Windows: SHGC")
-    shgc.setDescription("The ratio of solar heat gain through a glazing system compared to that of an unobstructed opening, for windows.")
-    shgc.setDefaultValue(0.3)
-    args << shgc
+    window_shgc = OpenStudio::Measure::OSArgument::makeDoubleArgument("window_shgc",true)
+    window_shgc.setDisplayName("Windows: SHGC")
+    window_shgc.setDescription("The ratio of solar heat gain through a glazing system compared to that of an unobstructed opening, for windows.")
+    window_shgc.setDefaultValue(0.3)
+    args << window_shgc
 
     #make an argument for entering heating shade multiplier
-    heat_shade_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("heat_shade_mult",true)
-    heat_shade_mult.setDisplayName("Windows: Heating Shade Multiplier")
-    heat_shade_mult.setDescription("Interior shading multiplier for heating season. 1.0 indicates no reduction in solar gain, 0.85 indicates 15% reduction, etc.")
-    heat_shade_mult.setDefaultValue(0.7)
-    args << heat_shade_mult
+    window_heat_shade_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("window_heat_shade_mult",true)
+    window_heat_shade_mult.setDisplayName("Windows: Heating Shade Multiplier")
+    window_heat_shade_mult.setDescription("Interior shading multiplier for heating season. 1.0 indicates no reduction in solar gain, 0.85 indicates 15% reduction, etc.")
+    window_heat_shade_mult.setDefaultValue(0.7)
+    args << window_heat_shade_mult
 
     #make an argument for entering cooling shade multiplier
-    cool_shade_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("cool_shade_mult",true)
-    cool_shade_mult.setDisplayName("Windows: Cooling Shade Multiplier")
-    cool_shade_mult.setDescription("Interior shading multiplier for cooling season. 1.0 indicates no reduction in solar gain, 0.85 indicates 15% reduction, etc.")
-    cool_shade_mult.setDefaultValue(0.7)
-    args << cool_shade_mult
+    window_cool_shade_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("window_cool_shade_mult",true)
+    window_cool_shade_mult.setDisplayName("Windows: Cooling Shade Multiplier")
+    window_cool_shade_mult.setDescription("Interior shading multiplier for cooling season. 1.0 indicates no reduction in solar gain, 0.85 indicates 15% reduction, etc.")
+    window_cool_shade_mult.setDefaultValue(0.7)
+    args << window_cool_shade_mult
 
     #make an argument for entering front window u-factor
-    ufactor = OpenStudio::Measure::OSArgument::makeDoubleArgument("skylight_ufactor",true)
-    ufactor.setDisplayName("Skylights: U-Factor")
-    ufactor.setUnits("Btu/hr-ft^2-R")
-    ufactor.setDescription("The heat transfer coefficient of the skylights.")
-    ufactor.setDefaultValue(0.37)
-    args << ufactor
+    skylight_ufactor = OpenStudio::Measure::OSArgument::makeDoubleArgument("skylight_ufactor",true)
+    skylight_ufactor.setDisplayName("Skylights: U-Factor")
+    skylight_ufactor.setUnits("Btu/hr-ft^2-R")
+    skylight_ufactor.setDescription("The heat transfer coefficient of the skylights.")
+    skylight_ufactor.setDefaultValue(0.37)
+    args << skylight_ufactor
 
     #make an argument for entering front window shgc
-    shgc = OpenStudio::Measure::OSArgument::makeDoubleArgument("skylight_shgc",true)
-    shgc.setDisplayName("Skylights: SHGC")
-    shgc.setDescription("The ratio of solar heat gain through a glazing system compared to that of an unobstructed opening, for skylights.")
-    shgc.setDefaultValue(0.3)
-    args << shgc
+    skylight_shgc = OpenStudio::Measure::OSArgument::makeDoubleArgument("skylight_shgc",true)
+    skylight_shgc.setDisplayName("Skylights: SHGC")
+    skylight_shgc.setDescription("The ratio of solar heat gain through a glazing system compared to that of an unobstructed opening, for skylights.")
+    skylight_shgc.setDefaultValue(0.3)
+    args << skylight_shgc
 
     #make an argument for entering heating shade multiplier
-    heat_shade_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("skylight_heat_shade_mult",true)
-    heat_shade_mult.setDisplayName("Skylights: Heating Shade Multiplier")
-    heat_shade_mult.setDescription("Interior shading multiplier for heating season. 1.0 indicates no reduction in solar gain, 0.85 indicates 15% reduction, etc.")
-    heat_shade_mult.setDefaultValue(0.7)
-    args << heat_shade_mult
+    skylight_heat_shade_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("skylight_heat_shade_mult",true)
+    skylight_heat_shade_mult.setDisplayName("Skylights: Heating Shade Multiplier")
+    skylight_heat_shade_mult.setDescription("Interior shading multiplier for heating season. 1.0 indicates no reduction in solar gain, 0.85 indicates 15% reduction, etc.")
+    skylight_heat_shade_mult.setDefaultValue(0.7)
+    args << skylight_heat_shade_mult
 
     #make an argument for entering cooling shade multiplier
-    cool_shade_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("skylight_cool_shade_mult",true)
-    cool_shade_mult.setDisplayName("Skylights: Cooling Shade Multiplier")
-    cool_shade_mult.setDescription("Interior shading multiplier for cooling season. 1.0 indicates no reduction in solar gain, 0.85 indicates 15% reduction, etc.")
-    cool_shade_mult.setDefaultValue(0.7)
-    args << cool_shade_mult
+    skylight_cool_shade_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("skylight_cool_shade_mult",true)
+    skylight_cool_shade_mult.setDisplayName("Skylights: Cooling Shade Multiplier")
+    skylight_cool_shade_mult.setDescription("Interior shading multiplier for cooling season. 1.0 indicates no reduction in solar gain, 0.85 indicates 15% reduction, etc.")
+    skylight_cool_shade_mult.setDefaultValue(0.7)
+    args << skylight_cool_shade_mult
     
     return args
   end #end the arguments method
@@ -105,10 +104,10 @@ class ProcessConstructionsWindowsSkylights < OpenStudio::Measure::ModelMeasure
       return false
     end
     
-    ufactor = runner.getDoubleArgumentValue("ufactor",user_arguments)
-    shgc = runner.getDoubleArgumentValue("shgc",user_arguments)
-    heat_shade_mult = runner.getDoubleArgumentValue("heat_shade_mult",user_arguments)
-    cool_shade_mult = runner.getDoubleArgumentValue("cool_shade_mult",user_arguments)
+    window_ufactor = runner.getDoubleArgumentValue("window_ufactor",user_arguments)
+    window_shgc = runner.getDoubleArgumentValue("window_shgc",user_arguments)
+    window_heat_shade_mult = runner.getDoubleArgumentValue("window_heat_shade_mult",user_arguments)
+    window_cool_shade_mult = runner.getDoubleArgumentValue("window_cool_shade_mult",user_arguments)
     skylight_ufactor = runner.getDoubleArgumentValue("skylight_ufactor",user_arguments)
     skylight_shgc = runner.getDoubleArgumentValue("skylight_shgc",user_arguments)
     skylight_heat_shade_mult = runner.getDoubleArgumentValue("skylight_heat_shade_mult",user_arguments)
@@ -124,18 +123,29 @@ class ProcessConstructionsWindowsSkylights < OpenStudio::Measure::ModelMeasure
         return false
     end
     
-    subsurfaces = {"WindowConstruction"=>{"subsurfaces"=>[], "ufactor"=>ufactor, "shgc"=>shgc, "heat_shade_mult"=>heat_shade_mult, "cool_shade_mult"=>cool_shade_mult, "int_shading_sch_name"=>"#{Constants.ObjectNameWindowShading} schedule"},
-                   "SkylightConstruction"=>{"subsurfaces"=>[], "ufactor"=>skylight_ufactor, "shgc"=>skylight_shgc, "heat_shade_mult"=>skylight_heat_shade_mult, "cool_shade_mult"=>skylight_cool_shade_mult, "int_shading_sch_name"=>"#{Constants.ObjectNameSkylightShading} schedule"}}
+    window_subsurfaces = []
+    skylight_subsurfaces = []
     model.getSubSurfaces.each do |subsurface|
       if subsurface.subSurfaceType.downcase.include? "window"
-        subsurfaces["WindowConstruction"]["subsurfaces"] << subsurface
+        window_subsurfaces << subsurface
       elsif subsurface.subSurfaceType.downcase.include? "skylight"
-        subsurfaces["SkylightConstruction"]["subsurfaces"] << subsurface
+        skylight_subsurfaces << subsurface
       end
     end   
     
     # Apply constructions
-    if not SubsurfaceConstructions.apply_window_skylight(runner, model, subsurfaces, weather, cooling_season)
+    if not SubsurfaceConstructions.apply_window(runner, model, window_subsurfaces, 
+                                                "WindowConstruction", 
+                                                weather, cooling_season, window_ufactor, window_shgc, 
+                                                window_heat_shade_mult, window_cool_shade_mult)
+        return false
+    end
+
+    # Apply constructions
+    if not SubsurfaceConstructions.apply_skylight(runner, model, skylight_subsurfaces, 
+                                                  "SkylightConstruction", 
+                                                  weather, cooling_season, skylight_ufactor, skylight_shgc, 
+                                                  skylight_heat_shade_mult, skylight_cool_shade_mult)
         return false
     end
 
