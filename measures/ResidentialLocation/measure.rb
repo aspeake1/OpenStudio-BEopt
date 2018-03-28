@@ -73,7 +73,7 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     end
     weather_file_path = File.join(weather_directory, weather_file_name)
 
-    success = Location.apply(model, runner, weather_file_path, dst_start_date, dst_end_date)
+    success, weather = Location.apply(model, runner, weather_file_path, dst_start_date, dst_end_date)
     return false if not success
 
     # report final condition
