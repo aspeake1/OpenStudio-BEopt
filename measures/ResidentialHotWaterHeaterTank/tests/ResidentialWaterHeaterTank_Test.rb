@@ -230,21 +230,21 @@ class ResidentialHotWaterHeaterTankTest < MiniTest::Test
     args_hash = {}
     args_hash["tank_volume"] = "test"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Storage tank volume must be greater than 0 or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Storage tank volume must be greater than 0.")
   end
   
   def test_argument_error_tank_volume_lt_0
     args_hash = {}
     args_hash["tank_volume"] = "-10"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Storage tank volume must be greater than 0 or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Storage tank volume must be greater than 0.")
   end
 
   def test_argument_error_tank_volume_eq_0
     args_hash = {}
     args_hash["tank_volume"] = "0"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Storage tank volume must be greater than 0 or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Storage tank volume must be greater than 0.")
   end
 
   def test_argument_error_setpoint_lt_0
@@ -265,21 +265,21 @@ class ResidentialHotWaterHeaterTankTest < MiniTest::Test
     args_hash = {}
     args_hash["capacity"] = "test"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Nominal capacity must be greater than 0 or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Nominal capacity must be greater than 0.")
   end
 
   def test_argument_error_capacity_lt_0
     args_hash = {}
     args_hash["capacity"] = "-10"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Nominal capacity must be greater than 0 or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Nominal capacity must be greater than 0.")
   end
 
   def test_argument_error_capacity_eq_0
     args_hash = {}
     args_hash["capacity"] = "0"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Nominal capacity must be greater than 0 or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Nominal capacity must be greater than 0.")
   end
   
   def test_argument_error_re_lt_0
@@ -300,28 +300,28 @@ class ResidentialHotWaterHeaterTankTest < MiniTest::Test
     args_hash = {}
     args_hash["energy_factor"] = "test"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated energy factor must be greater than 0 and less than 1, or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated energy factor must be greater than 0 and less than 1.")
   end
 
   def test_argument_error_ef_lt_0
     args_hash = {}
     args_hash["energy_factor"] = "-10"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated energy factor must be greater than 0 and less than 1, or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated energy factor must be greater than 0 and less than 1.")
   end
 
   def test_argument_error_ef_eq_0
     args_hash = {}
     args_hash["energy_factor"] = "0"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated energy factor must be greater than 0 and less than 1, or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated energy factor must be greater than 0 and less than 1.")
   end
 
   def test_argument_error_ef_gt_1
     args_hash = {}
     args_hash["energy_factor"] = "1.1"
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated energy factor must be greater than 0 and less than 1, or #{Constants.Auto}.")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated energy factor must be greater than 0 and less than 1.")
   end
   
   def test_argument_error_oncycle_lt_0

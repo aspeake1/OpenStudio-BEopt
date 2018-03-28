@@ -1,7 +1,6 @@
 # see the URL below for information on how to write OpenStudio measures
 # http://nrel.github.io/OpenStudio-user-documentation/measures/measure_writing_guide/
 
-require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/waterheater"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
@@ -38,27 +37,27 @@ class ResidentialHotWaterHeaterTank < OpenStudio::Measure::ModelMeasure
         fuel_display_names << Constants.FuelTypeOil
         fuel_display_names << Constants.FuelTypePropane
         fuel_display_names << Constants.FuelTypeElectric
-        fueltype = OpenStudio::Measure::OSArgument::makeChoiceArgument("fuel_type", fuel_display_names, true)
-        fueltype.setDisplayName("Fuel Type")
-        fueltype.setDescription("Type of fuel used for water heating.")
-        fueltype.setDefaultValue(Constants.FuelTypeGas)
-        args << fueltype
+        fuel_type = OpenStudio::Measure::OSArgument::makeChoiceArgument("fuel_type", fuel_display_names, true)
+        fuel_type.setDisplayName("Fuel Type")
+        fuel_type.setDescription("Type of fuel used for water heating.")
+        fuel_type.setDefaultValue(Constants.FuelTypeGas)
+        args << fuel_type
 
         # make an argument for the storage tank volume
-        storage_tank_volume = osargument::makeStringArgument("tank_volume", true)
-        storage_tank_volume.setDisplayName("Tank Volume")
-        storage_tank_volume.setDescription("Nominal volume of the of the water heater tank. Set to #{Constants.Auto} to have volume autosized.")
-        storage_tank_volume.setUnits("gal")
-        storage_tank_volume.setDefaultValue(Constants.Auto)
-        args << storage_tank_volume
+        tank_volume = osargument::makeStringArgument("tank_volume", true)
+        tank_volume.setDisplayName("Tank Volume")
+        tank_volume.setDescription("Nominal volume of the of the water heater tank. Set to #{Constants.Auto} to have volume autosized.")
+        tank_volume.setUnits("gal")
+        tank_volume.setDefaultValue(Constants.Auto)
+        args << tank_volume
 
         # make an argument for hot water setpoint temperature
-        dhw_setpoint = osargument::makeDoubleArgument("setpoint_temp", true)
-        dhw_setpoint.setDisplayName("Setpoint")
-        dhw_setpoint.setDescription("Water heater setpoint temperature.")
-        dhw_setpoint.setUnits("F")
-        dhw_setpoint.setDefaultValue(125)
-        args << dhw_setpoint
+        setpoint_temp = osargument::makeDoubleArgument("setpoint_temp", true)
+        setpoint_temp.setDisplayName("Setpoint")
+        setpoint_temp.setDescription("Water heater setpoint temperature.")
+        setpoint_temp.setUnits("F")
+        setpoint_temp.setDefaultValue(125)
+        args << setpoint_temp
     
         #make a choice argument for location
         location_args = OpenStudio::StringVector.new
@@ -72,28 +71,28 @@ class ResidentialHotWaterHeaterTank < OpenStudio::Measure::ModelMeasure
         location.setDefaultValue(Constants.Auto)
         args << location
 
-        # make an argument for water_heater_capacity
-        water_heater_capacity = osargument::makeStringArgument("capacity", true)
-        water_heater_capacity.setDisplayName("Input Capacity")
-        water_heater_capacity.setDescription("The maximum energy input rating of the water heater. Set to #{Constants.Auto} to have this field autosized.")
-        water_heater_capacity.setUnits("kBtu/hr")
-        water_heater_capacity.setDefaultValue("40.0")
-        args << water_heater_capacity
+        # make an argument for capacity
+        capacity = osargument::makeStringArgument("capacity", true)
+        capacity.setDisplayName("Input Capacity")
+        capacity.setDescription("The maximum energy input rating of the water heater. Set to #{Constants.Auto} to have this field autosized.")
+        capacity.setUnits("kBtu/hr")
+        capacity.setDefaultValue("40.0")
+        args << capacity
 
         # make an argument for the rated energy factor
-        rated_energy_factor = osargument::makeStringArgument("energy_factor", true)
-        rated_energy_factor.setDisplayName("Rated Energy Factor")
-        rated_energy_factor.setDescription("Ratio of useful energy output from the water heater to the total amount of energy delivered from the water heater. Enter #{Constants.Auto} for a water heater that meets the minimum federal efficiency requirements.")
-        rated_energy_factor.setDefaultValue("0.59")
-        args << rated_energy_factor
+        energy_factor = osargument::makeStringArgument("energy_factor", true)
+        energy_factor.setDisplayName("Rated Energy Factor")
+        energy_factor.setDescription("Ratio of useful energy output from the water heater to the total amount of energy delivered from the water heater. Enter #{Constants.Auto} for a water heater that meets the minimum federal efficiency requirements.")
+        energy_factor.setDefaultValue("0.59")
+        args << energy_factor
 
-        # make an argument for water_heater_recovery_efficiency
-        water_heater_recovery_efficiency = osargument::makeDoubleArgument("recovery_efficiency", true)
-        water_heater_recovery_efficiency.setDisplayName("Recovery Efficiency")
-        water_heater_recovery_efficiency.setDescription("Ratio of energy delivered to the water to the energy content of the fuel consumed by the water heater. Only used for non-electric water heaters.")
-        water_heater_recovery_efficiency.setUnits("Frac")
-        water_heater_recovery_efficiency.setDefaultValue(0.76)
-        args << water_heater_recovery_efficiency
+        # make an argument for recovery_efficiency
+        recovery_efficiency = osargument::makeDoubleArgument("recovery_efficiency", true)
+        recovery_efficiency.setDisplayName("Recovery Efficiency")
+        recovery_efficiency.setDescription("Ratio of energy delivered to the water to the energy content of the fuel consumed by the water heater. Only used for non-electric water heaters.")
+        recovery_efficiency.setUnits("Frac")
+        recovery_efficiency.setDefaultValue(0.76)
+        args << recovery_efficiency
     
         # make an argument on cycle electricity consumption
         offcyc_power = osargument::makeDoubleArgument("offcyc_power", true)
@@ -120,34 +119,20 @@ class ResidentialHotWaterHeaterTank < OpenStudio::Measure::ModelMeasure
 
         #Assign user inputs to variables
         fuel_type = runner.getStringArgumentValue("fuel_type",user_arguments)
-        cap = runner.getStringArgumentValue("capacity",user_arguments)
-        vol = runner.getStringArgumentValue("tank_volume",user_arguments)
-        ef = runner.getStringArgumentValue("energy_factor",user_arguments)
-        re = runner.getDoubleArgumentValue("recovery_efficiency",user_arguments)
+        capacity = runner.getStringArgumentValue("capacity",user_arguments)
+        tank_volume = runner.getStringArgumentValue("tank_volume",user_arguments)
+        energy_factor = runner.getStringArgumentValue("energy_factor",user_arguments)
+        recovery_efficiency = runner.getDoubleArgumentValue("recovery_efficiency",user_arguments)
         location = runner.getStringArgumentValue("location",user_arguments)
-        t_set = runner.getDoubleArgumentValue("setpoint_temp",user_arguments).to_f
-        oncycle_p = runner.getDoubleArgumentValue("oncyc_power",user_arguments)
-        offcycle_p = runner.getDoubleArgumentValue("offcyc_power",user_arguments)
+        setpoint_temp = runner.getDoubleArgumentValue("setpoint_temp",user_arguments).to_f
+        oncycle_power = runner.getDoubleArgumentValue("oncyc_power",user_arguments)
+        offcycle_power = runner.getDoubleArgumentValue("offcyc_power",user_arguments)
     
         #Validate inputs
         if not runner.validateUserArguments(arguments(model), user_arguments)
             return false
         end
     
-        # Validate inputs further
-        return false if not validate_storage_tank_volume(vol, runner)
-        return false if not validate_rated_energy_factor(ef, runner)
-        return false if not validate_setpoint_temperature(t_set, runner)
-        return false if not validate_water_heater_capacity(cap, runner)
-        if fuel_type == Constants.FuelTypeElectric
-            re = 0.98 #recovery efficiency set by fiat
-            oncycle_p = 0
-            offcycle_p = 0
-        else
-            return false if not validate_water_heater_recovery_efficiency(re, runner)
-            return false if not validate_parasitic_elec(oncycle_p, offcycle_p, runner)
-        end
-        
         # Get building units
         units = Geometry.get_building_units(model, runner)
         if units.nil?
@@ -171,80 +156,41 @@ class ResidentialHotWaterHeaterTank < OpenStudio::Measure::ModelMeasure
             return false
         end
 
-        # Remove all existing objects
-        obj_name = Constants.ObjectNameWaterHeater
-        model.getPlantLoops.each do |pl|
-            next if not pl.name.to_s.start_with? Constants.PlantLoopDomesticWater
-            Waterheater.remove_existing(runner, pl, obj_name, model)
-        end
-        
         location_hierarchy = Waterheater.get_location_hierarchy(ba_cz_name)
-
+        
+        Waterheater.remove(model, runner)
+        
         units.each_with_index do |unit, unit_index|
+        
+            # Get space
+            space = Geometry.get_space_from_location(unit, location, location_hierarchy)
+            next if space.nil?
+            
             # Get unit beds/baths
             nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)
             if nbeds.nil? or nbaths.nil?
                 return false
             end
-            sch_unit_index = Geometry.get_unit_dhw_sched_index(model, unit, runner)
-            if sch_unit_index.nil?
-                return false
-            end
-        
-            # Get space
-            space = Geometry.get_space_from_location(unit, location, location_hierarchy)
-            next if space.nil?
-            water_heater_tz = space.thermalZone.get
-    
-            #Check if a DHW plant loop already exists, if not add it
-            loop = nil
-            model.getPlantLoops.each do |pl|
-                next if pl.name.to_s != Constants.PlantLoopDomesticWater(unit.name.to_s)
-                loop = pl
-            end
+
+            # Calculate values if autosized
+            capacity = Waterheater.calc_capacity(capacity, fuel_type, nbeds, nbaths)
+            tank_volume = Waterheater.calc_nom_tankvol(tank_volume, fuel_type, nbeds, nbaths)
+            energy_factor = Waterheater.calc_ef(energy_factor, tank_volume, fuel_type)
             
-            if loop.nil?
-                runner.registerInfo("A new plant loop for DHW will be added to the model")
-                runner.registerInitialCondition("No water heater model currently exists")
-                loop = Waterheater.create_new_loop(model, Constants.PlantLoopDomesticWater(unit.name.to_s), t_set, Constants.WaterHeaterTypeTank)
-            end
-
-            if loop.components(OpenStudio::Model::PumpVariableSpeed::iddObjectType).empty?
-                new_pump = Waterheater.create_new_pump(model)
-                new_pump.addToNode(loop.supplyInletNode)
-            end
-
-            if loop.supplyOutletNode.setpointManagers.empty?
-                new_manager = Waterheater.create_new_schedule_manager(t_set, model, Constants.WaterHeaterTypeTank)
-                new_manager.addToNode(loop.supplyOutletNode)
-            end
-        
-            new_heater = Waterheater.create_new_heater(Constants.ObjectNameWaterHeater(unit.name.to_s), cap, fuel_type, vol, nbeds, nbaths, ef, re, t_set, water_heater_tz, oncycle_p, offcycle_p, Constants.WaterHeaterTypeTank, 0, File.dirname(__FILE__), model, runner)
-
-            storage_tank = Waterheater.get_shw_storage_tank(model, unit)
-
-            if storage_tank.nil?
-              loop.addSupplyBranchForComponent(new_heater)
-            else              
-              storage_tank.setHeater1SetpointTemperatureSchedule(new_heater.setpointTemperatureSchedule.get)
-              storage_tank.setHeater2SetpointTemperatureSchedule(new_heater.setpointTemperatureSchedule.get)
-              new_heater.addToNode(storage_tank.supplyOutletModelObject.get.to_Node.get)
-            end
+            success = Waterheater.apply_tank(model, unit, runner, space, fuel_type, 
+                                             capacity, tank_volume, energy_factor, 
+                                             recovery_efficiency, setpoint_temp, 
+                                             oncycle_power, offcycle_power)
+            return false if not success
 
         end
         
-        register_final_conditions(runner, model)
+        final_condition = list_water_heaters(model, runner).join("\n")
+        runner.registerFinalCondition(final_condition)
   
         return true
  
     end #end the run method
-
-    private
-
-    def register_final_conditions(runner, model)
-        final_condition = list_water_heaters(model, runner).join("\n")
-        runner.registerFinalCondition(final_condition)
-    end    
 
     def list_water_heaters(model, runner)
         water_heaters = []
@@ -267,67 +213,6 @@ class ResidentialHotWaterHeaterTank < OpenStudio::Measure::ModelMeasure
     end
 
     
-    def validate_storage_tank_volume(vol, runner)
-        return true if (vol == Constants.Auto)  # flag for autosizing
-        vol = vol.to_f
-
-        if vol <= 0
-            runner.registerError("Storage tank volume must be greater than 0 or #{Constants.Auto}.")   
-            return false
-        end
-        return true
-    end
-
-    def validate_rated_energy_factor(ef, runner)
-        return true if (ef == Constants.Auto)  # flag for autosizing
-        ef = ef.to_f
-
-        if (ef >= 1 or ef <= 0)
-            runner.registerError("Rated energy factor must be greater than 0 and less than 1, or #{Constants.Auto}.")
-            return false
-        end
-        return true
-    end
-  
-    def validate_setpoint_temperature(t_set, runner)
-        if (t_set <= 0 or t_set >= 212)
-            runner.registerError("Hot water temperature must be greater than 0 and less than 212.")
-            return false
-        end
-        return true
-    end
-
-    def validate_water_heater_capacity(cap, runner)
-        return true if cap == Constants.Auto # Autosized
-        cap = cap.to_f
-
-        if cap <= 0
-            runner.registerError("Nominal capacity must be greater than 0 or #{Constants.Auto}.")
-            return false
-        end
-        return true
-    end
-    
-    def validate_water_heater_recovery_efficiency(re, runner)
-        if (re < 0 or re > 1)
-            runner.registerError("Recovery efficiency must be at least 0 and at most 1.")
-            return false
-        end
-        return true
-    end
-  
-    def validate_parasitic_elec(oncycle_p, offcycle_p, runner)
-        if oncycle_p < 0
-            runner.registerError("Forced draft fan power must be greater than 0.")
-            return false
-        end
-        if offcycle_p < 0
-            runner.registerError("Parasitic electricity power must be greater than 0.")
-            return false
-        end
-        return true
-    end
-  
 end #end the measure
 
 #this allows the measure to be use by the application
