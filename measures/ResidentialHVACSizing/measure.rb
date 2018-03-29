@@ -181,6 +181,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         
         # Get HVAC system info
         hvac = get_hvac_for_unit(runner, model, unit)
+        puts hvac
         return false if hvac.nil?
         
         ducts = get_ducts_for_unit(runner, model, unit, hvac, unit_ffa)
@@ -2272,7 +2273,12 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         unit_final.GSHP_Bore_Depth = bore_depth
         unit_final.GSHP_Bore_Holes = bore_holes
         unit_final.GSHP_G_Functions = [lntts, gfnc_coeff]
-
+    
+    elsif hvac.HasFanCoil
+        # FIXME
+        unit_final.Heat_Capacity = 0
+        unit_final.Heat_Airflow = 0
+    
     else
         unit_final.Heat_Capacity = 0
         unit_final.Heat_Airflow = 0
@@ -2947,6 +2953,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     hvac.HasAirSourceHeatPump = false
     hvac.HasMiniSplitHeatPump = false
     hvac.HasGroundSourceHeatPump = false
+    hvac.HasFanCoil = false
     hvac.HasDehumidifier = false
     hvac.NumSpeedsCooling = 0
     hvac.NumSpeedsHeating = 0
@@ -3179,6 +3186,31 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             hvac.CoolingEIR = 1.0 / clg_coil.ratedCoolingCoefficientofPerformance
             
         elsif clg_coil.is_a? OpenStudio::Model::CoilCoolingWater
+            # FIXME
+            hvac.NumSpeedsCooling = 1
+            
+            if hvac.HasRoomAirConditioner
+                coolingCFMs = get_unit_feature(runner, unit, Constants.SizingInfoHVACCoolingCFMs, 'string')
+                return nil if coolingCFMs.nil?
+                hvac.CoolingCFMs = coolingCFMs.split(",").map(&:to_f)
+            end
+            
+            curves = [clg_coil.totalCoolingCapacityFunctionOfTemperatureCurve]
+            hvac.COOL_CAP_FT_SPEC = get_2d_vector_from_CAP_FT_SPEC_curves(curves, hvac.NumSpeedsCooling)
+            if not clg_coil.ratedSensibleHeatRatio.is_initialized
+                runner.registerError("SHR not set for #{clg_coil.name}.")
+                return nil
+            end
+            hvac.SHRRated = [clg_coil.ratedSensibleHeatRatio.get]
+            if clg_coil.ratedTotalCoolingCapacity.is_initialized
+                hvac.FixedCoolingCapacity = UnitConversions.convert(clg_coil.ratedTotalCoolingCapacity.get,"W","ton")
+            end
+            
+            if not hvac.HasRoomAirConditioner
+                capacityDerateFactorEER = get_unit_feature(runner, unit, Constants.SizingInfoHVACCapacityDerateFactorEER, 'string')
+                return nil if capacityDerateFactorEER.nil?
+                hvac.CapacityDerateFactorEER = capacityDerateFactorEER.split(",").map(&:to_f)
+            end
         
         else
             runner.registerError("Unexpected cooling coil: #{clg_coil.name}.")
@@ -3227,6 +3259,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                 hvac.HasDuctedHeating = true
             end
         end
+
+        puts htg_coil
+        puts clg_coil
 
         # Heating coil
         if htg_coil.is_a? OpenStudio::Model::CoilHeatingElectric
@@ -3304,6 +3339,12 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             hvac.HeatingEIR = 1.0 / htg_coil.ratedHeatingCoefficientofPerformance
 
         elsif htg_coil.is_a? OpenStudio::Model::CoilHeatingWater
+            # FIXME
+            hvac.NumSpeedsHeating = 1
+            if htg_coil.heatingDesignCapacity.is_initialized
+                hvac.FixedHeatingCapacity = UnitConversions.convert(htg_coil.heatingDesignCapacity.get,"W","ton")
+            end
+            hvac.BoilerDesignTemp = UnitConversions.convert(model.getBoilerHotWaters[0].designWaterOutletTemperature.get,"C","F")
             
         elsif not htg_coil.nil?
             runner.registerError("Unexpected heating coil: #{htg_coil.name}.")

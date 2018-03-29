@@ -124,22 +124,31 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
   end
 
-  def test_simulation_baseboards
+  def test_simulation_baseboards_heating_setpoints
     num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
     expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
-    _test_measure("test_simulation_baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
+    _test_measure("test_simulation_baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
   end
   
-  def test_simulation_fan_coil
+  def test_simulation_fan_coil_heating_setpoints
     num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
     expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
-    _test_measure("test_simulation_fan_coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
+    _test_measure("test_simulation_fan_coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
+  end
+  
+  def test_simulation_ptac_heating_setpoints
+    num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
+    expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
+    _test_measure("test_simulation_ptac.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
   end
 
   def test_multifamily_new_construction
@@ -205,7 +214,7 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
     return result
   end
 
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
+  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
     measure = ProcessHeatingSetpoints.new
 
@@ -240,6 +249,10 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
     result = runner.result
 
     show_output(result)
+
+    # save the model to test output directory
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    model.save(output_file_path, true)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

@@ -390,7 +390,7 @@ class HVAC
       end
       if self.has_room_ac(model, runner, thermal_zone)
         runner.registerInfo("Found room air conditioner in #{thermal_zone.name}.")
-        ptac = self.get_ptac(model, runner, thermal_zone)
+        ptac = self.get_room_ac(model, runner, thermal_zone)
         cooling_equipment << ptac
       end
       if self.has_mshp(model, runner, thermal_zone)
@@ -405,8 +405,13 @@ class HVAC
         runner.registerInfo("Found ground source heat pump in #{thermal_zone.name}.")
         cooling_equipment << system
       end
+      if self.has_central_ptac(model, runner, thermal_zone)
+        runner.registerInfo("Found central ptac in #{thermal_zone.name}.")
+        ptac = self.get_central_ptac(model, runner, thermal_zone)
+        cooling_equipment << ptac
+      end
       if self.has_fan_coil(model, runner, thermal_zone)
-        runner.registerInfo("Found four pipe fan coil in #{thermal_zone.name}.")
+        runner.registerInfo("Found central fan coil in #{thermal_zone.name}.")
         fcu = self.get_fan_coil(model, runner, thermal_zone)
         cooling_equipment << fcu
       end
@@ -454,12 +459,12 @@ class HVAC
         heating_equipment << system
       end
       if self.has_central_ptac(model, runner, thermal_zone)
-        runner.registerInfo("Found central PTAC in #{thermal_zone.name}.")
-        ptac = self.get_ptac(model, runner, thermal_zone)
+        runner.registerInfo("Found central ptac in #{thermal_zone.name}.")
+        ptac = self.get_central_ptac(model, runner, thermal_zone)
         heating_equipment << ptac
       end
       if self.has_fan_coil(model, runner, thermal_zone)
-        runner.registerInfo("Found four pipe fan coil in #{thermal_zone.name}.")
+        runner.registerInfo("Found central fan coil in #{thermal_zone.name}.")
         fcu = self.get_fan_coil(model, runner, thermal_zone)
         heating_equipment << fcu
       end
@@ -586,10 +591,21 @@ class HVAC
       return nil
     end
 
-    def self.get_ptac(model, runner, thermal_zone)
+    def self.get_room_ac(model, runner, thermal_zone)
       # Returns the PTAC if available
       model.getZoneHVACPackagedTerminalAirConditioners.each do |ptac|
         next unless thermal_zone.handle.to_s == ptac.thermalZone.get.handle.to_s
+        next if ptac.heatingCoil.to_CoilHeatingWater.is_initialized
+        return ptac
+      end
+      return nil
+    end
+
+    def self.get_central_ptac(model, runner, thermal_zone)
+      # Returns the central PTAC if available
+      model.getZoneHVACPackagedTerminalAirConditioners.each do |ptac|
+        next unless thermal_zone.handle.to_s == ptac.thermalZone.get.handle.to_s
+        next unless ptac.heatingCoil.to_CoilHeatingWater.is_initialized
         return ptac
       end
       return nil
@@ -622,18 +638,8 @@ class HVAC
       return nil
     end
 
-    def self.get_central_ptac(model, runner, thermal_zone)
-      # Returns the central PTAC if available
-      model.getZoneHVACPackagedTerminalAirConditioners.each do |ptac|
-        next unless thermal_zone.handle.to_s == ptac.thermalZone.get.handle.to_s
-        next unless ptac.heatingCoil.to_CoilHeatingWater.is_initialized
-        return ptac
-      end
-      return nil
-    end
-
     def self.get_fan_coil(model, runner, thermal_zone)
-      # Returns the central PTAC if available
+      # Returns the fan coil if available
       model.getZoneHVACFourPipeFanCoils.each do |fcu|
         next unless thermal_zone.handle.to_s == fcu.thermalZone.get.handle.to_s
         return fcu
@@ -723,7 +729,7 @@ class HVAC
     end
 
     def self.has_room_ac(model, runner, thermal_zone)
-      ptac = self.get_ptac(model, runner, thermal_zone)
+      ptac = self.get_room_ac(model, runner, thermal_zone)
       if not ptac.nil?
         return true
       end
@@ -900,7 +906,7 @@ class HVAC
     def self.remove_room_ac(model, runner, thermal_zone)
       # Returns true if the object was removed
       return false if not self.has_room_ac(model, runner, thermal_zone)
-      ptac = self.get_ptac(model, runner, thermal_zone)
+      ptac = self.get_room_ac(model, runner, thermal_zone)
       runner.registerInfo("Removed '#{ptac.name}' from #{thermal_zone.name}.")
       ptac.remove
       return true

@@ -2139,6 +2139,36 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_Dehumidifier_Fixed_Atlanta.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
 
+  def test_equip_central_system_baseboards
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+                      }
+    _test_measure("test_simulation_baseboards_airflow.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end
+
+  def test_equip_central_system_fan_coil
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+                      }
+    _test_measure("test_simulation_fan_coil_airflow.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end
+
+  def test_equip_central_system_ptac
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+                      }
+    _test_measure("test_simulation_ptac_airflow.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end
+
   def test_error_missing_geometry
     args_hash = {}
     result = _test_error(nil, args_hash)
@@ -2200,7 +2230,7 @@ class ProcessHVACSizingTest < MiniTest::Test
 
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, apply_volume_adj=false)
 
-    print_debug_info = false # set to true for more detailed output
+    print_debug_info = true # set to true for more detailed output
 
     # create an instance of the measure
     measure = ProcessHVACSizing.new

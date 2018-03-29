@@ -554,6 +554,33 @@ class ResidentialAirflowTest < MiniTest::Test
     model, result = _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, num_units)
   end
 
+  def test_simulation_baseboards_airflow
+    num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*7, "ScheduleRule"=>num_units*84, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*13, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_values = {}
+    _test_measure("test_simulation_baseboards_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
+  end
+  
+  def test_simulation_fan_coil_airflow
+    num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*7, "ScheduleRule"=>num_units*84, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*13, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_values = {}
+    _test_measure("test_simulation_fan_coil_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
+  end
+  
+  def test_simulation_ptac_airflow
+    num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*7, "ScheduleRule"=>num_units*84, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*13, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_values = {}
+    _test_measure("test_simulation_ptac_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
+  end
+  
   private
 
   def _test_error(osm_file_or_model, args_hash)
@@ -591,7 +618,7 @@ class ResidentialAirflowTest < MiniTest::Test
     return result
   end
 
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
+  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
     measure = ResidentialAirflow.new
 
@@ -625,7 +652,11 @@ class ResidentialAirflowTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
 
-    # show_output(result)
+    show_output(result)
+    
+    # save the model to test output directory
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    model.save(output_file_path, true)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
