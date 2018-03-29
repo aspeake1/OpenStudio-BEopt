@@ -80,29 +80,26 @@ class ProcessCentralSystemFanCoil < OpenStudio::Measure::ModelMeasure
     fan_coil_cooling = runner.getBoolArgumentValue("fan_coil_cooling",user_arguments)
     central_boiler_system_type = runner.getStringArgumentValue("central_boiler_system_type",user_arguments)
     central_boiler_fuel_type = {Constants.FuelTypeElectric=>"Electricity", Constants.FuelTypeGas=>"NaturalGas", Constants.FuelTypeOil=>"FuelOil#1", Constants.FuelTypePropane=>"PropaneGas"}[runner.getStringArgumentValue("central_boiler_fuel_type",user_arguments)]
-    
+
+    std = Standard.build("90.1-2013")
+
     if not fan_coil_heating and not fan_coil_cooling
       runner.registerError("Must specify at least heating or cooling.")
       return false
     end
 
     if fan_coil_heating and fan_coil_cooling
-      central_htg_fuel = central_boiler_fuel_type
-      zone_htg_fuel = central_boiler_fuel_type
-      clg_fuel = "Electricity"
+      hot_water_loop = std.model_get_or_add_hot_water_loop(model, central_boiler_fuel_type)
+      chilled_water_loop = std.model_get_or_add_chilled_water_loop(model, "Electricity", air_cooled = true)
       msg = "heating/cooling fan coil unit"
     elsif fan_coil_cooling # TODO: manually add strip heat or gas wall furnace, or is there another standards method to do this?
-      central_htg_fuel = nil
-      zone_htg_fuel = nil
-      clg_fuel = "Electricity"
+      hot_water_loop = nil
+      chilled_water_loop = std.model_get_or_add_chilled_water_loop(model, "Electricity", air_cooled = true)
       msg = "cooling-only fan coil unit"
     elsif fan_coil_heating
       runner.registerError("Cannot have heating-only fan coil unit.")
       return false
     end
-
-    standards_system_type = "Fan Coil"
-    std = Standard.build("90.1-2013")
 
     thermal_zones = []
     model.getThermalZones.each do |thermal_zone|
@@ -112,7 +109,9 @@ class ProcessCentralSystemFanCoil < OpenStudio::Measure::ModelMeasure
     # story_groups = std.model_group_zones_by_story(model, model.getThermalZones) # TODO: need to write our own "zones by stories" method since we don't use BuildingStory
     story_groups = [thermal_zones]
     story_groups.each do |zones|
-      std.model_add_hvac_system(model, standards_system_type, central_htg_fuel, zone_htg_fuel, clg_fuel, zones)
+
+      std.model_add_four_pipe_fan_coil(model, hot_water_loop, chilled_water_loop, zones)
+      
       if central_boiler_system_type == Constants.BoilerTypeSteam
         plant_loop = model.getPlantLoopByName("Hot Water Loop").get
         plant_loop.supplyComponents.each do |supply_component|

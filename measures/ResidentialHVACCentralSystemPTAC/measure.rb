@@ -65,12 +65,7 @@ class ProcessCentralSystemPTAC < OpenStudio::Measure::ModelMeasure
     central_boiler_system_type = runner.getStringArgumentValue("central_boiler_system_type",user_arguments)
     central_boiler_fuel_type = {Constants.FuelTypeElectric=>"Electricity", Constants.FuelTypeGas=>"NaturalGas", Constants.FuelTypeOil=>"FuelOil#1", Constants.FuelTypePropane=>"PropaneGas"}[runner.getStringArgumentValue("central_boiler_fuel_type",user_arguments)]
 
-    standards_system_type = "PTAC"
     std = Standard.build("90.1-2013")
-
-    central_htg_fuel = central_boiler_fuel_type
-    zone_htg_fuel = central_boiler_fuel_type
-    clg_fuel = "Electricity"
 
     thermal_zones = []
     model.getThermalZones.each do |thermal_zone|
@@ -80,7 +75,10 @@ class ProcessCentralSystemPTAC < OpenStudio::Measure::ModelMeasure
     # story_groups = std.model_group_zones_by_story(model, model.getThermalZones) # TODO: need to write our own "zones by stories" method since we don't use BuildingStory
     story_groups = [thermal_zones]
     story_groups.each do |zones|
-      std.model_add_hvac_system(model, standards_system_type, central_htg_fuel, zone_htg_fuel, clg_fuel, zones)
+
+      hot_water_loop = std.model_get_or_add_hot_water_loop(model, central_boiler_fuel_type)
+      std.model_add_ptac(model, sys_name = nil, hot_water_loop, zones, fan_type = 'ConstantVolume', "Water", cooling_type = 'Single Speed DX AC')
+    
       if central_boiler_system_type == Constants.BoilerTypeSteam
         plant_loop = model.getPlantLoopByName("Hot Water Loop").get
         plant_loop.supplyComponents.each do |supply_component|
