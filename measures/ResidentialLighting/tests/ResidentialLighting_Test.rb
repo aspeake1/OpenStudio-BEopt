@@ -13,7 +13,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1300}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_new_construction_100_incandescent
@@ -27,7 +27,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>2085}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_new_construction_20_cfl_hw_34_cfl_pg
@@ -41,7 +41,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1848}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_new_construction_34_cfl_hw_34_cfl_pg
@@ -55,7 +55,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1733}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_new_construction_60_led_hw_34_cfl_pg
@@ -69,7 +69,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1461}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_new_construction_100_cfl
@@ -83,7 +83,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1110}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_new_construction_100_led
@@ -97,7 +97,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>957}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_new_construction_100_led_low_efficacy
@@ -112,7 +112,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1159}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_new_construction_high_latitude
@@ -120,7 +120,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1733}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Anchorage.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Anchorage.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_retrofit_replace
@@ -128,13 +128,13 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1733}
-    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
     args_hash = {}
     args_hash["hw_cfl"] = 1.0
     expected_num_del_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1252}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
 
   def test_argument_error_hw_cfl_lt_0
@@ -286,7 +286,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Lights"=>num_ltg_spaces, "LightsDefinition"=>num_ltg_spaces, "ExteriorLights"=>1, "ExteriorLightsDefinition"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>3811.31}
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_ltg_spaces+1)
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units+2)
   end
 
   def test_multifamily_new_construction
@@ -296,7 +296,7 @@ class ResidentialLightingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Lights"=>num_ltg_spaces, "LightsDefinition"=>num_ltg_spaces, "ExteriorLights"=>1, "ExteriorLightsDefinition"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>7622.62}
-    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_ltg_spaces+1)
+    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units+2)
   end
   
   private

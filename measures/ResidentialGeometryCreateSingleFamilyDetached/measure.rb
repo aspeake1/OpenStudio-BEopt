@@ -728,7 +728,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       # set foundation walls outside boundary condition
       spaces = model.getSpaces
       spaces.each do |space|
-        if Geometry.get_space_floor_z(space) + OpenStudio.convert(space.zOrigin,"m","ft").get < 0
+        if Geometry.get_space_floor_z(space) + UnitConversions.convert(space.zOrigin,"m","ft") < 0
           surfaces = space.surfaces
           surfaces.each do |surface|
             next if surface.surfaceType.downcase != "wall"
