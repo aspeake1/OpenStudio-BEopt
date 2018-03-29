@@ -184,7 +184,7 @@ class ProcessConstructionsWallsDoubleWoodStud < OpenStudio::Measure::ModelMeasur
     end
     
     if not ThermalMassConstructions.apply(runner, model, walls_by_type,
-                                          drywall_thick_in, 1.0, 1.0)
+                                          drywall_thick_in)
         return false
     end
     
