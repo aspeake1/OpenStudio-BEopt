@@ -113,6 +113,8 @@ namespace :test do
   
   desc 'regenerate test osm files from osw files'
   task :regenerate_osms do
+  
+    require 'openstudio'
 
     start_time = Time.now
     num_tot = 0
