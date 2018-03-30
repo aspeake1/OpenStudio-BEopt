@@ -122,10 +122,9 @@ class ClothesDryer
               if not sch.validated?
                   return false
               end
+              #Create exhaust schedule
+              vent_sch = HotWaterSchedule.new(model, runner, unit_obj_name_f + " exhaust schedule", unit_obj_name_f + " exhaust temperature schedule", nbeds, sch_unit_index, hr_shift, "ClothesDryerExhaust", 0, File.dirname(File.expand_path('..', __FILE__)))
           end
-          
-          #Calculate the normalization factor for cd exhaust
-          cd_exhaust_norm = sch.calcClothesDryerAirflowRateNormalization
 
           #Add equipment for the cd
           if fuel_type == Constants.FuelTypeElectric
@@ -183,7 +182,6 @@ class ClothesDryer
           unit.setFeature(Constants.ClothesDryerMult(cd), mult.to_f)
           unit.setFeature(Constants.ClothesDryerFuelType(cd), fuel_type.to_s)
           unit.setFeature(Constants.ClothesDryerFuelSplit(cd), fuel_split.to_f)
-          unit.setFeature(Constants.ClothesDryerExhaustNorm(cd), cd_exhaust_norm.to_f)
           
       end
       
@@ -212,6 +210,22 @@ class ClothesDryer
       end
       if objects_to_remove.size > 0 and display_remove_msg
           runner.registerInfo("Removed existing clothes dryer from space '#{space.name.to_s}'.")
+      end
+      objects_to_remove.uniq.each do |object|
+          begin
+              object.remove
+          rescue
+              # no op
+          end
+      end
+  end
+  
+  def self.remove_existing_exhaust_schedule(model)
+      # Remove any existing clothes dryer exhaust schedule
+      objects_to_remove = []
+      model.getScheduleFixedIntervals.each do |schedule|
+          next unless schedule.name.to_s.include? "clothes dryer" and schedule.name.to_s.include? "exhaust schedule"
+          objects_to_remove << schedule
       end
       objects_to_remove.uniq.each do |object|
           begin

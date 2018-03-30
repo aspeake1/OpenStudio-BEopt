@@ -597,8 +597,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
             cd_shc = unit.getFeature(Constants.ClothesDryerSch(cd))
             cd_fuel_type = unit.getFeatureAsString(Constants.ClothesDryerFuelType(cd))
             cd_fuel_split = unit.getFeatureAsDouble(Constants.ClothesDryerFuelSplit(cd))
-            cd_exhaust_norm = unit.getFeatureAsDouble(Constants.ClothesDryerExhaustNorm(cd))
-            if !cd_cef.is_initialized or !cd_mult.is_initialized or !cd_sch.is_initialized or !cd_fuel_type.is_initialized or !cd_fuel_split.is_initialized or !cd_exhaust_norm.is_initialized
+            if !cd_cef.is_initialized or !cd_mult.is_initialized or !cd_sch.is_initialized or !cd_fuel_type.is_initialized or !cd_fuel_split.is_initialized
                 runner.registerError("Could not find clothes dryer properties.")
                 return false
             end
@@ -607,7 +606,6 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
             cd_sch = cd_sch.get
             cd_fuel_type = cd_fuel_type.get
             cd_fuel_split = cd_fuel_split.get
-            cd_exhaust_norm = cd_exhaust_norm.get
             
             # Update clothes dryer
             cd_space = cd.space.get

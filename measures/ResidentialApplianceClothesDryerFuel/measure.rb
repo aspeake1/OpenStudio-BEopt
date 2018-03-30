@@ -112,6 +112,7 @@ class ResidentialClothesDryerFuel < OpenStudio::Measure::ModelMeasure
     model.getSpaces.each do |space|
         ClothesDryer.remove_existing(runner, space, obj_name)
     end
+    ClothesDryer.remove_existing_exhaust_schedule(model)
     
     location_hierarchy = [Constants.SpaceTypeLaundryRoom, 
                           Constants.SpaceTypeLiving, 

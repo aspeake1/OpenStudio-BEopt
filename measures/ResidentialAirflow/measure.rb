@@ -389,7 +389,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     clothes_dryer_exhaust = OpenStudio::Measure::OSArgument::makeDoubleArgument("clothes_dryer_exhaust",true)
     clothes_dryer_exhaust.setDisplayName("Clothes Dryer: Exhaust")
     clothes_dryer_exhaust.setUnits("cfm")
-    clothes_dryer_exhaust.setDescription("Rated flow capacity of the clothes dryer exhaust. This fan is assumed to run 60 min/day between 11am and 12pm.")
+    clothes_dryer_exhaust.setDescription("Rated flow capacity of the clothes dryer exhaust. This fan is assumed to run after any clothes dryer events.")
     clothes_dryer_exhaust.setDefaultValue(100.0)
     args << clothes_dryer_exhaust
 
@@ -1086,18 +1086,32 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         thermal_zone.removeReturnPlenum
         thermal_zone.remove
       end
-
-      # Search for clothes dryer
+      
+      dryer_name = nil
+      dryer_exhaust_sch_name = nil
+      #Set the clothes dryer schedule
       (model.getElectricEquipments + model.getOtherEquipments).each do |equip|
         next unless equip.name.to_s == Constants.ObjectNameClothesDryer(Constants.FuelTypeElectric, building_unit.name.to_s) or equip.name.to_s == Constants.ObjectNameClothesDryer(Constants.FuelTypeGas, building_unit.name.to_s) or equip.name.to_s == Constants.ObjectNameClothesDryer(Constants.FuelTypePropane, building_unit.name.to_s)
-        #Get values out of schedule
-        schedules.ClothesDryerExhaust = equip.schedule.get.to_ScheduleFixedInterval.get
-        #Get dryer normalization factor
-        cd = equip
-        dryer_exhaust_norm = building_unit.getFeatureAsDouble(Constants.ClothesDryerExhaustNorm(cd)).to_f
-        unit.dryer_exhaust = dryerExhaust * dryer_exhaust_norm * 60.0 #60 is to capture the 60 min/day the clothes dryer exhaust runs per BA HSP
+        dryer_name = equip.name.to_s
+        unit.dryer_exhaust = dryerExhaust 
         break
       end
+
+      #get the dryer exhaust schedule (different from the dryer schedule)
+      if dryer_name != nil
+        model.getScheduleFixedIntervals.each do |schedule|
+          #runner.registerInfo("Fixed interval schedule name = #{schedule.name.to_s}")
+          next unless schedule.name.to_s.include? "clothes dryer" and schedule.name.to_s.include? "exhaust schedule"
+          schedules.ClothesDryerExhaust = schedule
+          break
+        end
+      end
+      
+      if schedules.ClothesDryerExhaust.nil? and unit.dryer_exhaust != nil
+        runner.registerError("Unable to find the clothes dryer exhaust schedule specified with the clothes dryer")
+        unit.dryer_exhaust = 0
+      end
+      
       if unit.dryer_exhaust.nil?
         runner.registerWarning("No clothes dryer object was found in #{building_unit.name.to_s} but the clothes dryer exhaust specified is non-zero. Overriding clothes dryer exhaust to be zero.")
         unit.dryer_exhaust = 0

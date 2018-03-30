@@ -455,10 +455,6 @@ class HotWaterSchedule
         return calcDesignLevelFromDailykWh(UnitConversions.convert(daily_therm, "therm", "kWh"))
     end
     
-    def calcClothesDryerAirflowRateNormalization
-        return (@maxflow / @totflow)
-    end
-    
     def schedule
         return @schedule
     end
@@ -502,6 +498,7 @@ class HotWaterSchedule
             # Read data into minute array
             skippedheader = false
             min_shift = 24 * 60 * days_shift
+            
             items = [0]*minutes_in_year
             File.open(minute_draw_profile).each do |line|
                 linedata = line.strip.split(',')
@@ -515,7 +512,7 @@ class HotWaterSchedule
                     shifted_min = shifted_min - minutes_in_year
                 end
                 value = linedata[1].to_f
-                items[shifted_min] = value
+                items[shifted_min.to_i] = value
             end
             
             # Aggregate minute schedule up to the timestep level to reduce the size 
