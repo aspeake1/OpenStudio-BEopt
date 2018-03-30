@@ -181,7 +181,6 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         
         # Get HVAC system info
         hvac = get_hvac_for_unit(runner, model, unit)
-        puts hvac
         return false if hvac.nil?
         
         ducts = get_ducts_for_unit(runner, model, unit, hvac, unit_ffa)
@@ -3260,9 +3259,6 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             end
         end
 
-        puts htg_coil
-        puts clg_coil
-
         # Heating coil
         if htg_coil.is_a? OpenStudio::Model::CoilHeatingElectric
             hvac.NumSpeedsHeating = 1
@@ -4230,7 +4226,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
     # Window AC
     thermal_zones.each do |thermal_zone|
-        ptac = HVAC.get_ptac(model, runner, thermal_zone)
+        ptac = HVAC.get_room_ac(model, runner, thermal_zone)
         next if ptac.nil?
         
         # PTAC
