@@ -238,7 +238,7 @@ class Geometry
   end
   
   def self.get_zone_volume(zone, apply_multipliers=false, runner=nil)
-    if zone.isVolumeAutocalculated
+    if zone.isVolumeAutocalculated or not zone.volume.is_initialized
       # Calculate volume from spaces
       volume = 0
       zone.spaces.each do |space|
@@ -249,10 +249,11 @@ class Geometry
         volume += UnitConversions.convert(space.volume * mult,"m^3","ft^3")
       end
     else
+      mult = 1.0
       if apply_multipliers
           mult = zone.multiplier.to_f
       end
-      volume = UnitConversions.convert(zone.volume,"m^3","ft^3")
+      volume = UnitConversions.convert(zone.volume.get * mult,"m^3","ft^3")
     end
     if volume <= 0 and not runner.nil?
       runner.registerError("Could not find any volume.")
