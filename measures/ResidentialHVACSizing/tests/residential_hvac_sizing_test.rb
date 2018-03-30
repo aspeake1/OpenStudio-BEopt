@@ -2287,7 +2287,7 @@ class ProcessHVACSizingTest < MiniTest::Test
 
         if apply_volume_adj
             if ['Heat Infil','Cool Infil Sens','Cool Infil Lat'].include?(beopt_key)
-                os_above_grade_finished_volume = Geometry.get_above_grade_finished_volume_from_spaces(model.getSpaces)
+                os_above_grade_finished_volume = Geometry.get_above_grade_finished_volume(model)
                 os_val = os_val * volume_adj_factor(os_above_grade_finished_volume)
             end
         end

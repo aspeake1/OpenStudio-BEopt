@@ -236,17 +236,25 @@ class Geometry
       end
       return floor_area
   end
-
-  def self.get_volume_from_spaces(spaces, apply_multipliers=false, runner=nil)
-    volume = 0
-    spaces.each do |space|
-      mult = 1.0
-      if apply_multipliers
-          mult = space.multiplier.to_f
+  
+  def self.get_zone_volume(zone, apply_multipliers=false, runner=nil)
+    if zone.isVolumeAutocalculated
+      # Calculate volume from spaces
+      volume = 0
+      zone.spaces.each do |space|
+        mult = 1.0
+        if apply_multipliers
+            mult = space.multiplier.to_f
+        end
+        volume += UnitConversions.convert(space.volume * mult,"m^3","ft^3")
       end
-      volume += UnitConversions.convert(space.volume * mult,"m^3","ft^3")
+    else
+      if apply_multipliers
+          mult = zone.multiplier.to_f
+      end
+      volume = UnitConversions.convert(zone.volume,"m^3","ft^3")
     end
-    if volume == 0 and not runner.nil?
+    if volume <= 0 and not runner.nil?
       runner.registerError("Could not find any volume.")
       return nil
     end
@@ -287,32 +295,11 @@ class Geometry
     return floor_area
   end
 
-  def self.get_finished_volume_from_spaces(spaces, apply_multipliers=false, runner=nil)
+  def self.get_above_grade_finished_volume(model, apply_multipliers=false, runner=nil)
     volume = 0
-    spaces.each do |space|
-      next if not self.space_is_finished(space)
-      mult = 1.0
-      if apply_multipliers
-          mult = space.multiplier.to_f
-      end
-      volume += UnitConversions.convert(space.volume * mult,"m^3","ft^3")
-    end
-    if volume == 0 and not runner.nil?
-        runner.registerError("Could not find any finished volume.")
-        return nil
-    end
-    return volume
-  end
-
-  def self.get_above_grade_finished_volume_from_spaces(spaces, apply_multipliers=false, runner=nil)
-    volume = 0
-    spaces.each do |space|
-      next if not (self.space_is_finished(space) and self.space_is_above_grade(space))
-      mult = 1.0
-      if apply_multipliers
-          mult = space.multiplier.to_f
-      end
-      volume += UnitConversions.convert(space.volume * mult,"m^3","ft^3")
+    model.getThermalZones.each do |zone|
+      next if not (self.zone_is_finished(zone) and self.zone_is_above_grade(zone))
+      volume += self.get_zone_volume(zone, apply_multipliers, runner)
     end
     if volume == 0 and not runner.nil?
         runner.registerError("Could not find any above-grade finished volume.")
