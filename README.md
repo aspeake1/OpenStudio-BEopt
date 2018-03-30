@@ -7,17 +7,9 @@ Unit Test Status: [![CircleCI](https://circleci.com/gh/NREL/OpenStudio-BEopt/tre
 
 Code Coverage: [![Coverage Status](https://coveralls.io/repos/github/NREL/OpenStudio-Beopt/badge.svg?branch=master)](https://coveralls.io/github/NREL/OpenStudio-Beopt?branch=master)
 
-
-## Table of Contents
-
-* [Running the Measures](#running-the-measures)
-* [Workflows](#workflows)
-* [Development](#development)
 <!--* [Outputs](#outputs)-->
 
 ## Running the Measures
-
-Please read the [Workflows](#workflows) section to understand how the measures are intended to be used, as well as the [Outputs](#outputs) section for a description of the types of outputs that can be produced.
 
 The measures can be run via the standard OpenStudio approaches: the user interfaces ([OpenStudio Application](http://nrel.github.io/OpenStudio-user-documentation/reference/openstudio_application_interface/) and [Parametric Analysis Tool](http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_analysis_tool_2/)), the [Command Line Interface](http://nrel.github.io/OpenStudio-user-documentation/reference/command_line_interface/), or via the [OpenStudio SDK](https://openstudio-sdk-documentation.s3.amazonaws.com/index.html).
 
@@ -28,6 +20,8 @@ An example OpenStudio Workflow [(create-model-example.osw)](https://github.com/N
 `openstudio.exe run -w create-model-example.osw`
 
 This will apply the measures to the OpenStudio seed model specified in the .osw, run the EnergyPlus simulation, and produce output. 
+
+<!--
 
 ## Workflows
 
@@ -63,6 +57,8 @@ Status: **Not Yet Available**
 ![Create Model From Geometry](https://cloud.githubusercontent.com/assets/5861765/25557648/f77be4e2-2cd2-11e7-9837-33840cadd369.png)
 
 In the future, we plan to support workflows where the geometry is defined not through our geometry measures, but through the OpenStudio Geometry Editor or SketchUp. There is currently no timeline for when this workflow will become available.
+
+-->
 
 ### Measure Order
 
