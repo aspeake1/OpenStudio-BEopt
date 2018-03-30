@@ -4344,7 +4344,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
 
     # Fan Coil
     thermal_zones.each do |thermal_zone|
-        fcu = HVAC.get_fan_coil(model, runner, thermal_zone)
+        fcu = HVAC.get_central_fan_coil(model, runner, thermal_zone)
         next if fcu.nil?
         
         # Coils
