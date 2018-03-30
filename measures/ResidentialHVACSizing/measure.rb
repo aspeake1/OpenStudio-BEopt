@@ -3018,7 +3018,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     hvac.HasAirSourceHeatPump = HVAC.has_ashp(model, runner, control_zone)
     hvac.HasGroundSourceHeatPump = HVAC.has_gshp(model, runner, control_zone)
     hvac.HasMiniSplitHeatPump = HVAC.has_mshp(model, runner, control_zone)
-    hvac.HasFanCoil = HVAC.has_fan_coil(model, runner, control_zone)
+    hvac.HasFanCoil = HVAC.has_central_fan_coil(model, runner, control_zone)
     has_ducted_mshp = HVAC.has_ducted_mshp(model, runner, control_zone)
     
     if hvac.HasAirSourceHeatPump or hvac.HasMiniSplitHeatPump
