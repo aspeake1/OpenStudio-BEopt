@@ -148,7 +148,7 @@ namespace :test do
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
     
-    os_cli = get_os_cli()
+    cli_path = OpenStudio.getOpenStudioCLI
 
     osw_files.each do |osw|
 
@@ -160,7 +160,7 @@ namespace :test do
         osw = File.expand_path("../test/osw_files/#{osw}", __FILE__)
         osm = File.expand_path("../test/osw_files/run/in.osm", __FILE__)
         osw_gem = File.expand_path("gems/OpenStudio-workflow-gem/lib/") # Speed up osm generation
-        command = "\"#{os_cli}\" -I #{osw_gem} run -w #{osw} -m >> log"
+        command = "\"#{cli_path}\" -I #{osw_gem} run -w #{osw} -m >> log"
         for _retry in 1..3
             system(command)
             break if File.exists?(osm)
@@ -313,8 +313,8 @@ task :update_measures do
   end
   
   # Update measure xmls
-  os_cli = get_os_cli()
-  command = "\"#{os_cli}\" measure --update_all #{measures_dir} >> log"
+  cli_path = OpenStudio.getOpenStudioCLI
+  command = "\"#{cli_path}\" measure --update_all #{measures_dir} >> log"
   puts "Updating measure.xml files..."
   system(command)
   
@@ -608,14 +608,4 @@ def get_tariff_json_files(tariffs_path)
   
   return true
 
-end
-
-def get_os_cli
-  # Get latest installed version of openstudio.exe
-  os_clis = Dir["C:/openstudio-*/bin/openstudio.exe"] + Dir["/usr/bin/openstudio"] + Dir["/usr/local/bin/openstudio"]
-  if os_clis.size == 0
-      puts "ERROR: Could not find the openstudio binary. You may need to install the OpenStudio Command Line Interface."
-      exit
-  end
-  return os_clis[-1]
 end

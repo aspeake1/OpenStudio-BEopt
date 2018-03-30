@@ -14,11 +14,9 @@ class WorkflowTest < MiniTest::Test
   private
   
   def run_and_check(in_osw, parent_dir)
-    os_clis = Dir["C:/openstudio-*/bin/openstudio.exe"] + Dir["/usr/bin/openstudio"] + Dir["/usr/local/bin/openstudio"]
-    os_cli = os_clis[-1]
-    
     # Run energy_rating_index workflow
-    command = "cd #{parent_dir} && \"#{os_cli}\" run -w #{in_osw}"
+    cli_path = OpenStudio.getOpenStudioCLI
+    command = "cd #{parent_dir} && \"#{cli_path}\" run -w #{in_osw}"
     system(command)
   
     # Check all output files exist
