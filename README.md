@@ -3,8 +3,6 @@ Residential OpenStudio Measures
 
 This project includes [OpenStudio measures](http://nrel.github.io/OpenStudio-user-documentation/getting_started/about_measures/) used to model residential buildings via the [EnergyPlus simulation engine](http://energyplus.net/).
 
-The latest official measures are available on the [Building Component Library](https://bcl.nrel.gov/search/site?f[0]=sm_og_group_ref%3Anode%3A83284).
-
 Unit Test Status: [![CircleCI](https://circleci.com/gh/NREL/OpenStudio-BEopt/tree/master.svg?style=svg)](https://circleci.com/gh/NREL/OpenStudio-BEopt/tree/master)
 
 Code Coverage: [![Coverage Status](https://coveralls.io/repos/github/NREL/OpenStudio-Beopt/badge.svg?branch=master)](https://coveralls.io/github/NREL/OpenStudio-Beopt?branch=master)
