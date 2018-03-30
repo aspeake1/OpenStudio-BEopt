@@ -77,7 +77,7 @@ class ProcessCentralSystemPTAC < OpenStudio::Measure::ModelMeasure
     story_groups.each do |zones|
 
       hot_water_loop = std.model_get_or_add_hot_water_loop(model, central_boiler_fuel_type)
-      std.model_add_ptac(model, sys_name = nil, hot_water_loop, zones, fan_type = 'ConstantVolume', "Water", cooling_type = 'Single Speed DX AC')
+      std.model_add_ptac(model, sys_name=nil, hot_water_loop, zones, fan_type="ConstantVolume", "Water", cooling_type="Single Speed DX AC")
     
       if central_boiler_system_type == Constants.BoilerTypeSteam
         plant_loop = model.getPlantLoopByName("Hot Water Loop").get

@@ -108,15 +108,6 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
   end
 
-  def test_simulation_baseboards_cooling_setpoints
-    num_units = 2
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
-    _test_measure("test_simulation_baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*3)
-  end
-
   def test_simulation_fan_coil_cooling_setpoints
     num_units = 2
     args_hash = {}

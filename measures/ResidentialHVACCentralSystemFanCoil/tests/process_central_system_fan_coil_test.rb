@@ -25,6 +25,26 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
   
+  def test_single_family_attached_fan_coil_heating_only
+    num_zones = 8
+    args_hash = {}
+    args_hash["fan_coil_cooling"] = "false"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>1*num_zones, "ZoneHVACUnitHeater"=>num_zones, "FanConstantVolume"=>num_zones, "CoilHeatingWater"=>num_zones}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+
+  def test_multifamily_fan_coil_heating_only
+    num_zones = 8
+    args_hash = {}
+    args_hash["fan_coil_cooling"] = "false"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>1*num_zones, "ZoneHVACUnitHeater"=>num_zones, "FanConstantVolume"=>num_zones, "CoilHeatingWater"=>num_zones}
+    expected_values = {}
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
+  
   def test_single_family_attached_fan_coil_cooling_only
     num_zones = 8
     args_hash = {}
@@ -52,6 +72,15 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_values = {}
     _test_measure("apply_central_system_to_this.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
+  
+  def test_simulation_unit_heater # then change weather file path to: C:/OpenStudio/OpenStudio-BEopt/measures/ResidentialLocation/resources/USA_CO_Denver_Intl_AP_725650_TMY3.epw; this is the seed model in test_simulation_fan_coil.osw
+    args_hash = {}
+    args_hash["fan_coil_cooling"] = "false"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>2, "ZoneHVACUnitHeater"=>2, "FanConstantVolume"=>2, "CoilHeatingWater"=>2}
+    expected_values = {}
+    _test_measure("apply_central_system_to_this.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
 
   def test_error_single_family_attached_fan_coil_no_heating_no_cooling
     num_zones = 8
@@ -61,15 +90,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     result = _test_error("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Must specify at least heating or cooling.")
   end
-  
-  def test_error_single_family_attached_fan_coil_heating_only
-    num_zones = 8
-    args_hash = {}
-    args_hash["fan_coil_cooling"] = "false"
-    result = _test_error("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot have heating-only fan coil unit.")
-  end
-  
+
   # TODO: test replace
 
   private

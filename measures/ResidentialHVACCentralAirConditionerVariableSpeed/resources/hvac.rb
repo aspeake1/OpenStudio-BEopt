@@ -410,9 +410,9 @@ class HVAC
         ptac = self.get_central_ptac(model, runner, thermal_zone)
         cooling_equipment << ptac
       end
-      if self.has_fan_coil(model, runner, thermal_zone)
+      if self.has_central_fan_coil(model, runner, thermal_zone)
         runner.registerInfo("Found central fan coil in #{thermal_zone.name}.")
-        fcu = self.get_fan_coil(model, runner, thermal_zone)
+        fcu = self.get_central_fan_coil(model, runner, thermal_zone)
         cooling_equipment << fcu
       end
       return cooling_equipment
@@ -463,10 +463,15 @@ class HVAC
         ptac = self.get_central_ptac(model, runner, thermal_zone)
         heating_equipment << ptac
       end
-      if self.has_fan_coil(model, runner, thermal_zone)
+      if self.has_central_fan_coil(model, runner, thermal_zone)
         runner.registerInfo("Found central fan coil in #{thermal_zone.name}.")
-        fcu = self.get_fan_coil(model, runner, thermal_zone)
+        fcu = self.get_central_fan_coil(model, runner, thermal_zone)
         heating_equipment << fcu
+      end
+      if self.has_central_unit_heater(model, runner, thermal_zone)
+        runner.registerInfo("Found central unit heater in #{thermal_zone.name}.")
+        uh = self.get_central_unit_heater(model, runner, thermal_zone)
+        heating_equipment << uh
       end
       return heating_equipment
     end
@@ -638,11 +643,20 @@ class HVAC
       return nil
     end
 
-    def self.get_fan_coil(model, runner, thermal_zone)
+    def self.get_central_fan_coil(model, runner, thermal_zone)
       # Returns the fan coil if available
       model.getZoneHVACFourPipeFanCoils.each do |fcu|
         next unless thermal_zone.handle.to_s == fcu.thermalZone.get.handle.to_s
         return fcu
+      end
+      return nil
+    end
+    
+    def self.get_central_unit_heater(model, runner, thermal_zone)
+      # Returns the unit heater if available
+      model.getZoneHVACUnitHeaters.each do |uh|
+        next unless thermal_zone.handle.to_s == uh.thermalZone.get.handle.to_s
+        return uh
       end
       return nil
     end
@@ -768,9 +782,17 @@ class HVAC
       return false
     end
 
-    def self.has_fan_coil(model, runner, thermal_zone)
-      fcu = self.get_fan_coil(model, runner, thermal_zone)
+    def self.has_central_fan_coil(model, runner, thermal_zone)
+      fcu = self.get_central_fan_coil(model, runner, thermal_zone)
       if not fcu.nil?
+        return true
+      end
+      return false
+    end
+    
+    def self.has_central_unit_heater(model, runner, thermal_zone)
+      uh = self.get_central_unit_heater(model, runner, thermal_zone)
+      if not uh.nil?
         return true
       end
       return false

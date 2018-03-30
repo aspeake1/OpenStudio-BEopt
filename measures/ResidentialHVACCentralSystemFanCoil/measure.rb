@@ -90,15 +90,15 @@ class ProcessCentralSystemFanCoil < OpenStudio::Measure::ModelMeasure
 
     if fan_coil_heating and fan_coil_cooling
       hot_water_loop = std.model_get_or_add_hot_water_loop(model, central_boiler_fuel_type)
-      chilled_water_loop = std.model_get_or_add_chilled_water_loop(model, "Electricity", air_cooled = true)
+      chilled_water_loop = std.model_get_or_add_chilled_water_loop(model, "Electricity", air_cooled=true)
       msg = "heating/cooling fan coil unit"
     elsif fan_coil_cooling # TODO: manually add strip heat or gas wall furnace, or is there another standards method to do this?
       hot_water_loop = nil
-      chilled_water_loop = std.model_get_or_add_chilled_water_loop(model, "Electricity", air_cooled = true)
+      chilled_water_loop = std.model_get_or_add_chilled_water_loop(model, "Electricity", air_cooled=true)
       msg = "cooling-only fan coil unit"
     elsif fan_coil_heating
-      runner.registerError("Cannot have heating-only fan coil unit.")
-      return false
+      hot_water_loop = std.model_get_or_add_hot_water_loop(model, central_boiler_fuel_type)
+      msg = "central zone hvac unit heaters"
     end
 
     thermal_zones = []
@@ -110,16 +110,23 @@ class ProcessCentralSystemFanCoil < OpenStudio::Measure::ModelMeasure
     story_groups = [thermal_zones]
     story_groups.each do |zones|
 
-      std.model_add_four_pipe_fan_coil(model, hot_water_loop, chilled_water_loop, zones)
+      if fan_coil_heating and not fan_coil_cooling
+        std.model_add_unitheater(model, sys_name=nil, zones, hvac_op_sch=nil, fan_control_type="ConstantVolume", fan_pressure_rise=OpenStudio.convert(0.2, "inH_{2}O", "Pa").get, "DistrictHeating", hot_water_loop)
+      else
+        std.model_add_four_pipe_fan_coil(model, hot_water_loop, chilled_water_loop, zones)
+      end
       
-      if central_boiler_system_type == Constants.BoilerTypeSteam
-        plant_loop = model.getPlantLoopByName("Hot Water Loop").get
-        plant_loop.supplyComponents.each do |supply_component|
-          next unless supply_component.to_PumpVariableSpeed.is_initialized
-          pump = supply_component.to_PumpVariableSpeed.get
-          # TODO: how to zero out the pumping energy?
+      if fan_coil_heating
+        if central_boiler_system_type == Constants.BoilerTypeSteam
+          plant_loop = model.getPlantLoopByName("Hot Water Loop").get
+          plant_loop.supplyComponents.each do |supply_component|
+            next unless supply_component.to_PumpVariableSpeed.is_initialized
+            pump = supply_component.to_PumpVariableSpeed.get
+            # TODO: how to zero out the pumping energy?
+          end
         end
       end
+
     end
 
     runner.registerInfo("Added #{msg} to the building.")
