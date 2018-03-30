@@ -108,9 +108,6 @@ class ProcessUnitHeater < OpenStudio::Measure::ModelMeasure
     
     static = UnitConversions.convert(0.5,"inH2O","Pa") # Pascal
 
-    # Remove boiler hot water loop if it exists
-    HVAC.remove_boiler_and_gshp_loops(model, runner)    
-
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?

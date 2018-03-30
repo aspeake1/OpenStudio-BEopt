@@ -13,7 +13,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Empty floorplan path was entered.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Empty floorplan path was entered.")
   end
 
   def test_error_invalid_floorplan_path
@@ -22,7 +22,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot find floorplan path '#{args_hash["floorplan_path"]}'.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot find floorplan path '#{args_hash["floorplan_path"]}'.")
   end
 
   def test_error_unexpected_space_type_name
@@ -31,18 +31,18 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Unexpected space type 'grrage'. Supported space types are: '#{Constants.ExpectedSpaceTypes.join("', '")}'.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Unexpected space type 'grrage'. Supported space types are: '#{Constants.ExpectedSpaceTypes.join("', '")}'.")
   end
-  
+
   def test_error_mix_of_finished_and_unfinished_spaces_in_a_zone
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "mix_of_spaces_in_a_zone.json")
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "'Thermal Zone 1' has a mix of finished and unfinished spaces.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "'Thermal Zone 1' has a mix of finished and unfinished spaces.")
   end
-  
+
   def test_error_empty_floorplan
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "empty.json")
@@ -51,23 +51,23 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     assert_equal("Fail", result.value.valueName)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot load floorplan from '#{args_hash["floorplan_path"]}'.")
   end
-  
+
   def test_error_no_space_types
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_space_types.json")
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
-    assert_equal("Fail", result.value.valueName)    
+    assert_equal("Fail", result.value.valueName)
     assert_includes(result.errors.map{ |x| x.logMessage }, "No space types were created.")
   end
-  
+
   def test_no_zones_assigned_to_spaces
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_spaces_assigned_to_zones.json")
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>4, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_simple_floorplan_unfinished_attic
@@ -76,7 +76,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_simple_floorplan_finished_attic
@@ -85,56 +85,56 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-  
+
   def test_single_family_attached
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFA_2unit.json")
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>71, "Space"=>8, "SpaceType"=>3, "ThermalZone"=>6, "BuildingUnit"=>2, "BuildingStory"=>3}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-  
+
   def test_multifamily
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_4unit.json")
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>24, "Space"=>4, "SpaceType"=>1, "ThermalZone"=>4, "BuildingUnit"=>4, "BuildingStory"=>2}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-=begin
+
   def test_mf_with_corridor
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_corr_12unit.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>102, "Space"=>14, "SpaceType"=>2, "ThermalZone"=>13, "BuildingUnit"=>12, "BuildingStory"=>2}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>92, "Space"=>14, "SpaceType"=>2, "ThermalZone"=>14, "BuildingUnit"=>12, "BuildingStory"=>2}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-=end
+
   def test_sfd_multi_zone_floorplan
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_Multizone.json")
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-=begin
+
   def test_mf_multi_zone_floorplan
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_Multizone.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>159, "Space"=>23, "SpaceType"=>7, "ThermalZone"=>23, "BuildingUnit"=>2, "BuildingStory"=>3}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>181, "Space"=>26, "SpaceType"=>6, "ThermalZone"=>22, "BuildingUnit"=>2, "BuildingStory"=>3}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-=end
+
   private
-  
+
   def _test_error(osm_file, args_hash)
     # create an instance of the measure
     measure = ResidentialGeometryFromFloorspaceJS.new
@@ -160,12 +160,12 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
-      
+
     return result
-    
+
   end
-  
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+
+  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name)
     # create an instance of the measure
     measure = ResidentialGeometryFromFloorspaceJS.new
 
@@ -176,12 +176,12 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     model = get_model(File.dirname(__FILE__), osm_file_or_model)
-    
+
     # get the initial objects in the model
     initial_objects = get_objects(model)
-    
+
     # get arguments
     arguments = measure.arguments(model)
     argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
@@ -200,15 +200,15 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = runner.result
 
     # save the model to test output directory
-    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{File.basename(args_hash["floorplan_path"]).gsub(".json","")}" + ".osm")
-    # model.save(output_file_path,true)    
-    
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    # model.save(output_file_path, true)
+
     # show the output
     # show_output(result)
-    
+
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    
+
     # get the final objects in the model
     final_objects = get_objects(model)
 
@@ -216,11 +216,11 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     obj_type_exclusions = ["PortList", "ZoneHVACEquipmentList", "Node", "SizingZone", "RenderingColor"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
-    
+
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
-    
+
     actual_values = {}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
@@ -229,7 +229,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
 
         end
     end
-    
+
     return model
   end
 
