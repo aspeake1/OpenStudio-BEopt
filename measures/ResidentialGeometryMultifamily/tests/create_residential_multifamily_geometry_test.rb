@@ -12,6 +12,14 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     result = _test_error("MF_8units_1story_SL_Denver.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Starting model is not empty.")
   end
+  
+  def test_error_num_units
+    args_hash = {}
+    args_hash["num_floors"] = 3
+    args_hash["num_units"] = 10
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "The number of units must be divisible by the number of floors.")
+  end
 
   def test_argument_error_crawl_height_invalid
     args_hash = {}
@@ -37,7 +45,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
 
   def test_warning_uneven_units_per_floor_with_interior_corr
     args_hash = {}
-    args_hash["num_units_per_floor"] = 3
+    args_hash["num_units"] = 3
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>2, "Surface"=>18, "ThermalZone"=>1+2, "Space"=>1+2, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>900*2, "BuildingHeight"=>8}
@@ -57,7 +65,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_two_story_double_exterior
     args_hash = {}
     args_hash["num_floors"] = 2
-    args_hash["num_units_per_floor"] = 4
+    args_hash["num_units"] = 2*4
     args_hash["corridor_position"] = "Double Exterior"
     args_hash["inset_width"] = 8
     args_hash["inset_depth"] = 6
@@ -71,7 +79,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_multiplex_right_inset
     args_hash = {}
     args_hash["num_floors"] = 8
-    args_hash["num_units_per_floor"] = 6
+    args_hash["num_units"] = 8*6
     args_hash["inset_width"] = 8
     args_hash["inset_depth"] = 6
     args_hash["foundation_type"] = "unfinished basement"
@@ -84,7 +92,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_multiplex_left_inset
     args_hash = {}
     args_hash["num_floors"] = 8
-    args_hash["num_units_per_floor"] = 6
+    args_hash["num_units"] = 8*6
     args_hash["inset_width"] = 8
     args_hash["inset_depth"] = 6
     args_hash["inset_position"] = "Left"
@@ -99,7 +107,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_crawl_single_exterior
     args_hash = {}
     args_hash["num_floors"] = 2
-    args_hash["num_units_per_floor"] = 12
+    args_hash["num_units"] = 12*2
     args_hash["corridor_position"] = "Single Exterior (Front)"
     args_hash["foundation_type"] = "crawlspace"
     expected_num_del_objects = {}
@@ -110,7 +118,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
 
   def test_crawlspace_double_loaded_corr
     args_hash = {}
-    args_hash["num_units_per_floor"] = 4
+    args_hash["num_units"] = 4
     args_hash["foundation_type"] = "crawlspace"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3}
@@ -120,7 +128,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
 
   def test_ufbasement_double_loaded_corr
     args_hash = {}
-    args_hash["num_units_per_floor"] = 4
+    args_hash["num_units"] = 4
     args_hash["foundation_type"] = "unfinished basement"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3}
@@ -133,7 +141,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
 
   def test_zone_mult_front_units_only
     args_hash = {}
-    args_hash["num_units_per_floor"] = 8
+    args_hash["num_units"] = 8
     args_hash["corridor_width"] = 0
     args_hash["use_zone_mult"] = "true"
     expected_num_del_objects = {}
@@ -144,7 +152,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
 
   def test_zone_mult_with_rear_units_even
     args_hash = {}
-    args_hash["num_units_per_floor"] = 8
+    args_hash["num_units"] = 8
     args_hash["use_zone_mult"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>6, "Surface"=>48, "ThermalZone"=>6+1, "Space"=>6+1, "SpaceType"=>2}
@@ -154,7 +162,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
 
   def test_zone_mult_with_rear_units_odd
     args_hash = {}
-    args_hash["num_units_per_floor"] = 9
+    args_hash["num_units"] = 9
     args_hash["corridor_position"] = "Double Exterior"
     args_hash["use_zone_mult"] = "true"
     expected_num_del_objects = {}
@@ -166,7 +174,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_floor_mult
     args_hash = {}
     args_hash["num_floors"] = 12
-    args_hash["num_units_per_floor"] = 8
+    args_hash["num_units"] = 12*8
     args_hash["use_floor_mult"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>24, "Surface"=>288, "ThermalZone"=>25, "Space"=>36, "SpaceType"=>2}
@@ -178,7 +186,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
 
   def test_one_unit_per_floor_with_rear_units
     args_hash = {}
-    args_hash["num_units_per_floor"] = 1
+    args_hash["num_units"] = 1
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Specified building as having rear units, but didn't specify enough units.")
   end
@@ -186,7 +194,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_two_units_per_floor_with_rear_units
     args_hash = {}
     args_hash["num_floors"] = 4
-    args_hash["num_units_per_floor"] = 2
+    args_hash["num_units"] = 4*2
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>8, "Surface"=>72, "ThermalZone"=>8+1, "Space"=>12, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>900*8, "BuildingHeight"=>4*8}
@@ -196,7 +204,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_one_unit_per_floor_with_no_rear_units
     args_hash = {}
     args_hash["num_floors"] = 4
-    args_hash["num_units_per_floor"] = 1
+    args_hash["num_units"] = 4*1
     args_hash["corridor_position"] = "None"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>24, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>1}
