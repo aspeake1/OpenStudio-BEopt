@@ -4,7 +4,7 @@ require "#{File.dirname(__FILE__)}/unit_conversions"
 class ClothesDryer
 
   def self.apply(model, unit, runner, sch, cef, mult, 
-                 space, fuel_type, fuel_split, exhaust_norm)
+                 space, fuel_type, fuel_split)
   
       # Get unit beds/baths
       nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)

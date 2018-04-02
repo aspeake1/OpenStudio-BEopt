@@ -179,8 +179,8 @@ class ResidentialClothesWasherTest < MiniTest::Test
     args_hash["rated_annual_energy"] = 123.0
     args_hash["annual_cost"] = 9.0
     args_hash["drum_volume"] = 3.68
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>2, "ScheduleConstant"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tankwh_cw_eleccd, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
@@ -191,8 +191,8 @@ class ResidentialClothesWasherTest < MiniTest::Test
     args_hash["rated_annual_energy"] = 123.0
     args_hash["annual_cost"] = 9.0
     args_hash["drum_volume"] = 3.68
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>2, "ScheduleConstant"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
     expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tankwh_cw_gascd, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
@@ -203,8 +203,8 @@ class ResidentialClothesWasherTest < MiniTest::Test
     args_hash["rated_annual_energy"] = 123.0
     args_hash["annual_cost"] = 9.0
     args_hash["drum_volume"] = 3.68
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>2, "ScheduleConstant"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
     expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tankwh_cw_propanecd, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end

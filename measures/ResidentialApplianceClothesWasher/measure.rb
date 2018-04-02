@@ -593,25 +593,32 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
             # Get clothes dryer properties
             cd_cef = unit.getFeatureAsDouble(Constants.ClothesDryerCEF(cd))
             cd_mult = unit.getFeatureAsDouble(Constants.ClothesDryerMult(cd))
-            cd_weekday_sch = unit.getFeatureAsString(Constants.ClothesDryerWeekdaySch(cd))
-            cd_shc = unit.getFeature(Constants.ClothesDryerSch(cd))
             cd_fuel_type = unit.getFeatureAsString(Constants.ClothesDryerFuelType(cd))
             cd_fuel_split = unit.getFeatureAsDouble(Constants.ClothesDryerFuelSplit(cd))
-            if !cd_cef.is_initialized or !cd_mult.is_initialized or !cd_sch.is_initialized or !cd_fuel_type.is_initialized or !cd_fuel_split.is_initialized
+            
+            model.getScheduleFixedIntervals.each do |schedule|
+                next unless schedule.name.to_s.include? "clothes dryer"
+                if schedule.name.to_s.include? "exhaust schedule"
+                    cd_exh_sch = schedule
+                else
+                    cd_shc = schedule
+                end
+            end
+            #runner.registerInfo("cd_sch = #{cd_sch}, cd_exh_sch = #{cd_exh_sch}")
+            if !cd_cef.is_initialized or !cd_mult.is_initialized or !cd_fuel_type.is_initialized or !cd_fuel_split.is_initialized
                 runner.registerError("Could not find clothes dryer properties.")
                 return false
             end
             cd_cef = cd_cef.get
             cd_mult = cd_mult.get
-            cd_sch = cd_sch.get
             cd_fuel_type = cd_fuel_type.get
             cd_fuel_split = cd_fuel_split.get
             
             # Update clothes dryer
             cd_space = cd.space.get
             ClothesDryer.remove_existing(runner, cd_space, cd_unit_obj_name, false)
-            success, cd_ann_e, cd_ann_f, cd_sch = ClothesDryer.apply(model, unit, runner, cd_sch, cd_cef, cd_mult, cd_sch, 
-                                                                     cd_space, cd_fuel_type, cd_fuel_split, cd_exhaust_norm)
+            success, cd_ann_e, cd_ann_f, cd_sch = ClothesDryer.apply(model, unit, runner, cd_sch, cd_cef, cd_mult, 
+                                                                     cd_space, cd_fuel_type, cd_fuel_split)
             
             if not success
                 return false
