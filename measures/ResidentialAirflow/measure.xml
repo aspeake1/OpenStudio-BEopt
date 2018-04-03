@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>residential_airflow</name>
   <uid>7d2adf5c-9995-49be-b662-a23d2452bb36</uid>
-  <version_id>6056a187-cfb0-4f26-9cd0-0679941af637</version_id>
-  <version_modified>20180326T171009Z</version_modified>
+  <version_id>fc9d657a-c5c7-403f-a6f6-e4c27e91c26d</version_id>
+  <version_modified>20180403T173404Z</version_modified>
   <xml_checksum>19EEDBBB</xml_checksum>
   <class_name>ResidentialAirflow</class_name>
   <display_name>Set Residential Airflow</display_name>
@@ -303,6 +303,24 @@
       </choices>
     </argument>
     <argument>
+      <name>range_spot_vent</name>
+      <display_name>Hour of range spot ventilation</display_name>
+      <description>Hour in which range spot ventilation occurs. Values indicate the time of spot ventilation, which lasts for 1 hour.</description>
+      <type>Integer</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>16</default_value>
+    </argument>
+    <argument>
+      <name>bathroom_spot_vent</name>
+      <display_name>Hour of bathroom spot ventilation</display_name>
+      <description>Hour in which bathroom spot ventilation occurs. Values indicate the time of spot ventilation, which lasts for 1 hour.</description>
+      <type>Integer</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>5</default_value>
+    </argument>
+    <argument>
       <name>mech_vent_cfis_open_time</name>
       <display_name>Mechanical Ventilation: CFIS Damper Open Time</display_name>
       <description>Minimum damper open time for a central fan integrated supply system.</description>
@@ -323,7 +341,7 @@
     <argument>
       <name>clothes_dryer_exhaust</name>
       <display_name>Clothes Dryer: Exhaust</display_name>
-      <description>Rated flow capacity of the clothes dryer exhaust. This fan is assumed to run 60 min/day between 11am and 12pm.</description>
+      <description>Rated flow capacity of the clothes dryer exhaust. This fan is assumed to run after any clothes dryer events.</description>
       <type>Double</type>
       <units>cfm</units>
       <required>true</required>
@@ -660,12 +678,6 @@
       <checksum>82988A63</checksum>
     </file>
     <file>
-      <filename>schedules.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>A299BFF0</checksum>
-    </file>
-    <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -678,100 +690,34 @@
       <checksum>9B96D48D</checksum>
     </file>
     <file>
-      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>E57D1B4A</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_CS_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>FCE187FA</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>5A0367AA</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_PB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>2687FC05</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_GRG_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>300B46AB</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_ElectricBaseboard.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>1051620D</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>F825B2C5</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_Neighbors.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>B5F0C991</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_UB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>1162EEBE</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_GRG_FR_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>EFABCFDE</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_ElecWHTank_ClothesWasher_ClothesDryer.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>2625C29F</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>20E86462</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHPDucted.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>7F5F53A0</checksum>
-    </file>
-    <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>FDA82DA6</checksum>
-    </file>
-    <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>1189E680</checksum>
     </file>
     <file>
+      <filename>hvac.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>1787BAAE</checksum>
+    </file>
+    <file>
+      <filename>schedules.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>BFEC0416</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>4C28AC14</checksum>
+    </file>
+    <file>
       <filename>residential_airflow_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>71C33475</checksum>
+      <checksum>8D0B7C2A</checksum>
     </file>
     <file>
       <version>
@@ -782,25 +728,103 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>CBD33282</checksum>
+      <checksum>D9F19108</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>10C790F0</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_CS_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>85E4A994</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>4BB5C497</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_PB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>DF53B00F</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_GRG_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>727D6539</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_ElectricBaseboard.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>E3AEC950</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>2958681F</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_Neighbors.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>60E15AB0</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_UB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>4E205AEF</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_GRG_FR_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>B13CD931</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_ElecWHTank_ClothesWasher_ClothesDryer.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>CDC4EA0E</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>8EDBA623</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHPDucted.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>725C81E9</checksum>
     </file>
     <file>
       <filename>SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>7694825C</checksum>
+      <checksum>5128C71E</checksum>
     </file>
     <file>
       <filename>MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>83F951BA</checksum>
+      <checksum>57093B24</checksum>
     </file>
     <file>
-      <filename>hvac.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>1787BAAE</checksum>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_ElecWHTank_ClothesWasher_GasClothesDryer.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>86C8E590</checksum>
     </file>
   </files>
 </measure>
