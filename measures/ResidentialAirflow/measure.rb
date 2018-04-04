@@ -1089,27 +1089,28 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       
       dryer_name = nil
       dryer_exhaust_sch_name = nil
-      #Set the clothes dryer schedule
+      cw = nil
+      cw_day_shift = nil
+      #Get the clothes washer so we can use the day shift for the clothes dryer
+      model.getElectricEquipments.each do |ee|
+        next if ee.name.to_s != Constants.ObjectNameClothesWasher(building_unit.name.to_s)
+        puts ee.name.to_s
+        cw = ee
+        cw_day_shift = building_unit.getFeatureAsDouble(Constants.ClothesWasherDayShift(cw))
+        break
+      end
+      
+      #Create the clothes dryer exhaust schedule
       (model.getElectricEquipments + model.getOtherEquipments).each do |equip|
         next unless equip.name.to_s == Constants.ObjectNameClothesDryer(Constants.FuelTypeElectric, building_unit.name.to_s) or equip.name.to_s == Constants.ObjectNameClothesDryer(Constants.FuelTypeGas, building_unit.name.to_s) or equip.name.to_s == Constants.ObjectNameClothesDryer(Constants.FuelTypePropane, building_unit.name.to_s)
         dryer_name = equip.name.to_s
-        unit.dryer_exhaust = dryerExhaust 
+        unit.dryer_exhaust = dryerExhaust
+        hr_shift = cw_day_shift.to_f + 1.0 / 24.0
+        nbeds, nbaths = Geometry.get_unit_beds_baths(model, building_unit, runner)
+        sch_unit_index = Geometry.get_unit_dhw_sched_index(model, building_unit, runner)
+        #Create exhaust schedule
+        schedules.ClothesDryerExhaust = HotWaterSchedule.new(model, runner, dryer_name + " exhaust schedule", dryer_name + " exhaust temperature schedule", nbeds, sch_unit_index, hr_shift, "ClothesDryerExhaust", 0, File.dirname(__FILE__))
         break
-      end
-
-      #get the dryer exhaust schedule (different from the dryer schedule)
-      if dryer_name != nil
-        model.getScheduleFixedIntervals.each do |schedule|
-          #runner.registerInfo("Fixed interval schedule name = #{schedule.name.to_s}")
-          next unless schedule.name.to_s.include? "clothes dryer" and schedule.name.to_s.include? "exhaust schedule"
-          schedules.ClothesDryerExhaust = schedule
-          break
-        end
-      end
-      
-      if schedules.ClothesDryerExhaust.nil? and unit.dryer_exhaust != nil
-        runner.registerError("Unable to find the clothes dryer exhaust schedule specified with the clothes dryer")
-        unit.dryer_exhaust = 0
       end
       
       if unit.dryer_exhaust.nil?
@@ -1131,22 +1132,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         return false
       end
       
-      range_array = []
-      for h in 1..24
-        if h == rangeExhaustTime
-          range_array.concat([1.0])
-        else
-          range_array.concat([0.0])
-        end
-      end
-      bathroom_array = []
-      for h in 1..24
-        if h == bathroomExhaustTime
-          bathroom_array.concat([1.0])
-        else
-          bathroom_array.concat([0.0])
-        end
-      end
+      range_array = [0.0] * 24
+      range_array[rangeExhaustTime - 1] = 1.0
+      bathroom_array = [0.0] * 24
+      bathroom_array[bathroomExhaustTime - 1] = 1.0
+
       schedules.BathExhaust = HourlyByMonthSchedule.new(model, runner, obj_name_infil + " bath exhaust schedule", [bathroom_array] * 12, [bathroom_array] * 12, normalize_values = false)
       schedules.RangeHood = HourlyByMonthSchedule.new(model, runner, obj_name_infil + " range hood schedule", [range_array] * 12, [range_array] * 12, normalize_values = false)
        
@@ -1408,7 +1398,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       if unit.dryer_exhaust != 0
         clothes_dryer_sch_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, schedule_value_output_var)
         clothes_dryer_sch_sensor.setName("#{obj_name_infil} clothes dryer sch s")
-        clothes_dryer_sch_sensor.setKeyName(schedules.ClothesDryerExhaust.name.to_s)
+        clothes_dryer_sch_sensor.setKeyName(dryer_name + " exhaust schedule")
       end
 
       nvavail_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, schedule_value_output_var)
@@ -1965,6 +1955,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       infil_program.addLine("Set Qrange = #{range_sch_sensor.name}*#{UnitConversions.convert(mech_vent.range_hood_hour_avg_exhaust,"cfm","m^3/s").round(4)}")
       if unit.dryer_exhaust > 0
         infil_program.addLine("Set Qdryer = #{clothes_dryer_sch_sensor.name}*#{UnitConversions.convert(unit.dryer_exhaust,"cfm","m^3/s")}")
+      else
+        infil_program.addLine("Set Qdryer = 0")
       end
       infil_program.addLine("Set Qbath = #{bath_sch_sensor.name}*#{UnitConversions.convert(mech_vent.bathroom_hour_avg_exhaust,"cfm","m^3/s").round(4)}")
       infil_program.addLine("Set QhpwhOut = 0")
@@ -1973,31 +1965,19 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       infil_program.addLine("Set QductsIn = #{duct_lk_supply_fan_equiv_var.name}")
 
       if mech_vent.MechVentType == Constants.VentTypeBalanced
-        if unit.dryer_exhaust > 0
-          infil_program.addLine("Set Qout = Qrange+Qbath+Qdryer+QhpwhOut+QductsOut")
-        else
-          infil_program.addLine("Set Qout = Qrange+Qbath+QhpwhOut+QductsOut")
-        end
+        infil_program.addLine("Set Qout = Qrange+Qbath+Qdryer+QhpwhOut+QductsOut")
         infil_program.addLine("Set Qin = QhpwhIn+QductsIn")
         infil_program.addLine("Set Qu = (@Abs (Qout-Qin))")
         infil_program.addLine("Set Qb = QWHV + (@Min Qout Qin)")
         infil_program.addLine("Set #{whole_house_fan_actuator.name} = 0")
       else
         if mech_vent.MechVentType == Constants.VentTypeExhaust
-          if unit.dryer_exhaust > 0
-            infil_program.addLine("Set Qout = QWHV+Qrange+Qbath+Qdryer+QhpwhOut+QductsOut")
-          else
-            infil_program.addLine("Set Qout = QWHV+Qrange+Qbath+QhpwhOut+QductsOut")
-          end
+          infil_program.addLine("Set Qout = QWHV+Qrange+Qbath+Qdryer+QhpwhOut+QductsOut")
           infil_program.addLine("Set Qin = QhpwhIn+QductsIn")
           infil_program.addLine("Set Qu = (@Abs (Qout-Qin))")
           infil_program.addLine("Set Qb = (@Min Qout Qin)")
         else # mech_vent.MechVentType == Constants.VentTypeSupply
-          if unit.dryer_exhaust > 0
-            infil_program.addLine("Set Qout = Qrange+Qbath+Qdryer+QhpwhOut+QductsOut")
-          else
-            infil_program.addLine("Set Qout = Qrange+Qbath+QhpwhOut+QductsOut")
-          end
+          infil_program.addLine("Set Qout = Qrange+Qbath+Qdryer+QhpwhOut+QductsOut")
           infil_program.addLine("Set Qin = QWHV+QhpwhIn+QductsIn")
           infil_program.addLine("Set Qu = @Abs (Qout- Qin)")
           infil_program.addLine("Set Qb = (@Min Qout Qin)")

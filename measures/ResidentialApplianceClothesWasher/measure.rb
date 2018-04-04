@@ -598,13 +598,9 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
             
             model.getScheduleFixedIntervals.each do |schedule|
                 next unless schedule.name.to_s.include? "clothes dryer"
-                if schedule.name.to_s.include? "exhaust schedule"
-                    cd_exh_sch = schedule
-                else
-                    cd_shc = schedule
-                end
+                cd_shc = schedule
             end
-            #runner.registerInfo("cd_sch = #{cd_sch}, cd_exh_sch = #{cd_exh_sch}")
+
             if !cd_cef.is_initialized or !cd_mult.is_initialized or !cd_fuel_type.is_initialized or !cd_fuel_split.is_initialized
                 runner.registerError("Could not find clothes dryer properties.")
                 return false
