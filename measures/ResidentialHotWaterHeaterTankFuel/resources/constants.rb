@@ -185,19 +185,10 @@ class Constants
   def self.ClothesDryerMult(clothes_dryer) # FUTURE: Use StandardsInfo object
     return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
   end
-  def self.ClothesDryerSch(clothes_dryer) # FUTURE: Use StandardsInfo object
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
-  end
-  def self.ClothesDryerExhaustSch(clothes_dryer) # FUTURE: Use StandardsInfo object
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
-  end
   def self.ClothesDryerFuelType(clothes_dryer) # FUTURE: Use StandardsInfo object
     return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
   end
   def self.ClothesDryerFuelSplit(clothes_dryer) # FUTURE: Use StandardsInfo object
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
-  end
-  def self.ClothesDryerExhaustNorm(clothes_dryer) # FUTURE: Use StandardsInfo object
     return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
   end
   def self.ClothesWasherDrumVolume(clothes_washer) # FUTURE: Use StandardsInfo object

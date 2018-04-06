@@ -596,11 +596,6 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
             cd_fuel_type = unit.getFeatureAsString(Constants.ClothesDryerFuelType(cd))
             cd_fuel_split = unit.getFeatureAsDouble(Constants.ClothesDryerFuelSplit(cd))
             
-            model.getScheduleFixedIntervals.each do |schedule|
-                next unless schedule.name.to_s.include? "clothes dryer"
-                cd_shc = schedule
-            end
-
             if !cd_cef.is_initialized or !cd_mult.is_initialized or !cd_fuel_type.is_initialized or !cd_fuel_split.is_initialized
                 runner.registerError("Could not find clothes dryer properties.")
                 return false

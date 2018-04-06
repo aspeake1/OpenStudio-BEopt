@@ -419,8 +419,12 @@ class HotWaterSchedule
         @temperature_sch_name = temperature_sch_name
         @days_shift = days_shift
         @nbeds = ([num_bedrooms, 5].min).to_i
-        @file_prefix = file_prefix
         @target_water_temperature = UnitConversions.convert(target_water_temperature, "F", "C")
+        if file_prefix == "ClothesDryer"
+          @file_prefix = "ClothesWasher"
+        else
+          @file_prefix = file_prefix
+        end
         
         timestep_minutes = (60/@model.getTimestep.numberOfTimestepsPerHour).to_i
         
@@ -477,15 +481,9 @@ class HotWaterSchedule
             if @file_prefix.nil?
                 return data
             end
-            
-            if @file_prefix == "ClothesDryer"
-                file_prefix = "ClothesWasher"
-            else
-                file_prefix = @file_prefix
-            end
 
             # Get appropriate file
-            minute_draw_profile = "#{measure_dir}/resources/#{file_prefix}Schedule_#{@nbeds}bed.csv"
+            minute_draw_profile = "#{measure_dir}/resources/#{@file_prefix}Schedule_#{@nbeds}bed.csv"
             if not File.file?(minute_draw_profile)
                 @runner.registerError("Unable to find file: #{minute_draw_profile}")
                 return nil
@@ -498,7 +496,6 @@ class HotWaterSchedule
             # Read data into minute array
             skippedheader = false
             min_shift = 24 * 60 * days_shift
-            
             items = [0]*minutes_in_year
             File.open(minute_draw_profile).each do |line|
                 linedata = line.strip.split(',')
@@ -532,9 +529,6 @@ class HotWaterSchedule
             ontime = 0
             
             column_header = @file_prefix
-            if column_header == "ClothesDryer"
-                column_header = "ClothesWasher"
-            end
             
             totflow_column_header = "#{column_header} Sum"
             maxflow_column_header = "#{column_header} Max"
