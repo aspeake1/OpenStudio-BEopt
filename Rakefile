@@ -235,6 +235,8 @@ end
 desc 'update all measures (resources, xmls, workflows, README)'
 task :update_measures do
 
+  require 'openstudio'
+
   puts "Updating measure resources..."
   measures_dir = File.expand_path("../measures/", __FILE__)
   

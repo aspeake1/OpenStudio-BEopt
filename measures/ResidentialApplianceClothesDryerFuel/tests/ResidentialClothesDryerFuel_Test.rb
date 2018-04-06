@@ -38,7 +38,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["cef"] = 2.75 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>81.0, "Annual_therm"=>36.7, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -48,7 +48,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["cef"] = 3.48 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>64.0, "Annual_therm"=>29.0, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -58,7 +58,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["cef"] = 2.75 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypePropane
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>81.0, "Annual_therm"=>0, "Annual_gal"=>40.1, "FuelType"=>Constants.FuelTypePropane, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -68,7 +68,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["cef"] = 3.48 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypePropane
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>64.0, "Annual_therm"=>0, "Annual_gal"=>31.7, "FuelType"=>Constants.FuelTypePropane, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -79,7 +79,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["mult"] = 0.8
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>64.8, "Annual_therm"=>29.4, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -90,21 +90,8 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["fuel_split"] = 0.05
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>57.8, "Annual_therm"=>37.5, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
-    _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-
-  def test_new_construction_modified_schedule
-    args_hash = {}
-    args_hash["cef"] = 2.75 / 1.15
-    args_hash["weekday_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
-    args_hash["weekend_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"
-    args_hash["monthly_sch"] = "1,2,3,4,5,6,7,8,9,10,11,12"
-    args_hash["fuel_type"] = Constants.FuelTypeGas
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
-    expected_values = {"Annual_kwh"=>81.0, "Annual_therm"=>36.7, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -114,7 +101,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["location"] = Constants.SpaceTypeFinishedBasement
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>81.0, "Annual_therm"=>36.7, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -125,7 +112,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["location"] = Constants.SpaceTypeGarage
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>81.0, "Annual_therm"=>36.7, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -135,14 +122,14 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["cef"] = 2.75 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>81.0, "Annual_therm"=>36.7, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     model = _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["cef"] = 3.48 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypePropane
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>64.0, "Annual_therm"=>0, "Annual_gal"=>31.7, "FuelType"=>Constants.FuelTypePropane, "Location"=>args_hash["location"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -152,14 +139,14 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["cef"] = 2.75 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypePropane
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>81.0, "Annual_therm"=>0, "Annual_gal"=>40.1, "FuelType"=>Constants.FuelTypePropane, "Location"=>args_hash["location"]}
     model = _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["cef"] = 3.48 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypeGas
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>64.0, "Annual_therm"=>29.0, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -169,8 +156,8 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash = {}
     args_hash["cef"] = 3.48 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypeGas
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>64.0, "Annual_therm"=>29.0, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -180,12 +167,12 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["cef"] = 2.75 / 1.15
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>81.0, "Annual_therm"=>36.7, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     model = _test_measure(osm_geo_beds_loc_wh_cw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["mult"] = 0.0
-    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleFixedInterval"=>1}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "Annual_therm"=>0, "Annual_gal"=>0, "FuelType"=>nil, "Location"=>args_hash["location"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
@@ -225,48 +212,6 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Occupancy energy multiplier must be greater than or equal to 0.0.")
   end
-
-  def test_argument_error_weekday_sch_wrong_number_of_values
-    args_hash = {}
-    args_hash["weekday_sch"] = "1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
-  end  
-
-  def test_argument_error_weekday_sch_not_number
-    args_hash = {}
-    args_hash["weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
-  end
-    
-  def test_argument_error_weekend_sch_wrong_number_of_values
-    args_hash = {}
-    args_hash["weekend_sch"] = "1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
-  end
-    
-  def test_argument_error_weekend_sch_not_number
-    args_hash = {}
-    args_hash["weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
-  end
-  
-  def test_argument_error_monthly_sch_wrong_number_of_values  
-    args_hash = {}
-    args_hash["monthly_sch"] = "1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
-  end
-  
-  def test_argument_error_monthly_sch_not_number
-    args_hash = {}
-    args_hash["monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
-    result = _test_error(osm_geo_beds_loc_wh_cw, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
-  end
   
   def test_error_missing_beds
     args_hash = {}
@@ -291,7 +236,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash = {}
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>num_units*80.98, "Annual_therm"=>num_units*36.71, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
@@ -302,7 +247,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["fuel_type"] = Constants.FuelTypeGas
     args_hash["location"] = Constants.SpaceTypeFinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>num_units*80.98, "Annual_therm"=>num_units*36.71, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
@@ -313,7 +258,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash["fuel_type"] = Constants.FuelTypeGas
     args_hash["location"] = Constants.SpaceTypeUnfinishedBasement
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>num_units*80.98, "Annual_therm"=>num_units*36.71, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end  
@@ -323,7 +268,7 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     args_hash = {}
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleFixedInterval"=>1}
     expected_values = {"Annual_kwh"=>647.81, "Annual_therm"=>293.69, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
