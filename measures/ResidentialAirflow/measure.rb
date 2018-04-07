@@ -206,11 +206,25 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     mech_vent_cfis_airflow_frac.setDefaultValue(1.0)
     args << mech_vent_cfis_airflow_frac
 
+    #make an integer argument for hour of range spot ventilation
+    range_exhaust_hour = OpenStudio::Measure::OSArgument::makeIntegerArgument("range_exhaust_hour",true)
+    range_exhaust_hour.setDisplayName("Spot Ventilation: Hour of range spot ventilation")
+    range_exhaust_hour.setDescription("Hour in which range spot ventilation occurs. Values indicate the time of spot ventilation, which lasts for 1 hour.")
+    range_exhaust_hour.setDefaultValue(16)
+    args << range_exhaust_hour
+    
+    #make an integer argument for hour of bathroom spot ventilation
+    bathroom_exhaust_hour = OpenStudio::Measure::OSArgument::makeIntegerArgument("bathroom_exhaust_hour",true)
+    bathroom_exhaust_hour.setDisplayName("Spot Ventilation: Hour of bathroom spot ventilation")
+    bathroom_exhaust_hour.setDescription("Hour in which bathroom spot ventilation occurs. Values indicate the time of spot ventilation, which lasts for 1 hour.")
+    bathroom_exhaust_hour.setDefaultValue(5)
+    args << bathroom_exhaust_hour
+    
     #make a double argument for dryer exhaust
     clothes_dryer_exhaust = OpenStudio::Measure::OSArgument::makeDoubleArgument("clothes_dryer_exhaust",true)
     clothes_dryer_exhaust.setDisplayName("Clothes Dryer: Exhaust")
     clothes_dryer_exhaust.setUnits("cfm")
-    clothes_dryer_exhaust.setDescription("Rated flow capacity of the clothes dryer exhaust. This fan is assumed to run 60 min/day between 11am and 12pm.")
+    clothes_dryer_exhaust.setDescription("Rated flow capacity of the clothes dryer exhaust. This fan is assumed to run after any clothes dryer events.")
     clothes_dryer_exhaust.setDefaultValue(100.0)
     args << clothes_dryer_exhaust
 
@@ -448,6 +462,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       mech_vent_total_efficiency = 0.0
       mech_vent_sensible_efficiency = 0.0
     end
+    range_exhaust_hour = runner.getIntegerArgumentValue("range_exhaust_hour",user_arguments)
+    bathroom_exhaust_hour = runner.getIntegerArgumentValue("bathroom_exhaust_hour",user_arguments)
     clothes_dryer_exhaust = runner.getDoubleArgumentValue("clothes_dryer_exhaust",user_arguments)
     is_existing_home = runner.getBoolArgumentValue("is_existing_home",user_arguments)
     
@@ -495,11 +511,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     # Create the airflow objects
     has_flue_chimney = (has_hvac_flue or has_water_heater_flue or has_fireplace_chimney)
     infil = Infiltration.new(living_ach50, shelter_coef, garage_ach50, crawl_ach, unfinished_attic_sla, unfinished_basement_ach, finished_basement_ach, pier_beam_ach, has_flue_chimney, is_existing_home, terrain)
-    mech_vent = MechanicalVentilation.new(mech_vent_type, mech_vent_infil_credit, mech_vent_total_efficiency, mech_vent_frac_62_2, mech_vent_fan_power, mech_vent_sensible_efficiency, mech_vent_ashrae_std, mech_vent_cfis_open_time, mech_vent_cfis_airflow_frac, clothes_dryer_exhaust)
+    mech_vent = MechanicalVentilation.new(mech_vent_type, mech_vent_infil_credit, mech_vent_total_efficiency, mech_vent_frac_62_2, mech_vent_fan_power, mech_vent_sensible_efficiency, mech_vent_ashrae_std, mech_vent_cfis_open_time, mech_vent_cfis_airflow_frac, clothes_dryer_exhaust, range_exhaust_hour, bathroom_exhaust_hour)
     nat_vent = NaturalVentilation.new(nat_vent_htg_offset, nat_vent_clg_offset, nat_vent_ovlp_offset, nat_vent_htg_season, nat_vent_clg_season, nat_vent_ovlp_season, nat_vent_num_weekdays, nat_vent_num_weekends, nat_vent_frac_windows_open, nat_vent_frac_window_area_openable, nat_vent_max_oa_hr, nat_vent_max_oa_rh)
     ducts = Ducts.new(duct_total_leakage, duct_norm_leakage_25pa, duct_supply_area_mult, duct_return_area_mult, duct_r, duct_supply_frac, duct_return_frac, duct_ah_supply_frac, duct_ah_return_frac, duct_location_frac, duct_num_returns, duct_location)
     
-    if not Airflow.apply(model, runner, infil, mech_vent, nat_vent, ducts)
+    if not Airflow.apply(model, runner, infil, mech_vent, nat_vent, ducts, File.dirname(__FILE__))
       return false
     end
 
