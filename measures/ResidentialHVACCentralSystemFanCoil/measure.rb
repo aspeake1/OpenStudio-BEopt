@@ -69,7 +69,7 @@ class ProcessCentralSystemFanCoil < OpenStudio::Measure::ModelMeasure
 
     fan_coil_heating = runner.getBoolArgumentValue("fan_coil_heating",user_arguments)
     fan_coil_cooling = runner.getBoolArgumentValue("fan_coil_cooling",user_arguments)
-    central_boiler_fuel_type = HelperMethods.eplus_fuel_map[runner.getStringArgumentValue("central_boiler_fuel_type",user_arguments)]
+    central_boiler_fuel_type = HelperMethods.eplus_fuel_map(runner.getStringArgumentValue("central_boiler_fuel_type",user_arguments))
 
     std = Standard.build("90.1-2013")
 

@@ -162,11 +162,11 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
 
-    show_output(result)
+    # show_output(result)
 
     # save the model to test output directory
-    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
-    model.save(output_file_path, true)
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    # model.save(output_file_path, true)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
