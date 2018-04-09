@@ -554,6 +554,40 @@ class ResidentialAirflowTest < MiniTest::Test
     model, result = _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
   end
 
+  def test_multifamily_new_construction_large_building
+    num_units = 24
+    args_hash = {}
+    args_hash["has_hvac_flue"] = "true"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*7, "ScheduleRule"=>num_units*84, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*13, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "AirLoopHVACReturnPlenum"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6}
+    expected_values = {"res_infil_1_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_2_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_3_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_4_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_5_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_5_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_6_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_6_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_7_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_7_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_8_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_8_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_9_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_9_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_10_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_10_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_11_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_11_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_12_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_12_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_13_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_13_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_14_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_14_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_15_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_15_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_16_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_16_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_17_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_17_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_18_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_18_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_19_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_19_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_20_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_20_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_21_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_21_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_22_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_22_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_23_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_23_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_24_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_24_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "TerrainType"=>"Suburbs"}
+    model, result = _test_measure("MF_24units_2story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
+  end
+
   def test_simulation_baseboards_airflow
     num_units = 2
     args_hash = {}
