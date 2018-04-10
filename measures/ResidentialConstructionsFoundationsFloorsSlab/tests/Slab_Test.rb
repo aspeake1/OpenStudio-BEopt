@@ -51,7 +51,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash = {}
     args_hash["exposed_perim"] = "134.16407864998726"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.02949+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -62,7 +62,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash["perim_width"] = 2
     args_hash["gap_r"] = 5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.01838+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -72,7 +72,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash["ext_depth"] = 4
     args_hash["ext_r"] = 15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.00845+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -82,7 +82,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash["whole_r"] = 20
     args_hash["gap_r"] = 10
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.00571+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -92,7 +92,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash["whole_r"] = 20
     args_hash["gap_r"] = 10
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.00743+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_slab_garage, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -104,7 +104,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash["whole_r"] = 20
     args_hash["gap_r"] = 10
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.00743+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_slab_garage_windows_doors, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -265,7 +265,7 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     args_hash["perim_width"] = 2
     args_hash["gap_r"] = 5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0254/0.01838+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

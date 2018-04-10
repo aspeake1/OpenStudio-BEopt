@@ -43,11 +43,11 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid corridor width entered.")
   end
 
-  def test_warning_uneven_units_per_floor_with_interior_corr
+  def test_argument_warning_odd_with_interior_corr
     args_hash = {}
     args_hash["num_units"] = 3
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>2, "Surface"=>18, "ThermalZone"=>1+2, "Space"=>1+2, "SpaceType"=>2}
+    expected_num_new_objects = {"BuildingUnit"=>3-1, "Surface"=>18, "ThermalZone"=>1+2, "Space"=>1+2, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>900*2, "BuildingHeight"=>8, "NumZonesRepresented"=>3-1}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 1)
   end

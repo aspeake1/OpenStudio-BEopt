@@ -59,7 +59,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinishedTest < MiniTest::Te
     args_hash["ceil_joist_height"] = 9.25
     args_hash["exposed_perim"] = "134.16407864998726"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.40683+0.3048/1.731+0.2032/1.3114+176.1+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+2242.8+67.642, "LayerSpecificHeat"=>418.7+837.4+837.4+1211.14, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_unfinished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -79,7 +79,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinishedTest < MiniTest::Te
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.798+0.3048/1.731+0.2032/1.3114+176.1+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+2242.8+67.642, "LayerSpecificHeat"=>418.7+837.4+837.4+1211.14, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_unfinished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -99,7 +99,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinishedTest < MiniTest::Te
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.3048/1.731+0.2032/1.3114+0.051816/0.029427+16.646+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+32.04+2242.8+67.642, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4+1211.14, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_unfinished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -119,7 +119,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinishedTest < MiniTest::Te
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.946+0.3048/1.731+0.2032/1.3114+0.025908/0.029427+176.1+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+32.04+2242.8+67.642, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4+1211.14, "LayerIndex"=>0+1+2+3+0+1+2+0, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_unfinished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -139,7 +139,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinishedTest < MiniTest::Te
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.40683+0.3048/1.731+0.2032/1.3114+176.1+0.1016/1.3114+0.23495/0.11686, "LayerDensity"=>1842.3+2242.8+2242.8+104.429, "LayerSpecificHeat"=>418.7+837.4+837.4+1153.61, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_unfinished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -159,7 +159,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinishedTest < MiniTest::Te
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.3048/1.731+0.2032/1.3114+0.051816/0.029427+13.2319+0.1016/1.3114+0.23495/2.59817, "LayerDensity"=>1842.3+2242.8+32.04+2242.8+67.64, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4+1211.14, "LayerIndex"=>0+1+2+0+1+2+0, "SurfacesWithConstructions"=>9}
     _test_measure(osm_geo_unfinished_basement_garage, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -311,7 +311,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinishedTest < MiniTest::Te
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_unfinished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
@@ -332,7 +332,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinishedTest < MiniTest::Te
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "AdditionalProperties"=>1}
     expected_values = {"SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_unfinished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  

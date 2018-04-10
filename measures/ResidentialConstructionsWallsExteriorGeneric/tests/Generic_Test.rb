@@ -30,7 +30,7 @@ class ProcessConstructionsWallsExteriorGenericTest < MiniTest::Test
     args_hash["specific_heat_2"] = 0.28
     args_hash["specific_heat_3"] = 0.28
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0635/1.3286+0.0762/0.0613+0.0635/1.0777, "LayerDensity"=>2216.046+41.652+2188.172, "LayerSpecificHeat"=>963.01+1172.36+1172.36, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>8}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -50,7 +50,7 @@ class ProcessConstructionsWallsExteriorGenericTest < MiniTest::Test
     args_hash["specific_heat_2"] = 0.21
     args_hash["specific_heat_3"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.06985/0.0638+0.0946/0.4986+0.0889/0.1337, "LayerDensity"=>1065.01+1553.94+833.52, "LayerSpecificHeat"=>1046.75+879.27+1046.75, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>8}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -180,7 +180,7 @@ class ProcessConstructionsWallsExteriorGenericTest < MiniTest::Test
     args_hash["specific_heat_2"] = 0.28
     args_hash["specific_heat_3"] = 0.28
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0635/1.3286+0.0762/0.0613+0.0635/1.0777, "LayerDensity"=>2216.046+41.652+2188.172, "LayerSpecificHeat"=>963.01+1172.36+1172.36, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end

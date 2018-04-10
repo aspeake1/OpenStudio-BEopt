@@ -20,7 +20,7 @@ class ProcessConstructionsCeilingsRoofsSheathingTest < MiniTest::Test
     args_hash["osb_thick_in"] = 0.75
     args_hash["rigid_thick_in"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.01905, "LayerConductivity"=>0.1154577, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -31,7 +31,7 @@ class ProcessConstructionsCeilingsRoofsSheathingTest < MiniTest::Test
     args_hash["rigid_r"] = 10
     args_hash["rigid_thick_in"] = 2
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.0508, "LayerConductivity"=>0.02885, "LayerDensity"=>32.04, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -42,7 +42,7 @@ class ProcessConstructionsCeilingsRoofsSheathingTest < MiniTest::Test
     args_hash["rigid_r"] = 10
     args_hash["rigid_thick_in"] = 2
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>2, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>2, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.01905+0.0508, "LayerConductivity"=>0.1154577+0.02885, "LayerDensity"=>512.64+32.04, "LayerSpecificHeat"=>1214.23+1214.23, "LayerIndex"=>0+1, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -94,7 +94,7 @@ class ProcessConstructionsCeilingsRoofsSheathingTest < MiniTest::Test
     args_hash = {}
     args_hash["surface"] = "Surface 14"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.01905, "LayerConductivity"=>0.1154577, "LayerDensity"=>512.64, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end

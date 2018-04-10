@@ -24,7 +24,7 @@ class ProcessConstructionsWallsExteriorSteelStudTest < MiniTest::Test
     args_hash["framing_factor"] = 0.25
     args_hash["correction_factor"] = 0.5 # no insulation, shouldn't apply
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.5049, "LayerDensity"=>1.1476, "LayerSpecificHeat"=>1004.88, "LayerIndex"=>0}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -38,7 +38,7 @@ class ProcessConstructionsWallsExteriorSteelStudTest < MiniTest::Test
     args_hash["framing_factor"] = 0.25
     args_hash["correction_factor"] = 0.46
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.087, "LayerDensity"=>44.989, "LayerSpecificHeat"=>1046.734, "LayerIndex"=>0}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

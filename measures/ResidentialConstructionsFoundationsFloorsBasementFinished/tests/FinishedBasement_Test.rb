@@ -57,7 +57,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinishedTest < MiniTest::Test
     args_hash["ceil_joist_height"] = 9.25
     args_hash["exposed_perim"] = "109.54451150103338"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.3275+0.3048/1.731+0.2032/1.3114+176.1+0.1016/1.3114, "LayerDensity"=>1842.3+2242.8+2242.8, "LayerSpecificHeat"=>418.7+837.4+837.4, "LayerIndex"=>0+1+2+0+1+2, "SurfacesWithConstructions"=>5}
     _test_measure(osm_geo_finished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -75,7 +75,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinishedTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.719+0.3048/1.731+0.2032/1.3114+176.1+0.1016/1.3114, "LayerDensity"=>1842.3+2242.8+2242.8, "LayerSpecificHeat"=>418.7+837.4+837.4, "LayerIndex"=>0+1+2+0+1+2, "SurfacesWithConstructions"=>5}
     _test_measure(osm_geo_finished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -93,7 +93,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinishedTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.3048/1.731+0.2032/1.3114+0.051816/0.029427+11.632+0.1016/1.3114, "LayerDensity"=>1842.3+2242.8+32.04+2242.8, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4, "LayerIndex"=>0+1+2+0+1+2, "SurfacesWithConstructions"=>5}
     _test_measure(osm_geo_finished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -111,7 +111,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinishedTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>2, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>1.209+0.3048/1.731+0.2032/1.3114+0.025908/0.029427+176.1+0.1016/1.3114, "LayerDensity"=>1842.3+2242.8+32.04+2242.8, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4, "LayerIndex"=>0+1+2+3+0+1+2, "SurfacesWithConstructions"=>5}
     _test_measure(osm_geo_finished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -129,7 +129,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinishedTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.3048/1.731+0.2032/1.3114+0.051816/0.029427+9.001+0.1016/1.3114, "LayerDensity"=>1842.3+2242.8+32.04+2242.8, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4, "LayerIndex"=>0+1+2+0+1+2, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_finished_basement_garage, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -272,7 +272,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinishedTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "AdditionalProperties"=>1}
     expected_values = {"SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_finished_basement, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

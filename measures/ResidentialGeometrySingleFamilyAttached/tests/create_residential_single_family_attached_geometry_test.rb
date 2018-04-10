@@ -28,12 +28,14 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid aspect ratio entered.")
   end
   
-  def test_argument_error_odd_and_rear_units
+  def test_argument_warning_odd_and_rear_units
     args_hash = {}
     args_hash["num_units"] = 9
     args_hash["has_rear_units"] = "true"
-    result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot specify building with rear units when there is an odd number of units.")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"BuildingUnit"=>9-1, "Surface"=>60, "ThermalZone"=>2*4+1, "Space"=>8+1, "SpaceType"=>2}
+    expected_values = {"FinishedFloorArea"=>900*8, "FinishedBasementHeight"=>8, "UnfinishedAtticHeight"=>21.21, "UnfinishedAtticFloorArea"=>900*8, "BuildingHeight"=>8+21.21, "NumZonesRepresented"=>9-1}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 1)
   end
 
   def test_two_story_fourplex_front_units_gable

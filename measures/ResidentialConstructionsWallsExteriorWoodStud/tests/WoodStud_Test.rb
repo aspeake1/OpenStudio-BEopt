@@ -23,7 +23,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "false"
     args_hash["framing_factor"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.33822, "LayerDensity"=>129.0207, "LayerSpecificHeat"=>1212.833, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -36,7 +36,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "false"
     args_hash["framing_factor"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.07448, "LayerDensity"=>162.403, "LayerSpecificHeat"=>1178.9167, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -49,7 +49,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "true"
     args_hash["framing_factor"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.05694, "LayerDensity"=>161.7351, "LayerSpecificHeat"=>1179.4578, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -62,7 +62,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "true"
     args_hash["framing_factor"] = 0.15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.1397, "LayerConductivity"=>0.04757, "LayerDensity"=>115.704, "LayerSpecificHeat"=>1158.0555, "LayerIndex"=>0, "SurfacesWithConstructions"=>8}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -136,7 +136,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "false"
     args_hash["framing_factor"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.33822, "LayerDensity"=>129.0207, "LayerSpecificHeat"=>1212.833, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end

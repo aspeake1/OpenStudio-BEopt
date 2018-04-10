@@ -45,7 +45,7 @@ class ProcessConstructionsFoundationsFloorsPierBeamTest < MiniTest::Test
     args_hash = {}
     args_hash["cavity_r"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.1397/1.904620, "LayerConductivity"=>2.598173704068639, "LayerDensity"=>67.684520, "LayerSpecificHeat"=>1210.925069, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -53,13 +53,13 @@ class ProcessConstructionsFoundationsFloorsPierBeamTest < MiniTest::Test
   def test_retrofit_replace
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.1397/0.048947, "LayerConductivity"=>0.048947, "LayerDensity"=>106.354587, "LayerSpecificHeat"=>1151.630118, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["cavity_r"] = "38"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.1397/0.029203, "LayerConductivity"=>0.048947, "LayerDensity"=>106.354587, "LayerSpecificHeat"=>1151.630118, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
@@ -68,7 +68,7 @@ class ProcessConstructionsFoundationsFloorsPierBeamTest < MiniTest::Test
     args_hash = {}
     args_hash["surface"] = "Surface 23"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_pier_beam, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

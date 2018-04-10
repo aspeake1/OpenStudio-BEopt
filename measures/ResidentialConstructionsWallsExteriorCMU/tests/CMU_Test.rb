@@ -25,7 +25,7 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     args_hash["furring_cavity_depth"] = 1
     args_hash["furring_spacing"] = 24
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>2, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>2, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.1524/0.538472+0.0254/0.14026, "LayerDensity"=>1001.1218+71.989, "LayerSpecificHeat"=>852.065+1211.355, "LayerIndex"=>0+1}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -40,7 +40,7 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     args_hash["furring_cavity_depth"] = 0
     args_hash["furring_spacing"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.1524/0.538472, "LayerDensity"=>1001.1218, "LayerSpecificHeat"=>852.065, "LayerIndex"=>0}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -55,7 +55,7 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     args_hash["furring_cavity_depth"] = 2
     args_hash["furring_spacing"] = 24
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>2, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>2, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.2032/0.284117+0.0508/0.04084, "LayerDensity"=>705.07224+110.334, "LayerSpecificHeat"=>858.2227+1154.524, "LayerIndex"=>0+1}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -70,7 +70,7 @@ class ProcessConstructionsWallsExteriorCMUTest < MiniTest::Test
     args_hash["furring_cavity_depth"] = 1
     args_hash["furring_spacing"] = 24
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>2, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>2, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.1524/0.6499+0.0254/0.1402, "LayerDensity"=>1800.455+71.989, "LayerSpecificHeat"=>845.554+1211.354, "LayerIndex"=>0+1}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

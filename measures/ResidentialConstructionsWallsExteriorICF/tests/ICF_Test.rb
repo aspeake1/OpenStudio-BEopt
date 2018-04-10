@@ -22,7 +22,7 @@ class ProcessConstructionsWallsExteriorICFTest < MiniTest::Test
     args_hash["concrete_thick_in"] = 4
     args_hash["framing_factor"] = 0.076
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0508/0.0310*2+0.1016/1.2205, "LayerDensity"=>68.565*2+2111.307, "LayerSpecificHeat"=>1214.23*2+844.353, "LayerIndex"=>0+1+2}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -34,7 +34,7 @@ class ProcessConstructionsWallsExteriorICFTest < MiniTest::Test
     args_hash["concrete_thick_in"] = 12
     args_hash["framing_factor"] = 0.076
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.0508/0.0291*2+0.3048/1.2205, "LayerDensity"=>68.565*2+2111.307, "LayerSpecificHeat"=>1214.23*2+844.353, "LayerIndex"=>0+1+2}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

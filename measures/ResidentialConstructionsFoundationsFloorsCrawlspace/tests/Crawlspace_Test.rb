@@ -53,7 +53,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     args_hash["ceil_joist_height"] = 9.25
     args_hash["exposed_perim"] = "134.16407864998726"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.23495/2.59817+0.3048/1.731+0.2032/1.3114+11.24877, "LayerDensity"=>67.641+1842.3+2242.8, "LayerSpecificHeat"=>1211.14+418.7+837.4, "LayerIndex"=>0+0+1+0+1, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -67,7 +67,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.23495/2.59817+0.3048/1.731+0.2032/1.3114+0.0508/0.02885+2.401, "LayerDensity"=>67.641+1842.3+2242.8+32.04, "LayerSpecificHeat"=>1211.14+418.7+837.4+1214.23, "LayerIndex"=>0+0+1+2+0+1, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -81,7 +81,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.23495/0.11686+0.3048/1.731+0.2032/1.3114+11.235, "LayerDensity"=>104.429+1842.3+2242.8, "LayerSpecificHeat"=>1153.611+418.7+837.4, "LayerIndex"=>0+0+1+0+1, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -95,7 +95,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>3}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>3, "AdditionalProperties"=>1}
     expected_values = {"LayerRValue"=>0.23495/2.59817+0.3048/1.731+0.2032/1.3114+0.0508/0.02885+1.881, "LayerDensity"=>67.641+1842.3+2242.8+32.04, "LayerSpecificHeat"=>1211.14+418.7+837.4+1214.23, "LayerIndex"=>0+0+1+2+0+1, "SurfacesWithConstructions"=>9}
     _test_measure(osm_geo_crawl_garage, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -206,7 +206,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
@@ -221,7 +221,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     args_hash["ceil_ff"] = 0.13
     args_hash["ceil_joist_height"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>2, "AdditionalProperties"=>1}
     expected_values = {"SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_crawl, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

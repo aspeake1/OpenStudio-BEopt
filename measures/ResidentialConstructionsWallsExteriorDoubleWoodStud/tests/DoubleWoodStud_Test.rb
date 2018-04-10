@@ -25,7 +25,7 @@ class ProcessConstructionsWallsExteriorDoubleWoodStudTest < MiniTest::Test
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = "false"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRvalue"=>0.0889/0.0741*2+0.0889/0.0402, "LayerDensity"=>148.393*2+119.207, "LayerSpecificHeat"=>1174.037*2+1160.187, "LayerIndex"=>0+1+2}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -40,7 +40,7 @@ class ProcessConstructionsWallsExteriorDoubleWoodStudTest < MiniTest::Test
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRvalue"=>0.0889/0.1794*2+0.0889/0.0285, "LayerDensity"=>146.657*2+117.470, "LayerSpecificHeat"=>1175.531*2+1161.847, "LayerIndex"=>0+1+2}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -55,7 +55,7 @@ class ProcessConstructionsWallsExteriorDoubleWoodStudTest < MiniTest::Test
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>2, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>2, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRvalue"=>0.0889/0.0493*2, "LayerDensity"=>146.657*2, "LayerSpecificHeat"=>1175.531*2, "LayerIndex"=>0+1}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

@@ -24,13 +24,13 @@ class ProcessConstructionsCeilingsRoofsRadiantBarrierTest < MiniTest::Test
     args_hash = {}
     args_hash["has_rb"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.00021336, "LayerConductivity"=>235.06980000000004, "LayerDensity"=>2700.9719999999998, "LayerSpecificHeat"=>921.14, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["has_rb"] = "false"
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>00, "LayerConductivity"=>0, "LayerDensity"=>0, "LayerSpecificHeat"=>0, "LayerIndex"=>0, "SurfacesWithConstructions"=>0}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
@@ -40,7 +40,7 @@ class ProcessConstructionsCeilingsRoofsRadiantBarrierTest < MiniTest::Test
     args_hash["surface"] = "Surface 14"
     args_hash["has_rb"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.00021336, "LayerConductivity"=>235.06980000000004, "LayerDensity"=>2700.9719999999998, "LayerSpecificHeat"=>921.14, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end

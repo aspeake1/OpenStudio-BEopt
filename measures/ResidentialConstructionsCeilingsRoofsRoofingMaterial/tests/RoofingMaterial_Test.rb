@@ -20,7 +20,7 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
     args_hash["solar_abs"] = 0.9
     args_hash["emissivity"] = 0.94
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.00945, "LayerConductivity"=>0.163, "LayerDensity"=>1121.4, "LayerSpecificHeat"=>1465.445, "LayerThermalAbs"=>0.94, "LayerSolarAbs"=>0.9, "LayerVisibleAbs"=>0.9, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -30,7 +30,7 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
     args_hash["solar_abs"] = 0.7
     args_hash["emissivity"] = 0.88
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.00945, "LayerConductivity"=>0.163, "LayerDensity"=>1121.4, "LayerSpecificHeat"=>1465.445, "LayerThermalAbs"=>0.88, "LayerSolarAbs"=>0.7, "LayerVisibleAbs"=>0.7, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -88,7 +88,7 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterialTest < MiniTest::Test
     args_hash = {}
     args_hash["surface"] = "Surface 14"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.0094488, "LayerConductivity"=>0.162714, "LayerDensity"=>1121.3999999999999, "LayerSpecificHeat"=>1465.4499999999998, "LayerThermalAbs"=>0.91, "LayerSolarAbs"=>0.85, "LayerVisibleAbs"=>0.85, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_unfinished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end

@@ -27,7 +27,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "false" # no insulation, shouldn't apply
     args_hash["framing_factor"] = 0.07
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.682, "LayerDensity"=>36.952, "LayerSpecificHeat"=>1208.183, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -40,7 +40,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "true" # no insulation, shouldn't apply
     args_hash["framing_factor"] = 0.07
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.682, "LayerDensity"=>36.952, "LayerSpecificHeat"=>1208.183, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -53,7 +53,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "true"
     args_hash["framing_factor"] = 0.07
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.050, "LayerDensity"=>78.346, "LayerSpecificHeat"=>1123.461, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -66,7 +66,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "false"
     args_hash["framing_factor"] = 0.11
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.235, "LayerConductivity"=>0.090, "LayerDensity"=>95.044, "LayerSpecificHeat"=>1146.094, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
     _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -144,7 +144,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoofTest < MiniTest::Test
     args_hash["ins_fills_cavity"] = "false" # no insulation, shouldn't apply
     args_hash["framing_factor"] = 0.07
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerThickness"=>0.140, "LayerConductivity"=>0.682, "LayerDensity"=>36.952, "LayerSpecificHeat"=>1208.183, "LayerIndex"=>0, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_finished_attic, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

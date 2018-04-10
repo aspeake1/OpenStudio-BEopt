@@ -23,7 +23,7 @@ class ProcessConstructionsWallsExteriorSIPTest < MiniTest::Test
     args_hash["sheathing_type"] = Constants.MaterialOSB
     args_hash["sheathing_thick_in"] = 0.44
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRvalue"=>0.0127/0.0343*2+0.0666/0.0432+0.0111/0.1154, "LayerDensity"=>147.063*2+107.013+512.64, "LayerSpecificHeat"=>1214.23*2+1214.23+1214.23, "LayerIndex"=>0+1+2+3}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -36,7 +36,7 @@ class ProcessConstructionsWallsExteriorSIPTest < MiniTest::Test
     args_hash["sheathing_type"] = Constants.MaterialGypsum
     args_hash["sheathing_thick_in"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>1, "AdditionalProperties"=>1}
     expected_values = {"LayerRvalue"=>0.0127/0.0307*2+0.2127/0.0420+0.0127/0.1603, "LayerDensity"=>147.063*2+107.013+801, "LayerSpecificHeat"=>1214.23*2+1214.23+837.4, "LayerIndex"=>0+1+2+3}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
