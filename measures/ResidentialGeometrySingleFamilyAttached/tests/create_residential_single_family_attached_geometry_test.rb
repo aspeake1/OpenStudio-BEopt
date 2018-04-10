@@ -27,6 +27,14 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid aspect ratio entered.")
   end
+  
+  def test_argument_error_odd_and_rear_units
+    args_hash = {}
+    args_hash["num_units"] = 9
+    args_hash["has_rear_units"] = "true"
+    result = _test_error(nil, args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot specify building with rear units when there is an odd number of units.")
+  end
 
   def test_two_story_fourplex_front_units_gable
     args_hash = {}
@@ -84,42 +92,40 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  '''
-  # TODO: Zone/floor multiplier arguments currently commented out
-
   def test_zone_mult_front_units_only
     args_hash = {}
     args_hash["num_units"] = 8
     args_hash["use_zone_mult"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>3, "Surface"=>58, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>2}
-    expected_values = {"FinishedFloorArea"=>900*3, "UnfinishedAtticHeight"=>5.30, "UnfinishedAtticFloorArea"=>900*8, "BuildingHeight"=>8+5.30}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"BuildingUnit"=>3, "Surface"=>30, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>2}
+    expected_values = {"FinishedFloorArea"=>900*3, "UnfinishedAtticHeight"=>10.61, "UnfinishedAtticFloorArea"=>900*8, "BuildingHeight"=>8+10.61}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  def test_zone_mult_with_rear_units_even
+  def test_zone_mult_with_rear_units
     args_hash = {}
     args_hash["num_units"] = 8
     args_hash["has_rear_units"] = "true"
     args_hash["use_zone_mult"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>6, "Surface"=>68, "ThermalZone"=>6+1, "Space"=>6+1, "SpaceType"=>2}
-    expected_values = {"FinishedFloorArea"=>900*6, "UnfinishedAtticHeight"=>5.30, "UnfinishedAtticFloorArea"=>900*8, "BuildingHeight"=>8+5.30}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"BuildingUnit"=>6, "Surface"=>48, "ThermalZone"=>6+1, "Space"=>6+1, "SpaceType"=>2}
+    expected_values = {"FinishedFloorArea"=>900*6, "UnfinishedAtticHeight"=>21.21, "UnfinishedAtticFloorArea"=>900*8, "BuildingHeight"=>8+21.21}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  def test_zone_mult_with_rear_units_odd
+  def test_zone_mult_with_two_stories
     args_hash = {}
-    args_hash["num_units"] = 9
+    args_hash["num_units"] = 8
+    args_hash["num_floors"] = 2
+    args_hash["roof_type"] = Constants.RoofTypeHip
+    args_hash["unit_aspect_ratio"] = 0.5
     args_hash["has_rear_units"] = "true"
     args_hash["use_zone_mult"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>6, "Surface"=>73, "ThermalZone"=>6+1, "Space"=>6+1, "SpaceType"=>2}
-    expected_values = {"FinishedFloorArea"=>900*6, "UnfinishedAtticHeight"=>5.30, "UnfinishedAtticFloorArea"=>900*9, "BuildingHeight"=>8+5.30}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"BuildingUnit"=>6, "Surface"=>84, "ThermalZone"=>6+1, "Space"=>8*2+1-2*2, "SpaceType"=>2}
+    expected_values = {"FinishedFloorArea"=>900*6, "UnfinishedAtticHeight"=>7.5, "UnfinishedAtticFloorArea"=>8*450, "BuildingHeight"=>8+8+7.5}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-
-  '''
 
   def test_one_unit_per_floor_with_rear_units
     args_hash = {}
@@ -258,6 +264,8 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+
+    # show_output(result)
 
     # save the model to test output directory
     # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
