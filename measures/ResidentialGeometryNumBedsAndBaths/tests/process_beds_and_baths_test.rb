@@ -54,7 +54,7 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     args_hash = {}
     args_hash["num_bathrooms"] = "2.0, 2.0, 2.8"
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bathrooms must be a positive multiple of 0.25.")    
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bathrooms must be a positive multiple of 0.25.")
   end
   
   def test_error_no_units_defined_in_model
@@ -67,7 +67,7 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     num_units = 1
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"AdditionalProperties"=>1}
     expected_values = {"Beds"=>3.0, "Baths"=>2.0, "Num_Units"=>num_units}
     model = _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["num_bedrooms"] = "4"
@@ -84,9 +84,9 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     args_hash["num_bedrooms"] = "2"
     args_hash["num_bathrooms"] = "1"
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"AdditionalProperties"=>num_units}
     expected_values = {"Beds"=>2.0, "Baths"=>1.0, "Num_Units"=>num_units}
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)    
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
   def test_multifamily_new_construction
@@ -95,7 +95,7 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     args_hash["num_bedrooms"] = "2"
     args_hash["num_bathrooms"] = "1.5"
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"AdditionalProperties"=>num_units}
     expected_values = {"Beds"=>2.0, "Baths"=>1.5, "Num_Units"=>num_units}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)    
   end  
