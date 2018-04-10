@@ -136,9 +136,6 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  '''
-  # TODO: Zone/floor multiplier arguments currently commented out
-
   def test_zone_mult_front_units_only
     args_hash = {}
     args_hash["num_units"] = 8
@@ -147,7 +144,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>3, "Surface"=>18, "ThermalZone"=>3, "Space"=>3, "SpaceType"=>1}
     expected_values = {"FinishedFloorArea"=>900*3, "BuildingHeight"=>8}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_zone_mult_with_rear_units_even
@@ -157,7 +154,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>6, "Surface"=>48, "ThermalZone"=>6+1, "Space"=>6+1, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>900*6, "BuildingHeight"=>8}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_zone_mult_with_rear_units_odd
@@ -168,21 +165,20 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>6, "Surface"=>36, "ThermalZone"=>6, "Space"=>6, "ShadingSurface"=>2, "ShadingSurfaceGroup"=>2, "SpaceType"=>1}
     expected_values = {"FinishedFloorArea"=>900*6, "BuildingHeight"=>8}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  def test_floor_mult
+  def test_zone_and_floor_mult
     args_hash = {}
     args_hash["num_floors"] = 12
     args_hash["num_units"] = 12*8
+    args_hash["use_zone_mult"] = "true"
     args_hash["use_floor_mult"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>24, "Surface"=>288, "ThermalZone"=>25, "Space"=>36, "SpaceType"=>2}
-    expected_values = {"FinishedFloorArea"=>900*24, "BuildingHeight"=>12*8}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"BuildingUnit"=>18, "Surface"=>252, "ThermalZone"=>19, "Space"=>30, "SpaceType"=>2}
+    expected_values = {"FinishedFloorArea"=>900*18, "BuildingHeight"=>12*8}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-
-  '''
 
   def test_one_unit_per_floor_with_rear_units
     args_hash = {}
@@ -280,6 +276,8 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+
+    # show_output(result)
 
     # save the model to test output directory
     # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
