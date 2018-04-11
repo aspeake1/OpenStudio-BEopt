@@ -84,25 +84,25 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     args << right_window_area
 
     #make a double argument for aspect ratio
-    aspect_ratio = OpenStudio::Measure::OSArgument::makeDoubleArgument("aspect_ratio", true)
-    aspect_ratio.setDisplayName("Windows: Aspect Ratio")
-    aspect_ratio.setDescription("Ratio of window height to width.")
-    aspect_ratio.setDefaultValue(1.333)
-    args << aspect_ratio
+    window_aspect_ratio = OpenStudio::Measure::OSArgument::makeDoubleArgument("window_aspect_ratio", true)
+    window_aspect_ratio.setDisplayName("Windows: Aspect Ratio")
+    window_aspect_ratio.setDescription("Ratio of window height to width.")
+    window_aspect_ratio.setDefaultValue(1.333)
+    args << window_aspect_ratio
 
-    depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("depth", true)
-    depth.setDisplayName("Overhangs: Depth")
-    depth.setUnits("ft")
-    depth.setDescription("Depth of the overhang. The distance from the wall surface in the direction normal to the wall surface.")
-    depth.setDefaultValue(2.0)
-    args << depth
+    overhang_depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("overhang_depth", true)
+    overhang_depth.setDisplayName("Overhangs: Depth")
+    overhang_depth.setUnits("ft")
+    overhang_depth.setDescription("Depth of the overhang. The distance from the wall surface in the direction normal to the wall surface.")
+    overhang_depth.setDefaultValue(2.0)
+    args << overhang_depth
 
-    offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("offset", true)
-    offset.setDisplayName("Overhangs: Offset")
-    offset.setUnits("ft")
-    offset.setDescription("Height of the overhangs above windows, relative to the top of the window framing.")
-    offset.setDefaultValue(0.5)
-    args << offset
+    overhang_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("overhang_offset", true)
+    overhang_offset.setDisplayName("Overhangs: Offset")
+    overhang_offset.setUnits("ft")
+    overhang_offset.setDescription("Height of the overhangs above windows, relative to the top of the window framing.")
+    overhang_offset.setDefaultValue(0.5)
+    args << overhang_offset
 
     # TODO: addOverhang() sets WidthExtension=Offset*2.
     # width_extension = OpenStudio::Measure::OSArgument::makeDoubleArgument("width_extension", true)
@@ -112,15 +112,15 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     # width_extension.setDefaultValue(1.0)
     # args << width_extension
 
-    facade_bools = OpenStudio::StringVector.new
-    facade_bools << "Front Facade"
-    facade_bools << "Back Facade"
-    facade_bools << "Left Facade"
-    facade_bools << "Right Facade"
-    facade_bools.each do |facade_bool|
-      facade = facade_bool.split(' ')[0]
-      arg = OpenStudio::Measure::OSArgument::makeBoolArgument(facade_bool.downcase.gsub(" ", "_"), true)
-      arg.setDisplayName(facade_bool)
+    overhang_facade_bools = OpenStudio::StringVector.new
+    overhang_facade_bools << "Front Facade"
+    overhang_facade_bools << "Back Facade"
+    overhang_facade_bools << "Left Facade"
+    overhang_facade_bools << "Right Facade"
+    overhang_facade_bools.each do |overhang_facade_bool|
+      facade = overhang_facade_bool.split(' ')[0]
+      arg = OpenStudio::Measure::OSArgument::makeBoolArgument("overhang_" + overhang_facade_bool.downcase.gsub(" ", "_"), true)
+      arg.setDisplayName(overhang_facade_bool)
       arg.setDescription("Overhangs: Specifies the presence of overhangs for windows on the #{facade.downcase} facade.")
       arg.setDefaultValue(true)
       args << arg
@@ -178,18 +178,18 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     window_areas[Constants.FacadeBack] = runner.getDoubleArgumentValue("back_window_area",user_arguments)
     window_areas[Constants.FacadeLeft] = runner.getDoubleArgumentValue("left_window_area",user_arguments)
     window_areas[Constants.FacadeRight] = runner.getDoubleArgumentValue("right_window_area",user_arguments)
-    aspect_ratio = runner.getDoubleArgumentValue("aspect_ratio",user_arguments)
-    depth = UnitConversions.convert(runner.getDoubleArgumentValue("depth",user_arguments), "ft", "m")
-    offset = UnitConversions.convert(runner.getDoubleArgumentValue("offset",user_arguments), "ft", "m")
+    window_aspect_ratio = runner.getDoubleArgumentValue("window_aspect_ratio",user_arguments)
+    overhang_depth = UnitConversions.convert(runner.getDoubleArgumentValue("overhang_depth",user_arguments), "ft", "m")
+    overhang_offset = UnitConversions.convert(runner.getDoubleArgumentValue("overhang_offset",user_arguments), "ft", "m")
     # width_extension = UnitConversions.convert(runner.getDoubleArgumentValue("width_extension",user_arguments), "ft", "m")
-    facade_bools = OpenStudio::StringVector.new
-    facade_bools << "#{Constants.FacadeFront} Facade"
-    facade_bools << "#{Constants.FacadeBack} Facade"
-    facade_bools << "#{Constants.FacadeLeft} Facade"
-    facade_bools << "#{Constants.FacadeRight} Facade"
-    facade_bools_hash = Hash.new
-    facade_bools.each do |facade_bool|
-      facade_bools_hash[facade_bool] = runner.getBoolArgumentValue(facade_bool.downcase.gsub(" ", "_"),user_arguments)
+    overhang_facade_bools = OpenStudio::StringVector.new
+    overhang_facade_bools << "#{Constants.FacadeFront} Facade"
+    overhang_facade_bools << "#{Constants.FacadeBack} Facade"
+    overhang_facade_bools << "#{Constants.FacadeLeft} Facade"
+    overhang_facade_bools << "#{Constants.FacadeRight} Facade"
+    overhang_facade_bools_hash = Hash.new
+    overhang_facade_bools.each do |facade_bool|
+      overhang_facade_bools_hash[facade_bool] = runner.getBoolArgumentValue("overhang_" + facade_bool.downcase.gsub(" ", "_"),user_arguments)
     end
     skylight_areas = {}
     skylight_areas[Constants.FacadeFront] = runner.getDoubleArgumentValue("front_skylight_area",user_arguments)
@@ -288,7 +288,7 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
         return false
       end
     end
-    if aspect_ratio <= 0
+    if window_aspect_ratio <= 0
       runner.registerError("Window Aspect Ratio must be greater than 0.")
       return false
     end
@@ -316,8 +316,8 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     max_single_window_area = 12.0 # sqft
     window_gap_y = 1.0 # ft; distance from top of wall
     window_gap_x = 0.2 # ft; distance between windows in a two-window group
-    min_wall_height_for_window = Math.sqrt(max_single_window_area * aspect_ratio) + window_gap_y * 1.05 # allow some wall area above/below
-    min_window_width = Math.sqrt(min_single_window_area / aspect_ratio) * 1.05 # allow some wall area to the left/right
+    min_wall_height_for_window = Math.sqrt(max_single_window_area * window_aspect_ratio) + window_gap_y * 1.05 # allow some wall area above/below
+    min_window_width = Math.sqrt(min_single_window_area / window_aspect_ratio) * 1.05 # allow some wall area to the left/right
     
     # Calculate available area for each wall, facade
     surface_avail_area = {}
@@ -413,7 +413,7 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
       facade_win_area = 0
       wall_surfaces[facade].each do |surface|
         next if surface_window_area[surface] == 0
-        if not add_windows_to_wall(surface, surface_window_area[surface], window_gap_y, window_gap_x, aspect_ratio, max_single_window_area, facade, constructions, model, runner)
+        if not add_windows_to_wall(surface, surface_window_area[surface], window_gap_y, window_gap_x, window_aspect_ratio, max_single_window_area, facade, constructions, model, runner)
           return false
         end
         tot_win_area += surface_window_area[surface]
@@ -503,7 +503,7 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     end
 
     if tot_win_area > 0
-      result = Geometry.process_overhangs(model, runner, depth, offset, facade_bools_hash)
+      result = Geometry.process_overhangs(model, runner, overhang_depth, overhang_offset, overhang_facade_bools_hash)
       unless result
         return false
       end
@@ -540,7 +540,7 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     return UnitConversions.convert(surface.grossArea, "m^2", "ft^2")
   end
   
-  def add_windows_to_wall(surface, window_area, window_gap_y, window_gap_x, aspect_ratio, max_single_window_area, facade, constructions, model, runner)
+  def add_windows_to_wall(surface, window_area, window_gap_y, window_gap_x, window_aspect_ratio, max_single_window_area, facade, constructions, model, runner)
     wall_width = Geometry.get_surface_length(surface)
     wall_height = Geometry.get_surface_height(surface)
 
@@ -551,7 +551,7 @@ class SetResidentialWindowSkylightArea < OpenStudio::Measure::ModelMeasure
     if num_windows % 2 == 1
       num_window_gaps -= 1
     end
-    window_width = Math.sqrt((window_area / num_windows.to_f) / aspect_ratio)
+    window_width = Math.sqrt((window_area / num_windows.to_f) / window_aspect_ratio)
     window_height = (window_area / num_windows.to_f) / window_width
     width_for_windows = window_width * num_windows.to_f + window_gap_x * num_window_gaps.to_f
     if width_for_windows > wall_width

@@ -490,7 +490,9 @@ class ResidentialMiscLargeUncommonLoadsTest < MiniTest::Test
     args_hash["has_pool_heater_elec"] = true
     args_hash["has_pool_heater_gas"] = true
     args_hash["has_pool_pump"] = true
-    args_hash["pool_mult"] = 0.0
+    args_hash["pool_heater_elec_mult"] = 0.0
+    args_hash["pool_heater_gas_mult"] = 0.0
+    args_hash["pool_pump_mult"] = 0.0
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "Annual_therm"=>0}
@@ -519,7 +521,9 @@ class ResidentialMiscLargeUncommonLoadsTest < MiniTest::Test
     args_hash["pool_heater_elec_annual_energy"] = 2300.0
     args_hash["pool_heater_gas_annual_energy"] = 222.0
     args_hash["pool_pump_annual_energy"] = 2250.0
-    args_hash["pool_mult"] = 0.004
+    args_hash["pool_heater_elec_mult"] = 0.004
+    args_hash["pool_heater_gas_mult"] = 0.004
+    args_hash["pool_pump_mult"] = 0.004
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "GasEquipmentDefinition"=>1, "GasEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>9.3+9.1, "Annual_therm"=>0.90}
@@ -615,7 +619,9 @@ class ResidentialMiscLargeUncommonLoadsTest < MiniTest::Test
   def test_pool_argument_error_mult_negative
     args_hash = {}
     args_hash["has_pool_heater_elec"] = true
-    args_hash["pool_mult"] = -1.0
+    args_hash["pool_heater_elec_mult"] = -1.0
+    args_hash["pool_heater_gas_mult"] = -1.0
+    args_hash["pool_pump_mult"] = -1.0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Energy multiplier must be greater than or equal to 0.")
   end
@@ -713,7 +719,9 @@ class ResidentialMiscLargeUncommonLoadsTest < MiniTest::Test
     args_hash["has_hot_tub_heater_elec"] = true
     args_hash["has_hot_tub_heater_gas"] = true
     args_hash["has_hot_tub_pump"] = true
-    args_hash["hot_tub_mult"] = 0.0
+    args_hash["hot_tub_heater_elec_mult"] = 0.0
+    args_hash["hot_tub_heater_gas_mult"] = 0.0
+    args_hash["hot_tub_pump_mult"] = 0.0
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "Annual_therm"=>0}
@@ -742,7 +750,9 @@ class ResidentialMiscLargeUncommonLoadsTest < MiniTest::Test
     args_hash["hot_tub_heater_elec_annual_energy"] = 1027.3
     args_hash["hot_tub_heater_gas_annual_energy"] = 81.0
     args_hash["hot_tub_pump_annual_energy"] = 1014.1
-    args_hash["hot_tub_mult"] = 0.048
+    args_hash["hot_tub_heater_elec_mult"] = 0.048
+    args_hash["hot_tub_heater_gas_mult"] = 0.048
+    args_hash["hot_tub_pump_mult"] = 0.048
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "GasEquipmentDefinition"=>1, "GasEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>49.8+49.2, "Annual_therm"=>3.93}
@@ -838,7 +848,9 @@ class ResidentialMiscLargeUncommonLoadsTest < MiniTest::Test
   def test_hot_tub_argument_error_mult_negative
     args_hash = {}
     args_hash["has_hot_tub_heater_elec"] = true
-    args_hash["hot_tub_mult"] = -1.0
+    args_hash["hot_tub_heater_elec_mult"] = -1.0
+    args_hash["hot_tub_heater_gas_mult"] = -1.0
+    args_hash["hot_tub_pump_mult"] = -1.0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Energy multiplier must be greater than or equal to 0.")
   end

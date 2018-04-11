@@ -69,12 +69,12 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
     args << furring_r
     
     #make a double argument for furring cavity depth
-    furring_cavity_depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("furring_cavity_depth", true)
-    furring_cavity_depth.setDisplayName("Furring Cavity Depth")
-    furring_cavity_depth.setUnits("in")
-    furring_cavity_depth.setDescription("The depth of the interior furring cavity. Enter zero for no furring strips.")
-    furring_cavity_depth.setDefaultValue(1.0)
-    args << furring_cavity_depth 
+    furring_cavity_depth_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("furring_cavity_depth_in", true)
+    furring_cavity_depth_in.setDisplayName("Furring Cavity Depth")
+    furring_cavity_depth_in.setUnits("in")
+    furring_cavity_depth_in.setDescription("The depth of the interior furring cavity. Enter zero for no furring strips.")
+    furring_cavity_depth_in.setDefaultValue(1.0)
+    args << furring_cavity_depth_in 
     
     #make a double argument for furring stud spacing
     furring_spacing = OpenStudio::Measure::OSArgument::makeDoubleArgument("furring_spacing", true)
@@ -139,7 +139,7 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
     density = runner.getDoubleArgumentValue("density",user_arguments)
     framing_factor = runner.getDoubleArgumentValue("framing_factor",user_arguments)
     furring_r = runner.getDoubleArgumentValue("furring_r",user_arguments)
-    furring_cavity_depth = runner.getDoubleArgumentValue("furring_cavity_depth",user_arguments)
+    furring_cavity_depth_in = runner.getDoubleArgumentValue("furring_cavity_depth_in",user_arguments)
     furring_spacing = runner.getDoubleArgumentValue("furring_spacing",user_arguments)
     drywall_thick_in = runner.getDoubleArgumentValue("drywall_thick_in",user_arguments)
     osb_thick_in = runner.getDoubleArgumentValue("osb_thick_in",user_arguments)
@@ -151,7 +151,7 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
                                        walls_by_type[Constants.SurfaceTypeWallExtInsFin], 
                                        Constants.SurfaceTypeWallExtInsFin,
                                        thick_in, conductivity, density, framing_factor,
-                                       furring_r, furring_cavity_depth, furring_spacing,
+                                       furring_r, furring_cavity_depth_in, furring_spacing,
                                        drywall_thick_in, osb_thick_in, rigid_r,
                                        mat_ext_finish)
         return false
@@ -161,7 +161,7 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
                                        walls_by_type[Constants.SurfaceTypeWallExtInsUnfin], 
                                        Constants.SurfaceTypeWallExtInsUnfin,
                                        thick_in, conductivity, density, framing_factor,
-                                       furring_r, furring_cavity_depth, furring_spacing,
+                                       furring_r, furring_cavity_depth_in, furring_spacing,
                                        0, osb_thick_in, rigid_r,
                                        mat_ext_finish)
         return false
@@ -171,7 +171,7 @@ class ProcessConstructionsWallsCMU < OpenStudio::Measure::ModelMeasure
                                        walls_by_type[Constants.SurfaceTypeWallIntFinInsUnfin], 
                                        Constants.SurfaceTypeWallIntFinInsUnfin,
                                        thick_in, conductivity, density, framing_factor,
-                                       furring_r, furring_cavity_depth, furring_spacing,
+                                       furring_r, furring_cavity_depth_in, furring_spacing,
                                        0, osb_thick_in, rigid_r,
                                        nil)
         return false

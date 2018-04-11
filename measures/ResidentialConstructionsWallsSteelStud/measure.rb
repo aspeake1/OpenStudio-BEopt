@@ -48,12 +48,12 @@ class ProcessConstructionsWallsSteelStud < OpenStudio::Measure::ModelMeasure
     args << install_grade
 
     #make a double argument for wall cavity depth
-    cavity_depth = OpenStudio::Measure::OSArgument::makeDoubleArgument("cavity_depth", true)
-    cavity_depth.setDisplayName("Cavity Depth")
-    cavity_depth.setUnits("in")
-    cavity_depth.setDescription("Depth of the stud cavity. 3.5\" for 2x4s, 5.5\" for 2x6s, etc.")
-    cavity_depth.setDefaultValue("3.5")
-    args << cavity_depth
+    cavity_depth_in = OpenStudio::Measure::OSArgument::makeDoubleArgument("cavity_depth_in", true)
+    cavity_depth_in.setDisplayName("Cavity Depth")
+    cavity_depth_in.setUnits("in")
+    cavity_depth_in.setDescription("Depth of the stud cavity. 3.5\" for 2x4s, 5.5\" for 2x6s, etc.")
+    cavity_depth_in.setDefaultValue("3.5")
+    args << cavity_depth_in
     
     #make a bool argument for whether the cavity insulation fills the cavity
     cavity_filled = OpenStudio::Measure::OSArgument::makeBoolArgument("cavity_filled", true)
@@ -129,7 +129,7 @@ class ProcessConstructionsWallsSteelStud < OpenStudio::Measure::ModelMeasure
     # Get inputs
     cavity_r = runner.getDoubleArgumentValue("cavity_r",user_arguments)
     install_grade = runner.getStringArgumentValue("install_grade",user_arguments).to_i
-    cavity_depth = runner.getDoubleArgumentValue("cavity_depth",user_arguments)
+    cavity_depth_in = runner.getDoubleArgumentValue("cavity_depth_in",user_arguments)
     cavity_filled = runner.getBoolArgumentValue("cavity_filled",user_arguments)  
     framing_factor = runner.getDoubleArgumentValue("framing_factor",user_arguments)
     correction_factor = runner.getDoubleArgumentValue("correction_factor",user_arguments)  
@@ -142,7 +142,7 @@ class ProcessConstructionsWallsSteelStud < OpenStudio::Measure::ModelMeasure
     if not WallConstructions.apply_steel_stud(runner, model,
                                               walls_by_type[Constants.SurfaceTypeWallExtInsFin], 
                                               Constants.SurfaceTypeWallExtInsFin,
-                                              cavity_r, install_grade, cavity_depth,
+                                              cavity_r, install_grade, cavity_depth_in,
                                               cavity_filled, framing_factor, correction_factor,
                                               drywall_thick_in, osb_thick_in, rigid_r,
                                               mat_ext_finish)
@@ -152,7 +152,7 @@ class ProcessConstructionsWallsSteelStud < OpenStudio::Measure::ModelMeasure
     if not WallConstructions.apply_steel_stud(runner, model,
                                               walls_by_type[Constants.SurfaceTypeWallExtInsUnfin], 
                                               Constants.SurfaceTypeWallExtInsUnfin,
-                                              cavity_r, install_grade, cavity_depth,
+                                              cavity_r, install_grade, cavity_depth_in,
                                               cavity_filled, framing_factor, correction_factor,
                                               0, osb_thick_in, rigid_r,
                                               mat_ext_finish)
@@ -162,7 +162,7 @@ class ProcessConstructionsWallsSteelStud < OpenStudio::Measure::ModelMeasure
     if not WallConstructions.apply_steel_stud(runner, model,
                                               walls_by_type[Constants.SurfaceTypeWallIntFinInsUnfin], 
                                               Constants.SurfaceTypeWallIntFinInsUnfin,
-                                              cavity_r, install_grade, cavity_depth,
+                                              cavity_r, install_grade, cavity_depth_in,
                                               cavity_filled, framing_factor, correction_factor,
                                               0, osb_thick_in, rigid_r,
                                               nil)

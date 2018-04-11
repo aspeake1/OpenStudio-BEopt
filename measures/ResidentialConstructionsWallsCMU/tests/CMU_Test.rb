@@ -14,7 +14,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     args_hash["density"] = 65
     args_hash["framing_factor"] = 0.076
     args_hash["furring_r"] = 0
-    args_hash["furring_cavity_depth"] = 1
+    args_hash["furring_cavity_depth_in"] = 1
     args_hash["furring_spacing"] = 24
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
@@ -35,7 +35,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     args_hash["density"] = 65
     args_hash["framing_factor"] = 0.076
     args_hash["furring_r"] = 0
-    args_hash["furring_cavity_depth"] = 0
+    args_hash["furring_cavity_depth_in"] = 0
     args_hash["furring_spacing"] = 0
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>6, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
@@ -59,7 +59,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     args_hash["density"] = 45
     args_hash["framing_factor"] = 0.076
     args_hash["furring_r"] = 10
-    args_hash["furring_cavity_depth"] = 2
+    args_hash["furring_cavity_depth_in"] = 2
     args_hash["furring_spacing"] = 24
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
@@ -80,7 +80,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     args_hash["density"] = 119
     args_hash["framing_factor"] = 0.076
     args_hash["furring_r"] = 0
-    args_hash["furring_cavity_depth"] = 1
+    args_hash["furring_cavity_depth_in"] = 1
     args_hash["furring_spacing"] = 24
     args_hash["drywall_thick_in"] = 1.0
     args_hash["osb_thick_in"] = 0
@@ -149,7 +149,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
 
   def test_argument_error_furring_cavity_depth_negative
     args_hash = {}
-    args_hash["furring_cavity_depth"] = -1
+    args_hash["furring_cavity_depth_in"] = -1
     result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Furring Cavity Depth must be greater than or equal to 0.")
   end

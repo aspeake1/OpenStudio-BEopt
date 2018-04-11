@@ -151,7 +151,7 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     Geometry.get_model_locations(model).each do |loc|
         fridge_location_args << loc
     end
-    fridge_location = OpenStudio::Measure::OSArgument::makeChoiceArgument("fridge_location", fridge_location_args, true)
+    fridge_location = OpenStudio::Measure::OSArgument::makeChoiceArgument("fridge_location", fridge_location_args, true, true)
     fridge_location.setDisplayName("Extra Refrigerator: Location")
     fridge_location.setDescription("The space type for the location. '#{Constants.Auto}' will automatically choose a space type based on the space types found in the model.")
     fridge_location.setDefaultValue(Constants.Auto)
@@ -201,7 +201,7 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     Geometry.get_model_locations(model).each do |loc|
         freezer_location_args << loc
     end
-    freezer_location = OpenStudio::Measure::OSArgument::makeChoiceArgument("freezer_location", freezer_location_args, true)
+    freezer_location = OpenStudio::Measure::OSArgument::makeChoiceArgument("freezer_location", freezer_location_args, true, true)
     freezer_location.setDisplayName("Freezer: Location")
     freezer_location.setDescription("The space type for the location. '#{Constants.Auto}' will automatically choose a space type based on the space types found in the model.")
     freezer_location.setDefaultValue(Constants.Auto)
@@ -217,6 +217,13 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     pool_heater_elec_annual_energy.setDefaultValue(2300)
     args << pool_heater_elec_annual_energy
 
+    #make a double argument for Energy Multiplier
+    pool_heater_elec_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("pool_heater_elec_mult")
+    pool_heater_elec_mult.setDisplayName("Pool: Electric Heater Energy Multiplier")
+    pool_heater_elec_mult.setDescription("Sets the annual energy use equal to the annual energy use times this multiplier.")
+    pool_heater_elec_mult.setDefaultValue(1)
+    args << pool_heater_elec_mult
+    
     #make a double argument for Gas Heater Annual Energy Use
     pool_heater_gas_annual_energy = OpenStudio::Measure::OSArgument::makeDoubleArgument("pool_heater_gas_annual_energy")
     pool_heater_gas_annual_energy.setDisplayName("Pool: Gas Heater Annual Energy Use")
@@ -225,6 +232,13 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     pool_heater_gas_annual_energy.setDefaultValue(222)
     args << pool_heater_gas_annual_energy
 
+    #make a double argument for Energy Multiplier
+    pool_heater_gas_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("pool_heater_gas_mult")
+    pool_heater_gas_mult.setDisplayName("Pool: Gas Heater Energy Multiplier")
+    pool_heater_gas_mult.setDescription("Sets the annual energy use equal to the annual energy use times this multiplier.")
+    pool_heater_gas_mult.setDefaultValue(1)
+    args << pool_heater_gas_mult
+    
     #make a double argument for Pump Annual Energy Use
     pool_pump_annual_energy = OpenStudio::Measure::OSArgument::makeDoubleArgument("pool_pump_annual_energy")
     pool_pump_annual_energy.setDisplayName("Pool: Pump Annual Energy Use")
@@ -234,11 +248,11 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     args << pool_pump_annual_energy
     
     #make a double argument for Energy Multiplier
-    pool_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("pool_mult")
-    pool_mult.setDisplayName("Pool: Energy Multiplier")
-    pool_mult.setDescription("Sets the annual energy use equal to the annual energy use times this multiplier.")
-    pool_mult.setDefaultValue(1)
-    args << pool_mult
+    pool_pump_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("pool_pump_mult")
+    pool_pump_mult.setDisplayName("Pool: Pump Energy Multiplier")
+    pool_pump_mult.setDescription("Sets the annual energy use equal to the annual energy use times this multiplier.")
+    pool_pump_mult.setDefaultValue(1)
+    args << pool_pump_mult
     
     #make a boolean argument for Scale Energy Use
     pool_scale_energy = OpenStudio::Measure::OSArgument::makeBoolArgument("pool_scale_energy",true)
@@ -278,6 +292,13 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     hot_tub_heater_elec_annual_energy.setDefaultValue(1027.3)
     args << hot_tub_heater_elec_annual_energy
 
+    #make a double argument for Energy Multiplier
+    hot_tub_heater_elec_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("hot_tub_heater_elec_mult")
+    hot_tub_heater_elec_mult.setDisplayName("Hot Tub: Electric Heater Energy Multiplier")
+    hot_tub_heater_elec_mult.setDescription("Sets the annual energy use equal to the annual energy use times this multiplier.")
+    hot_tub_heater_elec_mult.setDefaultValue(1)
+    args << hot_tub_heater_elec_mult
+    
     #make a double argument for Gas Heater Annual Energy Use
     hot_tub_heater_gas_annual_energy = OpenStudio::Measure::OSArgument::makeDoubleArgument("hot_tub_heater_gas_annual_energy")
     hot_tub_heater_gas_annual_energy.setDisplayName("Hot Tub: Gas Heater Annual Energy Use")
@@ -286,6 +307,13 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     hot_tub_heater_gas_annual_energy.setDefaultValue(81)
     args << hot_tub_heater_gas_annual_energy
 
+    #make a double argument for Energy Multiplier
+    hot_tub_heater_gas_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("hot_tub_heater_gas_mult")
+    hot_tub_heater_gas_mult.setDisplayName("Hot Tub: Gas Heater Energy Multiplier")
+    hot_tub_heater_gas_mult.setDescription("Sets the annual energy use equal to the annual energy use times this multiplier.")
+    hot_tub_heater_gas_mult.setDefaultValue(1)
+    args << hot_tub_heater_gas_mult
+    
     #make a double argument for Pump Annual Energy Use
     hot_tub_pump_annual_energy = OpenStudio::Measure::OSArgument::makeDoubleArgument("hot_tub_pump_annual_energy")
     hot_tub_pump_annual_energy.setDisplayName("Hot Tub: Pump Annual Energy Use")
@@ -295,11 +323,11 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     args << hot_tub_pump_annual_energy
     
     #make a double argument for Energy Multiplier
-    hot_tub_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("hot_tub_mult")
-    hot_tub_mult.setDisplayName("Hot Tub: Energy Multiplier")
-    hot_tub_mult.setDescription("Sets the annual energy use equal to the annual energy use times this multiplier.")
-    hot_tub_mult.setDefaultValue(1)
-    args << hot_tub_mult
+    hot_tub_pump_mult = OpenStudio::Measure::OSArgument::makeDoubleArgument("hot_tub_pump_mult")
+    hot_tub_pump_mult.setDisplayName("Hot Tub: Pump Energy Multiplier")
+    hot_tub_pump_mult.setDescription("Sets the annual energy use equal to the annual energy use times this multiplier.")
+    hot_tub_pump_mult.setDefaultValue(1)
+    args << hot_tub_pump_mult
     
     #make a boolean argument for Scale Energy Use
     hot_tub_scale_energy = OpenStudio::Measure::OSArgument::makeBoolArgument("hot_tub_scale_energy",true)
@@ -425,7 +453,7 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     Geometry.get_model_locations(model).each do |loc|
         gas_fireplace_location_args << loc
     end
-    gas_fireplace_location = OpenStudio::Measure::OSArgument::makeChoiceArgument("gas_fireplace_location", gas_fireplace_location_args, true)
+    gas_fireplace_location = OpenStudio::Measure::OSArgument::makeChoiceArgument("gas_fireplace_location", gas_fireplace_location_args, true, true)
     gas_fireplace_location.setDisplayName("Gas Fireplace: Location")
     gas_fireplace_location.setDescription("The space type for the location. '#{Constants.Auto}' will automatically choose a space type based on the space types found in the model.")
     gas_fireplace_location.setDefaultValue(Constants.Auto)
@@ -562,18 +590,22 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
     freezer_location = runner.getStringArgumentValue("freezer_location",user_arguments)
     
     pool_heater_elec_annual_energy = runner.getDoubleArgumentValue("pool_heater_elec_annual_energy",user_arguments)
+    pool_heater_elec_mult = runner.getDoubleArgumentValue("pool_heater_elec_mult",user_arguments)
     pool_heater_gas_annual_energy = runner.getDoubleArgumentValue("pool_heater_gas_annual_energy",user_arguments)
+    pool_heater_gas_mult = runner.getDoubleArgumentValue("pool_heater_gas_mult",user_arguments)
     pool_pump_annual_energy = runner.getDoubleArgumentValue("pool_pump_annual_energy",user_arguments)
-    pool_mult = runner.getDoubleArgumentValue("pool_mult",user_arguments)
+    pool_pump_mult = runner.getDoubleArgumentValue("pool_pump_mult",user_arguments)
     pool_scale_energy = runner.getBoolArgumentValue("pool_scale_energy",user_arguments)
     pool_weekday_sch = runner.getStringArgumentValue("pool_weekday_sch",user_arguments)
     pool_weekend_sch = runner.getStringArgumentValue("pool_weekend_sch",user_arguments)
     pool_monthly_sch = runner.getStringArgumentValue("pool_monthly_sch",user_arguments)
 
     hot_tub_heater_elec_annual_energy = runner.getDoubleArgumentValue("hot_tub_heater_elec_annual_energy",user_arguments)
+    hot_tub_heater_elec_mult = runner.getDoubleArgumentValue("hot_tub_heater_elec_mult",user_arguments)
     hot_tub_heater_gas_annual_energy = runner.getDoubleArgumentValue("hot_tub_heater_gas_annual_energy",user_arguments)
+    hot_tub_heater_gas_mult = runner.getDoubleArgumentValue("hot_tub_heater_gas_mult",user_arguments)
     hot_tub_pump_annual_energy = runner.getDoubleArgumentValue("hot_tub_pump_annual_energy",user_arguments)
-    hot_tub_mult = runner.getDoubleArgumentValue("hot_tub_mult",user_arguments)
+    hot_tub_pump_mult = runner.getDoubleArgumentValue("hot_tub_pump_mult",user_arguments)
     hot_tub_scale_energy = runner.getBoolArgumentValue("hot_tub_scale_energy",user_arguments)
     hot_tub_weekday_sch = runner.getStringArgumentValue("hot_tub_weekday_sch",user_arguments)
     hot_tub_weekend_sch = runner.getStringArgumentValue("hot_tub_weekend_sch",user_arguments)
@@ -707,9 +739,10 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
         if has_pool_heater_elec
         
             unit_obj_name = Constants.ObjectNamePoolHeater(Constants.FuelTypeElectric, unit.name.to_s)
-            success, ann_e, pool_sch = MiscLoads.apply_electric(model, unit, runner, pool_heater_elec_annual_energy, pool_mult,
-                                                                pool_weekday_sch, pool_weekend_sch, pool_monthly_sch, 
-                                                                pool_sch, nil, unit_obj_name, pool_scale_energy)
+            success, ann_e, pool_sch = MiscLoads.apply_electric(model, unit, runner, pool_heater_elec_annual_energy, 
+                                                                pool_heater_elec_mult, pool_weekday_sch, pool_weekend_sch, 
+                                                                pool_monthly_sch, pool_sch, nil, unit_obj_name, 
+                                                                pool_scale_energy)
             
             return false if not success
             
@@ -725,9 +758,10 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
         if has_pool_heater_gas
         
             unit_obj_name = Constants.ObjectNamePoolHeater(Constants.FuelTypeGas, unit.name.to_s)
-            success, ann_g, pool_sch = MiscLoads.apply_gas(model, unit, runner, pool_heater_gas_annual_energy, pool_mult,
-                                                           pool_weekday_sch, pool_weekend_sch, pool_monthly_sch, 
-                                                           pool_sch, nil, unit_obj_name, pool_scale_energy)
+            success, ann_g, pool_sch = MiscLoads.apply_gas(model, unit, runner, pool_heater_gas_annual_energy, 
+                                                           pool_heater_gas_mult, pool_weekday_sch, pool_weekend_sch, 
+                                                           pool_monthly_sch, pool_sch, nil, unit_obj_name, 
+                                                           pool_scale_energy)
             
             return false if not success
             
@@ -743,9 +777,10 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
         if has_pool_pump
         
             unit_obj_name = Constants.ObjectNamePoolPump(unit.name.to_s)
-            success, ann_e, pool_sch = MiscLoads.apply_electric(model, unit, runner, pool_pump_annual_energy, pool_mult,
-                                                                pool_weekday_sch, pool_weekend_sch, pool_monthly_sch, 
-                                                                pool_sch, nil, unit_obj_name, pool_scale_energy)
+            success, ann_e, pool_sch = MiscLoads.apply_electric(model, unit, runner, pool_pump_annual_energy, 
+                                                                pool_pump_mult, pool_weekday_sch, pool_weekend_sch, 
+                                                                pool_monthly_sch, pool_sch, nil, unit_obj_name, 
+                                                                pool_scale_energy)
             
             return false if not success
             
@@ -761,9 +796,10 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
         if has_hot_tub_heater_elec
         
             unit_obj_name = Constants.ObjectNameHotTubHeater(Constants.FuelTypeElectric, unit.name.to_s)
-            success, ann_e, hot_tub_sch = MiscLoads.apply_electric(model, unit, runner, hot_tub_heater_elec_annual_energy, hot_tub_mult,
-                                                                   hot_tub_weekday_sch, hot_tub_weekend_sch, hot_tub_monthly_sch, 
-                                                                   hot_tub_sch, nil, unit_obj_name, hot_tub_scale_energy)
+            success, ann_e, hot_tub_sch = MiscLoads.apply_electric(model, unit, runner, hot_tub_heater_elec_annual_energy, 
+                                                                   hot_tub_heater_elec_mult, hot_tub_weekday_sch, 
+                                                                   hot_tub_weekend_sch, hot_tub_monthly_sch, hot_tub_sch, 
+                                                                   nil, unit_obj_name, hot_tub_scale_energy)
             
             return false if not success
             
@@ -779,9 +815,10 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
         if has_hot_tub_heater_gas
         
             unit_obj_name = Constants.ObjectNameHotTubHeater(Constants.FuelTypeGas, unit.name.to_s)
-            success, ann_g, hot_tub_sch = MiscLoads.apply_gas(model, unit, runner, hot_tub_heater_gas_annual_energy, hot_tub_mult,
-                                                              hot_tub_weekday_sch, hot_tub_weekend_sch, hot_tub_monthly_sch, 
-                                                              hot_tub_sch, nil, unit_obj_name, hot_tub_scale_energy)
+            success, ann_g, hot_tub_sch = MiscLoads.apply_gas(model, unit, runner, hot_tub_heater_gas_annual_energy, 
+                                                              hot_tub_heater_gas_mult, hot_tub_weekday_sch, 
+                                                              hot_tub_weekend_sch, hot_tub_monthly_sch, hot_tub_sch, 
+                                                              nil, unit_obj_name, hot_tub_scale_energy)
             
             return false if not success
             
@@ -797,7 +834,7 @@ class ResidentialMiscLargeUncommonLoads < OpenStudio::Measure::ModelMeasure
         if has_hot_tub_pump
         
             unit_obj_name = Constants.ObjectNameHotTubPump(unit.name.to_s)
-            success, ann_e, hot_tub_sch = MiscLoads.apply_electric(model, unit, runner, hot_tub_pump_annual_energy, hot_tub_mult,
+            success, ann_e, hot_tub_sch = MiscLoads.apply_electric(model, unit, runner, hot_tub_pump_annual_energy, hot_tub_pump_mult,
                                                                    hot_tub_weekday_sch, hot_tub_weekend_sch, hot_tub_monthly_sch, 
                                                                    hot_tub_sch, nil, unit_obj_name, hot_tub_scale_energy)
             

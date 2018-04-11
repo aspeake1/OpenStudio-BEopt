@@ -11,7 +11,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     args_hash = {}
     args_hash["cavity_r"] = 0
     args_hash["install_grade"] = "3" # no insulation, shouldn't apply
-    args_hash["cavity_depth"] = 3.5
+    args_hash["cavity_depth_in"] = 3.5
     args_hash["ins_fills_cavity"] = false
     args_hash["framing_factor"] = 0.25
     args_hash["correction_factor"] = 0.5 # no insulation, shouldn't apply
@@ -41,7 +41,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     args_hash = {}
     args_hash["cavity_r"] = 13
     args_hash["install_grade"] = "2"
-    args_hash["cavity_depth"] = 3.5
+    args_hash["cavity_depth_in"] = 3.5
     args_hash["ins_fills_cavity"] = true
     args_hash["framing_factor"] = 0.25
     args_hash["correction_factor"] = 0.46
@@ -60,7 +60,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     args_hash = {}
     args_hash["cavity_r"] = 13
     args_hash["install_grade"] = "2"
-    args_hash["cavity_depth"] = 3.5
+    args_hash["cavity_depth_in"] = 3.5
     args_hash["ins_fills_cavity"] = true
     args_hash["framing_factor"] = 0.25
     args_hash["correction_factor"] = 0.46
@@ -88,7 +88,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     
   def test_argument_error_cavity_depth_zero
     args_hash = {}
-    args_hash["cavity_depth"] = 0
+    args_hash["cavity_depth_in"] = 0
     result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Cavity Depth must be greater than 0.")
   end

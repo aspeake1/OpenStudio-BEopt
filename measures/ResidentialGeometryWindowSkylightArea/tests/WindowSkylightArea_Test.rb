@@ -126,7 +126,7 @@ class WindowSkylightAreaTest < MiniTest::Test
 
   def test_argument_error_invalid_aspect_ratio
     args_hash = {}
-    args_hash["aspect_ratio"] = 0
+    args_hash["window_aspect_ratio"] = 0
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
@@ -246,7 +246,7 @@ class WindowSkylightAreaTest < MiniTest::Test
 
   def test_error_invalid_overhang_depth
     args_hash = {}
-    args_hash["depth"] = -1
+    args_hash["overhang_depth"] = -1
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
@@ -255,7 +255,7 @@ class WindowSkylightAreaTest < MiniTest::Test
 
   def test_error_invalid_overhang_offset
     args_hash = {}
-    args_hash["offset"] = -1
+    args_hash["overhang_offset"] = -1
     result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
@@ -264,12 +264,12 @@ class WindowSkylightAreaTest < MiniTest::Test
 
   def test_retrofit_replace_one_ft_with_two_ft_overhangs
     args_hash = {}
-    args_hash["depth"] = 1
+    args_hash["overhang_depth"] = 1
     expected_num_del_objects = {}
     expected_num_new_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>1}
     model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], [0]*5, [0]*5, expected_num_del_objects, expected_num_new_objects, expected_values)
-    args_hash["depth"] = 2
+    args_hash["overhang_depth"] = 2
     expected_num_del_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_num_new_objects = {"SubSurface"=>33, "ShadingSurface"=>33, "ShadingSurfaceGroup"=>33}
     expected_values = {"Constructions"=>0, "OverhangDepth"=>2}

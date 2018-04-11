@@ -136,7 +136,7 @@ def validate_measure_args(measure_args, provided_args, lookup_file, measure_name
         when "string"
             # no op
         when "choice"
-            if not arg.choiceValues.include?(provided_args[arg.name])
+            if not arg.choiceValues.include?(provided_args[arg.name]) and not arg.modelDependent
                 register_error("Value of '#{provided_args[arg.name].to_s}' for argument '#{arg.name.to_s}' and measure '#{measure_name.to_s}' must be one of: #{arg.choiceValues.to_s}.", runner)
             end
         end
