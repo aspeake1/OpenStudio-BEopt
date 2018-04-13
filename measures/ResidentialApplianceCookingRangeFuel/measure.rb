@@ -88,7 +88,7 @@ class ResidentialCookingRangeFuel < OpenStudio::Measure::ModelMeasure
     Geometry.get_model_locations(model).each do |loc|
         location_args << loc
     end
-    location = OpenStudio::Measure::OSArgument::makeChoiceArgument("location", location_args, true)
+    location = OpenStudio::Measure::OSArgument::makeChoiceArgument("location", location_args, true, true)
     location.setDisplayName("Location")
     location.setDescription("The space type for the location. '#{Constants.Auto}' will automatically choose a space type based on the space types found in the model.")
     location.setDefaultValue(Constants.Auto)
@@ -245,7 +245,7 @@ class ResidentialCookingRangeFuel < OpenStudio::Measure::ModelMeasure
         if fuel_type == Constants.FuelTypeGas
             s_ann = "#{tot_range_ann_f.round} therms"
         else
-            s_ann = "#{UnitConversions.btu2gal(UnitConversions.convert(tot_range_ann_f, "therm", "Btu"), fuel_type).round} gallons"
+            s_ann = "#{UnitConversions.convert(UnitConversions.convert(tot_range_ann_f, "therm", "Btu"), "Btu", "gal", fuel_type).round} gallons"
         end
         s_ignition = ""
         if e_ignition

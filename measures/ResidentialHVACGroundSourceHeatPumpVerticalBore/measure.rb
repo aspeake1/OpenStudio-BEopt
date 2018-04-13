@@ -316,75 +316,6 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
     heatingEIR = get_gshp_heating_eir(cop, fanKW_Adjust, pumpKW_Adjust)
     min_hp_temp = -30.0
     
-    # Remove ground heat exchanger condenser loop if it exists
-    HVAC.remove_boiler_and_gshp_loops(model, runner)
-    
-    ground_heat_exch_vert = OpenStudio::Model::GroundHeatExchangerVertical.new(model)
-    ground_heat_exch_vert.setName(Constants.ObjectNameGroundSourceHeatPumpVerticalBore + " exchanger")
-    ground_heat_exch_vert.setBoreHoleRadius(UnitConversions.convert(bore_diameter/2.0,"in","m"))
-    ground_heat_exch_vert.setGroundThermalConductivity(UnitConversions.convert(ground_conductivity,"Btu/(hr*ft*R)","W/(m*K)"))
-    ground_heat_exch_vert.setGroundThermalHeatCapacity(UnitConversions.convert(ground_conductivity / ground_diffusivity,"Btu/(ft^3*F)","J/(m^3*K)"))
-    ground_heat_exch_vert.setGroundTemperature(UnitConversions.convert(weather.data.AnnualAvgDrybulb,"F","C"))
-    ground_heat_exch_vert.setGroutThermalConductivity(UnitConversions.convert(grout_conductivity,"Btu/(hr*ft*R)","W/(m*K)"))
-    ground_heat_exch_vert.setPipeThermalConductivity(UnitConversions.convert(pipe_cond,"Btu/(hr*ft*R)","W/(m*K)"))
-    ground_heat_exch_vert.setPipeOutDiameter(UnitConversions.convert(pipe_od,"in","m"))
-    ground_heat_exch_vert.setUTubeDistance(UnitConversions.convert(leg_separation,"in","m"))
-    ground_heat_exch_vert.setPipeThickness(UnitConversions.convert((pipe_od - pipe_id)/2.0,"in","m"))
-    ground_heat_exch_vert.setMaximumLengthofSimulation(1)
-    ground_heat_exch_vert.setGFunctionReferenceRatio(0.0005)
-    
-    plant_loop = OpenStudio::Model::PlantLoop.new(model)
-    plant_loop.setName(Constants.ObjectNameGroundSourceHeatPumpVerticalBore + " condenser loop")
-    if fluid_type == Constants.FluidWater
-      plant_loop.setFluidType('Water')
-    else
-      plant_loop.setFluidType({Constants.FluidPropyleneGlycol=>'PropyleneGlycol', Constants.FluidEthyleneGlycol=>'EthyleneGlycol'}[fluid_type])
-      plant_loop.setGlycolConcentration((frac_glycol * 100).to_i)
-    end
-    plant_loop.setMaximumLoopTemperature(48.88889)
-    plant_loop.setMinimumLoopTemperature(UnitConversions.convert(hw_design,"F","C"))
-    plant_loop.setMinimumLoopFlowRate(0)
-    plant_loop.setLoadDistributionScheme('SequentialLoad')
-    
-    sizing_plant = plant_loop.sizingPlant
-    sizing_plant.setLoopType('Condenser')
-    sizing_plant.setDesignLoopExitTemperature(UnitConversions.convert(chw_design,"F","C"))
-    sizing_plant.setLoopDesignTemperatureDifference(UnitConversions.convert(design_delta_t,"R","K"))
-    
-    setpoint_mgr_follow_ground_temp = OpenStudio::Model::SetpointManagerFollowGroundTemperature.new(model)
-    setpoint_mgr_follow_ground_temp.setName(Constants.ObjectNameGroundSourceHeatPumpVerticalBore + " condenser loop temp")
-    setpoint_mgr_follow_ground_temp.setControlVariable('Temperature')
-    setpoint_mgr_follow_ground_temp.setMaximumSetpointTemperature(48.88889)
-    setpoint_mgr_follow_ground_temp.setMinimumSetpointTemperature(UnitConversions.convert(hw_design,"F","C"))
-    setpoint_mgr_follow_ground_temp.setReferenceGroundTemperatureObjectType('Site:GroundTemperature:Deep')
-    setpoint_mgr_follow_ground_temp.addToNode(plant_loop.supplyOutletNode)
-    
-    pump = OpenStudio::Model::PumpVariableSpeed.new(model)
-    pump.setName(Constants.ObjectNameGroundSourceHeatPumpVerticalBore + " pump")
-    pump.setRatedPumpHead(pump_head)
-    pump.setMotorEfficiency(dse * 0.77 * 0.6)
-    pump.setFractionofMotorInefficienciestoFluidStream(0)
-    pump.setCoefficient1ofthePartLoadPerformanceCurve(0)
-    pump.setCoefficient2ofthePartLoadPerformanceCurve(1)
-    pump.setCoefficient3ofthePartLoadPerformanceCurve(0)
-    pump.setCoefficient4ofthePartLoadPerformanceCurve(0)
-    pump.setMinimumFlowRate(0)
-    pump.setPumpControlType('Intermittent')
-    pump.addToNode(plant_loop.supplyInletNode)
-    
-    plant_loop.addSupplyBranchForComponent(ground_heat_exch_vert)
-    
-    chiller_bypass_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
-    plant_loop.addSupplyBranchForComponent(chiller_bypass_pipe)
-    coil_bypass_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
-    plant_loop.addDemandBranchForComponent(coil_bypass_pipe)
-    supply_outlet_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
-    supply_outlet_pipe.addToNode(plant_loop.supplyOutletNode)    
-    demand_inlet_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
-    demand_inlet_pipe.addToNode(plant_loop.demandInletNode) 
-    demand_outlet_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
-    demand_outlet_pipe.addToNode(plant_loop.demandOutletNode)
-    
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?
@@ -395,6 +326,73 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
     
       obj_name = Constants.ObjectNameGroundSourceHeatPumpVerticalBore(unit.name.to_s)
       
+      ground_heat_exch_vert = OpenStudio::Model::GroundHeatExchangerVertical.new(model)
+      ground_heat_exch_vert.setName(obj_name + " exchanger")
+      ground_heat_exch_vert.setBoreHoleRadius(UnitConversions.convert(bore_diameter/2.0,"in","m"))
+      ground_heat_exch_vert.setGroundThermalConductivity(UnitConversions.convert(ground_conductivity,"Btu/(hr*ft*R)","W/(m*K)"))
+      ground_heat_exch_vert.setGroundThermalHeatCapacity(UnitConversions.convert(ground_conductivity / ground_diffusivity,"Btu/(ft^3*F)","J/(m^3*K)"))
+      ground_heat_exch_vert.setGroundTemperature(UnitConversions.convert(weather.data.AnnualAvgDrybulb,"F","C"))
+      ground_heat_exch_vert.setGroutThermalConductivity(UnitConversions.convert(grout_conductivity,"Btu/(hr*ft*R)","W/(m*K)"))
+      ground_heat_exch_vert.setPipeThermalConductivity(UnitConversions.convert(pipe_cond,"Btu/(hr*ft*R)","W/(m*K)"))
+      ground_heat_exch_vert.setPipeOutDiameter(UnitConversions.convert(pipe_od,"in","m"))
+      ground_heat_exch_vert.setUTubeDistance(UnitConversions.convert(leg_separation,"in","m"))
+      ground_heat_exch_vert.setPipeThickness(UnitConversions.convert((pipe_od - pipe_id)/2.0,"in","m"))
+      ground_heat_exch_vert.setMaximumLengthofSimulation(1)
+      ground_heat_exch_vert.setGFunctionReferenceRatio(0.0005)
+      
+      plant_loop = OpenStudio::Model::PlantLoop.new(model)
+      plant_loop.setName(obj_name + " condenser loop")
+      if fluid_type == Constants.FluidWater
+        plant_loop.setFluidType('Water')
+      else
+        plant_loop.setFluidType({Constants.FluidPropyleneGlycol=>'PropyleneGlycol', Constants.FluidEthyleneGlycol=>'EthyleneGlycol'}[fluid_type])
+        plant_loop.setGlycolConcentration((frac_glycol * 100).to_i)
+      end
+      plant_loop.setMaximumLoopTemperature(48.88889)
+      plant_loop.setMinimumLoopTemperature(UnitConversions.convert(hw_design,"F","C"))
+      plant_loop.setMinimumLoopFlowRate(0)
+      plant_loop.setLoadDistributionScheme('SequentialLoad')
+      runner.registerInfo("Added '#{plant_loop.name}' to model.")
+      
+      sizing_plant = plant_loop.sizingPlant
+      sizing_plant.setLoopType('Condenser')
+      sizing_plant.setDesignLoopExitTemperature(UnitConversions.convert(chw_design,"F","C"))
+      sizing_plant.setLoopDesignTemperatureDifference(UnitConversions.convert(design_delta_t,"R","K"))
+      
+      setpoint_mgr_follow_ground_temp = OpenStudio::Model::SetpointManagerFollowGroundTemperature.new(model)
+      setpoint_mgr_follow_ground_temp.setName(obj_name + " condenser loop temp")
+      setpoint_mgr_follow_ground_temp.setControlVariable('Temperature')
+      setpoint_mgr_follow_ground_temp.setMaximumSetpointTemperature(48.88889)
+      setpoint_mgr_follow_ground_temp.setMinimumSetpointTemperature(UnitConversions.convert(hw_design,"F","C"))
+      setpoint_mgr_follow_ground_temp.setReferenceGroundTemperatureObjectType('Site:GroundTemperature:Deep')
+      setpoint_mgr_follow_ground_temp.addToNode(plant_loop.supplyOutletNode)
+      
+      pump = OpenStudio::Model::PumpVariableSpeed.new(model)
+      pump.setName(obj_name + " pump")
+      pump.setRatedPumpHead(pump_head)
+      pump.setMotorEfficiency(dse * 0.77 * 0.6)
+      pump.setFractionofMotorInefficienciestoFluidStream(0)
+      pump.setCoefficient1ofthePartLoadPerformanceCurve(0)
+      pump.setCoefficient2ofthePartLoadPerformanceCurve(1)
+      pump.setCoefficient3ofthePartLoadPerformanceCurve(0)
+      pump.setCoefficient4ofthePartLoadPerformanceCurve(0)
+      pump.setMinimumFlowRate(0)
+      pump.setPumpControlType('Intermittent')
+      pump.addToNode(plant_loop.supplyInletNode)
+      
+      plant_loop.addSupplyBranchForComponent(ground_heat_exch_vert)
+      
+      chiller_bypass_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
+      plant_loop.addSupplyBranchForComponent(chiller_bypass_pipe)
+      coil_bypass_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
+      plant_loop.addDemandBranchForComponent(coil_bypass_pipe)
+      supply_outlet_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
+      supply_outlet_pipe.addToNode(plant_loop.supplyOutletNode)    
+      demand_inlet_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
+      demand_inlet_pipe.addToNode(plant_loop.demandInletNode) 
+      demand_outlet_pipe = OpenStudio::Model::PipeAdiabatic.new(model)
+      demand_outlet_pipe.addToNode(plant_loop.demandOutletNode)
+    
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
       
       control_slave_zones_hash = HVAC.get_control_and_slave_zones(thermal_zones)
@@ -493,10 +491,7 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
         
         air_loop_unitary.addToNode(air_supply_inlet_node)
         
-        runner.registerInfo("Added '#{fan.name}' to '#{air_loop_unitary.name}' of '#{air_loop.name}'")
-        runner.registerInfo("Added '#{clg_coil.name}' to '#{air_loop_unitary.name}' of '#{air_loop.name}'")
-        runner.registerInfo("Added '#{htg_coil.name}' to '#{air_loop_unitary.name}' of '#{air_loop.name}'")
-        runner.registerInfo("Added '#{supp_htg_coil.name}' to '#{air_loop_unitary.name}' of '#{air_loop.name}'")    
+        runner.registerInfo("Added '#{clg_coil.name}' and '#{htg_coil.name}' to '#{air_loop_unitary.name}' of '#{air_loop.name}'")
         
         air_loop_unitary.setControllingZoneorThermostatLocation(control_zone)
         
