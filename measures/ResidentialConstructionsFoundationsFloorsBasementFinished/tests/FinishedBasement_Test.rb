@@ -133,6 +133,24 @@ class ProcessConstructionsFoundationsFloorsBasementFinishedTest < MiniTest::Test
     expected_values = {"LayerRValue"=>0.3048/1.731+0.2032/1.3114+0.051816/0.029427+9.001+0.1016/1.3114, "LayerDensity"=>1842.3+2242.8+32.04+2242.8, "LayerSpecificHeat"=>418.7+837.4+1214.23+837.4, "LayerIndex"=>0+1+2+0+1+2, "SurfacesWithConstructions"=>7}
     _test_measure(osm_geo_finished_basement_garage, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  def test_single_family_attached_new_construction_no_zone_mult
+    num_units = 10
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_values = {"LayerRValue"=>22.517828, "LayerDensity"=>6360.64, "LayerSpecificHeat"=>3308.43, "LayerIndex"=>0+1+2+3, "SurfacesWithConstructions"=>32}
+    _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_single_family_attached_new_construction_yes_zone_mult
+    num_units = 3
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_values = {"LayerRValue"=>22.517828, "LayerDensity"=>6360.64, "LayerSpecificHeat"=>3308.43, "LayerIndex"=>0+1+2+3, "SurfacesWithConstructions"=>11}
+    _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
 
   def test_argument_error_wall_ins_height_negative
     args_hash = {}

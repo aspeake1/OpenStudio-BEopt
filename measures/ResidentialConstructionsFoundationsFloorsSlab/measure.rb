@@ -243,9 +243,10 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
     end
     
     # Get geometry values
-    slabArea = Geometry.calculate_total_area_from_surfaces(surfaces)
+    slabArea = Geometry.calculate_total_area_from_surfaces(surfaces, true)
     if exposed_perim == Constants.Auto
-        slabExtPerimeter = Geometry.calculate_exposed_perimeter(model, surfaces)
+        slabExtPerimeter = Geometry.calculate_exposed_perimeter(model, surfaces, false, true)
+        puts slabExtPerimeter
     else
         slabExtPerimeter = exposed_perim.to_f
     end

@@ -99,6 +99,24 @@ class ProcessConstructionsFoundationsFloorsCrawlspaceTest < MiniTest::Test
     expected_values = {"LayerRValue"=>0.23495/2.59817+0.3048/1.731+0.2032/1.3114+0.0508/0.02885+1.881, "LayerDensity"=>67.641+1842.3+2242.8+32.04, "LayerSpecificHeat"=>1211.14+418.7+837.4+1214.23, "LayerIndex"=>0+0+1+2+0+1, "SurfacesWithConstructions"=>9}
     _test_measure(osm_geo_crawl_garage, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  def test_single_family_attached_new_construction_no_zone_mult
+    num_units = 10
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_values = {"LayerRValue"=>352.170481, "LayerDensity"=>4186.231013, "LayerSpecificHeat"=>3682.712914, "LayerIndex"=>0+1+2+3+1, "SurfacesWithConstructions"=>52}
+    _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_single_family_attached_new_construction_yes_zone_mult
+    num_units = 3
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_values = {"LayerRValue"=>352.170481, "LayerDensity"=>4186.231013, "LayerSpecificHeat"=>3682.712914, "LayerIndex"=>0+1+2+3+1, "SurfacesWithConstructions"=>38}
+    _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
 
   def test_argument_error_wall_rigid_r_negative
     args_hash = {}

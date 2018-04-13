@@ -108,6 +108,24 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     expected_values = {"LayerRValue"=>0.0254/0.00743+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>1}
     _test_measure(osm_geo_slab_garage_windows_doors, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  def test_single_family_attached_new_construction_no_zone_mult
+    num_units = 10
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_values = {"LayerRValue"=>2.177485, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>num_units}
+    _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_single_family_attached_new_construction_yes_zone_mult
+    num_units = 3
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_values = {"LayerRValue"=>2.177485, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>num_units}
+    _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
 
   def test_argument_error_perim_r_negative
     args_hash = {}

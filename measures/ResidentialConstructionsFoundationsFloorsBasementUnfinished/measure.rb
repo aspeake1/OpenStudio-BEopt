@@ -237,9 +237,9 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinished < OpenStudio::Meas
     end
     
     # Get geometry values
-    ubFloorArea = Geometry.get_floor_area_from_spaces(spaces)
+    ubFloorArea = Geometry.get_floor_area_from_spaces(spaces, true)
     if exposed_perim == Constants.Auto
-        ubExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true)
+        ubExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true, true)
     else
         ubExtPerimeter = exposed_perim.to_f
     end

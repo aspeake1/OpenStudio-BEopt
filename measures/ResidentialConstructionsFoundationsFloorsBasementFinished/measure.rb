@@ -215,9 +215,9 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
     end
 
     # Get geometry values
-    fbFloorArea = Geometry.get_floor_area_from_spaces(spaces)
+    fbFloorArea = Geometry.get_floor_area_from_spaces(spaces, true)
     if exposed_perim == Constants.Auto
-        fbExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true)
+        fbExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true, true)
     else
         fbExtPerimeter = exposed_perim.to_f
     end

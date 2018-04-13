@@ -168,9 +168,9 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
     
     # Get geometry values
     csHeight = Geometry.spaces_avg_height(spaces)
-    csFloorArea = Geometry.get_floor_area_from_spaces(spaces)
+    csFloorArea = Geometry.get_floor_area_from_spaces(spaces, true)
     if exposed_perim == Constants.Auto
-        csExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true)
+        csExtPerimeter = Geometry.calculate_exposed_perimeter(model, floor_surfaces, has_foundation_walls=true, true)
     else
         csExtPerimeter = exposed_perim.to_f
     end

@@ -576,10 +576,15 @@ class Geometry
     end
 
     # Takes in a list of surfaces and returns the total gross area
-    def self.calculate_total_area_from_surfaces(surfaces)
+    def self.calculate_total_area_from_surfaces(surfaces, apply_multipliers=false)
         total_area = 0
         surfaces.each do |surface|
-            total_area += UnitConversions.convert(surface.grossArea, "m^2", "ft^2")
+            mult = 1.0
+            if apply_multipliers
+                space = surface.space.get
+                mult = space.multiplier.to_f
+            end
+            total_area += UnitConversions.convert(surface.grossArea * mult, "m^2", "ft^2")
         end
         return total_area
     end
@@ -660,14 +665,14 @@ class Geometry
     # TODO: Has not been tested on buildings with multiple foundations
     #        (aside from basements/crawls with attached garages over slabs)
     # TODO: Update code to work for non-rectangular buildings.
-    def self.calculate_exposed_perimeter(model, ground_floor_surfaces, has_foundation_walls=false)
+    def self.calculate_exposed_perimeter(model, ground_floor_surfaces, has_foundation_walls=false, apply_multipliers=false)
 
         perimeter = 0
 
         # Get ground edges
         if not has_foundation_walls
             # Use edges from floor surface
-            ground_edges = self.get_edges_for_surfaces(ground_floor_surfaces, false)
+            ground_edges = self.get_edges_for_surfaces(ground_floor_surfaces, false, false, apply_multipliers)
         else
             # Use top edges from foundation walls instead
             surfaces = []
@@ -680,7 +685,7 @@ class Geometry
                     surfaces << surface
                 end
             end
-            ground_edges = self.get_edges_for_surfaces(surfaces, true)
+            ground_edges = self.get_edges_for_surfaces(surfaces, true, false, apply_multipliers)
         end
 
         # Get bottom edges of exterior exposed walls or interzonal walls
@@ -690,7 +695,7 @@ class Geometry
             next if not (self.is_exterior_surface(surface) or self.is_interzonal_surface(surface))
             surfaces << surface
         end
-        model_edges = self.get_edges_for_surfaces(surfaces, false, true)
+        model_edges = self.get_edges_for_surfaces(surfaces, false, true, apply_multipliers)
 
         # check edges for matches
         ground_edges.each do |e1|
@@ -708,10 +713,16 @@ class Geometry
         return UnitConversions.convert(perimeter, "m", "ft")
     end
 
-    def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false)
+    def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false, apply_multipliers=false)
         edges = []
         edge_counter = 0
         surfaces.each do |surface|
+            mult = 1.0
+            if apply_multipliers
+                space = surface.space.get
+                mult = space.multiplier.to_f
+            end
+        
             # ensure we only process bottom or top edge of wall surfaces
             if use_top_edge
                 matchz = self.getSurfaceZValues([surface]).max
@@ -733,10 +744,12 @@ class Geometry
             vertex_hash.each do |k,v|
                 edge_counter += 1
                 counter += 1
-                if vertex_hash.size != counter
-                    edges << [v, vertex_hash[counter+1], self.get_facade_for_surface(surface)]
-                elsif vertex_hash.size > 2 # different code for wrap around vertex (if > 2 vertices)
-                    edges << [v, vertex_hash[1], self.get_facade_for_surface(surface)]
+                (1..mult).to_a.each do |m|
+                  if vertex_hash.size != counter
+                      edges << [v, vertex_hash[counter+1], self.get_facade_for_surface(surface)]
+                  elsif vertex_hash.size > 2 # different code for wrap around vertex (if > 2 vertices)
+                      edges << [v, vertex_hash[1], self.get_facade_for_surface(surface)]
+                  end
                 end
             end
         end
