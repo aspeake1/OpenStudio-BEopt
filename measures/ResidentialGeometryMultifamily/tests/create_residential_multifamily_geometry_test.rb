@@ -168,12 +168,11 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  def test_zone_and_floor_mult
+  def test_zone_mult_many_floors
     args_hash = {}
     args_hash["num_floors"] = 12
     args_hash["num_units"] = 12*8
     args_hash["use_zone_mult"] = "true"
-    args_hash["use_floor_mult"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>18, "Surface"=>252, "ThermalZone"=>19, "Space"=>30, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>900*18, "BuildingHeight"=>12*8, "NumZonesRepresented"=>12*8}

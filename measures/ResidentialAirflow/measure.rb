@@ -737,7 +737,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     building.stories = model.getBuilding.standardsNumberOfAboveGroundStories.get
     building.num_units = units.size
     building.above_grade_volume = Geometry.get_above_grade_finished_volume_from_spaces(model_spaces, true)
-    building.above_grade_exterior_wall_area = Geometry.calculate_above_grade_exterior_wall_area(model_spaces, false)
+    building.above_grade_exterior_wall_area = Geometry.calculate_above_grade_exterior_wall_area(model_spaces, true)
     model.getThermalZones.each do |thermal_zone|
       if Geometry.is_garage(thermal_zone)
         building.garage_zone = thermal_zone

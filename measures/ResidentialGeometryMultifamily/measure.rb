@@ -151,13 +151,6 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     use_zone_mult.setDefaultValue(false)
     args << use_zone_mult
 
-    #make an argument for using floor multipliers
-    use_floor_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_floor_mult", true)
-    use_floor_mult.setDisplayName("Use Floor Multipliers?")
-    use_floor_mult.setDescription("Model only one interior floor with thermal zone multipliers equal to the number of interior floors.")
-    use_floor_mult.setDefaultValue(false)
-    args << use_floor_mult
-
     return args
   end
 
@@ -186,8 +179,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     foundation_type = runner.getStringArgumentValue("foundation_type",user_arguments)
     foundation_height = runner.getDoubleArgumentValue("foundation_height",user_arguments)
     use_zone_mult = runner.getBoolArgumentValue("use_zone_mult",user_arguments)
-    use_floor_mult = runner.getBoolArgumentValue("use_floor_mult",user_arguments)
-    
+
     if foundation_type == "slab"
       foundation_height = 0.0
     elsif foundation_type == "unfinished basement"
@@ -892,7 +884,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     end # end zone mult
     
     # Apply floor multiplier
-    if use_floor_mult and num_floors > 3
+    if use_zone_mult and num_floors > 3
     
       floor_zs = []
       model.getSurfaces.each do |surface|
