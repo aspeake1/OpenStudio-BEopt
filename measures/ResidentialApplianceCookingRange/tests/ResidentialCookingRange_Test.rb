@@ -355,13 +355,23 @@ class ResidentialCookingRangeTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "No building geometry has been defined.")
   end
   
-  def test_single_family_attached_new_construction
+  def test_single_family_attached_new_construction_gas
     num_units = 4
     args_hash = {}
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units}
     expected_values = {"Annual_kwh"=>num_units*79.87, "Annual_therm"=>num_units*28.53, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Location"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+  end
+  
+  def test_single_family_attached_new_construction_propane
+    num_units = 4
+    args_hash = {}
+    args_hash["fuel_type"] = Constants.FuelTypePropane
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "OtherEquipment"=>num_units, "OtherEquipmentDefinition"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*79.87, "Annual_therm"=>0, "Annual_gal"=>num_units*31.1, "FuelType"=>Constants.FuelTypePropane, "Location"=>args_hash["location"]}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
