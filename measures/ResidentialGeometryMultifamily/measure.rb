@@ -151,6 +151,23 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     use_zone_mult.setDefaultValue(false)
     args << use_zone_mult
 
+    #make a choice argument for model objects
+    building_facades = OpenStudio::StringVector.new
+    building_facades << "None"
+    building_facades << Constants.FacadeBack
+    building_facades << Constants.FacadeLeft
+    building_facades << Constants.FacadeRight
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeRight}"
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeBack}"
+    building_facades << "#{Constants.FacadeBack}, #{Constants.FacadeRight}"
+
+    #make an argument for shared building facade
+    shared_building_facades = OpenStudio::Measure::OSArgument::makeChoiceArgument("shared_building_facades", building_facades, true)
+    shared_building_facades.setDisplayName("Shared Building Facade(s)")
+    shared_building_facades.setDescription("The facade(s) of the building that are shared. Surfaces on these facades become adiabatic.")
+    shared_building_facades.setDefaultValue("None")
+    args << shared_building_facades
+
     return args
   end
 
@@ -179,6 +196,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     foundation_type = runner.getStringArgumentValue("foundation_type",user_arguments)
     foundation_height = runner.getDoubleArgumentValue("foundation_height",user_arguments)
     use_zone_mult = runner.getBoolArgumentValue("use_zone_mult",user_arguments)
+    shared_building_facades = runner.getStringArgumentValue("shared_building_facades",user_arguments)
 
     if foundation_type == "slab"
       foundation_height = 0.0
@@ -800,7 +818,21 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     OpenStudio::Model.intersectSurfaces(spaces)
     OpenStudio::Model.matchSurfaces(spaces)
 
-    # Apply zone multiplier
+    # Make shared building facade surfaces adiabatic
+    if shared_building_facades != "None"
+      shared_building_facades = shared_building_facades.split(", ")
+      shared_building_facades.each do |shared_building_facade|
+        model.getSurfaces.each do |surface|
+          next unless surface.surfaceType.downcase == "wall"
+          next unless ["outdoors", "ground"].include? surface.outsideBoundaryCondition.downcase
+          next if surface.adjacentSurface.is_initialized
+          next unless Geometry.get_facade_for_surface(surface) == shared_building_facade
+          surface.setOutsideBoundaryCondition("Adiabatic")
+        end
+      end
+    end
+
+    # Apply zone multipliers
     if use_zone_mult and ((num_units_per_floor > 3 and not has_rear_units) or (num_units_per_floor > 7 and has_rear_units))
 
       (1..num_units_per_floor).to_a.each do |unit_num_per_floor|

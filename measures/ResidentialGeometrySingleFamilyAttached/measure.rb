@@ -158,6 +158,23 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     use_zone_mult.setDefaultValue(false)
     args << use_zone_mult
 
+    #make a choice argument for model objects
+    building_facades = OpenStudio::StringVector.new
+    building_facades << "None"
+    building_facades << Constants.FacadeBack
+    building_facades << Constants.FacadeLeft
+    building_facades << Constants.FacadeRight
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeRight}"
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeBack}"
+    building_facades << "#{Constants.FacadeBack}, #{Constants.FacadeRight}"
+
+    #make an argument for shared building facade
+    shared_building_facades = OpenStudio::Measure::OSArgument::makeChoiceArgument("shared_building_facades", building_facades, true)
+    shared_building_facades.setDisplayName("Shared Building Facade(s)")
+    shared_building_facades.setDescription("The facade(s) of the building that are shared. Surfaces on these facades become adiabatic.")
+    shared_building_facades.setDefaultValue("None")
+    args << shared_building_facades
+
     return args
   end
 
@@ -183,7 +200,8 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     roof_type = runner.getStringArgumentValue("roof_type",user_arguments)
     roof_pitch = {"1:12"=>1.0/12.0, "2:12"=>2.0/12.0, "3:12"=>3.0/12.0, "4:12"=>4.0/12.0, "5:12"=>5.0/12.0, "6:12"=>6.0/12.0, "7:12"=>7.0/12.0, "8:12"=>8.0/12.0, "9:12"=>9.0/12.0, "10:12"=>10.0/12.0, "11:12"=>11.0/12.0, "12:12"=>12.0/12.0}[runner.getStringArgumentValue("roof_pitch",user_arguments)]    
     use_zone_mult = runner.getBoolArgumentValue("use_zone_mult",user_arguments)
-    
+    shared_building_facades = runner.getStringArgumentValue("shared_building_facades",user_arguments)
+
     if foundation_type == "slab"
       foundation_height = 0.0
     elsif foundation_type == "unfinished basement" or foundation_type == "finished basement"
@@ -338,11 +356,11 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
         m[2,3] = wall_height * (story - 1)
         new_living_space.setTransformation(OpenStudio::Transformation.new(m))
         new_living_space.setThermalZone(living_zone)
-        
+
         living_spaces_back << new_living_space
-              
+
       end
-      
+
       # attic
       if roof_type != Constants.RoofTypeFlat
         attic_space = get_attic_space(model, x, -y, wall_height, num_floors, roof_pitch, roof_type)
@@ -355,7 +373,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           attic_spaces << attic_space
           attic_space_back = attic_space
         end
-      end      
+      end
       
       # create the back unit
       unit_spaces_hash[2] = living_spaces_back
@@ -452,7 +470,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           else
             new_living_space.setName("living space|#{Constants.ObjectNameBuildingUnit(unit_num)}|story #{story+1}")
           end  
-          new_living_space.setSpaceType(living_space_type)          
+          new_living_space.setSpaceType(living_space_type)
         
           m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
           m[0,3] = -pos * x
@@ -486,18 +504,18 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
             new_attic_space.setXOrigin(0)
             new_attic_space.setYOrigin(0)
             new_attic_space.setZOrigin(0)
-         
+
             attic_spaces << new_attic_space
-          
+
           end
-        end         
+        end
         
         unit_spaces_hash[unit_num] = new_living_spaces
       
-      end     
+      end
     
-    end   
-    
+    end
+
     # foundation
     if foundation_height > 0
       
@@ -706,7 +724,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     
     # intersect and match surfaces for each space in the vector
     OpenStudio::Model.intersectSurfaces(spaces)
-    OpenStudio::Model.matchSurfaces(spaces)    
+    OpenStudio::Model.matchSurfaces(spaces)
     
     if attic_type == "unfinished attic" and roof_type != Constants.RoofTypeFlat
       if offset == 0
@@ -729,7 +747,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       attic_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedAttic)
       attic_space.setSpaceType(attic_space_type)
     end
-    
+
     unit_hash = {}
     unit_spaces_hash.each do |unit_num, spaces|
       # Store building unit information
@@ -741,17 +759,31 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       end
       unit_hash[unit_num] = unit
     end
-    
+
     # put all of the spaces in the model into a vector
     spaces = OpenStudio::Model::SpaceVector.new
     model.getSpaces.each do |space|
       spaces << space
-    end    
-    
+    end
+
     # intersect and match surfaces for each space in the vector
     OpenStudio::Model.intersectSurfaces(spaces)
     OpenStudio::Model.matchSurfaces(spaces)
-    
+
+    # Make shared building facade surfaces adiabatic
+    if shared_building_facades != "None"
+      shared_building_facades = shared_building_facades.split(", ")
+      shared_building_facades.each do |shared_building_facade|
+        model.getSurfaces.each do |surface|
+          next unless surface.surfaceType.downcase == "wall"
+          next unless ["outdoors", "ground"].include? surface.outsideBoundaryCondition.downcase
+          next if surface.adjacentSurface.is_initialized
+          next unless Geometry.get_facade_for_surface(surface) == shared_building_facade
+          surface.setOutsideBoundaryCondition("Adiabatic")
+        end
+      end
+    end
+
     # Apply zone multipliers
     if use_zone_mult and ((num_units > 3 and not has_rear_units) or (num_units > 7 and has_rear_units))
       (2..num_units).to_a.each do |unit_num|
