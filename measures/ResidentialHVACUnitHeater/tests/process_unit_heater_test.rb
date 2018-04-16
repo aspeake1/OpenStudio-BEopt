@@ -10,7 +10,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
   def test_new_construction_eff_0_78_gas_fan
     args_hash = {}
     args_hash["fan_power"] = "0.7"
-    args_hash["airflow"] = "65.0"
+    args_hash["airflow_rate"] = "65.0"
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>1}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
@@ -207,7 +207,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
   def test_error_fan_power_without_airflow
     args_hash = {}
     args_hash["fan_power"] = "0.7"
-    args_hash["airflow"] = "0.0"
+    args_hash["airflow_rate"] = "0.0"
     result = _test_error("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "If Fan Power > 0, then Airflow Rate cannot be zero.")
   end
@@ -230,7 +230,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
-      if args_hash[arg.name]
+      if args_hash.has_key?(arg.name)
         assert(temp_arg_var.setValue(args_hash[arg.name]))
       end
       argument_map[arg.name] = temp_arg_var
@@ -271,7 +271,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
-      if args_hash[arg.name]
+      if args_hash.has_key?(arg.name)
         assert(temp_arg_var.setValue(args_hash[arg.name]))
       end
       argument_map[arg.name] = temp_arg_var

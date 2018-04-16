@@ -71,62 +71,33 @@ The order in which these measures are called is important. For example, the Wind
 |Group|Measure|Dependencies*|
 |:---|:---|:---|
 |1. Location|1. Location||
-|2. Geometry|1. Geometry - Single-Family Detached (or Single-Family Attached or Multifamily)||
-||2. Number of Beds and Baths||
-||3. Number of Occupants|Beds/Baths|
-||4. Orientation||
-||5. Eaves||
-||6. Door Area||
-||7. Window Areas||
-||8. Overhangs|Window Areas|
-||9. Neighbors||
-|3. Envelope Constructions|1. Uninsulated Surfaces||
-||2. Ceilings/Roofs - Unfinished Attic (or Finished Roof)||
-||3. Ceilings/Roofs - Roof Sheathing||
-||4. Ceilings/Roofs - Roofing Material||
-||5. Ceilings/Roofs - Radiant Barrier||
-||6. Ceilings/Roofs - Ceiling Thermal Mass||
-||7. Foundations/Floors - Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
-||8. Foundations/Floors - Interzonal Floor Construction||
-||9. Foundations/Floors - Floor Covering||
-||10. Foundations/Floors - Floor Sheathing||
-||11. Foundations/Floors - Floor Thermal Mass||
-||12. Walls - Wood Stud (or Double Stud, CMU, etc.)||
-||13. Walls - Interzonal Construction||
-||14. Walls - Wall Sheathing||
-||15. Walls - Exterior Finish||
-||16. Walls - Exterior Thermal Mass||
-||17. Walls - Partition Thermal Mass||
-||18. Window Construction|Window Areas, Location|
-||19. Door Construction|Door Area|
-||20. Furniture Thermal Mass||
-|4. Domestic Hot Water|1. Water Heater - Fuel Tank (or Electric Tank, Fuel Tankless, Heat Pump, etc.)|Beds/Baths|
+|2. Geometry|1. Geometry - Create Single-Family Detached (or Single-Family Attached or Multifamily)||
+||2. Door Area||
+||3. Window/Skylight Area||
+|3. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
+||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
+||3. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
+||4. Floors||
+||5. Windows/Skylights|Window/Skylight Area, Location|
+||6. Doors|Door Area|
+|4. Domestic Hot Water|1. Water Heater - Tank (or Tankless, Heat Pump, etc.)||
 ||2. Hot Water Fixtures|Water Heater|
 ||3. Hot Water Distribution|Hot Water Fixtures, Location|
 ||4. Solar Hot Water|Water Heater, Location|
 |5. HVAC|1. Central Air Source Heat Pump (or AC/Furnace, Boiler, MSHP, etc.)||
 ||2. Heating Setpoint|HVAC Equipment, Location|
 ||3. Cooling Setpoint|HVAC Equipment, Location|
-||4. Ceiling Fan|Cooling Setpoint, Beds/Baths|
+||4. Ceiling Fan|Cooling Setpoint|
 ||5. Dehumidifier|HVAC Equipment|
 |6. Major Appliances|1. Refrigerator||
 ||2. Clothes Washer|Water Heater, Location|
-||3. Clothes Dryer - Electric (or Fuel)|Beds/Baths, Clothes Washer|
+||3. Clothes Dryer|Clothes Washer|
 ||4. Dishwasher|Water Heater, Location|
-||5. Cooking Range - Electric (or Fuel)|Beds/Baths|
+||5. Cooking Range||
 |7. Lighting|1. Lighting|Location|
-|8. Misc Loads|1. Plug Loads|Beds/Baths|
-||2. Extra Refrigerator||
-||3. Freezer||
-||4. Hot Tub Heater - Electric (or Gas)|Beds/Baths|
-||5. Hot Tub Pump|Beds/Baths|
-||6. Pool Heater - Electric (or Gas)|Beds/Baths|
-||7. Pool Pump|Beds/Baths|
-||8. Well Pump|Beds/Baths|
-||9. Gas Fireplace|Beds/Baths|
-||10. Gas Grill|Beds/Baths|
-||11. Gas Lighting|Beds/Baths|
-|9. Airflow|1. Airflow|Location, Beds/Baths, HVAC Equipment, Clothes Dryer|
+|8. Misc Loads|1. Plug Loads||
+||2. Large, Uncommon Loads||
+|9. Airflow|1. Airflow|Location, HVAC Equipment, Clothes Dryer|
 |10. Sizing|1. HVAC Sizing|(lots of measures...)|
 <!--- MEASURE_WORKFLOW_END -->
 
