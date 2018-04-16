@@ -190,7 +190,7 @@ class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
             if fuel_type == Constants.FuelTypeGas
                 s_ann = "#{tot_ann_f.round} therms"
             else
-                s_ann = "#{UnitConversions.convert(UnitConversions.convert(tot_range_ann_f, "therm", "Btu"), "Btu", "gal", fuel_type).round} gallons"
+                s_ann = "#{UnitConversions.convert(UnitConversions.convert(tot_ann_f, "therm", "Btu"), "Btu", "gal", fuel_type).round} gallons"
             end
             s_ignition = ""
             if has_elec_ignition
