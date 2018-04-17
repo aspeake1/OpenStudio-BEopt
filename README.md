@@ -15,9 +15,9 @@ The measures can be run via the standard OpenStudio approaches: the user interfa
 
 If interested in programatically driving the simulations, you will likely find it easiest to use the Command Line Interface approach. The Command Line Interface is a self-contained executable that can run an OpenStudio Workflow file, which defines a series of OpenStudio measures to apply.
 
-An example OpenStudio Workflow [(create-model-example.osw)](https://github.com/NREL/OpenStudio-BEopt/blob/master/workflows/create-model-example.osw) is provided with a pre-populated selection of residential measures and arguments. It can be modified as needed and then run like so:
+An example OpenStudio Workflow [(example_single_family_detached.osw)](https://github.com/NREL/OpenStudio-BEopt/blob/master/workflows/example_single_family_detached.osw) is provided with a pre-populated selection of residential measures and arguments. It can be modified as needed and then run like so:
 
-`openstudio.exe run -w create-model-example.osw`
+`openstudio.exe run -w example_single_family_detached.osw`
 
 This will apply the measures, run the EnergyPlus simulation, and produce output. 
 
