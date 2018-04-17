@@ -171,7 +171,7 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
 
   def test_auto_heating_season
     args_hash = {}
-    args_hash["use_auto_season"] = "true"
+    args_hash["use_auto_season"] = true
     expected_num_del_objects = {"ScheduleRule"=>24, "ScheduleRuleset"=>2}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3}
     expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
@@ -206,7 +206,7 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
-      if args_hash[arg.name]
+      if args_hash.has_key?(arg.name)
         assert(temp_arg_var.setValue(args_hash[arg.name]))
       end
       argument_map[arg.name] = temp_arg_var
@@ -247,7 +247,7 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
-      if args_hash[arg.name]
+      if args_hash.has_key?(arg.name)
         assert(temp_arg_var.setValue(args_hash[arg.name]))
       end
       argument_map[arg.name] = temp_arg_var

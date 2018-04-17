@@ -7,31 +7,23 @@ require 'fileutils'
 
 class DoorAreaTest < MiniTest::Test
   
-  def osm_geo
-    return "SFD_2000sqft_2story_FB_GRG_UA.osm"
-  end
-  
-  def osm_geo_rotated
-    return "SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm"
-  end
-  
   def test_no_door_area
     args_hash = {}
     args_hash["door_area"] = 0
     expected_values = {"Constructions"=>0}
-    result = _test_measure(osm_geo, args_hash, 0, 0, 0, expected_values)
+    result = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, 0, 0, 0, expected_values)
   end
 
   def test_sfd_new_construction_rotated
     args_hash = {}
     expected_values = {"Constructions"=>0}
-    model = _test_measure(osm_geo_rotated, args_hash, 0, 20, 0, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm", args_hash, 0, 20, 0, expected_values)
   end
   
   def test_sfd_retrofit_replace
     args_hash = {}
     expected_values = {"Constructions"=>0}
-    model = _test_measure(osm_geo, args_hash, 0, 20, 0, expected_values)
+    model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, 0, 20, 0, expected_values)
     args_hash = {}
     args_hash["door_area"] = 30
     expected_values = {"Constructions"=>0}
@@ -41,7 +33,7 @@ class DoorAreaTest < MiniTest::Test
   def test_argument_error_invalid_door_area
     args_hash = {}
     args_hash["door_area"] = -20
-    result = _test_error(osm_geo, args_hash)
+    result = _test_error("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Invalid door area.")
   end  
   
@@ -91,7 +83,7 @@ class DoorAreaTest < MiniTest::Test
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
-      if args_hash[arg.name]
+      if args_hash.has_key?(arg.name)
         assert(temp_arg_var.setValue(args_hash[arg.name]))
       end
       argument_map[arg.name] = temp_arg_var
@@ -137,7 +129,7 @@ class DoorAreaTest < MiniTest::Test
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
-      if args_hash[arg.name]
+      if args_hash.has_key?(arg.name)
         assert(temp_arg_var.setValue(args_hash[arg.name]))
       end
       argument_map[arg.name] = temp_arg_var
