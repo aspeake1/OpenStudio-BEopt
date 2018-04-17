@@ -172,13 +172,29 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     eaves_depth.setDefaultValue(2.0)
     args << eaves_depth
     
-    #TODO: Needs more testing
     #make an argument for using zone multipliers
-    #use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
-    #use_zone_mult.setDisplayName("Use Zone Multipliers?")
-    #use_zone_mult.setDescription("Model only one interior unit with its thermal zone multiplier equal to the number of interior units.")
-    #use_zone_mult.setDefaultValue(false)
-    #args << use_zone_mult
+    use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
+    use_zone_mult.setDisplayName("Use Zone Multipliers?")
+    use_zone_mult.setDescription("Model only one interior unit with its thermal zone multiplier equal to the number of interior units.")
+    use_zone_mult.setDefaultValue(false)
+    args << use_zone_mult
+
+    #make a choice argument for model objects
+    building_facades = OpenStudio::StringVector.new
+    building_facades << "None"
+    building_facades << Constants.FacadeBack
+    building_facades << Constants.FacadeLeft
+    building_facades << Constants.FacadeRight
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeRight}"
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeBack}"
+    building_facades << "#{Constants.FacadeBack}, #{Constants.FacadeRight}"
+
+    #make an argument for shared building facade
+    shared_building_facades = OpenStudio::Measure::OSArgument::makeChoiceArgument("shared_building_facades", building_facades, true)
+    shared_building_facades.setDisplayName("Shared Building Facade(s)")
+    shared_building_facades.setDescription("The facade(s) of the building that are shared. Surfaces on these facades become adiabatic.")
+    shared_building_facades.setDefaultValue("None")
+    args << shared_building_facades
 
     #make a string argument for number of bedrooms
     num_br = OpenStudio::Measure::OSArgument::makeStringArgument("num_bedrooms", false)
@@ -288,7 +304,8 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     roof_pitch = {"1:12"=>1.0/12.0, "2:12"=>2.0/12.0, "3:12"=>3.0/12.0, "4:12"=>4.0/12.0, "5:12"=>5.0/12.0, "6:12"=>6.0/12.0, "7:12"=>7.0/12.0, "8:12"=>8.0/12.0, "9:12"=>9.0/12.0, "10:12"=>10.0/12.0, "11:12"=>11.0/12.0, "12:12"=>12.0/12.0}[runner.getStringArgumentValue("roof_pitch",user_arguments)]
     roof_structure = runner.getStringArgumentValue("roof_structure",user_arguments)
     eaves_depth = UnitConversions.convert(runner.getDoubleArgumentValue("eaves_depth",user_arguments),"ft","m")
-    use_zone_mult = false #runner.getBoolArgumentValue("use_zone_mult",user_arguments)
+    use_zone_mult = runner.getBoolArgumentValue("use_zone_mult",user_arguments)
+    shared_building_facades = runner.getStringArgumentValue("shared_building_facades",user_arguments)
     num_br = runner.getStringArgumentValue("num_bedrooms", user_arguments).split(",").map(&:strip)
     num_ba = runner.getStringArgumentValue("num_bathrooms", user_arguments).split(",").map(&:strip)
     num_occupants = runner.getStringArgumentValue("num_occupants",user_arguments)
@@ -303,6 +320,8 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
 
     if foundation_type == "slab"
       foundation_height = 0.0
+    elsif foundation_type == "unfinished basement" or foundation_type == "finished basement"
+      foundation_height = 8.0
     end
 
     # error checking
@@ -310,13 +329,21 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       runner.registerError("Starting model is not empty.")
       return false
     end
+    if foundation_type == "crawlspace" and ( foundation_height < 1.5 or foundation_height > 5.0 )
+      runner.registerError("The crawlspace height can be set between 1.5 and 5 ft.")
+      return false
+    end
     if num_units == 1 and has_rear_units
       runner.registerError("Specified building as having rear units, but didn't specify enough units.")
       return false
-    end
+    end    
     if unit_aspect_ratio < 0
       runner.registerError("Invalid aspect ratio entered.")
       return false
+    end
+    if has_rear_units and num_units % 2 != 0
+      runner.registerWarning("Specified a building with rear units and an odd number of units. Subtracting one unit.")
+      num_units -= 1
     end
 
     # Convert to SI
@@ -859,7 +886,21 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     OpenStudio::Model.intersectSurfaces(spaces)
     OpenStudio::Model.matchSurfaces(spaces)
 
-    # Apply zone multiplier
+    # Make shared building facade surfaces adiabatic
+    if shared_building_facades != "None"
+      shared_building_facades = shared_building_facades.split(", ")
+      shared_building_facades.each do |shared_building_facade|
+        model.getSurfaces.each do |surface|
+          next unless surface.surfaceType.downcase == "wall"
+          next unless ["outdoors", "ground", "foundation"].include? surface.outsideBoundaryCondition.downcase
+          next if surface.adjacentSurface.is_initialized
+          next unless Geometry.get_facade_for_surface(surface) == shared_building_facade
+          surface.setOutsideBoundaryCondition("Adiabatic")
+        end
+      end
+    end
+    
+    # Apply zone multipliers
     if use_zone_mult and ((num_units > 3 and not has_rear_units) or (num_units > 7 and has_rear_units))
       (2..num_units).to_a.each do |unit_num|
 
@@ -972,7 +1013,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       return false
     end
 
-    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch)
+    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch, true)
     unless result
       return false
     end

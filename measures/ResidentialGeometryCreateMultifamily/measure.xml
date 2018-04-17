@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>create_residential_multifamily_geometry</name>
   <uid>9bc07973-98a4-46fc-b643-e280628817c5</uid>
-  <version_id>6b4605a1-fe33-4999-9f66-84fcad938db1</version_id>
-  <version_modified>20180416T163842Z</version_modified>
+  <version_id>cd5ab966-364a-452c-b865-683ca475e4e7</version_id>
+  <version_modified>20180417T203304Z</version_modified>
   <xml_checksum>2AF3A68E</xml_checksum>
   <class_name>CreateResidentialMultifamilyGeometry</class_name>
   <display_name>Create Residential Multifamily Geometry</display_name>
@@ -41,9 +41,9 @@
       <default_value>1</default_value>
     </argument>
     <argument>
-      <name>num_units_per_floor</name>
-      <display_name>Num Units Per Floor</display_name>
-      <description>The number of units per floor.</description>
+      <name>num_units</name>
+      <display_name>Num Units</display_name>
+      <description>The number of units. This must be divisible by the number of floors.</description>
       <type>Integer</type>
       <units>#</units>
       <required>true</required>
@@ -190,6 +190,64 @@
       <default_value>2</default_value>
     </argument>
     <argument>
+      <name>use_zone_mult</name>
+      <display_name>Use Zone Multipliers?</display_name>
+      <description>Model only one interior unit per floor with its thermal zone multiplier equal to the number of interior units per floor.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>false</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>shared_building_facades</name>
+      <display_name>Shared Building Facade(s)</display_name>
+      <description>The facade(s) of the building that are shared. Surfaces on these facades become adiabatic.</description>
+      <type>Choice</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>None</default_value>
+      <choices>
+        <choice>
+          <value>None</value>
+          <display_name>None</display_name>
+        </choice>
+        <choice>
+          <value>back</value>
+          <display_name>back</display_name>
+        </choice>
+        <choice>
+          <value>left</value>
+          <display_name>left</display_name>
+        </choice>
+        <choice>
+          <value>right</value>
+          <display_name>right</display_name>
+        </choice>
+        <choice>
+          <value>left, right</value>
+          <display_name>left, right</display_name>
+        </choice>
+        <choice>
+          <value>left, back</value>
+          <display_name>left, back</display_name>
+        </choice>
+        <choice>
+          <value>back, right</value>
+          <display_name>back, right</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
       <name>num_bedrooms</name>
       <display_name>Number of Bedrooms</display_name>
       <description>Specify the number of bedrooms. Used to determine the energy usage of appliances and plug loads, hot water usage, mechanical ventilation rate, etc.</description>
@@ -329,33 +387,10 @@
       <checksum>A001EED9</checksum>
     </file>
     <file>
-      <filename>create_residential_multifamily_geometry_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>D29845F8</checksum>
-    </file>
-    <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>91D17463</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.12.2</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>D6B9D25D</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>92D32A87</checksum>
     </file>
     <file>
       <filename>schedules.rb</filename>
@@ -373,7 +408,30 @@
       <filename>MF_8units_1story_SL_Denver.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>6B113EBA</checksum>
+      <checksum>EBDB992B</checksum>
+    </file>
+    <file>
+      <filename>create_residential_multifamily_geometry_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>5D2F9D3C</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.12.2</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>FFBC86D7</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>CEADC97D</checksum>
     </file>
   </files>
 </measure>

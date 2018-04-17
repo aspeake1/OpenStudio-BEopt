@@ -222,19 +222,19 @@ class Geometry
   end
 
   def self.get_floor_area_from_spaces(spaces, apply_multipliers=false, runner=nil)
-      floor_area = 0
-      spaces.each do |space|
-          mult = 1.0
-          if apply_multipliers
-              mult = space.multiplier.to_f
-          end
-          floor_area += UnitConversions.convert(space.floorArea * mult, "m^2", "ft^2")
+    floor_area = 0
+    spaces.each do |space|
+      mult = 1.0
+      if apply_multipliers
+        mult = space.multiplier.to_f
       end
-      if floor_area == 0 and not runner.nil?
-          runner.registerError("Could not find any floor area.")
-          return nil
-      end
-      return floor_area
+      floor_area += UnitConversions.convert(space.floorArea * mult, "m^2", "ft^2")
+    end
+    if floor_area == 0 and not runner.nil?
+      runner.registerError("Could not find any floor area.")
+      return nil
+    end
+    return floor_area
   end
   
   def self.get_zone_volume(zone, apply_multipliers=false, runner=nil)
@@ -1352,7 +1352,7 @@ class Geometry
 
   end
 
-  def self.process_occupants(model, runner, num_occ, occ_gain, sens_frac, lat_frac, weekday_sch, weekend_sch, monthly_sch)
+  def self.process_occupants(model, runner, num_occ, occ_gain, sens_frac, lat_frac, weekday_sch, weekend_sch, monthly_sch, apply_multipliers=false)
 
     num_occ = num_occ.split(",").map(&:strip)
 
@@ -1493,7 +1493,11 @@ class Geometry
             end
           end
 
-          space_num_occ = unit_occ * UnitConversions.convert(space.floorArea, "m^2", "ft^2") / ffa
+          mult = 1.0
+          if apply_multipliers
+            mult = space.multiplier.to_f
+          end
+          space_num_occ = unit_occ * UnitConversions.convert(space.floorArea * mult, "m^2", "ft^2") / ffa
 
           if space_num_occ > 0
 

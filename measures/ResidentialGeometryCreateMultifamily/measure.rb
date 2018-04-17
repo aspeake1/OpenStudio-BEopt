@@ -52,13 +52,13 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     num_floors.setDefaultValue(1)
     args << num_floors
 
-    #make an argument for number of units per floor
-    num_units_per_floor = OpenStudio::Measure::OSArgument::makeIntegerArgument("num_units_per_floor",true)
-    num_units_per_floor.setDisplayName("Num Units Per Floor")
-    num_units_per_floor.setUnits("#")
-    num_units_per_floor.setDescription("The number of units per floor.")
-    num_units_per_floor.setDefaultValue(2)
-    args << num_units_per_floor
+    #make an argument for number of units
+    num_units = OpenStudio::Measure::OSArgument::makeIntegerArgument("num_units",true)
+    num_units.setDisplayName("Num Units")
+    num_units.setUnits("#")
+    num_units.setDescription("The number of units. This must be divisible by the number of floors.")
+    num_units.setDefaultValue(2)
+    args << num_units
 
     #make an argument for unit aspect ratio
     unit_aspect_ratio = OpenStudio::Measure::OSArgument::makeDoubleArgument("unit_aspect_ratio",true)
@@ -153,21 +153,29 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     eaves_depth.setDefaultValue(2.0)
     args << eaves_depth
 
-    #TODO: Needs more testing
     #make an argument for using zone multipliers
-    #use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
-    #use_zone_mult.setDisplayName("Use Zone Multipliers?")
-    #use_zone_mult.setDescription("Model only one interior unit per floor with its thermal zone multiplier equal to the number of interior units per floor.")
-    #use_zone_mult.setDefaultValue(false)
-    #args << use_zone_mult
+    use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
+    use_zone_mult.setDisplayName("Use Zone Multipliers?")
+    use_zone_mult.setDescription("Model only one interior unit per floor with its thermal zone multiplier equal to the number of interior units per floor.")
+    use_zone_mult.setDefaultValue(false)
+    args << use_zone_mult
 
-    #TODO: Needs more testing
-    #make an argument for using floor multipliers
-    #use_floor_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_floor_mult", true)
-    #use_floor_mult.setDisplayName("Use Floor Multipliers?")
-    #use_floor_mult.setDescription("Model only one interior floor with thermal zone multipliers equal to the number of interior floors.")
-    #use_floor_mult.setDefaultValue(false)
-    #args << use_floor_mult
+    #make a choice argument for model objects
+    building_facades = OpenStudio::StringVector.new
+    building_facades << "None"
+    building_facades << Constants.FacadeBack
+    building_facades << Constants.FacadeLeft
+    building_facades << Constants.FacadeRight
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeRight}"
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeBack}"
+    building_facades << "#{Constants.FacadeBack}, #{Constants.FacadeRight}"
+
+    #make an argument for shared building facade
+    shared_building_facades = OpenStudio::Measure::OSArgument::makeChoiceArgument("shared_building_facades", building_facades, true)
+    shared_building_facades.setDisplayName("Shared Building Facade(s)")
+    shared_building_facades.setDescription("The facade(s) of the building that are shared. Surfaces on these facades become adiabatic.")
+    shared_building_facades.setDefaultValue("None")
+    args << shared_building_facades
 
     #make a string argument for number of bedrooms
     num_br = OpenStudio::Measure::OSArgument::makeStringArgument("num_bedrooms", false)
@@ -268,7 +276,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     unit_ffa = UnitConversions.convert(runner.getDoubleArgumentValue("unit_ffa",user_arguments),"ft^2","m^2")
     wall_height = UnitConversions.convert(runner.getDoubleArgumentValue("wall_height",user_arguments),"ft","m")
     num_floors = runner.getIntegerArgumentValue("num_floors",user_arguments)
-    num_units_per_floor = runner.getIntegerArgumentValue("num_units_per_floor",user_arguments)
+    num_units = runner.getIntegerArgumentValue("num_units",user_arguments)
     unit_aspect_ratio = runner.getDoubleArgumentValue("unit_aspect_ratio",user_arguments)
     corridor_position = runner.getStringArgumentValue("corridor_position",user_arguments)
     corridor_width = UnitConversions.convert(runner.getDoubleArgumentValue("corridor_width",user_arguments),"ft","m")
@@ -279,8 +287,8 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     foundation_type = runner.getStringArgumentValue("foundation_type",user_arguments)
     foundation_height = runner.getDoubleArgumentValue("foundation_height",user_arguments)
     eaves_depth = UnitConversions.convert(runner.getDoubleArgumentValue("eaves_depth",user_arguments),"ft","m")
-    use_zone_mult = false #runner.getBoolArgumentValue("use_zone_mult",user_arguments)
-    use_floor_mult = false #runner.getBoolArgumentValue("use_floor_mult",user_arguments)
+    use_zone_mult = runner.getBoolArgumentValue("use_zone_mult",user_arguments)
+    shared_building_facades = runner.getStringArgumentValue("shared_building_facades",user_arguments)
     num_br = runner.getStringArgumentValue("num_bedrooms", user_arguments).split(",").map(&:strip)
     num_ba = runner.getStringArgumentValue("num_bathrooms", user_arguments).split(",").map(&:strip)
     num_occupants = runner.getStringArgumentValue("num_occupants",user_arguments)
@@ -295,12 +303,23 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
 
     if foundation_type == "slab"
       foundation_height = 0.0
+    elsif foundation_type == "unfinished basement"
+      foundation_height = 8.0
     end
+    num_units_per_floor = num_units / num_floors
     num_units_per_floor_actual = num_units_per_floor
 
     # error checking
     if model_spaces.size > 0
       runner.registerError("Starting model is not empty.")
+      return false
+    end
+    if foundation_type == "crawlspace" and ( foundation_height < 1.5 or foundation_height > 5.0 )
+      runner.registerError("The crawlspace height can be set between 1.5 and 5 ft.")
+      return false
+    end
+    if num_units % num_floors != 0
+      runner.registerError("The number of units must be divisible by the number of floors.")
       return false
     end
     if num_units_per_floor == 1 and (corridor_position == "Double-Loaded Interior" or corridor_position == "Double Exterior")
@@ -902,7 +921,21 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     OpenStudio::Model.intersectSurfaces(spaces)
     OpenStudio::Model.matchSurfaces(spaces)
 
-    # Apply zone multiplier
+    # Make shared building facade surfaces adiabatic
+    if shared_building_facades != "None"
+      shared_building_facades = shared_building_facades.split(", ")
+      shared_building_facades.each do |shared_building_facade|
+        model.getSurfaces.each do |surface|
+          next unless surface.surfaceType.downcase == "wall"
+          next unless ["outdoors", "ground", "foundation"].include? surface.outsideBoundaryCondition.downcase
+          next if surface.adjacentSurface.is_initialized
+          next unless Geometry.get_facade_for_surface(surface) == shared_building_facade
+          surface.setOutsideBoundaryCondition("Adiabatic")
+        end
+      end
+    end
+    
+    # Apply zone multipliers
     if use_zone_mult and ((num_units_per_floor > 3 and not has_rear_units) or (num_units_per_floor > 7 and has_rear_units))
 
       (1..num_units_per_floor).to_a.each do |unit_num_per_floor|
@@ -984,17 +1017,17 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
         end # end building floor
       end # end unit per floor
     end # end zone mult
-
+    
     # Apply floor multiplier
-    if use_floor_mult and num_floors > 3
-
+    if use_zone_mult and num_floors > 3
+    
       floor_zs = []
       model.getSurfaces.each do |surface|
         next unless surface.surfaceType.downcase == "floor"
         floor_zs << Geometry.getSurfaceZValues([surface])[0]
       end
       floor_zs = floor_zs.uniq.sort.select{|x| x >= 0}
-
+      
       floor_zs[2..-2].each do |floor_z|
         units_to_remove = []
         Geometry.get_building_units(model, runner).each do |unit|
@@ -1012,9 +1045,9 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
             space.remove
           end
           unit.remove
-        end
+        end      
       end
-
+      
       Geometry.get_building_units(model, runner).each do |unit|
         unit.spaces.each do |space|
           next unless floor_zs[1] == Geometry.get_space_floor_z(space)
@@ -1022,7 +1055,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
           thermal_zone.setMultiplier(thermal_zone.multiplier * (num_floors - 2))
         end
       end
-
+      
     end # end floor mult
 
     # make all surfaces adjacent to corridor spaces into adiabatic surfaces
@@ -1066,7 +1099,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch)
+    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch, true)
     unless result
       return false
     end

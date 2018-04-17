@@ -127,6 +127,24 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
+  def test_single_family_attached_new_construction_no_zone_mult
+    num_units = 10
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_values = {"LayerRValue"=>30.598762, "LayerDensity"=>6360.64, "LayerSpecificHeat"=>4519.412914, "LayerIndex"=>0+1+2+3, "SurfacesWithConstructions"=>52}
+    _test_measure("SFA_10units_2story_UB_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_single_family_attached_new_construction_yes_zone_mult
+    num_units = 3
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
+    expected_values = {"LayerRValue"=>30.598762, "LayerDensity"=>6360.64, "LayerSpecificHeat"=>4519.412914, "LayerIndex"=>0+1+2+3, "SurfacesWithConstructions"=>11}
+    _test_measure("SFA_10units_2story_UB_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
   def test_argument_error_wall_ins_height_negative
     args_hash = {}
     args_hash["wall_ins_height"] = -1
