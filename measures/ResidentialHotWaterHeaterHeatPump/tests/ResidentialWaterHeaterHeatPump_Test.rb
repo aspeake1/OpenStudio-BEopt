@@ -7,84 +7,12 @@ require 'fileutils'
 
 class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
 
-    def osm_geo_loc
-        return "SFD_2000sqft_2story_FB_GRG_UA_Denver.osm"
-    end
-  
-    def osm_geo_beds
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm"
-    end
-
-    def osm_geo_beds_loc
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm"
-    end
-  
-    def osm_geo_beds_loc_1_1
-        return "SFD_2000sqft_2story_FB_GRG_UA_1Beds_1Baths_Denver.osm"
-    end
-
-    def osm_geo_beds_loc_2_1
-        return "SFD_2000sqft_2story_FB_GRG_UA_2Beds_1Baths_Denver.osm"
-    end
-
-    def osm_geo_beds_loc_2_2
-        return "SFD_2000sqft_2story_FB_GRG_UA_2Beds_2Baths_Denver.osm"
-    end
-
-    def osm_geo_beds_loc_5_3
-        return "SFD_2000sqft_2story_FB_GRG_UA_5Beds_3Baths_Denver.osm"
-    end
-    
-    def osm_geo_beds_loc_tank_elec
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank.osm"
-    end
-  
-    def osm_geo_beds_loc_tank_gas
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTank.osm"
-    end
-
-    def osm_geo_beds_loc_tank_oil
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_OilWHTank.osm"
-    end
-
-    def osm_geo_beds_loc_tank_propane
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_PropaneWHTank.osm"
-    end
-
-    def osm_geo_beds_loc_tankless_electric
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTankless.osm"
-    end
-
-    def osm_geo_beds_loc_tankless_gas
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTankless.osm"
-    end
-
-    def osm_geo_beds_loc_tankless_propane
-        return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_PropaneWHTankless.osm"
-    end
-
-    def osm_geo_beds_loc_hpwh
-      return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH.osm"
-    end
-    
-    def osm_geo_beds_loc_tank_electric_shw
-      return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_SHW.osm"
-    end
-    
-    def osm_geo_beds_loc_tankless_electric_shw
-      return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTankless_SHW.osm"
-    end  
-    
-    def osm_geo_beds_loc_hpwh_shw
-      return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH_SHW.osm"
-    end
-    
     def test_new_construction_50
         args_hash = {}
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16, "ScheduleConstant"=>7, "ScheduleRuleset"=>7}
         expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end
   
     def test_new_construction_40
@@ -93,7 +21,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16, "ScheduleConstant"=>7, "ScheduleRuleset"=>7}
         expected_values = {"TankVolume"=>36, "Heater1Height"=>0.599, "Heater2Height"=>0.106, "TankU"=>1.35, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0712, "CondTop"=>0.458, "AirflowRate"=>0.0854, "Sensor1Height"=>0.669, "Sensor2Height"=>0.669, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end
     
     def test_new_construction_80
@@ -110,7 +38,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>6, "EnergyManagementSystemActuator"=>5, "EnergyManagementSystemTrendVariable"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16, "ScheduleConstant"=>7, "ScheduleRuleset"=>7}
         expected_values = {"TankVolume"=>72, "Heater1Height"=>1.131, "Heater2Height"=>0.333, "TankU"=>0.787, "OnCycle"=>8.5, "OffCycle"=>8.5, "CondBottom"=>0.01, "CondTop"=>0.865, "AirflowRate"=>0.226, "Sensor1Height"=>1.265, "Sensor2Height"=>0.466, "Cap"=>2349.6, "COP"=>2.4, "SHR"=>0.98, "WBTemp"=>13.08, "FanEff"=>0.172}
-        _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end
   
     def test_new_construction_66
@@ -127,7 +55,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>6, "EnergyManagementSystemActuator"=>5, "EnergyManagementSystemTrendVariable"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16, "ScheduleConstant"=>7, "ScheduleRuleset"=>7}
         expected_values = {"TankVolume"=>59.4, "Heater1Height"=>0.945, "Heater2Height"=>0.278, "TankU"=>0.926, "OnCycle"=>8.5, "OffCycle"=>8.5, "CondBottom"=>0.01, "CondTop"=>0.723, "AirflowRate"=>0.226, "Sensor1Height"=>1.056, "Sensor2Height"=>0.389, "Cap"=>2349.6, "COP"=>2.4, "SHR"=>0.98, "WBTemp"=>13.08, "FanEff"=>0.172}
-        _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end
   
     def test_new_construction_50_living
@@ -136,8 +64,8 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16, "ScheduleConstant"=>7, "ScheduleRuleset"=>7}
         expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        model = _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
-        _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end
     
     def test_retrofit_replace_50_with_80
@@ -145,7 +73,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16, "ScheduleConstant"=>7, "ScheduleRuleset"=>7}
         expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        model = _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        model = _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
         args_hash = {}
         args_hash["storage_tank_volume"] = "80"
         args_hash["max_temp"] = "110"
@@ -167,31 +95,15 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "ScheduleRuleset"=>7, "ScheduleConstant"=>6, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16}
         expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc_tank_elec, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end
   
-    def test_retrofit_replace_tank_gas
-        args_hash = {}
-        expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-        expected_num_new_objects = {"WaterHeaterStratified"=>1, "ScheduleRuleset"=>7, "ScheduleConstant"=>6, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16}
-        expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc_tank_gas, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
-    end
-
     def test_retrofit_replace_tank_oil
         args_hash = {}
         expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "ScheduleRuleset"=>7, "ScheduleConstant"=>6, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16}
         expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc_tank_oil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
-    end
-
-    def test_retrofit_replace_tank_propane
-        args_hash = {}
-        expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-        expected_num_new_objects = {"WaterHeaterStratified"=>1, "ScheduleRuleset"=>7, "ScheduleConstant"=>6, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16}
-        expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc_tank_propane, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_OilWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end
 
     def test_retrofit_replace_tankless_electric
@@ -199,24 +111,8 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
         expected_num_new_objects = {"WaterHeaterStratified"=>1, "ScheduleRuleset"=>7, "ScheduleConstant"=>6, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16}
         expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc_tankless_electric, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+        _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTankless.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end
-
-    def test_retrofit_replace_tankless_gas
-        args_hash = {}
-        expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-        expected_num_new_objects = {"WaterHeaterStratified"=>1, "ScheduleRuleset"=>7, "ScheduleConstant"=>6, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16}
-        expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc_tankless_gas, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
-    end
-
-    def test_retrofit_replace_tankless_propane
-        args_hash = {}
-        expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-        expected_num_new_objects = {"WaterHeaterStratified"=>1, "ScheduleRuleset"=>7, "ScheduleConstant"=>6, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>16}
-        expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-        _test_measure(osm_geo_beds_loc_tankless_propane, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
-    end  
 
     def test_retrofit_replace_hpwh
       args_hash = {}
@@ -224,7 +120,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
       expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>5, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemTrendVariable"=>3}
       expected_num_new_objects = {"WaterHeaterStratified"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ScheduleConstant"=>5, "ScheduleRuleset"=>7}
       expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
-      _test_measure(osm_geo_beds_loc_hpwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+      _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
     end
     
     def test_retrofit_replace_tank_electric_shw
@@ -233,7 +129,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
       expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
       expected_num_new_objects = {"WaterHeaterStratified"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ScheduleConstant"=>5, "ScheduleRuleset"=>7, "OutputVariable"=>16}
       expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
-      _test_measure(osm_geo_beds_loc_tank_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+      _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTank_SHW.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end  
     
     def test_retrofit_replace_tankless_electric_shw
@@ -242,7 +138,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
       expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
       expected_num_new_objects = {"WaterHeaterStratified"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ScheduleConstant"=>5, "ScheduleRuleset"=>7, "OutputVariable"=>16}
       expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
-      _test_measure(osm_geo_beds_loc_tankless_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+      _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_WHTankless_SHW.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end  
     
     def test_retrofit_replace_hpwh_shw
@@ -252,125 +148,125 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
       expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>5, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemTrendVariable"=>3}
       expected_num_new_objects = {"WaterHeaterStratified"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ScheduleConstant"=>5, "ScheduleRuleset"=>7}
       expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
-      _test_measure(osm_geo_beds_loc_hpwh_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+      _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH_SHW.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
     end
     
     def test_argument_error_tank_volume_lt_0
         args_hash = {}
         args_hash["storage_tank_volume"] = "-10"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Storage tank volume must be greater than 0.")
     end
 
     def test_argument_error_tank_volume_eq_0
         args_hash = {}
         args_hash["storage_tank_volume"] = "0"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Storage tank volume must be greater than 0.")
     end
 
     def test_argument_error_setpoint_lt_0
         args_hash = {}
         args_hash["setpoint_temp"] = -10
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Hot water temperature must be greater than 0 and less than 212.")
     end
 
     def test_argument_error_setpoint_lg_300
         args_hash = {}
         args_hash["setpoint_temp"] = 300
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Hot water temperature must be greater than 0 and less than 212.")
     end
 
     def test_argument_error_element_capacity_lt_0
         args_hash = {}
         args_hash["element_capacity"] = "-10"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Element capacity must be greater than 0.")
     end
   
     def test_argument_error_min_temp_gt_80
         args_hash = {}
         args_hash["min_temp"] = "80"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Minimum temperature will prevent HPWH from running, double check inputs.")
     end
   
     def test_argument_error_max_temp_lt_0
         args_hash = {}
         args_hash["max_temp"] = "0"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Maximum temperature will prevent HPWH from running, double check inputs.")
     end
   
     def test_argument_error_cap_lt_0
         args_hash = {}
         args_hash["cap"] = "-1"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated capacity must be greater than 0.")
     end
   
     def test_argument_error_cop_lt_0
         args_hash = {}
         args_hash["cop"] = "0"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated COP must be greater than 0.")
     end
   
     def test_argument_error_shr_lt_0
         args_hash = {}
         args_hash["shr"] = "-1"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated sensible heat ratio must be between 0 and 1.")
     end
   
     def test_argument_error_gt_1
         args_hash = {}
         args_hash["shr"] = "2"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Rated sensible heat ratio must be between 0 and 1.")
     end
   
     def test_argument_error_fan_power_lt_0
         args_hash = {}
         args_hash["fan_power"] = "-1"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Fan power must be greater than 0.")
     end
   
     def test_argument_error_parasitics_lt_0
         args_hash = {}
         args_hash["parasitics"] = "-1"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Parasitics must be greater than 0.")
     end
   
     def test_argument_error_tank_ua_lt_0
         args_hash = {}
         args_hash["tank_ua"] = "-1"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Tank UA must be greater than 0.")
     end
   
     def test_argument_error_int_factor_lt_0
         args_hash = {}
         args_hash["int_factor"] = "-1"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Interaction factor must be between 0 and 1.")
     end
   
     def test_argument_error_int_factor_gt_1
         args_hash = {}
         args_hash["int_factor"] = "2"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Interaction factor must be between 0 and 1.")
     end
   
     def test_argument_error_temp_depress_gt_0
         args_hash = {}
         args_hash["temp_depress"] = "-1"
-        result = _test_error(osm_geo_beds_loc, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Temperature depression must be greater than 0.")
     end
   
@@ -380,15 +276,9 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "No building geometry has been defined.")
     end
   
-    def test_error_missing_beds
-        args_hash = {}
-        result = _test_error(osm_geo_loc, args_hash)
-        assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
-    end
-  
     def test_error_missing_mains_temp
         args_hash = {}
-        result = _test_error(osm_geo_beds, args_hash)
+        result = _test_error("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm", args_hash)
         assert_equal(result.errors.map{ |x| x.logMessage }[0], "Mains water temperature has not been set.")
     end
   
@@ -428,7 +318,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         # populate argument with specified hash value if specified
         arguments.each do |arg|
             temp_arg_var = arg.clone
-            if args_hash[arg.name]
+            if args_hash.has_key?(arg.name)
                 assert(temp_arg_var.setValue(args_hash[arg.name]))
             end
             argument_map[arg.name] = temp_arg_var
@@ -472,7 +362,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         # populate argument with specified hash value if specified
         arguments.each do |arg|
             temp_arg_var = arg.clone
-                if args_hash[arg.name]
+                if args_hash.has_key?(arg.name)
                     assert(temp_arg_var.setValue(args_hash[arg.name]))
                 end
             argument_map[arg.name] = temp_arg_var

@@ -8,7 +8,9 @@ class WorkflowTest < MiniTest::Test
 
   def test_osw
     parent_dir = File.absolute_path(File.join(File.dirname(__FILE__), ".."))
-    run_and_check("create-model-example.osw", parent_dir)
+    Dir["#{parent_dir}/*.osw"].each do |osw|
+        run_and_check(osw, parent_dir)
+    end
   end
 
   private
