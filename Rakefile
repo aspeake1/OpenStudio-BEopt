@@ -405,7 +405,6 @@ def generate_example_osws(data_hash, include_measures, exclude_measures,
   workflowJSON = OpenStudio::WorkflowJSON.new
   workflowJSON.setOswPath(osw_path)
   workflowJSON.addMeasurePath("../measures")
-  workflowJSON.setSeedFile("../seeds/EmptySeedModel.osm")
   
   steps = OpenStudio::WorkflowStepVector.new
   

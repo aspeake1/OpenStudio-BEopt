@@ -19,7 +19,7 @@ An example OpenStudio Workflow [(create-model-example.osw)](https://github.com/N
 
 `openstudio.exe run -w create-model-example.osw`
 
-This will apply the measures to the OpenStudio seed model specified in the .osw, run the EnergyPlus simulation, and produce output. 
+This will apply the measures, run the EnergyPlus simulation, and produce output. 
 
 <!--
 
