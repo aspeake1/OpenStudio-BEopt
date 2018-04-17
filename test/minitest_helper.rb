@@ -68,8 +68,8 @@ def get_objects(model)
           building_unit = obj.public_send("to_#{obj_type}").get
           next if building_unit.spaces.size == 0
         end
-        if obj_type == "AdditionalProperties"
-          next # TODO: Remove this eventually
+        if ["AdditionalProperties","YearDescription"].include? obj_type
+          next # Remove this eventually?
         end
         objects << [obj_type, obj]
     end
