@@ -71,7 +71,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
     num_units = 10
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>2*num_units+2, "Construction"=>2*num_units, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
     expected_values = {"LayerRValue"=>22.517828, "LayerDensity"=>6360.64, "LayerSpecificHeat"=>3308.43, "LayerIndex"=>0+1+2+3, "SurfacesWithConstructions"=>32}
     _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -80,7 +80,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
     num_units = 3
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2}
+    expected_num_new_objects = {"Material"=>2*num_units+2, "Construction"=>2*num_units, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
     expected_values = {"LayerRValue"=>22.517828, "LayerDensity"=>6360.64, "LayerSpecificHeat"=>3308.43, "LayerIndex"=>0+1+2+3, "SurfacesWithConstructions"=>11}
     _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

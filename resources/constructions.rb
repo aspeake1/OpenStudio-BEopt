@@ -1353,7 +1353,7 @@ class FoundationConstructions
                         gap_r, exterior_r, exterior_depth,
                         whole_r, concrete_thick_in, 
                         has_fnd_walls=false, exposed_perimeter=nil, 
-                        foundation=nil)
+                        foundation=nil, apply_multipliers=false)
 
         return true if surface.nil?
         
@@ -1413,7 +1413,7 @@ class FoundationConstructions
         
         # Exposed perimeter
         if exposed_perimeter.nil?
-            exposed_perimeter = Geometry.calculate_exposed_perimeter(model, [surface], has_fnd_walls)
+            exposed_perimeter = Geometry.calculate_exposed_perimeter(model, [surface], has_fnd_walls, apply_multipliers)
         end
         if exposed_perimeter <= 0
           runner.registerError("Calculated an exposed perimeter <= 0 for slab '#{surface.name.to_s}'.")
