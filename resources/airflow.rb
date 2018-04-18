@@ -758,13 +758,15 @@ class Airflow
     end
     
     #Get the clothes washer so we can use the day shift for the clothes dryer
-    cw_day_shift = 0.0
-    model.getElectricEquipments.each do |ee|
-      next if ee.name.to_s != Constants.ObjectNameClothesWasher(unit.name.to_s)
-      cw_day_shift = unit.getFeatureAsDouble(Constants.ClothesWasherDayShift(ee)).get
-      break
+    if mech_vent.dryer_exhaust > 0
+      cw_day_shift = 0.0
+      model.getElectricEquipments.each do |ee|
+        next if ee.name.to_s != Constants.ObjectNameClothesWasher(unit.name.to_s)
+        cw_day_shift = unit.getFeatureAsDouble(Constants.ClothesWasherDayShift(ee)).get
+        break
+      end
+      dryer_exhaust_day_shift = cw_day_shift + 1.0 / 24.0
     end
-    dryer_exhaust_day_shift = cw_day_shift + 1.0 / 24.0
     
     # Search for clothes dryer
     has_dryer = false
@@ -1812,10 +1814,12 @@ class Airflow
     bath_sch_sensor.setName("#{obj_name_infil} bath sch s")
     bath_sch_sensor.setKeyName(bath_exhaust_sch.schedule.name.to_s)
 
-    dryer_exhaust_sch = HotWaterSchedule.new(model, runner, obj_name_mech_vent + " dryer exhaust schedule", obj_name_mech_vent + " dryer exhaust temperature schedule", nbeds, sch_unit_index, mv_output.dryer_exhaust_day_shift, "ClothesDryerExhaust", 0, @measure_dir)
-    dryer_sch_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Schedule Value"])
-    dryer_sch_sensor.setName("#{obj_name_infil} dryer sch s")
-    dryer_sch_sensor.setKeyName(dryer_exhaust_sch.schedule.name.to_s)
+    if mv_output.has_dryer and mech_vent.dryer_exhaust > 0
+      dryer_exhaust_sch = HotWaterSchedule.new(model, runner, obj_name_mech_vent + " dryer exhaust schedule", obj_name_mech_vent + " dryer exhaust temperature schedule", nbeds, sch_unit_index, mv_output.dryer_exhaust_day_shift, "ClothesDryerExhaust", 0, @measure_dir)
+      dryer_sch_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Schedule Value"])
+      dryer_sch_sensor.setName("#{obj_name_infil} dryer sch s")
+      dryer_sch_sensor.setKeyName(dryer_exhaust_sch.schedule.name.to_s)
+    end
     
     wh_sch_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Schedule Value"])
     wh_sch_sensor.setName("#{obj_name_infil} wh sch s")
@@ -2018,10 +2022,10 @@ class Airflow
     end
 
     infil_program.addLine("Set Qrange = #{range_sch_sensor.name}*#{UnitConversions.convert(mv_output.range_hood_hour_avg_exhaust,"cfm","m^3/s").round(4)}")
-    if mv_output.has_dryer
+    if mv_output.has_dryer and mech_vent.dryer_exhaust > 0
       infil_program.addLine("Set Qdryer = #{dryer_sch_sensor.name}*#{UnitConversions.convert(mech_vent.dryer_exhaust,"cfm","m^3/s").round(4)}")
     else
-      infil_program.addLine("Set Qdryer = #{dryer_sch_sensor.name}*#{UnitConversions.convert(0.0,"cfm","m^3/s").round(4)}")
+      infil_program.addLine("Set Qdryer = 0.0")
     end
     infil_program.addLine("Set Qbath = #{bath_sch_sensor.name}*#{UnitConversions.convert(mv_output.bathroom_hour_avg_exhaust,"cfm","m^3/s").round(4)}")
     infil_program.addLine("Set QhpwhOut = 0")
