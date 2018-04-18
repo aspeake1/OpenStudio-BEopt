@@ -21,7 +21,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -45,7 +45,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -69,7 +69,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -93,7 +93,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>8, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -117,7 +117,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/0.1168615354327202
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -131,8 +131,8 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     num_units = 10
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"LayerRValue"=>30.598762, "LayerDensity"=>6360.64, "LayerSpecificHeat"=>4519.412914, "LayerIndex"=>0+1+2+3, "SurfacesWithConstructions"=>52}
+    expected_num_new_objects = {"Material"=>16, "Construction"=>0, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>10, "ExposedPerimeter"=>134.165}
     _test_measure("SFA_10units_2story_UB_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -140,8 +140,8 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     num_units = 3
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"LayerRValue"=>30.598762, "LayerDensity"=>6360.64, "LayerSpecificHeat"=>4519.412914, "LayerIndex"=>0+1+2+3, "SurfacesWithConstructions"=>11}
+    expected_num_new_objects = {"Material"=>16, "Construction"=>0, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>10, "ExposedPerimeter"=>134.165}
     _test_measure("SFA_10units_2story_UB_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -302,7 +302,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
     
     # check we have the expected number of new/deleted objects
-    #check_num_objects(all_new_objects, expected_num_new_objects, "added")
+    check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
     actual_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>0}

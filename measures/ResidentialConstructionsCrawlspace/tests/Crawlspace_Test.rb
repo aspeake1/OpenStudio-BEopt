@@ -66,7 +66,7 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"LayerRValue"=>352.170481, "LayerDensity"=>4186.231013, "LayerSpecificHeat"=>3682.712914, "LayerIndex"=>0+1+2+3+1, "SurfacesWithConstructions"=>52}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -75,7 +75,7 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"LayerRValue"=>352.170481, "LayerDensity"=>4186.231013, "LayerSpecificHeat"=>3682.712914, "LayerIndex"=>0+1+2+3+1, "SurfacesWithConstructions"=>38}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   

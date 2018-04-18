@@ -39,6 +39,24 @@ class ProcessConstructionsPierBeamTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
+  def test_single_family_attached_new_construction_no_zone_mult
+    num_units = 10
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>1+num_units, "Construction"=>2*num_units, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"CeilingRValue"=>0}
+    _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_single_family_attached_new_construction_yes_zone_mult
+    num_units = 3
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>1+num_units, "Construction"=>2*num_units, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"CeilingRValue"=>0}
+    _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
   def test_argument_error_cavity_r_negative
     args_hash = {}
     args_hash["cavity_r"] = -1
@@ -133,7 +151,7 @@ class ProcessConstructionsPierBeamTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
