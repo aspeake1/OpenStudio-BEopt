@@ -12,7 +12,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
     args_hash["fan_power"] = "0.7"
     args_hash["airflow_rate"] = "65.0"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>1, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>1}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
   end
@@ -21,7 +21,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
     args_hash = {}
     args_hash["fuel_type"] = Constants.FuelTypeWood
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeWood, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
@@ -29,7 +29,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
   def test_retrofit_replace_furnace
     args_hash = {}
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end
@@ -77,7 +77,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
   def test_retrofit_replace_electric_baseboard
     args_hash = {}
     expected_num_del_objects = {"ZoneHVACBaseboardConvectiveElectric"=>2}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_ElectricBaseboard.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end
@@ -85,7 +85,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
   def test_retrofit_replace_boiler
     args_hash = {}
     expected_num_del_objects = {"PlantLoop"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>2, "PumpVariableSpeed"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "SetpointManagerScheduled"=>1}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
   end
@@ -190,7 +190,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2*num_units, "CoilHeatingGas"=>2*num_units, "FanOnOff"=>2*num_units, "AdditionalProperties"=>num_units}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2*num_units, "CoilHeatingGas"=>2*num_units, "FanOnOff"=>2*num_units}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4)
   end
@@ -199,7 +199,7 @@ class ProcessUnitHeaterTest < MiniTest::Test
     num_units = 8
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>num_units, "CoilHeatingGas"=>num_units, "FanOnOff"=>num_units, "AdditionalProperties"=>num_units}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>num_units, "CoilHeatingGas"=>num_units, "FanOnOff"=>num_units}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*2)
   end

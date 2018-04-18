@@ -616,7 +616,7 @@ class ResidentialAirflowTest < MiniTest::Test
     num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*6, "ScheduleRule"=>num_units*72, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*12, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>21, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1, "ScheduleFixedInterval"=>num_units}
     expected_values = {}
     _test_measure("test_simulation_baseboards_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
   end
@@ -625,7 +625,7 @@ class ResidentialAirflowTest < MiniTest::Test
     num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*6, "ScheduleRule"=>num_units*72, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*12, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>21, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1, "ScheduleFixedInterval"=>num_units}
     expected_values = {}
     _test_measure("test_simulation_fan_coil_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
   end
@@ -634,7 +634,7 @@ class ResidentialAirflowTest < MiniTest::Test
     num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*6, "ScheduleRule"=>num_units*72, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*12, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>21, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1, "ScheduleFixedInterval"=>num_units}
     expected_values = {}
     _test_measure("test_simulation_ptac_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
   end

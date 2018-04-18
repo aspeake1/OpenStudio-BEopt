@@ -142,15 +142,6 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
     _test_measure("test_simulation_fan_coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
   end
   
-  def test_simulation_unit_heater_heating_setpoints
-    num_units = 2
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
-    expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
-    _test_measure("test_simulation_unit_heater.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
-  end
-  
   def test_simulation_ptac_heating_setpoints
     num_units = 2
     args_hash = {}

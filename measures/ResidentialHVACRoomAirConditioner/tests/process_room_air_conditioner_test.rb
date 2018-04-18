@@ -11,7 +11,7 @@ class ProcessRoomAirConditionerTest < MiniTest::Test
     args_hash = {}
     args_hash["capacity"] = "2.0"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1}
     expected_values = {"COP"=>2.49, "NominalCapacity"=>7033.70, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end    
@@ -19,7 +19,7 @@ class ProcessRoomAirConditionerTest < MiniTest::Test
   def test_retrofit_replace_furnace
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1}
     expected_values = {"COP"=>2.49, "hvac_priority"=>2}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -67,7 +67,7 @@ class ProcessRoomAirConditionerTest < MiniTest::Test
   def test_retrofit_replace_electric_baseboard
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1}
     expected_values = {"COP"=>2.49, "hvac_priority"=>2}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_ElectricBaseboard.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -75,7 +75,7 @@ class ProcessRoomAirConditionerTest < MiniTest::Test
   def test_retrofit_replace_boiler
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "AdditionalProperties"=>1}
+    expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1}
     expected_values = {"COP"=>2.49, "hvac_priority"=>2}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end  
@@ -180,7 +180,7 @@ class ProcessRoomAirConditionerTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"CoilHeatingElectric"=>num_units, "FanOnOff"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units, "AdditionalProperties"=>num_units}
+    expected_num_new_objects = {"CoilHeatingElectric"=>num_units, "FanOnOff"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units}
     expected_values = {"COP"=>2.49, "hvac_priority"=>1}
     _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*1)
   end
@@ -189,7 +189,7 @@ class ProcessRoomAirConditionerTest < MiniTest::Test
     num_units = 8
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"CoilHeatingElectric"=>num_units, "FanOnOff"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units, "AdditionalProperties"=>num_units}
+    expected_num_new_objects = {"CoilHeatingElectric"=>num_units, "FanOnOff"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units}
     expected_values = {"COP"=>2.49, "hvac_priority"=>1}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*1)
   end   
