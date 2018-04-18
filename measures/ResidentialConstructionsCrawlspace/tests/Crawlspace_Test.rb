@@ -65,17 +65,17 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     num_units = 10
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
+    expected_num_new_objects = {"Material"=>16, "Construction"=>19, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>134.165}
     _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_single_family_attached_new_construction_yes_zone_mult
-    num_units = 3
+    num_units = 10
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>3}
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
+    expected_num_new_objects = {"Material"=>16, "Construction"=>19, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>134.165}
     _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   

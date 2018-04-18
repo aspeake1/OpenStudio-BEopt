@@ -105,7 +105,6 @@ class ProcessConstructionsCrawlspace < OpenStudio::Measure::ModelMeasure
     crawl_height = Geometry.spaces_avg_height(spaces)
     
     # Apply constructions
-    puts "HERE0"
     floors_by_type[Constants.SurfaceTypeFloorFndGrndCS].each do |floor_surface|
         wall_surfaces = FoundationConstructions.get_walls_connected_to_floor(walls_by_type[Constants.SurfaceTypeWallFndGrndCS], 
                                                                              floor_surface)

@@ -673,11 +673,11 @@ class Geometry
             ground_edges = self.get_edges_for_surfaces(surfaces, true, false, apply_multipliers)
         end
 
-        # Get bottom edges of exterior exposed walls or interzonal walls
+        # Get bottom edges of exterior exposed walls or interzonal walls or pier & beam walls
         surfaces = []
         model.getSurfaces.each do |surface|
             next if not surface.surfaceType.downcase == "wall"
-            next if not (self.is_exterior_surface(surface) or self.is_interzonal_surface(surface))
+            next if not (self.is_exterior_surface(surface) or self.is_interzonal_surface(surface) or self.is_pier_beam_surface(surface))
             surfaces << surface
         end
         model_edges = self.get_edges_for_surfaces(surfaces, false, true, apply_multipliers)
@@ -685,8 +685,7 @@ class Geometry
         # check edges for matches
         ground_edges.each do |e1|
             model_edges.each do |e2|
-                # see if edges have same geometry
-                next if not ((e1[0] == e2[1] and e1[1] == e2[0]) or (e1[0] == e2[0] and e1[1] == e2[1]))
+                next if not ((equal_vertices(e1[0], e2[1]) and equal_vertices(e1[1], e2[0])) or (equal_vertices(e1[0], e2[0]) and equal_vertices(e1[1], e2[1])))
                 point_one = OpenStudio::Point3d.new(e1[0][0],e1[0][1],e1[0][2])
                 point_two = OpenStudio::Point3d.new(e1[1][0],e1[1][1],e1[1][2])
                 length = OpenStudio::Vector3d.new(point_one - point_two).length
@@ -696,6 +695,14 @@ class Geometry
         end
 
         return UnitConversions.convert(perimeter, "m", "ft")
+    end
+
+    def self.equal_vertices(v1, v2)
+      tol = 0.001
+      return false if (v1[0] - v2[0]).abs > tol
+      return false if (v1[1] - v2[1]).abs > tol
+      return false if (v1[2] - v2[2]).abs > tol
+      return true
     end
 
     def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false, apply_multipliers=false)
