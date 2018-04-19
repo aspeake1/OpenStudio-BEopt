@@ -50,8 +50,8 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     num_units = 10
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1+num_units, "Construction"=>2*num_units, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"SumRValues"=>0.077, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>134.165}
+    expected_num_new_objects = {"Material"=>2+num_units, "Construction"=>2*num_units, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"SumRValues"=>num_units*(0.077+0.293), "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>2*10*15+2*30}
     _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -59,8 +59,8 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     num_units = 3
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1+num_units, "Construction"=>2*num_units, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"SumRValues"=>0.077, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>134.165}
+    expected_num_new_objects = {"Material"=>2+num_units, "Construction"=>2*num_units, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"SumRValues"=>num_units*(0.077+0.293), "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>2*10*15+2*30}
     _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   

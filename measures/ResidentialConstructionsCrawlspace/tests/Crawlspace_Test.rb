@@ -64,18 +64,38 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
   def test_single_family_attached_new_construction_no_zone_mult
     num_units = 10
     args_hash = {}
+    args_hash["wall_rigid_r"] = 0
+    args_hash["ceiling_cavity_r"] = 0
+    args_hash["ceiling_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["ceiling_framing_factor"] = 0.13
+    args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>16, "Construction"=>19, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>134.165}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    ceiling_ins_r = 0.23495/2.598173704068639
+    ceiling_plywood_r = 0.01905/0.1154577
+    ceiling_mass_r = 0.015875/0.1154577
+    ceiling_carpet_r = 0.0127/0.0433443509615385
+    ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>2*10*15+2*30}
     _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_single_family_attached_new_construction_yes_zone_mult
-    num_units = 10
+    num_units = 3
     args_hash = {}
+    args_hash["wall_rigid_r"] = 0
+    args_hash["ceiling_cavity_r"] = 0
+    args_hash["ceiling_install_grade"] = "2" # no insulation, shouldn't apply
+    args_hash["ceiling_framing_factor"] = 0.13
+    args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>16, "Construction"=>19, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>134.165}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    ceiling_ins_r = 0.23495/2.598173704068639
+    ceiling_plywood_r = 0.01905/0.1154577
+    ceiling_mass_r = 0.015875/0.1154577
+    ceiling_carpet_r = 0.0127/0.0433443509615385
+    ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>2*10*15+2*30}
     _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
