@@ -162,7 +162,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
 
     #make a choice argument for model objects
     building_facades = OpenStudio::StringVector.new
-    building_facades << "None"
+    building_facades << Constants.FacadeNone
     building_facades << Constants.FacadeBack
     building_facades << Constants.FacadeLeft
     building_facades << Constants.FacadeRight
@@ -174,7 +174,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     shared_building_facades = OpenStudio::Measure::OSArgument::makeChoiceArgument("shared_building_facades", building_facades, true)
     shared_building_facades.setDisplayName("Shared Building Facade(s)")
     shared_building_facades.setDescription("The facade(s) of the building that are shared. Surfaces on these facades become adiabatic.")
-    shared_building_facades.setDefaultValue("None")
+    shared_building_facades.setDefaultValue(Constants.FacadeNone)
     args << shared_building_facades
 
     #make a string argument for number of bedrooms
