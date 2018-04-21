@@ -19,7 +19,7 @@ rake update_measures
 case $CIRCLE_NODE_INDEX in
   0)
     # We currently only use one node to make Coveralls happy.
-    take test:regenerate_osms
+    rake test:regenerate_osms
     rake test:all
     ;;
   #1)
