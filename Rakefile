@@ -9,14 +9,16 @@ require 'pp'
 require 'colored'
 require 'json'
 
-# change the file: users/username/.bcl/config.yml
-# to the ID of the BCL group you want your measures to go into
-# get the group id number from the URL of the group on BCL
-# https://bcl.nrel.gov/node/37347 - the group ID here is 37347
-# you must be an administrator or editor member of a group to
-# upload content to that group
 
+desc 'perform tasks related to BCL'
 namespace :measures do
+  # change the file: users/username/.bcl/config.yml
+  # to the ID of the BCL group you want your measures to go into
+  # get the group id number from the URL of the group on BCL
+  # https://bcl.nrel.gov/node/37347 - the group ID here is 37347
+  # you must be an administrator or editor member of a group to
+  # upload content to that group
+
   desc 'Generate measures to prepare for upload to BCL '
   task :generate do
     require 'bcl'
@@ -101,6 +103,8 @@ namespace :measures do
   
 end # end the :measures namespace
 
+
+desc 'perform tasks related to unit tests'
 namespace :test do
 
   desc 'Run unit tests for all measures'
@@ -112,7 +116,16 @@ namespace :test do
   end
   
   desc 'regenerate test osm files from osw files'
-  task :regenerate_osms do
+  Rake::TestTask.new('regenerate_osms') do |t|
+    t.libs << 'test'
+    t.test_files = Dir['test/osw_files/tests/*.rb']
+    t.warning = false
+    t.verbose = true
+  end
+
+end
+
+def regenerate_osms
 
     require 'openstudio'
   
@@ -139,8 +152,7 @@ namespace :test do
                 osw_map[osw] << m
             end
         elsif testrbs.size > 1
-            puts "ERROR: Multiple .rb files found in #{m} tests dir."
-            exit
+            fail "ERROR: Multiple .rb files found in #{m} tests dir."
       end
     end
     
@@ -202,8 +214,7 @@ namespace :test do
             break if File.exists?(osm)
         end
         if not File.exists?(osm)
-            puts "  ERROR: Could not generate osm."
-            exit
+            fail "  ERROR: Could not generate osm."
         end
 
         # Add auto-generated message to top of file
@@ -225,10 +236,6 @@ namespace :test do
         num_copied = 0
         osw_map[osw_filename].each do |measure|
             measure_test_dir = File.expand_path("../measures/#{measure}/tests/", __FILE__)
-            if not Dir.exists?(measure_test_dir)
-                puts "  ERROR: Could not copy osm to #{measure_test_dir}."
-                exit
-            end
             FileUtils.cp(osm, File.expand_path("#{measure_test_dir}/#{osm_filename}", __FILE__))
             num_copied += 1
         end
@@ -246,10 +253,19 @@ namespace :test do
     end
     
     puts "Completed. #{num_success} of #{num_tot} osm files were regenerated successfully (#{Time.now - start_time} seconds)."
-    
-  end
 
 end
+
+def get_osms_listed_in_test(testrb)
+    osms = []
+    if not File.exists?(testrb)
+      return osms
+    end
+    str = File.readlines(testrb).join("\n")
+    osms = str.scan(/\w+\.osm/)
+    return osms.uniq
+end
+
 
 desc 'update all measures (resources, xmls, workflows, README)'
 task :update_measures do
@@ -385,10 +401,10 @@ task :update_measures do
   
 end
 
-# This function will generate OpenStudio OSWs
-# with all the measures in it, in the order specified in /resources/measure-info.json
 def generate_example_osws(data_hash, include_measures, exclude_measures, 
                           osw_filename, simplify=true)
+  # This function will generate OpenStudio OSWs
+  # with all the measures in it, in the order specified in /resources/measure-info.json
 
   require 'openstudio'
   require_relative 'resources/meta_measure'
@@ -481,8 +497,8 @@ def generate_example_osws(data_hash, include_measures, exclude_measures,
   
 end
 
-# This method updates the "Measure Order" table in the README.md
 def update_readme(data_hash)
+  # This method updates the "Measure Order" table in the README.md
   
   puts "Updating README measure order..."
   
@@ -530,12 +546,13 @@ def update_readme(data_hash)
   
 end
 
-# This function will check that all measure folders (in measures/) 
-# are listed in the /resources/measure-info.json and vice versa
-# and return the list of all measures used in the proper order
-#
-# @return {data_hash} of measure-info.json
 def get_and_proof_measure_order_json()
+  # This function will check that all measure folders (in measures/) 
+  # are listed in the /resources/measure-info.json and vice versa
+  # and return the list of all measures used in the proper order
+  #
+  # @return {data_hash} of measure-info.json
+
   # List all measures in measures/ folder
   beopt_measure_folder = File.expand_path("../measures/", __FILE__)
   all_measures = Dir.entries(beopt_measure_folder).select{|entry| entry.start_with?('Residential')}
@@ -593,15 +610,6 @@ def get_requires_from_file(filerb)
   return requires
 end
 
-def get_osms_listed_in_test(testrb)
-    osms = []
-    if not File.exists?(testrb)
-      return osms
-    end
-    str = File.readlines(testrb).join("\n")
-    osms = str.scan(/\w+\.osm/)
-    return osms.uniq
-end
 
 desc 'update urdb tariffs'
 task :update_tariffs do

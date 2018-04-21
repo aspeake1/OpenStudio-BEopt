@@ -11,7 +11,6 @@ rm -f Gemfile.lock
 bundle install
 
 rake update_measures
-rake test:regenerate_osms
 
 # Run a specific set of tests on each node.
 # Test groups are defined in the Rakefile.
@@ -20,6 +19,7 @@ rake test:regenerate_osms
 case $CIRCLE_NODE_INDEX in
   0)
     # We currently only use one node to make Coveralls happy.
+    rake test:regenerate_osms
     rake test:all
     ;;
   #1)
