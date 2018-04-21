@@ -645,8 +645,8 @@ class Geometry
       return true
   end
 
-  # Takes in a list of ground exposed floor surfaces for which to calculate the perimeter;
-  # checks for edges shared by a ground exposed floor and 1) exterior exposed or 2) interzonal wall.
+  # Takes in a list of floor surfaces for which to calculate the exposed perimeter.
+  # Returns the total exposed perimeter.
   # NOTE: Does not work for buildings with non-orthogonal walls.
   def self.calculate_exposed_perimeter(model, ground_floor_surfaces, has_foundation_walls=false, apply_multipliers=false)
 
@@ -675,16 +675,16 @@ class Geometry
           end
           ground_edges = self.get_edges_for_surfaces(surfaces, true, false, apply_multipliers)
       end
-
-      # Get bottom edges of exterior exposed walls or interzonal walls or pier & beam walls
+      
+      # Get bottom edges of exterior walls (building footprint)
       surfaces = []
       model.getSurfaces.each do |surface|
           next if not surface.surfaceType.downcase == "wall"
-          next if not (self.is_exterior_surface(surface) or self.is_interzonal_surface(surface) or self.is_pier_beam_surface(surface))
+          next if surface.outsideBoundaryCondition.downcase != "outdoors"
           surfaces << surface
       end
       model_edges = self.get_edges_for_surfaces(surfaces, false, true, apply_multipliers)
-
+      
       # check edges for matches
       ground_edges.each do |e1|
           model_edges.each do |e2|
@@ -709,6 +709,14 @@ class Geometry
   end
 
   def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false, apply_multipliers=false)
+
+      top_z = -99999
+      bottom_z = 99999
+      surfaces.each do |surface|
+          top_z = [self.getSurfaceZValues([surface]).max, top_z].max
+          bottom_z = [self.getSurfaceZValues([surface]).min, bottom_z].min
+      end
+  
       edges = []
       edge_counter = 0
       surfaces.each do |surface|
@@ -718,17 +726,17 @@ class Geometry
               mult = space.multiplier.to_f
           end
       
-          # ensure we only process bottom or top edge of wall surfaces
           if use_top_edge
-              matchz = self.getSurfaceZValues([surface]).max
+              matchz = top_z
           else
-              matchz = self.getSurfaceZValues([surface]).min
+              matchz = bottom_z
           end
+          
           # get vertices
           vertex_hash = {}
           vertex_counter = 0
           surface.vertices.each do |vertex|
-              next if (UnitConversions.convert(vertex.z, "m", "ft") - matchz).abs > 0.0001
+              next if (UnitConversions.convert(vertex.z, "m", "ft") - matchz).abs > 0.0001 # ensure we only process bottom/top edge of wall surfaces
               vertex_counter += 1
               vertex_hash[vertex_counter] = [vertex.x + surface.space.get.xOrigin,
                                              vertex.y + surface.space.get.yOrigin,

@@ -50,7 +50,7 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
-    expected_values = {"ExposedPerimeter"=>134.2}
+    expected_values = {"ExposedPerimeter"=>104.2}
     _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -204,7 +204,7 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"SumRValues"=>0, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>0}
+    actual_values = {"SumRValues"=>0, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>0, "GarageExposedPerimeter"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
