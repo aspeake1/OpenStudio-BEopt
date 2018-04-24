@@ -648,14 +648,14 @@ class Geometry
   # Takes in a list of floor surfaces for which to calculate the exposed perimeter.
   # Returns the total exposed perimeter.
   # NOTE: Does not work for buildings with non-orthogonal walls.
-  def self.calculate_exposed_perimeter(model, ground_floor_surfaces, has_foundation_walls=false, apply_multipliers=false)
+  def self.calculate_exposed_perimeter(model, ground_floor_surfaces, has_foundation_walls=false)
 
       perimeter = 0
 
       # Get ground edges
       if not has_foundation_walls
           # Use edges from floor surface
-          ground_edges = self.get_edges_for_surfaces(ground_floor_surfaces, false, false, apply_multipliers)
+          ground_edges = self.get_edges_for_surfaces(ground_floor_surfaces, false, false)
       else
           # Use top edges from foundation walls instead
           surfaces = []
@@ -673,7 +673,7 @@ class Geometry
                   surfaces << surface
               end
           end
-          ground_edges = self.get_edges_for_surfaces(surfaces, true, false, apply_multipliers)
+          ground_edges = self.get_edges_for_surfaces(surfaces, true, false)
       end
       
       # Get bottom edges of exterior walls (building footprint)
@@ -683,7 +683,7 @@ class Geometry
           next if surface.outsideBoundaryCondition.downcase != "outdoors"
           surfaces << surface
       end
-      model_edges = self.get_edges_for_surfaces(surfaces, false, true, apply_multipliers)
+      model_edges = self.get_edges_for_surfaces(surfaces, false, true)
       
       # check edges for matches
       ground_edges.each do |e1|
@@ -708,7 +708,7 @@ class Geometry
       return true
   end
 
-  def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false, apply_multipliers=false)
+  def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false)
 
       top_z = -99999
       bottom_z = 99999
@@ -720,12 +720,7 @@ class Geometry
       edges = []
       edge_counter = 0
       surfaces.each do |surface|
-          mult = 1.0
-          if apply_multipliers
-              space = surface.space.get
-              mult = space.multiplier.to_f
-          end
-      
+
           if use_top_edge
               matchz = top_z
           else
@@ -747,13 +742,11 @@ class Geometry
           vertex_hash.each do |k,v|
               edge_counter += 1
               counter += 1
-              (1..mult).to_a.each do |m|
                 if vertex_hash.size != counter
                     edges << [v, vertex_hash[counter+1], self.get_facade_for_surface(surface)]
                 elsif vertex_hash.size > 2 # different code for wrap around vertex (if > 2 vertices)
                     edges << [v, vertex_hash[1], self.get_facade_for_surface(surface)]
                 end
-              end
           end
       end
       

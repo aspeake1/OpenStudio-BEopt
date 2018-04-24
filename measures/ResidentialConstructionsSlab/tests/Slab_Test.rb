@@ -68,8 +68,26 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>3, "Construction"=>4, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"ExposedPerimeter"=>360}
+    expected_values = {"ExposedPerimeter"=>360-2*7*15}
     _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_multifamily_new_construction_no_zone_mult
+    num_units = 10+1
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>12, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"ExposedPerimeter"=>401.8-2*10}
+    _test_measure("MF_40units_4story_SL_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_multifamily_new_construction_yes_zone_mult
+    num_units = 6+1
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>8, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"ExposedPerimeter"=>401.8-2*2*23.2135-2*10}
+    _test_measure("MF_40units_4story_SL_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_argument_error_perimeter_r_negative
@@ -187,7 +205,7 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     result = runner.result
     
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
