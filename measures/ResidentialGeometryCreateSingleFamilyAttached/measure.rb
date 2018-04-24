@@ -171,13 +171,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     eaves_depth.setDescription("The eaves depth of the roof.")
     eaves_depth.setDefaultValue(2.0)
     args << eaves_depth
-    
-    #make an argument for using zone multipliers
-    use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
-    use_zone_mult.setDisplayName("Use Zone Multipliers?")
-    use_zone_mult.setDescription("Model only one interior unit with its thermal zone multiplier equal to the number of interior units.")
-    use_zone_mult.setDefaultValue(false)
-    args << use_zone_mult
 
     #make a choice argument for model objects
     building_facades = OpenStudio::StringVector.new
@@ -304,7 +297,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     roof_pitch = {"1:12"=>1.0/12.0, "2:12"=>2.0/12.0, "3:12"=>3.0/12.0, "4:12"=>4.0/12.0, "5:12"=>5.0/12.0, "6:12"=>6.0/12.0, "7:12"=>7.0/12.0, "8:12"=>8.0/12.0, "9:12"=>9.0/12.0, "10:12"=>10.0/12.0, "11:12"=>11.0/12.0, "12:12"=>12.0/12.0}[runner.getStringArgumentValue("roof_pitch",user_arguments)]
     roof_structure = runner.getStringArgumentValue("roof_structure",user_arguments)
     eaves_depth = UnitConversions.convert(runner.getDoubleArgumentValue("eaves_depth",user_arguments),"ft","m")
-    use_zone_mult = runner.getBoolArgumentValue("use_zone_mult",user_arguments)
     shared_building_facades = runner.getStringArgumentValue("shared_building_facades",user_arguments)
     num_br = runner.getStringArgumentValue("num_bedrooms", user_arguments).split(",").map(&:strip)
     num_ba = runner.getStringArgumentValue("num_bathrooms", user_arguments).split(",").map(&:strip)
@@ -864,7 +856,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       attic_space.setSpaceType(attic_space_type)
     end
 
-    unit_hash = {}
     unit_spaces_hash.each do |unit_num, spaces|
       # Store building unit information
       unit = OpenStudio::Model::BuildingUnit.new(model)
@@ -873,7 +864,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       spaces.each do |space|
         space.setBuildingUnit(unit)
       end
-      unit_hash[unit_num] = unit
     end
 
     # put all of the spaces in the model into a vector
@@ -898,92 +888,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           surface.setOutsideBoundaryCondition("Adiabatic")
         end
       end
-    end
-    
-    # Apply zone multipliers
-    if use_zone_mult and ((num_units > 3 and not has_rear_units) or (num_units > 7 and has_rear_units))
-      (2..num_units).to_a.each do |unit_num|
-
-        if not has_rear_units
-
-          zone_names_for_multiplier_adjustment = []
-          space_names_to_remove = []
-          unit_spaces = unit_hash[unit_num].spaces
-          if unit_num == 2 # leftmost interior unit
-            unit_spaces.each do |space|
-              thermal_zone = space.thermalZone.get
-              zone_names_for_multiplier_adjustment << thermal_zone.name.to_s
-            end
-            model.getThermalZones.each do |thermal_zone|
-              zone_names_for_multiplier_adjustment.each do |tz|
-                if thermal_zone.name.to_s == tz
-                  thermal_zone.setMultiplier(num_units - 2)
-                end
-              end
-            end
-          elsif unit_num < num_units # interior units that get removed
-            unit_spaces.each do |space|
-              space_names_to_remove << space.name.to_s
-            end
-            unit_hash[unit_num].remove
-            model.getSpaces.each do |space|
-              space_names_to_remove.each do |s|
-                if space.name.to_s == s
-                  if space.thermalZone.is_initialized
-                    thermal_zone = space.thermalZone.get
-                    thermal_zone.remove
-                  end
-                  space.remove
-                end
-              end
-            end
-          end
-
-        else # has rear units
-          next unless unit_num > 2
-
-          zone_names_for_multiplier_adjustment = []
-          space_names_to_remove = []
-          unit_spaces = unit_hash[unit_num].spaces
-          if unit_num == 3 or unit_num == 4 # leftmost interior units
-            unit_spaces.each do |space|
-              thermal_zone = space.thermalZone.get
-              zone_names_for_multiplier_adjustment << thermal_zone.name.to_s
-            end
-            model.getThermalZones.each do |thermal_zone|
-              zone_names_for_multiplier_adjustment.each do |tz|
-                if thermal_zone.name.to_s == tz
-                  thermal_zone.setMultiplier(num_units / 2 - 2)
-                end
-              end
-            end
-          elsif unit_num != num_units - 1 and unit_num != num_units # interior units that get removed
-            unit_spaces.each do |space|
-              space_names_to_remove << space.name.to_s
-            end
-            unit_hash[unit_num].remove
-            model.getSpaces.each do |space|
-              space_names_to_remove.each do |s|
-                if space.name.to_s == s
-                  if space.thermalZone.is_initialized
-                    thermal_zone = space.thermalZone.get
-                    thermal_zone.remove
-                  end
-                  space.remove
-                end
-              end
-            end
-          end
-
-        end
-
-      end
-    end
-
-    model.getSurfaces.each do |surface|
-      next unless surface.outsideBoundaryCondition.downcase == "surface"
-      next if surface.adjacentSurface.is_initialized
-      surface.setOutsideBoundaryCondition("Adiabatic")
     end
 
     # set foundation outside boundary condition to Kiva "foundation"
@@ -1013,7 +917,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       return false
     end
 
-    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch, true)
+    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch)
     unless result
       return false
     end

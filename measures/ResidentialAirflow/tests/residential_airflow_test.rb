@@ -554,89 +554,54 @@ class ResidentialAirflowTest < MiniTest::Test
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
   end
 
-  def test_single_family_attached_new_construction_no_zone_mult
-    num_units = 10
-    args_hash = {}
-    args_hash["has_hvac_flue"] = "true"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemSubroutine"=>num_units*1, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*17+3, "EnergyManagementSystemActuator"=>num_units*17, "EnergyManagementSystemGlobalVariable"=>num_units*23, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ZoneMixing"=>num_units*2, "OtherEquipment"=>num_units*10, "OtherEquipmentDefinition"=>num_units*10, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Surface"=>num_units*6, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "AirLoopHVACReturnPlenum"=>num_units*1, "Material"=>1, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "SurfacePropertyConvectionCoefficients"=>num_units*6}
-    expected_values = {"res_infil_1_program"=>{"c"=>0.052200, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_1 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_1_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_2_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_2 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_2_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_3_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_3 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_3_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_4_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_4 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_4_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_5_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_5_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_5 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_5_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_6_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_6_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_6 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_6_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_7_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_7_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_7 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_7_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_8_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_8_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_8 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_8_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_9_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_9_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_9 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_9_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_10_program"=>{"c"=>0.052200, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_10_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_10 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_10_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
-    model, result = _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
-  end
-  
-  def test_single_family_attached_new_construction_yes_zone_mult
-    num_units = 3
-    args_hash = {}
-    args_hash["has_hvac_flue"] = "true"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemSubroutine"=>num_units*1, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*17+3, "EnergyManagementSystemActuator"=>num_units*17, "EnergyManagementSystemGlobalVariable"=>num_units*23, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ZoneMixing"=>num_units*2, "OtherEquipment"=>num_units*10, "OtherEquipmentDefinition"=>num_units*10, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Surface"=>num_units*6, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "AirLoopHVACReturnPlenum"=>num_units*1, "Material"=>1, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "SurfacePropertyConvectionCoefficients"=>num_units*6}
-    expected_values = {"res_infil_1_program"=>{"c"=>0.052200, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_1 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_1_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_2_program"=>{"c"=>0.026100, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_2 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_2_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "res_infil_10_program"=>{"c"=>0.052200, "Cs"=>0.088900, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_10_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_10 ret air zone"=>{"RADuctVol"=>40.5}, "res_ds_10_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, \
-                       "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
-    model, result = _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
-  end
-  
   def test_multifamily_new_construction_furnace_central_air_conditioner
-    num_units = 8
+    num_units = 40
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*8+3, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "AirLoopHVACReturnPlenum"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6}
-    expected_values = {"res_infil_1_program"=>{"c"=>0.047360, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_2_program"=>{"c"=>0.047360, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_3_program"=>{"c"=>0.015540, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_4_program"=>{"c"=>0.015540, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_5_program"=>{"c"=>0.015540, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_5_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_6_program"=>{"c"=>0.015540, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_6_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_7_program"=>{"c"=>0.047360, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_7_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_8_program"=>{"c"=>0.047360, "Cs"=>0.049758, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_8_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+    expected_values = {"res_infil_1_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_2_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_3_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_4_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_5_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_5_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_6_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_6_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_7_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_7_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_8_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_8_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_9_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_9_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_10_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_10_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_11_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_11_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_12_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_12_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_13_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_13_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_14_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_14_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_15_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_15_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_16_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_16_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_17_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_17_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_18_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_18_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_19_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_19_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_20_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_20_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_21_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_21_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_22_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_22_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_23_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_23_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_24_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_24_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_25_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_25_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_26_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_26_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_27_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_27_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_28_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_28_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_29_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_29_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_30_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_30_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_31_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_31_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_32_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_32_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_33_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_33_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_34_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_34_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_35_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_35_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_36_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_36_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_37_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_37_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_38_program"=>{"c"=>0.017400, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_38_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_39_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_39_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
+                       "res_infil_40_program"=>{"c"=>0.052200, "Cs"=>0.075400, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_40_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
                        "TerrainType"=>"Suburbs"}
-    model, result = _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
-  end
-
-  def test_multifamily_new_construction_large_building
-    num_units = 24
-    args_hash = {}
-    args_hash["has_hvac_flue"] = "true"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*8+3, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "AirLoopHVACReturnPlenum"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6}
-    expected_values = {"res_infil_1_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_2_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_2_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_3_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_3_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_4_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_5_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_5_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_6_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_6_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_7_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_7_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_8_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_8_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_9_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_9_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_10_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_10_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_11_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_11_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_12_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_12_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_13_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_13_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_14_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_14_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_15_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_15_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_16_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_16_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_17_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_17_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_18_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_18_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_19_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_19_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_20_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_20_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_21_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_21_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_22_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_22_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_23_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_23_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "res_infil_24_program"=>{"c"=>0.031300, "Cs"=>0.088500, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_24_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, \
-                       "TerrainType"=>"Suburbs"}
-    model, result = _test_measure("MF_24units_2story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
+    model, result = _test_measure("MF_40units_4story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
   end
 
   private

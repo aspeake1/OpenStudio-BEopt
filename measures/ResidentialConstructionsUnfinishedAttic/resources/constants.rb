@@ -135,7 +135,7 @@ class Constants
     return 'multifamily'
   end
   def self.BuildingTypeSingleFamilyAttached
-    return 'singlefamilyttached'
+    return 'singlefamilyattached'
   end
   def self.BuildingTypeSingleFamilyDetached
     return 'singlefamilydetached'

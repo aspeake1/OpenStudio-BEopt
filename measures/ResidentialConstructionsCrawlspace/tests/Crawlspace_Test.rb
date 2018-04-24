@@ -69,24 +69,24 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_CS_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_single_family_attached_new_construction_no_zone_mult
+  def test_single_family_attached_new_construction
     num_units = 10
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>7, "Construction"=>22, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
     expected_values = {"ExposedPerimeter"=>360}
-    _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_No_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
-  def test_single_family_attached_new_construction_yes_zone_mult
-    num_units = 3
+
+  def test_multifamily_new_construction
+    num_units = 10+1
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>22, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"ExposedPerimeter"=>360}
-    _test_measure("SFA_10units_2story_CS_UA_3Beds_2Baths_Denver_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_num_new_objects = {"Material"=>7, "Construction"=>24, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"ExposedPerimeter"=>401.8}
+    _test_measure("MF_40units_4story_CS_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
+
   def test_argument_error_wall_rigid_r_negative
     args_hash = {}
     args_hash["wall_rigid_r"] = -1

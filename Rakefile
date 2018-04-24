@@ -197,7 +197,7 @@ def regenerate_osms
     end
 
     osw_files.each do |osw|
-    
+
         next if osw_map[osw].nil?
 
         # Generate osm from osw
@@ -555,7 +555,7 @@ def get_and_proof_measure_order_json()
 
   # List all measures in measures/ folder
   beopt_measure_folder = File.expand_path("../measures/", __FILE__)
-  all_measures = Dir.entries(beopt_measure_folder).select{|entry| entry.start_with?('Residential')}
+  all_measures = Dir.entries(beopt_measure_folder).select{|entry| entry.start_with?('Residential', 'ZoneMultipliers')}
   
   # Load json, and get all measures in there
   json_file = "workflows/measure-info.json"
