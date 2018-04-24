@@ -99,7 +99,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_NoClgSetpoint.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 4)
   end
   
-  def test_single_family_attached_new_construction
+  def test_single_family_attached_new_construction_central_air_conditioner
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
@@ -108,25 +108,25 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
   end
 
-  def test_simulation_fan_coil_cooling_setpoints
-    num_units = 2
+  def test_single_family_attached_new_construction_central_system_fan_coil
+    num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
     expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
-    _test_measure("test_simulation_fan_coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Fan_Coil_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
   end
   
-  def test_simulation_ptac_cooling_setpoints
-    num_units = 2
+  def test_single_family_attached_new_construction_central_system_ptac
+    num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
     expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
-    _test_measure("test_simulation_ptac.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_units*5)
   end
   
-  def test_multifamily_new_construction
+  def test_multifamily_new_construction_central_air_conditioner
     num_units = 8
     args_hash = {}
     expected_num_del_objects = {}

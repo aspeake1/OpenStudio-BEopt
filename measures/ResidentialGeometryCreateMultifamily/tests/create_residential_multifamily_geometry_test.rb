@@ -49,7 +49,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     args_hash["num_units"] = 3
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>3-1, "Surface"=>18, "ThermalZone"=>1+2, "Space"=>1+2, "SpaceType"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>50}
-   expected_values = {"FinishedFloorArea"=>900*2, "BuildingHeight"=>8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>6.78, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>4}
+    expected_values = {"FinishedFloorArea"=>900*2, "BuildingHeight"=>8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>6.78, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>4}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
