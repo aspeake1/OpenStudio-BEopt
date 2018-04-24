@@ -197,7 +197,7 @@ def regenerate_osms
     end
 
     osw_files.each do |osw|
-    
+
         next if osw_map[osw].nil?
 
         # Generate osm from osw

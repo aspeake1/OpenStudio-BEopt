@@ -856,7 +856,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       attic_space.setSpaceType(attic_space_type)
     end
 
-    unit_hash = {}
     unit_spaces_hash.each do |unit_num, spaces|
       # Store building unit information
       unit = OpenStudio::Model::BuildingUnit.new(model)
@@ -865,7 +864,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       spaces.each do |space|
         space.setBuildingUnit(unit)
       end
-      unit_hash[unit_num] = unit
     end
 
     # put all of the spaces in the model into a vector
@@ -890,12 +888,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           surface.setOutsideBoundaryCondition("Adiabatic")
         end
       end
-    end
-
-    model.getSurfaces.each do |surface|
-      next unless surface.outsideBoundaryCondition.downcase == "surface"
-      next if surface.adjacentSurface.is_initialized
-      surface.setOutsideBoundaryCondition("Adiabatic")
     end
 
     # set foundation outside boundary condition to Kiva "foundation"
@@ -925,7 +917,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       return false
     end
 
-    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch, true)
+    result = Geometry.process_occupants(model, runner, num_occupants, occ_gain=384.0, sens_frac=0.573, lat_frac=0.427, occupants_weekday_sch, occupants_weekend_sch, occupants_monthly_sch)
     unless result
       return false
     end
