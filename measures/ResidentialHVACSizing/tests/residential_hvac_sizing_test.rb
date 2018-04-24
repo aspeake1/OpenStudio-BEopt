@@ -520,6 +520,7 @@ class ProcessHVACSizingTest < MiniTest::Test
   end
 
   def test_loads_2story_slab_garage_finished_attic
+    skip
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
