@@ -513,7 +513,7 @@ class ResidentialAirflowTest < MiniTest::Test
     model, result = _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 1)
   end
 
-  def test_single_family_attached_new_construction
+  def test_single_family_attached_new_construction_furnace_central_air_conditioner
     num_units = 4
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"
@@ -525,6 +525,33 @@ class ResidentialAirflowTest < MiniTest::Test
                        "res_infil_4_program"=>{"c"=>0.042099, "Cs"=>0.066417, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_4_program"=>{"Cs"=>0.000089, "Cw"=>0.000199}, "res ds_4 ret air zone"=>{"RADuctVol"=>34}, "res_ds_4_lk_subrout"=>{"f_sup"=>0.199900, "f_ret"=>0.100099, "f_OA"=>0.099800}, \
                        "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
     model, result = _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
+  end
+  
+  def test_single_family_attached_new_construction_central_system_boiler_baseboards
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*8+3, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Boiler_Baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
+  end
+  
+  def test_single_family_attached_new_construction_central_system_fan_coil
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*8+3, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Fan_Coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
+  end
+  
+  def test_single_family_attached_new_construction_central_system_ptac
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*8+3, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
   end
 
   def test_single_family_attached_new_construction_no_zone_mult
@@ -560,7 +587,7 @@ class ResidentialAirflowTest < MiniTest::Test
     model, result = _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_Yes_Zone_Mult.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
   end
   
-  def test_multifamily_new_construction
+  def test_multifamily_new_construction_furnace_central_air_conditioner
     num_units = 8
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"
@@ -612,33 +639,6 @@ class ResidentialAirflowTest < MiniTest::Test
     model, result = _test_measure("MF_24units_2story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, num_units)
   end
 
-  def test_simulation_baseboards_airflow
-    num_units = 2
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*8+3, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
-    expected_values = {}
-    _test_measure("test_simulation_baseboards_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
-  end
-  
-  def test_simulation_fan_coil_airflow
-    num_units = 2
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*8+3, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
-    expected_values = {}
-    _test_measure("test_simulation_fan_coil_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
-  end
-  
-  def test_simulation_ptac_airflow
-    num_units = 2
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*4, "ScheduleRule"=>num_units*48, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*8+3, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "SpaceInfiltrationEffectiveLeakageArea"=>1}
-    expected_values = {}
-    _test_measure("test_simulation_ptac_heating_setpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 5)
-  end
-  
   private
 
   def _test_error(osm_file_or_model, args_hash)

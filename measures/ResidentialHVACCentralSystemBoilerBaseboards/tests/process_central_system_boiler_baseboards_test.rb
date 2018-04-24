@@ -35,14 +35,6 @@ class ProcessCentralSystemHotWaterBoilerBaseboardsTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
 
-  def test_simulation_baseboards # then change weather file path to: C:/OpenStudio/OpenStudio-BEopt/measures/ResidentialLocation/resources/USA_CO_Denver_Intl_AP_725650_TMY3.epw; this is the seed model in test_simulation_baseboards.osw
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>2, "ZoneHVACBaseboardConvectiveWater"=>2}
-    expected_values = {}
-    _test_measure("apply_central_system_to_this.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
-  end
-
   # TODO: test replace
 
   private
