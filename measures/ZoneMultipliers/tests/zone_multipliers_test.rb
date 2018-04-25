@@ -7,6 +7,14 @@ require 'fileutils'
 
 class ZoneMultipliersTest < MiniTest::Test
 
+  def test_sfd_zone_mult
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {"NumActualZones"=>2, "NumZonesRepresented"=>2}
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+
   def test_sfa_zone_mult_front_units_only
     args_hash = {}
     expected_num_del_objects = {}
