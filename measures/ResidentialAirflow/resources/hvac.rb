@@ -2840,11 +2840,13 @@ class HVAC
       if thermostatsetpointdualsetpoint.is_initialized
         thermostatsetpointdualsetpoint.get.coolingSetpointTemperatureSchedule.get.to_Schedule.get.to_ScheduleRuleset.get.scheduleRules.each do |rule|
           coolingSetpoint = Array.new(24, Constants.NoCoolingSetpoint)
-          rule.daySchedule.values.each_with_index do |value, hour|
+          rule.daySchedule.values.each_with_index do |value, i|
+            hour = rule.daySchedule.times[i].hours - 1
             if value < coolingSetpoint[hour]
               coolingSetpoint[hour] = UnitConversions.convert(value,"C","F") + cooling_setpoint_offset
             end
           end
+          coolingSetpoint = backfill_schedule_values(coolingSetpoint, Constants.NoCoolingSetpoint)
           # weekday
           if rule.applyMonday and rule.applyTuesday and rule.applyWednesday and rule.applyThursday and rule.applyFriday
             unless rule.daySchedule.values.all? {|x| x == Constants.NoCoolingSetpoint}
