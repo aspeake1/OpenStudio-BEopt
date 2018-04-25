@@ -506,7 +506,7 @@ class HotWaterSchedule
     def getOntimeFraction
         return @ontime
     end
-
+    
     private
 
         def loadMinuteDrawProfileFromFile(timestep_minutes, unit_index, days_shift, measure_dir, weeks)
@@ -524,10 +524,10 @@ class HotWaterSchedule
             
             minutes_in_year = 8760 * 60
             weeks_in_minutes = weeks * 7 * 24 * 60
-
+            
             # Read data into minute array
             skippedheader = false
-            min_shift = 24 * 60 * (days_shift + 7 * unit_index) % 365 # For MF homes, shift each unit by an additional week
+            min_shift = 24 * 60 * ((days_shift + 7 * unit_index) % 365) # For MF homes, shift each unit by an additional week
             items = [0]*minutes_in_year
             File.open(minute_draw_profile).each do |line|
                 linedata = line.strip.split(',')
@@ -535,14 +535,15 @@ class HotWaterSchedule
                     skippedheader = true
                     next
                 end
-                minute = linedata[0].to_i
-                shifted_minute = minute - min_shift
+                shifted_minute = linedata[0].to_i - min_shift
                 if shifted_minute < 0
-                    shifted_minute = shifted_minute + minutes_in_year
+                    stored_minute = shifted_minute + minutes_in_year
+                else
+                    stored_minute = shifted_minute
                 end
                 value = linedata[1].to_f
-                items[shifted_minute.to_i] = value
-                if shifted_minute > weeks_in_minutes
+                items[stored_minute.to_i] = value
+                if shifted_minute >= weeks_in_minutes
                     break # no need to process more data
                 end
             end
