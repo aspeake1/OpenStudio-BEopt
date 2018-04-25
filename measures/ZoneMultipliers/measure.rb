@@ -8,7 +8,7 @@ class ZoneMultipliers < OpenStudio::Measure::ModelMeasure
 
   # human readable name
   def name
-    return "ZoneMultipliers"
+    return "Apply Zone Multipliers"
   end
 
   # human readable description

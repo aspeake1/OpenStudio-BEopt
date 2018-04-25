@@ -9,7 +9,7 @@ class ZoneMultipliersTest < MiniTest::Test
 
   def test_sfd_zone_mult
     args_hash = {}
-    expected_num_del_objects = {}
+    expected_num_del_objects = {"BuildingUnit"=>0, "ThermalZone"=>0}
     expected_num_new_objects = {}
     expected_values = {"NumActualZones"=>2, "NumZonesRepresented"=>2}
     _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
@@ -17,7 +17,7 @@ class ZoneMultipliersTest < MiniTest::Test
 
   def test_sfa_zone_mult_front_units_only
     args_hash = {}
-    expected_num_del_objects = {}
+    expected_num_del_objects = {"BuildingUnit"=>7, "ThermalZone"=>7}
     expected_num_new_objects = {}
     expected_values = {"NumActualZones"=>3, "NumZonesRepresented"=>10}
     _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
@@ -25,7 +25,7 @@ class ZoneMultipliersTest < MiniTest::Test
 
   def test_sfa_zone_mult_has_rear_units
     args_hash = {}
-    expected_num_del_objects = {}
+    expected_num_del_objects = {"BuildingUnit"=>4, "ThermalZone"=>4}
     expected_num_new_objects = {}
     expected_values = {"NumActualZones"=>6, "NumZonesRepresented"=>10}
     _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_HasRearUnits.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
@@ -34,7 +34,7 @@ class ZoneMultipliersTest < MiniTest::Test
   def test_mf_zone_mult_double_loaded_corridor
     num_finished_spaces = 3
     args_hash = {}
-    expected_num_del_objects = {}
+    expected_num_del_objects = {"BuildingUnit"=>22, "ThermalZone"=>22}
     expected_num_new_objects = {}
     expected_values = {"NumActualZones"=>18, "NumZonesRepresented"=>40}
     _test_measure("MF_40units_4story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
@@ -43,7 +43,7 @@ class ZoneMultipliersTest < MiniTest::Test
   def test_mf_zone_mult_exterior_corridor
     num_finished_spaces = 3
     args_hash = {}
-    expected_num_del_objects = {}
+    expected_num_del_objects = {"BuildingUnit"=>5, "ThermalZone"=>5}
     expected_num_new_objects = {}
     expected_values = {"NumActualZones"=>3, "NumZonesRepresented"=>8}
     _test_measure("MF_8units_1story_SL_Denver_ExteriorCorridor.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
@@ -134,7 +134,7 @@ class ZoneMultipliersTest < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["Node", "PortList", "SizingZone", "ZoneHVACEquipmentList", "Space", "Surface", "ThermalZone", "BuildingUnit"]
+    obj_type_exclusions = ["Node", "PortList", "SizingZone", "ZoneHVACEquipmentList", "Space", "Surface"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 
