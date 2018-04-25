@@ -17,6 +17,7 @@ class Geometry
             facades << facade
           end
         end
+        next if facades.empty?
         if facades.include? Constants.FacadeFront and facades.include? Constants.FacadeBack
         elsif facades.include? Constants.FacadeLeft and facades.include? Constants.FacadeRight
         else

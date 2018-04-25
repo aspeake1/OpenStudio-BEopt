@@ -31,6 +31,22 @@ class ZoneMultipliersTest < MiniTest::Test
     _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_HasRearUnits.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
+  def test_sfa_finished_basement_zone_mult_front_units_only
+    args_hash = {}
+    expected_num_del_objects = {"BuildingUnit"=>7, "ThermalZone"=>2*7}
+    expected_num_new_objects = {}
+    expected_values = {"NumActualZones"=>2*3, "NumZonesRepresented"=>2*10}
+    _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+
+  def test_sfa_finished_basement_zone_mult_has_rear_units
+    args_hash = {}
+    expected_num_del_objects = {"BuildingUnit"=>4, "ThermalZone"=>2*4}
+    expected_num_new_objects = {}
+    expected_values = {"NumActualZones"=>2*6, "NumZonesRepresented"=>2*10}
+    _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver_HasRearUnits.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+
   def test_mf_zone_mult_double_loaded_corridor
     num_finished_spaces = 3
     args_hash = {}
