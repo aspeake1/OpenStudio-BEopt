@@ -442,7 +442,7 @@ end
 
 class HotWaterSchedule
 
-    def initialize(model, runner, sch_name, temperature_sch_name, num_bedrooms, unit_index, days_shift, file_prefix, target_water_temperature, measure_dir, create_sch_object=true)
+    def initialize(model, runner, sch_name, temperature_sch_name, num_bedrooms, days_shift, file_prefix, target_water_temperature, measure_dir, create_sch_object=true)
         @validated = true
         @model = model
         @runner = runner
@@ -461,7 +461,7 @@ class HotWaterSchedule
         timestep_minutes = (60/@model.getTimestep.numberOfTimestepsPerHour).to_i
         weeks = 1 # use a single week that repeats
 
-        data = loadMinuteDrawProfileFromFile(timestep_minutes, unit_index, days_shift, measure_dir, weeks)
+        data = loadMinuteDrawProfileFromFile(timestep_minutes, days_shift, measure_dir, weeks)
         @totflow, @maxflow, @ontime = loadDrawProfileStatsFromFile(measure_dir)
         if data.nil? or @totflow.nil? or @maxflow.nil? or @ontime.nil?
             @validated = false
@@ -509,7 +509,7 @@ class HotWaterSchedule
     
     private
 
-        def loadMinuteDrawProfileFromFile(timestep_minutes, unit_index, days_shift, measure_dir, weeks)
+        def loadMinuteDrawProfileFromFile(timestep_minutes, days_shift, measure_dir, weeks)
             data = []
             if @file_prefix.nil?
                 return data
@@ -527,7 +527,7 @@ class HotWaterSchedule
             
             # Read data into minute array
             skippedheader = false
-            min_shift = 24 * 60 * ((days_shift + 7 * unit_index) % 365) # For MF homes, shift each unit by an additional week
+            min_shift = 24 * 60 * (days_shift % 365) # For MF homes, shift each unit by an additional week
             items = [0]*minutes_in_year
             File.open(minute_draw_profile).each do |line|
                 linedata = line.strip.split(',')
