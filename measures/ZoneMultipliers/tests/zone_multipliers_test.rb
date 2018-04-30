@@ -64,6 +64,15 @@ class ZoneMultipliersTest < MiniTest::Test
     expected_values = {"NumActualZones"=>3, "NumZonesRepresented"=>8}
     _test_measure("MF_8units_1story_SL_Denver_ExteriorCorridor.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
+  
+  def test_mf_zone_mult_furnace_central_air_conditioner
+    num_finished_spaces = 3
+    args_hash = {}
+    expected_num_del_objects = {"BuildingUnit"=>12, "ThermalZone"=>12, "AirLoopHVAC"=>12, "EnergyManagementSystemActuator"=>90, "PlantLoop"=>6, "WaterHeaterMixed"=>6, "EnergyManagementSystemSensor"=>78, "EnergyManagementSystemProgram"=>30, "EnergyManagementSystemProgramCallingManager"=>18}
+    expected_num_new_objects = {}
+    expected_values = {"NumActualZones"=>12, "NumZonesRepresented"=>24}
+    _test_measure("MF_24units_2story_UB_3Beds_1pt5Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
 
   private
 
@@ -150,7 +159,7 @@ class ZoneMultipliersTest < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["Node", "PortList", "SizingZone", "ZoneHVACEquipmentList", "Space", "Surface"]
+    obj_type_exclusions = ["Node", "PortList", "SizingZone", "ZoneHVACEquipmentList", "Space", "Surface", "SpaceInfiltrationDesignFlowRate", "OtherEquipment", "People", "ZoneMixing", "ElectricEquipment", "AirTerminalSingleDuctUncontrolled", "AirLoopHVACReturnPlenum", "AvailabilityManagerAssignmentList", "AirLoopHVACUnitarySystem", "FanOnOff", "CoilHeatingGas", "CoilCoolingDXSingleSpeed", "AirLoopHVACZoneSplitter", "AirLoopHVACZoneMixer", "SizingSystem", "ConnectorMixer", "ConnectorSplitter", "SizingPlant", "PipeAdiabatic", "PumpVariableSpeed", "SetpointManagerScheduled"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 

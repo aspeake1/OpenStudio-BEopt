@@ -274,6 +274,74 @@ class ZoneMultipliers < OpenStudio::Measure::ModelMeasure
       surface.setOutsideBoundaryCondition("Adiabatic")
     end
 
+    # remove orphaned air loops
+    model.getAirLoopHVACs.each do |air_loop|
+      next unless air_loop.thermalZones.empty?
+      air_loop.remove
+    end
+
+    # remove orphaned plant loops
+    plant_loops = []
+    model.getPlantLoops.each do |plant_loop|
+      plant_loop.supplyComponents.each do |supply_component|
+        water_heater = nil
+        if supply_component.to_WaterHeaterMixed.is_initialized
+          water_heater = supply_component.to_WaterHeaterMixed.get
+        elsif supply_component.to_WaterHeaterStratified.is_initialized
+          water_heater = supply_component.to_WaterHeaterStratified.get
+        end
+        unless water_heater.nil?
+          next if water_heater.ambientTemperatureThermalZone.is_initialized
+          unless plant_loops.include? plant_loop
+            plant_loops << plant_loop
+          end
+        end
+      end
+    end
+    plant_loops.each do |plant_loop|
+      plant_loop.remove
+    end
+
+    # remove orphaned ems actuators
+    model.getEnergyManagementSystemActuators.each do |ems_actuator|
+      next if ems_actuator.actuatedComponent.is_initialized
+      ems_actuator.remove
+    end
+
+    # remove orphaned ems sensors and programs
+    model.getEnergyManagementSystemSensors.each do |ems_sensor|
+      next if ems_sensor.keyName.empty?
+      remove_sensor = true
+      (model.getAirLoopHVACs + model.getThermalZones + model.getScheduleRulesets + model.getFanOnOffs + model.getNodes + model.getScheduleConstants + model.getScheduleIntervals).each do |obj|
+        if obj.to_AirLoopHVAC.is_initialized
+          obj = obj.demandInletNode
+        end
+        next unless obj.name.to_s == ems_sensor.keyName.to_s
+        remove_sensor = false
+        break
+      end
+      next unless remove_sensor
+      model.getEnergyManagementSystemProgramCallingManagers.each do |ems_program_calling_manager|
+        ems_program_calling_manager.programs.each do |ems_program|
+          remove_program = false
+          ems_program.lines.each do |line|
+            next unless line.include? ems_sensor.name.to_s
+            remove_program = true
+            break
+          end
+          next unless remove_program
+          ems_program.remove
+        end
+      end
+      ems_sensor.remove
+    end
+    
+    # remove orphaned ems program calling managers
+    model.getEnergyManagementSystemProgramCallingManagers.each do |ems_program_calling_manager|
+      next unless ems_program_calling_manager.programs.empty?
+      ems_program_calling_manager.remove
+    end
+
     runner.registerFinalCondition("Model finished with #{model.getThermalZones.length} thermal zones.")
 
     return true
