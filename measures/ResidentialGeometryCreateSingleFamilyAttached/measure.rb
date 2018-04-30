@@ -877,15 +877,22 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     OpenStudio::Model.matchSurfaces(spaces)
 
     # Make shared building facade surfaces adiabatic
-    if shared_building_facades != "None"
+    if shared_building_facades != Constants.FacadeNone
+      mat = OpenStudio::Model::MasslessOpaqueMaterial.new(model)
+      mat.setName(Constants.SurfaceTypeAdiabatic)
+      mat.setRoughness("Rough")
+      mat.setThermalResistance(UnitConversions.convert(1000.0, "hr*ft^2*F/Btu", "m^2*K/W"))
+      constr = OpenStudio::Model::Construction.new(model)
+      constr.setName(Constants.SurfaceTypeAdiabatic)
+      constr.setLayers([mat])
       shared_building_facades = shared_building_facades.split(", ")
       shared_building_facades.each do |shared_building_facade|
         model.getSurfaces.each do |surface|
           next unless surface.surfaceType.downcase == "wall"
-          next unless ["outdoors", "ground", "foundation"].include? surface.outsideBoundaryCondition.downcase
+          next unless surface.outsideBoundaryCondition.downcase == "outdoors"
           next if surface.adjacentSurface.is_initialized
           next unless Geometry.get_facade_for_surface(surface) == shared_building_facade
-          surface.setOutsideBoundaryCondition("Adiabatic")
+          surface.setConstruction(constr)
         end
       end
     end

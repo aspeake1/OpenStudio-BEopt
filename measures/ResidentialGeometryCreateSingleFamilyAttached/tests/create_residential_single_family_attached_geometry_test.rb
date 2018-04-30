@@ -180,8 +180,8 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = "finished basement"
     args_hash["shared_building_facades"] = "back, right"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>80, "ThermalZone"=>2*4+1, "Space"=>(2+1)*4+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>40}
-    expected_values = {"FinishedFloorArea"=>900*4, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>300*4, "UnfinishedAtticHeight"=>7.12, "UnfinishedAtticFloorArea"=>300*4, "BuildingHeight"=>8+8+8+7.12, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>13}
+    expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>80, "ThermalZone"=>2*4+1, "Space"=>(2+1)*4+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>58, "Material"=>1, "Construction"=>1}
+    expected_values = {"FinishedFloorArea"=>900*4, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>300*4, "UnfinishedAtticHeight"=>7.12, "UnfinishedAtticFloorArea"=>300*4, "BuildingHeight"=>8+8+8+7.12, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>9}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -479,7 +479,14 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
           actual_values["EavesDepth"] = [UnitConversions.convert(l,"m","ft"), UnitConversions.convert(w,"m","ft")].min
           assert_in_epsilon(expected_values["EavesDepth"], actual_values["EavesDepth"], 0.01)
         elsif obj_type == "Surface"
-          if new_object.outsideBoundaryCondition.downcase == "adiabatic"
+          if new_object.outsideBoundaryCondition.downcase == "outdoors"
+            if new_object.construction.is_initialized
+              new_object.construction.get.to_LayeredConstruction.get.layers.each do |layer|
+                next unless layer.name.to_s.include? Constants.SurfaceTypeAdiabatic
+                actual_values["NumAdiabaticSurfaces"] += 1
+              end
+            end
+          elsif new_object.outsideBoundaryCondition.downcase == "adiabatic"
             actual_values["NumAdiabaticSurfaces"] += 1
           end
         end

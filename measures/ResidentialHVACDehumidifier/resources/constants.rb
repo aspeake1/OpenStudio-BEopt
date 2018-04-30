@@ -933,6 +933,9 @@ class Constants
   def self.SpaceTypeUnfinishedBasement
     return 'unfinished basement'
   end
+  def self.SurfaceTypeAdiabatic # adiabatic construction instead of adiabatic outside boundary condition
+    return 'Adiabatic'
+  end
   def self.SurfaceTypeFloorFinInsUnfinAttic # unfinished attic floor
     return 'FloorFinInsUnfinAttic'
   end
