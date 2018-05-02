@@ -108,7 +108,8 @@ class ProcessCentralSystemFanCoil < OpenStudio::Measure::ModelMeasure
 
     end
 
-    runner.registerInfo("Added #{msg} to the building.")
+    simulation_control = model.getSimulationControl
+    simulation_control.setRunSimulationforSizingPeriods(true) # indicate e+ autosizing
 
     return true
 

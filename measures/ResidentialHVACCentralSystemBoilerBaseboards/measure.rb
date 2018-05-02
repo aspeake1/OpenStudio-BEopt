@@ -97,6 +97,9 @@ class ProcessCentralSystemBoilerBaseboards < OpenStudio::Measure::ModelMeasure
 
     end
 
+    simulation_control = model.getSimulationControl
+    simulation_control.setRunSimulationforSizingPeriods(true) # indicate e+ autosizing
+
     runner.registerInfo("Added #{central_boiler_system_type} central boiler and baseboards to the building.")
     
     return true

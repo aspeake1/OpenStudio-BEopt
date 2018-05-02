@@ -71,8 +71,11 @@ class ProcessCentralSystemPTAC < OpenStudio::Measure::ModelMeasure
 
     end
 
+    simulation_control = model.getSimulationControl
+    simulation_control.setRunSimulationforSizingPeriods(true)
+
     runner.registerInfo("Added PTAC to the building.")
-    
+
     return true
 
   end
