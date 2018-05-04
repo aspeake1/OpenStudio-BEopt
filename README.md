@@ -19,7 +19,7 @@ An example OpenStudio Workflow [(example_single_family_detached.osw)](https://gi
 
 `openstudio.exe run -w example_single_family_detached.osw`
 
-This will apply the measures to the OpenStudio seed model specified in the .osw, run the EnergyPlus simulation, and produce output. 
+This will apply the measures, run the EnergyPlus simulation, and produce output. 
 
 <!--
 
