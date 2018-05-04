@@ -183,7 +183,9 @@ class HourlyByMonthSchedule
             end
 
             schedule.setWinterDesignDaySchedule(winterDesignDaySchedule)
+            schedule.winterDesignDaySchedule.setName("#{winterDesignDaySchedule.name} winter design")
             schedule.setSummerDesignDaySchedule(summerDesignDaySchedule)
+            schedule.summerDesignDaySchedule.setName("#{winterDesignDaySchedule.name} summer design")
 
             return schedule
         end
@@ -427,7 +429,9 @@ class MonthWeekdayWeekendSchedule
             end
             
             schedule.setWinterDesignDaySchedule(winterDesignDaySchedule)
+            schedule.winterDesignDaySchedule.setName("#{winterDesignDaySchedule.name} winter design")
             schedule.setSummerDesignDaySchedule(summerDesignDaySchedule)
+            schedule.summerDesignDaySchedule.setName("#{winterDesignDaySchedule.name} summer design")
 
             return schedule
         end

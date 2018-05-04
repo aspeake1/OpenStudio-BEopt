@@ -222,7 +222,7 @@ class ProcessCeilingFanTest < MiniTest::Test
         final_objects.each do |obj_type, final_object|
             next if not final_object.respond_to?("to_#{obj_type}")
             final_object = final_object.public_send("to_#{obj_type}").get
-            if obj_type == "ScheduleDay" and final_object.name.to_s.start_with?(Constants.ObjectNameCoolingSetpoint)
+            if obj_type == "ScheduleDay" and final_object.name.to_s.start_with?(Constants.ObjectNameCoolingSetpoint) and not final_object.name.to_s.include? "design"
                 if final_object.name.to_s.include?(Schedule.allday_name)
                     for i in 1..24
                         next if final_object.values[i-1] > 999

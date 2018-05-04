@@ -176,7 +176,7 @@ class Location
         end
         
         if iecc_zone.length == 1
-          iecc_zone += "A"
+          iecc_zone += "A" # for 7 and 8, A and B don't matter in terms of autosizing
         end
         iecc_zone = "ASHRAE 169-2006-#{iecc_zone}"
 
