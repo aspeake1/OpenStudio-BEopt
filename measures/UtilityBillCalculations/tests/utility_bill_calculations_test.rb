@@ -7,6 +7,13 @@ require 'fileutils'
 
 class UtilityBillCalculationsTest < MiniTest::Test
 
+  # BEopt building:
+  # - 600 sq ft (30 x 20), Denver EPW
+  # - Propane cooking range
+  # - Oil Standard water heater
+  # - All other options left at default values
+  # Then retrieve 1.csv from output folder, change headers to OpenStudio headers, and subtract Produced column from Facility column
+
   def test_simple_calculations_0kW_pv_net_metering
     args_hash = {}
     args_hash["electric_bill_type"] = "Simple"
@@ -19,7 +26,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>724, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>96+571.76, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -35,7 +42,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>564, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>96+571.76-160.24, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
@@ -51,7 +58,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>-176, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>96+571.76-859.48628, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -68,23 +75,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_annual_excess_sellback_rate_type"] = Constants.RetailElectricityCost
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>-883, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, expected_values)
-  end
-
-  def test_simple_calculations_0kW_pv_feed_in_tariff
-    args_hash = {}
-    args_hash["electric_bill_type"] = "Simple"
-    args_hash["elec_fixed"] = "8.0"
-    args_hash["elec_rate"] = Constants.Auto
-    args_hash["gas_fixed"] = "8.0"
-    args_hash["gas_rate"] = Constants.Auto
-    args_hash["oil_rate"] = Constants.Auto
-    args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
-    args_hash["pv_tariff_rate"] = "0.12"
-    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>724, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>96+571.76-1607.76, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -100,7 +91,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_tariff_rate"] = "0.12"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>724-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>96+571.76-178.01, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -118,7 +109,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>724-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>96+571.76-1786.08, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
@@ -163,7 +154,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__) # Southern California Edison Co - Domestic Service: D - Baseline Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -171,7 +162,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>781.22, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+700.45, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -179,7 +170,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__) # Southern California Edison Co - Domestic Service: D - Baseline Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -187,15 +178,15 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>781.22-196, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+700.45-196, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
-  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_tiered
+  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_tiered # TODO: fails, calculating: -276.56646728515625
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__) # Southern California Edison Co - Domestic Service: D - Baseline Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -203,15 +194,15 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>781.22-1042, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+700.45-1736, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
-  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_retail_sellback_tiered # TODO: works with dollars=0
+  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_retail_sellback_tiered # TODO: fails, rrrreally close though
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__) # Southern California Edison Co - Domestic Service: D - Baseline Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -219,23 +210,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_annnual_excess_sellback_rate_type"] = Constants.RetailElectricityCost
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>781.22-770, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, expected_values)
-  end
-  
-  def test_detailed_calculations_0kW_pv_feed_in_tariff_custom_tariff_tiered
-    args_hash = {}
-    args_hash["electric_bill_type"] = "Detailed"
-    args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__)
-    args_hash["gas_fixed"] = "8.0"
-    args_hash["gas_rate"] = Constants.Auto
-    args_hash["oil_rate"] = Constants.Auto
-    args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
-    args_hash["pv_tariff_rate"] = "0.12"
-    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>781.22, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+700.45-700, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -243,7 +218,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__) # Southern California Edison Co - Domestic Service: D - Baseline Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -251,7 +226,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_tariff_rate"] = "0.12"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>781.22-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+700.45-178.02, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
@@ -259,7 +234,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586bda1b5457a3ef521c9605.json", __FILE__) # Southern California Edison Co - Domestic Service: D - Baseline Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -267,7 +242,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_tariff_rate"] = "0.12"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>781.22-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+700.45-1786.09, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -275,7 +250,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__) # Georgia Power Co - Schedule TOU-REO-7 - Time of Use - Residential
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -283,7 +258,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>642.14, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>108+487.38, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -291,7 +266,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__) # Georgia Power Co - Schedule TOU-REO-7 - Time of Use - Residential
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -299,15 +274,15 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>642.14-139, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>108+487.38-139, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
-  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_tou # TODO: very close with either dollars=0/1
+  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_tou # TODO: fails, calculating: -179.72647094726562
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__) # Georgia Power Co - Schedule TOU-REO-7 - Time of Use - Residential
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -315,15 +290,15 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>642.14-914, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>108+487.38-1631, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
-  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_retail_sellback_tou
+  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_retail_sellback_tou # TODO: fails, calculating: 108.0
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__) # Georgia Power Co - Schedule TOU-REO-7 - Time of Use - Residential
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -331,23 +306,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_annnual_excess_sellback_rate_type"] = Constants.RetailElectricityCost
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>642.14-1397, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, expected_values)
-  end
-  
-  def test_detailed_calculations_0kW_pv_feed_in_tariff_custom_tariff_tou
-    args_hash = {}
-    args_hash["electric_bill_type"] = "Detailed"
-    args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__)
-    args_hash["gas_fixed"] = "8.0"
-    args_hash["gas_rate"] = Constants.Auto
-    args_hash["oil_rate"] = Constants.Auto
-    args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
-    args_hash["pv_tariff_rate"] = "0.12"
-    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>642.14, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>108+487.38-1397, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -355,7 +314,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__) # Georgia Power Co - Schedule TOU-REO-7 - Time of Use - Residential
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -363,7 +322,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_tariff_rate"] = "0.12"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>642.14-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>108+487.38-178.02, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
@@ -371,7 +330,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../539f6d9eec4f024411ecb875.json", __FILE__) # Georgia Power Co - Schedule TOU-REO-7 - Time of Use - Residential
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -379,7 +338,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_tariff_rate"] = "0.12"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>642.14-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>108+487.38-1786.09, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -387,7 +346,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__) # Southern California Edison Co - Time-of-use Tiered Domestic: TOU-D-T-Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -395,15 +354,15 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>837.8, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+756.21, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
-  def test_detailed_calculations_1kW_pv_net_metering_custom_tariff_tiered_tou # TODO: very close
+  def test_detailed_calculations_1kW_pv_net_metering_custom_tariff_tiered_tou # TODO: fails, calculating: 506.031494140625
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__) # Southern California Edison Co - Time-of-use Tiered Domestic: TOU-D-T-Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -411,15 +370,16 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>837.8-249, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    # expected_values = {Constants.FuelTypeElectric=>11.16+756.21-249, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
+    expected_values = {Constants.FuelTypeElectric=>11.16+760.49-236, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
-  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_tiered_tou
+  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_tiered_tou # TODO: fails, calculating: -276.56646728515625
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__) # Southern California Edison Co - Time-of-use Tiered Domestic: TOU-D-T-Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -427,38 +387,22 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     args_hash["pv_sellback_rate"] = "0.03"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>837.8-1099, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+756.21-1792, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
-  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_retail_sellback_tiered_tou # TODO: close with dollars=0
+  def test_detailed_calculations_10kW_pv_net_metering_custom_tariff_retail_sellback_tiered_tou # TODO: fails, rrrreally close though
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__) # Southern California Edison Co - Time-of-use Tiered Domestic: TOU-D-T-Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
     args_hash["prop_rate"] = Constants.Auto
     args_hash["pv_compensation_type"] = Constants.PVNetMetering
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>837.8-827, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
-    _test_measure_calculations(timeseries, args_hash, expected_values)
-  end
-  
-  def test_detailed_calculations_0kW_pv_feed_in_tariff_custom_tariff_tiered_tou
-    args_hash = {}
-    args_hash["electric_bill_type"] = "Detailed"
-    args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__)
-    args_hash["gas_fixed"] = "8.0"
-    args_hash["gas_rate"] = Constants.Auto
-    args_hash["oil_rate"] = Constants.Auto
-    args_hash["prop_rate"] = Constants.Auto
-    args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
-    args_hash["pv_tariff_rate"] = "0.12"
-    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>837.8, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+756.21-756, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
@@ -466,7 +410,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__) # Southern California Edison Co - Time-of-use Tiered Domestic: TOU-D-T-Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -474,7 +418,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_tariff_rate"] = "0.12"
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>837.8-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+756.21-178.02, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
   
@@ -482,7 +426,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash = {}
     args_hash["electric_bill_type"] = "Detailed"
     args_hash["tariff_label"] = "Custom Tariff"
-    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__)
+    args_hash["custom_tariff"] = File.expand_path("../586be0bd5457a30d661c9605.json", __FILE__) # Southern California Edison Co - Time-of-use Tiered Domestic: TOU-D-T-Region 5
     args_hash["gas_fixed"] = "8.0"
     args_hash["gas_rate"] = Constants.Auto
     args_hash["oil_rate"] = Constants.Auto
@@ -490,7 +434,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
     args_hash["pv_tariff_rate"] = "0.12"
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
-    expected_values = {Constants.FuelTypeElectric=>837.8-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = {Constants.FuelTypeElectric=>11.16+756.21-1786.09, Constants.FuelTypeGas=>96+205.71, Constants.FuelTypePropane=>61.99, Constants.FuelTypeOil=>343.95}
     _test_measure_calculations(timeseries, args_hash, expected_values)
   end
 
