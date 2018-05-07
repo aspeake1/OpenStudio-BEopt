@@ -1211,13 +1211,13 @@ class HVACSizing
         elsif sched_base.to_ScheduleConstant.is_initialized 
             sched = sched_base.to_ScheduleConstant.get
         else
-            runner.registerWarning("Expected ScheduleRuleset or ScheduleFixedInterval for object '#{gain.name.to_s}'. Skipping...")
+            runner.registerWarning("Expected type for object '#{gain.name.to_s}'. Skipping...")
             next
         end
         next if sched.nil?
         
         # Get schedule hourly values
-        if sched.is_a? OpenStudio::Model::ScheduleRuleset
+        if sched.is_a? OpenStudio::Model::ScheduleRuleset or sched.is_a? OpenStudio::Model::ScheduleFixedInterval
             # Override any hot water schedules with smoothed schedules; TODO: Is there a better approach?
             max_mult = nil
             if gain.name.to_s.start_with?(Constants.ObjectNameShower)
