@@ -78,6 +78,50 @@ class WeatherProcess
     return []
   end
   
+  def self.add_design_days(model, climate_zone)
+  
+    # Remove any existing Design Day objects that are in the file
+    model.getDesignDays.each(&:remove)
+  
+    # Define the weather file for each climate zone
+    climate_zone_weather_file_map = {
+        'ASHRAE 169-2006-1A' => 'USA_FL_Miami.Intl.AP.722020_TMY3.ddy',
+        'ASHRAE 169-2006-1B' => 'SAU_Riyadh.404380_IWEC.ddy',
+        'ASHRAE 169-2006-2A' => 'USA_TX_Houston-Bush.Intercontinental.AP.722430_TMY3.ddy',
+        'ASHRAE 169-2006-2B' => 'USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.ddy',
+        'ASHRAE 169-2006-3A' => 'USA_TN_Memphis.Intl.AP.723340_TMY3.ddy',
+        'ASHRAE 169-2006-3B' => 'USA_TX_El.Paso.Intl.AP.722700_TMY3.ddy',
+        'ASHRAE 169-2006-3C' => 'USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy',
+        'ASHRAE 169-2006-4A' => 'USA_MD_Baltimore-Washington.Intl.AP.724060_TMY3.ddy',
+        'ASHRAE 169-2006-4B' => 'USA_NM_Albuquerque.Intl.AP.723650_TMY3.ddy',
+        'ASHRAE 169-2006-4C' => 'USA_OR_Salem-McNary.Field.726940_TMY3.ddy',
+        'ASHRAE 169-2006-5A' => 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.ddy',
+        'ASHRAE 169-2006-5B' => 'USA_ID_Boise.Air.Terminal.726810_TMY3.ddy',
+        'ASHRAE 169-2006-5C' => 'CAN_BC_Vancouver.718920_CWEC.ddy',
+        'ASHRAE 169-2006-6A' => 'USA_VT_Burlington.Intl.AP.726170_TMY3.ddy',
+        'ASHRAE 169-2006-6B' => 'USA_MT_Helena.Rgnl.AP.727720_TMY3.ddy',
+        'ASHRAE 169-2006-7A' => 'USA_MN_Duluth.Intl.AP.727450_TMY3.ddy',
+        'ASHRAE 169-2006-7B' => 'USA_MN_Duluth.Intl.AP.727450_TMY3.ddy',
+        'ASHRAE 169-2006-8A' => 'USA_AK_Fairbanks.Intl.AP.702610_TMY3.ddy',
+        'ASHRAE 169-2006-8B' => 'USA_AK_Fairbanks.Intl.AP.702610_TMY3.ddy'
+    }
+
+    weather_file = File.join(File.dirname(__FILE__), climate_zone_weather_file_map[climate_zone])
+  
+    # Load in the ddy file based on convention that it is in
+    # the same directory and has the same basename as the epw file.
+    ddy_file = "#{File.join(File.dirname(weather_file), File.basename(weather_file, '.*'))}.ddy"
+    ddy_model = OpenStudio::EnergyPlus.loadAndTranslateIdf(ddy_file).get
+    ddy_model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each do |d|
+      # Import the 99.6% Heating and 0.4% Cooling design days
+      ddy_list = /(Htg 99.6. Condns DB)|(Clg .4% Condns DB=>MWB)/
+      if d.name.get =~ ddy_list
+        model.addObject(d.clone)
+      end
+    end
+  
+  end
+  
   def error?
     return @error
   end

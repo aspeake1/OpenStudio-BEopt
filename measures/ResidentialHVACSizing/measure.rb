@@ -8,8 +8,7 @@
 # http://openstudio.nrel.gov/sites/openstudio.nrel.gov/files/nv_data/cpp_documentation_it/model/html/namespaces.html
 
 require "#{File.dirname(__FILE__)}/resources/hvac_sizing"
-require "#{File.dirname(__FILE__)}/resources/weather"
-require "#{File.dirname(__FILE__)}/resources/constants"
+require "#{File.dirname(__FILE__)}/resources/location"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 
 #start the measure
@@ -73,7 +72,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
       require "openstudio-standards"
       std = Standard.build("90.1-2013")
       climate_zone = Location.get_climate_zone_iecc(model.getWeatherFile.wMONumber)
-      std.model_add_design_days_and_weather_file(model, climate_zone, nil)
+      WeatherProcess.add_design_days(model, climate_zone)
 
       runner.registerFinalCondition("Design days for #{climate_zone} added to the model for autosizing.")
 

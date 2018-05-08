@@ -99,6 +99,8 @@ def get_model_object_type(model_object)
         obj_type = "Material"
     elsif obj_type == "WindowMaterialSimpleGlazingSystem"
         obj_type = "SimpleGlazing"
+    elsif obj_type == "SizingPeriodDesignDay"
+        obj_type = "DesignDay"
     end
     return obj_type
 end

@@ -2145,9 +2145,8 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {
-                      }
+    expected_num_new_objects = {"DesignDay"=>2}
+    expected_values = {}
     _test_measure("SFA_HVACSizing_Equip_Central_System_Boiler_Baseboards_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
 
@@ -2155,7 +2154,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"DesignDay"=>2}
     expected_values = {
                       }
     _test_measure("SFA_HVACSizing_Equip_Central_System_Fan_Coil_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -2165,7 +2164,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"DesignDay"=>2}
     expected_values = {
                       }
     _test_measure("SFA_HVACSizing_Equip_Central_System_PTAC_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -2275,7 +2274,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     obj_type_exclusions = []
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
-
+    
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
