@@ -3,30 +3,12 @@
 
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/weather"
-require "#{File.dirname(__FILE__)}/resources/hvac"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
+require "#{File.dirname(__FILE__)}/resources/pv"
 
 # start the measure
 class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
-
-  class PVSystem
-    def initialize
-    end
-    attr_accessor(:size, :module_type, :inv_eff, :losses)
-  end
-
-  class PVAzimuth
-    def initialize
-    end
-    attr_accessor(:abs)
-  end
-
-  class PVTilt
-    def initialize
-    end
-    attr_accessor(:abs)
-  end
 
   # human readable name
   def name
@@ -145,10 +127,6 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    pv_system = PVSystem.new
-    pv_azimuth = PVAzimuth.new
-    pv_tilt = PVTilt.new
-
     weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
     if weather.error?
       return false
@@ -156,46 +134,17 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
 
     roof_tilt = Geometry.get_roof_pitch(model.getSurfaces)
 
-    pv_system.size = UnitConversions.convert(size, "kW", "W")
-    pv_system.module_type = module_type
-    pv_system.inv_eff = inverter_efficiency
-    pv_system.losses = system_losses
-    pv_tilt.abs = Geometry.get_abs_tilt(tilt_type, tilt, roof_tilt, weather.header.Latitude)
-    pv_azimuth.abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, model.getBuilding.northAxis)
+    size_w = UnitConversions.convert(size, "kW", "W")
+    tilt_abs = Geometry.get_abs_tilt(tilt_type, tilt, roof_tilt, weather.header.Latitude)
+    azimuth_abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, model.getBuilding.northAxis)
 
     obj_name = Constants.ObjectNamePhotovoltaics
-
-    # Remove existing photovoltaics
-    curves_to_remove = []
-    model.getElectricLoadCenterDistributions.each do |electric_load_center_dist|
-      next unless electric_load_center_dist.name.to_s == "#{obj_name} elec load center dist"
-      electric_load_center_dist.generators.each do |generator|
-        generator = generator.to_GeneratorPVWatts.get
-        generator.remove
-      end
-      if electric_load_center_dist.inverter.is_initialized
-        inverter = electric_load_center_dist.inverter.get
-        inverter.remove
-      end
-      electric_load_center_dist.remove
-    end
-
-    electric_load_center_dist = OpenStudio::Model::ElectricLoadCenterDistribution.new(model)
-    electric_load_center_dist.setName("#{obj_name} elec load center dist")
-
-    generator = OpenStudio::Model::GeneratorPVWatts.new(model, pv_system.size)
-    generator.setName("#{obj_name} generator")
-    generator.setModuleType(pv_system.module_type)
-    generator.setSystemLosses(pv_system.losses)
-    generator.setTiltAngle(pv_tilt.abs)
-    generator.setAzimuthAngle(pv_azimuth.abs)
     
-    inverter = OpenStudio::Model::ElectricLoadCenterInverterPVWatts.new(model)
-    inverter.setName("#{obj_name} inverter")
-    inverter.setInverterEfficiency(pv_system.inv_eff)
-
-    electric_load_center_dist.addGenerator(generator)
-    electric_load_center_dist.setInverter(inverter)
+    PV.remove(model, runner, obj_name)
+    
+    success = PV.apply(model, runner, obj_name, size_w, module_type, system_losses,
+                       inverter_efficiency, tilt_abs, azimuth_abs)
+    return false if not success
 
     return true
 
