@@ -24,36 +24,36 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash = {}
     args_hash["azimuth"] = 180.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3714}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_west_azimuth_back_roof
     args_hash = {}
     args_hash["azimuth"] = 180.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3086}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_east_azimuth_back_roof
     args_hash = {}
     args_hash["azimuth"] = 180.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2896}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_south_azimuth_back_roof
     args_hash = {}
     args_hash["azimuth"] = 180.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2072}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_north_azimuth_absolute_west
@@ -61,9 +61,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 90.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2896}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_west_azimuth_absolute_west
@@ -71,9 +71,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 90.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2904}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_east_azimuth_absolute_west
@@ -81,9 +81,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 90.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2896}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
   def test_faces_south_azimuth_absolute_west
@@ -91,9 +91,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 90.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2896}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
   def test_faces_north_azimuth_absolute_southwest
@@ -101,9 +101,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 45.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3444}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)      
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_west_azimuth_absolute_southwest
@@ -111,9 +111,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 45.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3444}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)      
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
     def test_faces_east_azimuth_absolute_southwest
@@ -121,9 +121,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 45.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3444}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)      
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_faces_south_azimuth_absolute_southwest
@@ -131,45 +131,45 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 45.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3444}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)      
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
   def test_faces_north_tilt_absolute_zero
     args_hash = {}
     args_hash["tilt_type"] = Constants.CoordAbsolute
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3071}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1) 
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_west_tilt_absolute_zero
     args_hash = {}
     args_hash["tilt_type"] = Constants.CoordAbsolute
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3071}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1) 
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values) 
   end
   
   def test_faces_east_tilt_absolute_zero
     args_hash = {}
     args_hash["tilt_type"] = Constants.CoordAbsolute
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3071}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1) 
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_south_tilt_absolute_zero
     args_hash = {}
     args_hash["tilt_type"] = Constants.CoordAbsolute
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3071}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1) 
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   
@@ -178,9 +178,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.CoordAbsolute
     args_hash["tilt"] = 30.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3745}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)     
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>30, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_west_tilt_absolute_thirty
@@ -188,9 +188,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.CoordAbsolute
     args_hash["tilt"] = 30.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3060}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)     
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>30, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_faces_east_tilt_absolute_thirty
@@ -198,9 +198,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.CoordAbsolute
     args_hash["tilt"] = 30.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2863}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)     
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>30, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_faces_south_tilt_absolute_thirty
@@ -208,9 +208,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.CoordAbsolute
     args_hash["tilt"] = 30.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>1961}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)     
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>30, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
   def test_faces_north_tilt_latitude_minus_15_deg
@@ -218,9 +218,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.TiltLatitude
     args_hash["tilt"] = -15.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3693}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7-15, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_west_tilt_latitude_minus_15_deg
@@ -228,9 +228,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.TiltLatitude
     args_hash["tilt"] = -15.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3098}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7-15, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_east_tilt_latitude_minus_15_deg
@@ -238,9 +238,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.TiltLatitude
     args_hash["tilt"] = -15.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2922}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7-15, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_south_tilt_latitude_minus_15_deg
@@ -248,9 +248,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.TiltLatitude
     args_hash["tilt"] = -15.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2151}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7-15, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_north_tilt_latitude_plus_15_deg
@@ -258,9 +258,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.TiltLatitude
     args_hash["tilt"] = 15.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3655}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7+15, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_faces_west_tilt_latitude_plus_15_deg
@@ -268,9 +268,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.TiltLatitude
     args_hash["tilt"] = 15.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2752}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7+15, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_faces_east_tilt_latitude_plus_15_deg
@@ -278,9 +278,9 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.TiltLatitude
     args_hash["tilt"] = 15.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2497}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7+15, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
   def test_faces_south_tilt_latitude_plus_15_deg
@@ -288,99 +288,76 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.TiltLatitude
     args_hash["tilt"] = 15.0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>1196}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7+15, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_north_tilt_pitch_roof
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3714}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)     
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_faces_west_tilt_pitch_roof
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3087}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)     
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_faces_east_tilt_pitch_roof
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2905}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)     
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
   def test_faces_south_tilt_pitch_roof
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2084}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)     
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_south_single_family_attached_new_construction
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2084}
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_faces_south_multifamily_new_construction
     num_units = 8
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>3069}
-    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
-  
+
   def test_faces_south_retrofit_size
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2084}
-    model = _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)    
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    model = _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["size"] = 5.0
-    expected_num_del_objects = {"GeneratorMicroTurbine"=>1, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>4173}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    expected_num_del_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
+    expected_values = {"SystemCapacity"=>5000, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-=begin
-  def test_make_successful_energyplus_run_tmy_with_pv
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2287}
-    model = _test_measure("SFD_Successful_EnergyPlus_Run_TMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
-    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculationsSimple", "tests", "SFD_Successful_EnergyPlus_Run_TMY_PV.osm"), true)
-    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculationsDetailed", "tests", "SFD_Successful_EnergyPlus_Run_TMY_PV.osm"), true)
-  end
-
-  def test_make_successful_energyplus_run_amy_with_pv
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
-    expected_values = {"total_kwhs"=>2105}
-    model = _test_measure("SFD_Successful_EnergyPlus_Run_AMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
-    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "TimeseriesCSVExport", "tests", "SFD_Successful_EnergyPlus_Run_AMY_PV.osm"), true)
-    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculationsDetailed", "tests", "SFD_Successful_EnergyPlus_Run_AMY_PV.osm"), true)
-    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculationsSimple", "tests", "SFD_Successful_EnergyPlus_Run_AMY_PV.osm"), true)
-  end
-=end
-  
   private
-  
+
   def _test_error(osm_file_or_model, args_hash)
     # create an instance of the measure
     measure = ResidentialPhotovoltaics.new
@@ -447,37 +424,40 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
-    
+
     # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     assert_equal(num_infos, result.info.size)
     assert_equal(num_warnings, result.warnings.size)
-    
+
     # get the final objects in the model
     final_objects = get_objects(model)
-    
+
     # get new and deleted objects
-    obj_type_exclusions = ["ModelObjectList", "ScheduleTypeLimits", "ScheduleConstant"]
+    obj_type_exclusions = ["ModelObjectList"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
-    
+
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 
     all_new_objects.each do |obj_type, new_objects|
-        new_objects.each do |new_object|
-            next if not new_object.respond_to?("to_#{obj_type}")
-            new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "ScheduleFixedInterval"
-                total_kwhs = OpenStudio::sum(new_object.timeSeries.values) / 1000
-                assert_in_epsilon(expected_values["total_kwhs"], total_kwhs, 0.06)
-            end
+      new_objects.each do |new_object|
+        next if not new_object.respond_to?("to_#{obj_type}")
+        new_object = new_object.public_send("to_#{obj_type}").get
+        if obj_type == "GeneratorPVWatts"
+          assert_in_epsilon(expected_values["SystemCapacity"], new_object.dcSystemCapacity, 0.01)
+          assert_in_epsilon(expected_values["TiltAngle"], new_object.tiltAngle, 0.01)
+          assert_in_epsilon(expected_values["AzimuthAngle"], new_object.azimuthAngle, 0.01)
+        elsif obj_type == "ElectricLoadCenterInverterPVWatts"
+          assert_in_epsilon(expected_values["InverterEfficiency"], new_object.inverterEfficiency, 0.01)
         end
+      end
     end
-    
+
     return model
   end
 
