@@ -68,13 +68,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     # Determine e+ autosizing or not
     simulation_control = model.getSimulationControl
     if simulation_control.runSimulationforSizingPeriods
-    
-      require "openstudio-standards"
-      std = Standard.build("90.1-2013")
-      climate_zone = Location.get_climate_zone_iecc(model.getWeatherFile.wMONumber)
-      WeatherProcess.add_design_days(model, climate_zone)
 
-      runner.registerFinalCondition("Design days for #{climate_zone} added to the model for autosizing.")
+      weather.add_design_days(model)
+      runner.registerFinalCondition("Design days for #{File.basename(weather.epw_path)} added to the model for autosizing.")
 
       return true
 
