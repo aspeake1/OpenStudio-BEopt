@@ -65,10 +65,19 @@ class ZoneMultipliersTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_Denver_ExteriorCorridor.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
   
+  def test_sfa_zone_mult_furnace_central_air_conditioner
+    num_finished_spaces = 3
+    args_hash = {}
+    expected_num_del_objects = {"BuildingUnit"=>7, "ThermalZone"=>7+7, "AirLoopHVAC"=>7, "EnergyManagementSystemActuator"=>91, "PlantLoop"=>7, "WaterHeaterMixed"=>7, "EnergyManagementSystemSensor"=>105, "EnergyManagementSystemProgram"=>21, "EnergyManagementSystemProgramCallingManager"=>14, "SurfacePropertyConvectionCoefficients"=>7*6, "ThermostatSetpointDualSetpoint"=>7}
+    expected_num_new_objects = {}
+    expected_values = {"NumActualZones"=>3, "NumZonesRepresented"=>10}
+    _test_measure("SFA_10units_2story_SL_3Beds_1pt5Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+  
   def test_mf_zone_mult_furnace_central_air_conditioner
     num_finished_spaces = 3
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>12, "ThermalZone"=>12, "AirLoopHVAC"=>12, "EnergyManagementSystemActuator"=>90, "PlantLoop"=>6, "WaterHeaterMixed"=>6, "EnergyManagementSystemSensor"=>78, "EnergyManagementSystemProgram"=>30, "EnergyManagementSystemProgramCallingManager"=>18}
+    expected_num_del_objects = {"BuildingUnit"=>12, "ThermalZone"=>12*2, "AirLoopHVAC"=>12, "EnergyManagementSystemActuator"=>108, "PlantLoop"=>6, "WaterHeaterMixed"=>6, "EnergyManagementSystemSensor"=>138, "EnergyManagementSystemProgram"=>36, "EnergyManagementSystemProgramCallingManager"=>24, "SurfacePropertyConvectionCoefficients"=>72, "ThermostatSetpointDualSetpoint"=>12}
     expected_num_new_objects = {}
     expected_values = {"NumActualZones"=>12, "NumZonesRepresented"=>24}
     _test_measure("MF_24units_2story_UB_3Beds_1pt5Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
@@ -146,8 +155,8 @@ class ZoneMultipliersTest < MiniTest::Test
     result = runner.result
 
     # save the model to test output directory
-    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
-    # model.save(output_file_path, true)
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
+    model.save(output_file_path, true)
     
     # show the output
     # show_output(result)
@@ -159,7 +168,7 @@ class ZoneMultipliersTest < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["Node", "PortList", "SizingZone", "ZoneHVACEquipmentList", "Space", "Surface", "SpaceInfiltrationDesignFlowRate", "OtherEquipment", "People", "ZoneMixing", "ElectricEquipment", "AirTerminalSingleDuctUncontrolled", "AirLoopHVACReturnPlenum", "AvailabilityManagerAssignmentList", "AirLoopHVACUnitarySystem", "FanOnOff", "CoilHeatingGas", "CoilCoolingDXSingleSpeed", "AirLoopHVACZoneSplitter", "AirLoopHVACZoneMixer", "SizingSystem", "ConnectorMixer", "ConnectorSplitter", "SizingPlant", "PipeAdiabatic", "PumpVariableSpeed", "SetpointManagerScheduled"]
+    obj_type_exclusions = ["Node", "PortList", "SizingZone", "ZoneHVACEquipmentList", "Space", "Surface", "SpaceInfiltrationDesignFlowRate", "OtherEquipment", "People", "ZoneMixing", "ElectricEquipment", "AirTerminalSingleDuctUncontrolled", "AirLoopHVACReturnPlenum", "AvailabilityManagerAssignmentList", "AirLoopHVACUnitarySystem", "FanOnOff", "CoilHeatingGas", "CoilCoolingDXSingleSpeed", "AirLoopHVACZoneSplitter", "AirLoopHVACZoneMixer", "SizingSystem", "ConnectorMixer", "ConnectorSplitter", "SizingPlant", "PipeAdiabatic", "PumpVariableSpeed", "SetpointManagerScheduled", "ScheduleDay", "ScheduleRule", "ScheduleRuleset", "ElectricEquipmentDefinition", "EnergyManagementSystemGlobalVariable"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 
