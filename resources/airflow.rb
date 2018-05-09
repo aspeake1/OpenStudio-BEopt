@@ -1315,34 +1315,34 @@ class Airflow
     win_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Mean Air Humidity Ratio"])
     win_sensor.setName("#{obj_name_ducts} win s")
     win_sensor.setKeyName(unit_living.zone.name.to_s)
-      
-    ra_duct_zone = OpenStudio::Model::ThermalZone.new(model)
-    ra_duct_zone.setName(obj_name_ducts + " ret air zone")
-    ra_duct_zone.setVolume(UnitConversions.convert(ducts_output.return_volume,"ft^3","m^3"))
-
-    sw_point = OpenStudio::Point3d.new(0, 74, 0)
-    nw_point = OpenStudio::Point3d.new(0, 75, 0)
-    ne_point = OpenStudio::Point3d.new(1, 75, 0)
-    se_point = OpenStudio::Point3d.new(1, 74, 0)
-    ra_duct_polygon = Geometry.make_polygon(sw_point, nw_point, ne_point, se_point)
-
-    ra_space = OpenStudio::Model::Space::fromFloorPrint(ra_duct_polygon, 1, model)
-    ra_space = ra_space.get
-    ra_space.setName(obj_name_ducts + " ret air space")
-    ra_space.setThermalZone(ra_duct_zone)
-
-    ra_space.surfaces.each do |surface|
-      surface.setConstruction(adiabatic_const)
-      surface.setOutsideBoundaryCondition("Adiabatic")
-      surface.setSunExposure("NoSun")
-      surface.setWindExposure("NoWind")
-      surface_property_convection_coefficients = OpenStudio::Model::SurfacePropertyConvectionCoefficients.new(surface)
-      surface_property_convection_coefficients.setConvectionCoefficient1Location("Inside")
-      surface_property_convection_coefficients.setConvectionCoefficient1Type("Value")
-      surface_property_convection_coefficients.setConvectionCoefficient1(999)
-    end
 
     if has_forced_air_equipment
+
+      ra_duct_zone = OpenStudio::Model::ThermalZone.new(model)
+      ra_duct_zone.setName(obj_name_ducts + " ret air zone")
+      ra_duct_zone.setVolume(UnitConversions.convert(ducts_output.return_volume,"ft^3","m^3"))
+
+      sw_point = OpenStudio::Point3d.new(0, 74, 0)
+      nw_point = OpenStudio::Point3d.new(0, 75, 0)
+      ne_point = OpenStudio::Point3d.new(1, 75, 0)
+      se_point = OpenStudio::Point3d.new(1, 74, 0)
+      ra_duct_polygon = Geometry.make_polygon(sw_point, nw_point, ne_point, se_point)
+
+      ra_space = OpenStudio::Model::Space::fromFloorPrint(ra_duct_polygon, 1, model)
+      ra_space = ra_space.get
+      ra_space.setName(obj_name_ducts + " ret air space")
+      ra_space.setThermalZone(ra_duct_zone)
+
+      ra_space.surfaces.each do |surface|
+        surface.setConstruction(adiabatic_const)
+        surface.setOutsideBoundaryCondition("Adiabatic")
+        surface.setSunExposure("NoSun")
+        surface.setWindExposure("NoWind")
+        surface_property_convection_coefficients = OpenStudio::Model::SurfacePropertyConvectionCoefficients.new(surface)
+        surface_property_convection_coefficients.setConvectionCoefficient1Location("Inside")
+        surface_property_convection_coefficients.setConvectionCoefficient1Type("Value")
+        surface_property_convection_coefficients.setConvectionCoefficient1(999)
+      end
 
       air_demand_inlet_node = nil
       supply_fan = nil

@@ -76,6 +76,11 @@ class ZoneMultipliers < OpenStudio::Measure::ModelMeasure
                   zone_names_for_multiplier_adjustment.each do |tz|
                     if thermal_zone.name.to_s == tz
                       thermal_zone.setMultiplier(num_units - 2)
+                      model.getAirLoopHVACReturnPlenums.each do |return_plenum|
+                        return_plenum = return_plenum.thermalZone.get
+                        next unless return_plenum.name.to_s.include? "_#{unit_num} "
+                        return_plenum.setMultiplier(num_units - 2)
+                      end
                     end
                   end
                 end
@@ -113,6 +118,11 @@ class ZoneMultipliers < OpenStudio::Measure::ModelMeasure
                   zone_names_for_multiplier_adjustment.each do |tz|
                     if thermal_zone.name.to_s == tz
                       thermal_zone.setMultiplier(num_units / 2 - 2)
+                      model.getAirLoopHVACReturnPlenums.each do |return_plenum|
+                        return_plenum = return_plenum.thermalZone.get
+                        next unless return_plenum.name.to_s.include? "_#{unit_num} "
+                        return_plenum.setMultiplier(num_units / 2 - 2)
+                      end
                     end
                   end
                 end
@@ -168,6 +178,11 @@ class ZoneMultipliers < OpenStudio::Measure::ModelMeasure
                     zone_names_for_multiplier_adjustment.each do |tz|
                       if thermal_zone.name.to_s == tz
                         thermal_zone.setMultiplier(num_units_per_floor - 2)
+                        model.getAirLoopHVACReturnPlenums.each do |return_plenum|
+                          return_plenum = return_plenum.thermalZone.get
+                          next unless return_plenum.name.to_s.include? "_#{unit_num} "
+                          return_plenum.setMultiplier(num_units_per_floor - 2)
+                        end
                       end
                     end
                   end
@@ -204,6 +219,11 @@ class ZoneMultipliers < OpenStudio::Measure::ModelMeasure
                     zone_names_for_multiplier_adjustment.each do |tz|
                       if thermal_zone.name.to_s == tz
                         thermal_zone.setMultiplier(num_units_per_floor / 2 - 2)
+                        model.getAirLoopHVACReturnPlenums.each do |return_plenum|
+                          return_plenum = return_plenum.thermalZone.get
+                          next unless return_plenum.name.to_s.include? "_#{unit_num} "
+                          return_plenum.setMultiplier(num_units_per_floor / 2 - 2)
+                        end
                       end
                     end
                   end
@@ -299,6 +319,7 @@ class ZoneMultipliers < OpenStudio::Measure::ModelMeasure
         unless water_heater.nil?
           next if water_heater.ambientTemperatureThermalZone.is_initialized
           unless plant_loops.include? plant_loop
+            water_heater.setpointTemperatureSchedule.get.remove
             plant_loops << plant_loop
           end
         end

@@ -168,7 +168,7 @@ class ZoneMultipliersTest < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["Node", "PortList", "SizingZone", "ZoneHVACEquipmentList", "Space", "Surface", "SpaceInfiltrationDesignFlowRate", "OtherEquipment", "People", "ZoneMixing", "ElectricEquipment", "AirTerminalSingleDuctUncontrolled", "AirLoopHVACReturnPlenum", "AvailabilityManagerAssignmentList", "AirLoopHVACUnitarySystem", "FanOnOff", "CoilHeatingGas", "CoilCoolingDXSingleSpeed", "AirLoopHVACZoneSplitter", "AirLoopHVACZoneMixer", "SizingSystem", "ConnectorMixer", "ConnectorSplitter", "SizingPlant", "PipeAdiabatic", "PumpVariableSpeed", "SetpointManagerScheduled", "ScheduleDay", "ScheduleRule", "ScheduleRuleset", "ElectricEquipmentDefinition", "EnergyManagementSystemGlobalVariable"]
+    obj_type_exclusions = ["Node", "PortList", "SizingZone", "ZoneHVACEquipmentList", "Space", "Surface", "SpaceInfiltrationDesignFlowRate", "OtherEquipment", "People", "ZoneMixing", "ElectricEquipment", "AirTerminalSingleDuctUncontrolled", "AirLoopHVACReturnPlenum", "AvailabilityManagerAssignmentList", "AirLoopHVACUnitarySystem", "FanOnOff", "CoilHeatingGas", "CoilCoolingDXSingleSpeed", "AirLoopHVACZoneSplitter", "AirLoopHVACZoneMixer", "SizingSystem", "ConnectorMixer", "ConnectorSplitter", "SizingPlant", "PipeAdiabatic", "PumpVariableSpeed", "SetpointManagerScheduled", "ScheduleDay", "ScheduleRule", "ScheduleRuleset", "ElectricEquipmentDefinition", "EnergyManagementSystemGlobalVariable", "ScheduleConstant"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 
