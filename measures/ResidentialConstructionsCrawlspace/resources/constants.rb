@@ -203,6 +203,9 @@ class Constants
   def self.EndUseMechVentFan
     return 'residential mech vent fan'
   end
+  def self.EquipFault
+    return 'equip fault'
+  end
   def self.FacadeFront
     return 'front'
   end

@@ -65,6 +65,22 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
     fan_power_installed.setDefaultValue(0.5)
     args << fan_power_installed
     
+    #make a double argument for central ac rated cfm per ton
+    rated_cfm_per_ton = OpenStudio::Measure::OSArgument::makeDoubleArgument("rated_cfm_per_ton", true)
+    rated_cfm_per_ton.setDisplayName("Rated CFM Per Ton")
+    rated_cfm_per_ton.setUnits("cfm/ton")
+    rated_cfm_per_ton.setDescription("TODO.")
+    rated_cfm_per_ton.setDefaultValue(400.0)
+    args << rated_cfm_per_ton
+    
+    #make a double argument for central ac actual cfm per ton
+    actual_cfm_per_ton = OpenStudio::Measure::OSArgument::makeDoubleArgument("actual_cfm_per_ton", true)
+    actual_cfm_per_ton.setDisplayName("Actual CFM Per Ton")
+    actual_cfm_per_ton.setUnits("cfm/ton")
+    actual_cfm_per_ton.setDescription("TODO.")
+    actual_cfm_per_ton.setDefaultValue(400.0)
+    args << actual_cfm_per_ton
+    
     #make a double argument for central ac crankcase
     crankcase_capacity = OpenStudio::Measure::OSArgument::makeDoubleArgument("crankcase_capacity", true)
     crankcase_capacity.setDisplayName("Crankcase")
@@ -129,8 +145,8 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
     dse.setDisplayName("Distribution System Efficiency")
     dse.setDescription("Defines the energy losses associated with the delivery of energy from the equipment to the source of the load.")
     dse.setDefaultValue("NA")
-    args << dse  
-    
+    args << dse
+
     return args
   end #end the arguments method
 
@@ -148,6 +164,8 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
     shrs = [runner.getDoubleArgumentValue("shr",user_arguments)]
     fan_power_rated = runner.getDoubleArgumentValue("fan_power_rated",user_arguments)
     fan_power_installed = runner.getDoubleArgumentValue("fan_power_installed",user_arguments)
+    rated_cfm_per_ton = runner.getDoubleArgumentValue("rated_cfm_per_ton",user_arguments)
+    actual_cfm_per_ton = runner.getDoubleArgumentValue("actual_cfm_per_ton",user_arguments)
     crankcase_capacity = runner.getDoubleArgumentValue("crankcase_capacity",user_arguments)
     crankcase_temp = runner.getDoubleArgumentValue("crankcase_temp",user_arguments)
     eer_capacity_derate_1ton = runner.getDoubleArgumentValue("eer_capacity_derate_1ton",user_arguments)
@@ -190,6 +208,9 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
                                              eer_capacity_derates, capacity, dse,
                                              existing_objects)
       return false if not success
+      
+      result = HVAC.write_fault_ems(model, unit, runner, rated_cfm_per_ton, actual_cfm_per_ton, false)
+      return false unless result
       
     end # unit
 

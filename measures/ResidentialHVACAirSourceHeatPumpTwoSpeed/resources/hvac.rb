@@ -7,6 +7,63 @@ require "#{File.dirname(__FILE__)}/schedules"
 
 class HVAC
 
+    def self.write_fault_ems(model, unit, runner, rated_airflow_rate, installed_airflow_rate, is_heat_pump)
+
+      obj_name = "#{Constants.ObjectNameCentralAirConditioner(unit.name.to_s)} #{Constants.EquipFault}"
+    
+      fault_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
+      fault_program.setName("#{obj_name} program")
+      
+      f = installed_airflow_rate / rated_airflow_rate - 1.0
+      
+      fault_program.addLine("Set a1_AF_Qgr_c = 2.95E-01")
+      fault_program.addLine("Set a2_AF_Qgr_c = 0.0 - 1.17E-03")
+      fault_program.addLine("Set a3_AF_Qgr_c = 0.0 - 1.57E-03")
+      fault_program.addLine("Set a4_AF_Qgr_c = 6.92E-02")
+      fault_program.addLine("Set q0 = a1_AF_Qgr_c")
+      fault_program.addLine("Set q1 = a2_AF_Qgr_c*T_ID")
+      fault_program.addLine("Set q2 = a3_AF_Qgr_c*T_OD")
+      fault_program.addLine("Set q3 = a4_AF_Qgr_c*#{f}")
+      fault_program.addLine("Set Y_AF_Q_R_c = 1 + ((q0+(q1)+(q2)+(q3))*#{f})" )
+      # TODO: Set actuator
+
+      fault_program.addLine("Set a1_AF_Wodu_c = 0.0 -1.03E-01")
+      fault_program.addLine("Set a2_AF_Wodu_c = 4.12E-03")
+      fault_program.addLine("Set a3_AF_Wodu_c = 2.38E-03")
+      fault_program.addLine("Set a4_AF_Wodu_c = 2.10E-01")
+      fault_program.addLine("Set w0 = a1_AF_Wodu_c")
+      fault_program.addLine("Set w1 = a2_AF_Wodu_c*T_ID")
+      fault_program.addLine("Set w2 = a3_AF_Wodu_c*T_OD")
+      fault_program.addLine("Set w3 = a4_AF_Wodu_c*#{f}")
+      fault_program.addLine("Set Y_AF_OD_c = 1 + ((w0+(w1)+(w2)+(w3))*#{f})")
+      # TODO: Set actuator (NOTE: need to calculate EIR)
+
+      if is_heat_pump
+
+        fault_program.addLine("Set a1_AF_Qgr_h = 0.0009404")
+        fault_program.addLine("Set a2_AF_Qgr_h = 0.0065171")
+        fault_program.addLine("Set a3_AF_Qgr_h = 0.0 - 0.3464391")
+        fault_program.addLine("Set qh1 = a1_AF_Qgr_h")
+        fault_program.addLine("Set qh2 = a2_AF_Qgr_h*T_OD")
+        fault_program.addLine("Set qh3 = a3_AF_Qgr_h*#{f}")
+        fault_program.addLine("Set Y_AF_Q_R_h = 1 + ((qh1 + (qh2) + (qh3))*#{f})")
+        # TODO: Set actuator
+
+        fault_program.addLine("Set a1_AF_Wodu_h = 0.0 - 0.177359")
+        fault_program.addLine("Set a2_AF_Wodu_h = 0.0 - 0.0125111")
+        fault_program.addLine("Set a3_AF_Wodu_h = 0.4784914")
+        fault_program.addLine("Set wh1 = a1_AF_Wodu_h")
+        fault_program.addLine("Set wh2 = a2_AF_Wodu_h*T_OD")
+        fault_program.addLine("Set wh3 = a3_AF_Wodu_h*#{f}")
+        fault_program.addLine("Set Y_AF_OD_h = 1 + ((wh1 + (wh2) + (wh3))*#{f})")
+        # TODO: Set actuator (NOTE: need to calculate EIR)
+
+      end
+      
+      return true
+
+    end
+
     def self.apply_central_ac_1speed(model, unit, runner, seer, eers, shrs,
                                      fan_power_rated, fan_power_installed,
                                      crankcase_capacity, crankcase_temp,
