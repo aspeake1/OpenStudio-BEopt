@@ -9,56 +9,119 @@ class HVAC
 
     def self.write_fault_ems(model, unit, runner, rated_airflow_rate, installed_airflow_rate, is_heat_pump)
 
-      obj_name = "#{Constants.ObjectNameCentralAirConditioner(unit.name.to_s)} #{Constants.EquipFault}"
+      obj_name = Constants.ObjectNameInstallationQualityFault(unit.name.to_s)
+
+      output_vars = Airflow.create_output_vars(model, ["Zone Mean Air Temperature", "Zone Outdoor Air Drybulb Temperature"])
+
+      thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
+
+      unit_living = nil
+      thermal_zones.each do |thermal_zone|
+        if Geometry.is_finished_basement(thermal_zone)
+          unit_finished_basement = thermal_zone
+        elsif Geometry.is_living(thermal_zone)
+          unit_living = thermal_zone
+        end
+      end
+      
+      tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Mean Air Temperature"])
+      tin_sensor.setName("#{obj_name} tin s")
+      tin_sensor.setKeyName(unit_living.name.to_s)
+      
+      tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Outdoor Air Drybulb Temperature"])
+      tout_sensor.setName("#{obj_name} tt s")
+      tout_sensor.setKeyName(unit_living.name.to_s)
+
+      htg_coil = nil
+      clg_coil = nil
+      HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
+        system, clg_coil, htg_coil, air_loop = get_unitary_system_air_loop(model, runner, control_zone)
+        unless htg_coil.nil?
+          htg_coil = get_coil_from_hvac_component(htg_coil)
+        end
+        unless clg_coil.nil?
+          clg_coil = get_coil_from_hvac_component(clg_coil)
+        end
+      end
+
+      cool_cap_fff_curve = clg_coil.totalCoolingCapacityFunctionOfFlowFractionCurve
+      cool_eir_fff_curve = clg_coil.energyInputRatioFunctionOfFlowFractionCurve
+
+      cool_cap_fff_act = OpenStudio::Model::EnergyManagementSystemActuator.new(cool_cap_fff_curve, "Curve", "Curve Result")
+      cool_cap_fff_act.setName("#{obj_name} cap clg act")
+
+      cool_eir_fff_act = OpenStudio::Model::EnergyManagementSystemActuator.new(cool_eir_fff_curve, "Curve", "Curve Result")
+      cool_eir_fff_act.setName("#{obj_name} eir clg act")
     
       fault_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
-      fault_program.setName("#{obj_name} program")
-      
+      fault_program.setName("#{obj_name} prog")
+
       f = installed_airflow_rate / rated_airflow_rate - 1.0
-      
+
+      fault_program.addLine("Set F = #{f.round(3)}")
       fault_program.addLine("Set a1_AF_Qgr_c = 2.95E-01")
       fault_program.addLine("Set a2_AF_Qgr_c = 0.0 - 1.17E-03")
       fault_program.addLine("Set a3_AF_Qgr_c = 0.0 - 1.57E-03")
       fault_program.addLine("Set a4_AF_Qgr_c = 6.92E-02")
       fault_program.addLine("Set q0 = a1_AF_Qgr_c")
-      fault_program.addLine("Set q1 = a2_AF_Qgr_c*T_ID")
-      fault_program.addLine("Set q2 = a3_AF_Qgr_c*T_OD")
-      fault_program.addLine("Set q3 = a4_AF_Qgr_c*#{f}")
-      fault_program.addLine("Set Y_AF_Q_R_c = 1 + ((q0+(q1)+(q2)+(q3))*#{f})" )
-      # TODO: Set actuator
+      fault_program.addLine("Set q1 = a2_AF_Qgr_c*#{tin_sensor.name}")
+      fault_program.addLine("Set q2 = a3_AF_Qgr_c*#{tout_sensor.name}")
+      fault_program.addLine("Set q3 = a4_AF_Qgr_c*F")
+      fault_program.addLine("Set Y_AF_Q_R_c = 1 + ((q0+(q1)+(q2)+(q3))*F)")
+      fault_program.addLine("Set #{cool_cap_fff_act.name} = Y_AF_Q_R_c")
 
       fault_program.addLine("Set a1_AF_Wodu_c = 0.0 -1.03E-01")
       fault_program.addLine("Set a2_AF_Wodu_c = 4.12E-03")
       fault_program.addLine("Set a3_AF_Wodu_c = 2.38E-03")
       fault_program.addLine("Set a4_AF_Wodu_c = 2.10E-01")
       fault_program.addLine("Set w0 = a1_AF_Wodu_c")
-      fault_program.addLine("Set w1 = a2_AF_Wodu_c*T_ID")
-      fault_program.addLine("Set w2 = a3_AF_Wodu_c*T_OD")
-      fault_program.addLine("Set w3 = a4_AF_Wodu_c*#{f}")
-      fault_program.addLine("Set Y_AF_OD_c = 1 + ((w0+(w1)+(w2)+(w3))*#{f})")
-      # TODO: Set actuator (NOTE: need to calculate EIR)
+      fault_program.addLine("Set w1 = a2_AF_Wodu_c*#{tin_sensor.name}")
+      fault_program.addLine("Set w2 = a3_AF_Wodu_c*#{tout_sensor.name}")
+      fault_program.addLine("Set w3 = a4_AF_Wodu_c*F")
+      fault_program.addLine("Set Y_AF_OD_c = 1 + ((w0+(w1)+(w2)+(w3))*F)")
+      fault_program.addLine("Set #{cool_eir_fff_act.name} = Y_AF_OD_c / Y_AF_Q_R_c")
+      
+      # TODO: ems output var?
+      # TODO: ems output var?
 
       if is_heat_pump
+
+        hp_heat_cap_fff_curve = htg_coil.totalHeatingCapacityFunctionofFlowFractionCurve
+        hp_heat_eir_fff_curve = htg_coil.energyInputRatioFunctionofFlowFractionCurve
+      
+        hp_heat_cap_fff_act = OpenStudio::Model::EnergyManagementSystemActuator.new(hp_heat_cap_fff_curve, "Curve", "Curve Result")
+        hp_heat_cap_fff_act.setName("#{obj_name} cap htg act")
+
+        hp_heat_eir_fff_act = OpenStudio::Model::EnergyManagementSystemActuator.new(hp_heat_eir_fff_curve, "Curve", "Curve Result")
+        hp_heat_eir_fff_act.setName("#{obj_name} eir htg act")
 
         fault_program.addLine("Set a1_AF_Qgr_h = 0.0009404")
         fault_program.addLine("Set a2_AF_Qgr_h = 0.0065171")
         fault_program.addLine("Set a3_AF_Qgr_h = 0.0 - 0.3464391")
         fault_program.addLine("Set qh1 = a1_AF_Qgr_h")
-        fault_program.addLine("Set qh2 = a2_AF_Qgr_h*T_OD")
-        fault_program.addLine("Set qh3 = a3_AF_Qgr_h*#{f}")
-        fault_program.addLine("Set Y_AF_Q_R_h = 1 + ((qh1 + (qh2) + (qh3))*#{f})")
-        # TODO: Set actuator
+        fault_program.addLine("Set qh2 = a2_AF_Qgr_h*#{tout_sensor.name}")
+        fault_program.addLine("Set qh3 = a3_AF_Qgr_h*F")
+        fault_program.addLine("Set Y_AF_Q_R_h = 1 + ((qh1 + (qh2) + (qh3))*F)")
+        fault_program.addLine("Set #{hp_heat_cap_fff_act.name} = Y_AF_Q_R_h")
 
         fault_program.addLine("Set a1_AF_Wodu_h = 0.0 - 0.177359")
         fault_program.addLine("Set a2_AF_Wodu_h = 0.0 - 0.0125111")
         fault_program.addLine("Set a3_AF_Wodu_h = 0.4784914")
         fault_program.addLine("Set wh1 = a1_AF_Wodu_h")
-        fault_program.addLine("Set wh2 = a2_AF_Wodu_h*T_OD")
-        fault_program.addLine("Set wh3 = a3_AF_Wodu_h*#{f}")
-        fault_program.addLine("Set Y_AF_OD_h = 1 + ((wh1 + (wh2) + (wh3))*#{f})")
-        # TODO: Set actuator (NOTE: need to calculate EIR)
+        fault_program.addLine("Set wh2 = a2_AF_Wodu_h*#{tout_sensor.name}")
+        fault_program.addLine("Set wh3 = a3_AF_Wodu_h*F")
+        fault_program.addLine("Set Y_AF_OD_h = 1 + ((wh1 + (wh2) + (wh3))*F)")
+        fault_program.addLine("Set #{hp_heat_eir_fff_act.name} = Y_AF_OD_h / Y_AF_Q_R_h")
+        
+        # TODO: ems output var?
+        # TODO: ems output var?
 
       end
+      
+      program_calling_manager = OpenStudio::Model::EnergyManagementSystemProgramCallingManager.new(model)
+      program_calling_manager.setName("#{obj_name} prog man")
+      program_calling_manager.setCallingPoint("InsideHVACSystemIterationLoop")
+      program_calling_manager.addProgram(fault_program)
       
       return true
 

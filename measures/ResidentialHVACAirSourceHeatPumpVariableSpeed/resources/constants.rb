@@ -203,9 +203,6 @@ class Constants
   def self.EndUseMechVentFan
     return 'residential mech vent fan'
   end
-  def self.EquipFault
-    return 'equip fault'
-  end
   def self.FacadeFront
     return 'front'
   end
@@ -504,6 +501,13 @@ class Constants
       s_unit = "|#{unit_name}"
     end
     return "res infil#{s_unit}"
+  end
+  def self.ObjectNameInstallationQualityFault(unit_name=self.ObjectNameBuildingUnit)
+    s_unit = ""
+    if unit_name != self.ObjectNameBuildingUnit
+      s_unit = "|#{unit_name}"
+    end
+    return "res installation quality fault#{s_unit}"
   end
   def self.ObjectNameLighting(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""

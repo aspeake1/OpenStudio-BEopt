@@ -10,7 +10,7 @@ class ProcessSingleSpeedCentralAirConditionerTest < MiniTest::Test
   def test_new_construction_seer_13
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>1, "OutputVariable"=>2, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>2, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_values = {"COP"=>3.95, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end  

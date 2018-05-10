@@ -4,6 +4,7 @@
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/hvac"
+require "#{File.dirname(__FILE__)}/resources/airflow"
 
 #start the measure
 class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasure
