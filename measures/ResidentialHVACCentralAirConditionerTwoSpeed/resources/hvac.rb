@@ -7,7 +7,7 @@ require "#{File.dirname(__FILE__)}/schedules"
 
 class HVAC
 
-    def self.write_fault_ems(model, unit, runner, rated_airflow_rate, installed_airflow_rate, is_heat_pump, output_vars)
+    def self.write_fault_ems(model, unit, runner, control_zone, rated_airflow_rate, installed_airflow_rate, is_heat_pump, output_vars)
 
       obj_name = Constants.ObjectNameInstallationQualityFault(unit.name.to_s)
 
@@ -21,25 +21,28 @@ class HVAC
           unit_living = thermal_zone
         end
       end
-      
+
       tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Mean Air Temperature"])
       tin_sensor.setName("#{obj_name} tin s")
       tin_sensor.setKeyName(unit_living.name.to_s)
-      
+
       tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Outdoor Air Drybulb Temperature"])
       tout_sensor.setName("#{obj_name} tt s")
       tout_sensor.setKeyName(unit_living.name.to_s)
 
-      htg_coil = nil
-      clg_coil = nil
-      HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
-        system, clg_coil, htg_coil, air_loop = get_unitary_system_air_loop(model, runner, control_zone)
-        unless htg_coil.nil?
-          htg_coil = get_coil_from_hvac_component(htg_coil)
-        end
-        unless clg_coil.nil?
-          clg_coil = get_coil_from_hvac_component(clg_coil)
-        end
+      system, clg_coil, htg_coil, air_loop = get_unitary_system_air_loop(model, runner, control_zone)
+      unless htg_coil.nil?
+        htg_coil = get_coil_from_hvac_component(htg_coil)
+      end
+      unless clg_coil.nil?
+        clg_coil = get_coil_from_hvac_component(clg_coil)
+      end
+      
+      if clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized
+
+        runner.registerError("Currently can only apply fault program to single-speed equipment.")
+        return true
+
       end
 
       cool_cap_fff_curve = clg_coil.totalCoolingCapacityFunctionOfFlowFractionCurve
@@ -78,9 +81,6 @@ class HVAC
       fault_program.addLine("Set w3 = a4_AF_Wodu_c*F")
       fault_program.addLine("Set Y_AF_OD_c = 1 + ((w0+(w1)+(w2)+(w3))*F)")
       fault_program.addLine("Set #{cool_eir_fff_act.name} = Y_AF_OD_c / Y_AF_Q_R_c")
-      
-      # TODO: ems output var?
-      # TODO: ems output var?
 
       if is_heat_pump
 
@@ -110,9 +110,6 @@ class HVAC
         fault_program.addLine("Set wh3 = a3_AF_Wodu_h*F")
         fault_program.addLine("Set Y_AF_OD_h = 1 + ((wh1 + (wh2) + (wh3))*F)")
         fault_program.addLine("Set #{hp_heat_eir_fff_act.name} = Y_AF_OD_h / Y_AF_Q_R_h")
-        
-        # TODO: ems output var?
-        # TODO: ems output var?
 
       end
       
