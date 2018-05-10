@@ -272,6 +272,10 @@ class ProcessSingleSpeedCentralAirConditionerTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
+    # save the model to test output directory
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/test.osm")
+    model.save(output_file_path, true)
+    
     #show_output(result)
     
     # assert that it ran correctly

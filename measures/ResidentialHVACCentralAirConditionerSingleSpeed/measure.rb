@@ -215,7 +215,7 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
       
       result = HVAC.write_fault_ems(model, unit, runner, rated_cfm_per_ton, actual_cfm_per_ton, false, output_vars)
       return false unless result
-      
+
     end # unit
 
     return true

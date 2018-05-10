@@ -10,6 +10,7 @@
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/hvac"
+require "#{File.dirname(__FILE__)}/resources/airflow"
 
 #start the measure
 class ProcessSingleSpeedAirSourceHeatPump < OpenStudio::Measure::ModelMeasure
@@ -85,7 +86,23 @@ class ProcessSingleSpeedAirSourceHeatPump < OpenStudio::Measure::ModelMeasure
     fan_power_installed.setUnits("W/cfm")
     fan_power_installed.setDescription("Fan power (in W) per delivered airflow rate (in cfm) of the outdoor fan for the maximum fan speed under actual operating conditions.")
     fan_power_installed.setDefaultValue(0.5)
-    args << fan_power_installed    
+    args << fan_power_installed
+    
+    #make a double argument for central ac rated cfm per ton
+    rated_cfm_per_ton = OpenStudio::Measure::OSArgument::makeDoubleArgument("rated_cfm_per_ton", true)
+    rated_cfm_per_ton.setDisplayName("Rated CFM Per Ton")
+    rated_cfm_per_ton.setUnits("cfm/ton")
+    rated_cfm_per_ton.setDescription("TODO.")
+    rated_cfm_per_ton.setDefaultValue(400.0)
+    args << rated_cfm_per_ton
+    
+    #make a double argument for central ac actual cfm per ton
+    actual_cfm_per_ton = OpenStudio::Measure::OSArgument::makeDoubleArgument("actual_cfm_per_ton", true)
+    actual_cfm_per_ton.setDisplayName("Actual CFM Per Ton")
+    actual_cfm_per_ton.setUnits("cfm/ton")
+    actual_cfm_per_ton.setDescription("TODO.")
+    actual_cfm_per_ton.setDefaultValue(400.0)
+    args << actual_cfm_per_ton
     
     #make a double argument for ashp min t
     min_temp = OpenStudio::Measure::OSArgument::makeDoubleArgument("min_temp", true)
@@ -231,6 +248,8 @@ class ProcessSingleSpeedAirSourceHeatPump < OpenStudio::Measure::ModelMeasure
     shrs = [runner.getDoubleArgumentValue("shr",user_arguments)]
     fan_power_rated = runner.getDoubleArgumentValue("fan_power_rated",user_arguments)
     fan_power_installed = runner.getDoubleArgumentValue("fan_power_installed",user_arguments)
+    rated_cfm_per_ton = runner.getDoubleArgumentValue("rated_cfm_per_ton",user_arguments)
+    actual_cfm_per_ton = runner.getDoubleArgumentValue("actual_cfm_per_ton",user_arguments)
     min_temp = runner.getDoubleArgumentValue("min_temp",user_arguments)
     crankcase_capacity = runner.getDoubleArgumentValue("crankcase_capacity",user_arguments)
     crankcase_temp = runner.getDoubleArgumentValue("crankcase_temp",user_arguments)
@@ -261,7 +280,10 @@ class ProcessSingleSpeedAirSourceHeatPump < OpenStudio::Measure::ModelMeasure
     else
       dse = 1.0
     end
-    
+
+    # Output Variables
+    output_vars = Airflow.create_output_vars(model, ["Zone Mean Air Temperature", "Zone Outdoor Air Drybulb Temperature"])
+
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?
@@ -285,7 +307,10 @@ class ProcessSingleSpeedAirSourceHeatPump < OpenStudio::Measure::ModelMeasure
                                                heat_pump_capacity, supplemental_efficiency, 
                                                supplemental_capacity, dse)
       return false if not success
-                                               
+      
+      result = HVAC.write_fault_ems(model, unit, runner, rated_cfm_per_ton, actual_cfm_per_ton, true, output_vars)
+      return false unless result
+
     end # unit
 
     return true
