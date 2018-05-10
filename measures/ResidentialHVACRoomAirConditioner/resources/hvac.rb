@@ -7,11 +7,9 @@ require "#{File.dirname(__FILE__)}/schedules"
 
 class HVAC
 
-    def self.write_fault_ems(model, unit, runner, rated_airflow_rate, installed_airflow_rate, is_heat_pump)
+    def self.write_fault_ems(model, unit, runner, rated_airflow_rate, installed_airflow_rate, is_heat_pump, output_vars)
 
       obj_name = Constants.ObjectNameInstallationQualityFault(unit.name.to_s)
-
-      output_vars = Airflow.create_output_vars(model, ["Zone Mean Air Temperature", "Zone Outdoor Air Drybulb Temperature"])
 
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
 

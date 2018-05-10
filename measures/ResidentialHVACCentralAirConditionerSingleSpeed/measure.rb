@@ -186,11 +186,14 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
       dse = 1.0
     end
     
+    # Output Variables
+    output_vars = Airflow.create_output_vars(model, ["Zone Mean Air Temperature", "Zone Outdoor Air Drybulb Temperature"])
+    
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?
       return false
-    end 
+    end
     
     units.each do |unit|
     
@@ -210,7 +213,7 @@ class ProcessSingleSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasur
                                              existing_objects)
       return false if not success
       
-      result = HVAC.write_fault_ems(model, unit, runner, rated_cfm_per_ton, actual_cfm_per_ton, false)
+      result = HVAC.write_fault_ems(model, unit, runner, rated_cfm_per_ton, actual_cfm_per_ton, false, output_vars)
       return false unless result
       
     end # unit
