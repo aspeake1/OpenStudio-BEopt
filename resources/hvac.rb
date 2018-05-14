@@ -9,7 +9,7 @@ class HVAC
 
     def self.write_fault_ems(model, unit, runner, control_zone, rated_airflow_rate, installed_airflow_rate, is_heat_pump, output_vars)
 
-      obj_name = Constants.ObjectNameInstallationQualityFault(unit.name.to_s)
+      obj_name = Constants.ObjectNameInstallationQualityFault(unit.name.to_s.gsub("unit ", "")).gsub("|", "_")
 
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
 
@@ -61,8 +61,8 @@ class HVAC
 
       fault_program.addLine("Set F = #{f.round(3)}")
       fault_program.addLine("Set a1_AF_Qgr_c = 2.95E-01")
-      fault_program.addLine("Set a2_AF_Qgr_c = 0.0 - 1.17E-03")
-      fault_program.addLine("Set a3_AF_Qgr_c = 0.0 - 1.57E-03")
+      fault_program.addLine("Set a2_AF_Qgr_c = -1.17E-03")
+      fault_program.addLine("Set a3_AF_Qgr_c = -1.57E-03")
       fault_program.addLine("Set a4_AF_Qgr_c = 6.92E-02")
       fault_program.addLine("Set q0 = a1_AF_Qgr_c")
       fault_program.addLine("Set q1 = a2_AF_Qgr_c*#{tin_sensor.name}")
@@ -71,7 +71,7 @@ class HVAC
       fault_program.addLine("Set Y_AF_Q_R_c = 1 + ((q0+(q1)+(q2)+(q3))*F)")
       fault_program.addLine("Set #{cool_cap_fff_act.name} = Y_AF_Q_R_c")
 
-      fault_program.addLine("Set a1_AF_Wodu_c = 0.0 -1.03E-01")
+      fault_program.addLine("Set a1_AF_Wodu_c = -1.03E-01")
       fault_program.addLine("Set a2_AF_Wodu_c = 4.12E-03")
       fault_program.addLine("Set a3_AF_Wodu_c = 2.38E-03")
       fault_program.addLine("Set a4_AF_Wodu_c = 2.10E-01")
@@ -95,15 +95,15 @@ class HVAC
 
         fault_program.addLine("Set a1_AF_Qgr_h = 0.0009404")
         fault_program.addLine("Set a2_AF_Qgr_h = 0.0065171")
-        fault_program.addLine("Set a3_AF_Qgr_h = 0.0 - 0.3464391")
+        fault_program.addLine("Set a3_AF_Qgr_h = -0.3464391")
         fault_program.addLine("Set qh1 = a1_AF_Qgr_h")
         fault_program.addLine("Set qh2 = a2_AF_Qgr_h*#{tout_sensor.name}")
         fault_program.addLine("Set qh3 = a3_AF_Qgr_h*F")
         fault_program.addLine("Set Y_AF_Q_R_h = 1 + ((qh1 + (qh2) + (qh3))*F)")
         fault_program.addLine("Set #{hp_heat_cap_fff_act.name} = Y_AF_Q_R_h")
 
-        fault_program.addLine("Set a1_AF_Wodu_h = 0.0 - 0.177359")
-        fault_program.addLine("Set a2_AF_Wodu_h = 0.0 - 0.0125111")
+        fault_program.addLine("Set a1_AF_Wodu_h = -0.177359")
+        fault_program.addLine("Set a2_AF_Wodu_h = -0.0125111")
         fault_program.addLine("Set a3_AF_Wodu_h = 0.4784914")
         fault_program.addLine("Set wh1 = a1_AF_Wodu_h")
         fault_program.addLine("Set wh2 = a2_AF_Wodu_h*#{tout_sensor.name}")
@@ -120,6 +120,32 @@ class HVAC
       
       return true
 
+    end
+    
+    def self.remove_fault_ems(model, obj_name)
+    
+      # Remove existing EMS
+
+      model.getEnergyManagementSystemProgramCallingManagers.each do |pcm|
+        next unless pcm.name.to_s.start_with? obj_name
+        pcm.remove
+      end
+      
+      model.getEnergyManagementSystemSensors.each do |sensor|
+        next unless sensor.name.to_s.start_with? obj_name.gsub(" ", "_")
+        sensor.remove
+      end
+      
+      model.getEnergyManagementSystemActuators.each do |actuator|
+        next unless actuator.name.to_s.start_with? obj_name.gsub(" ", "_")
+        actuator.remove
+      end
+      
+      model.getEnergyManagementSystemPrograms.each do |program|
+        next unless program.name.to_s.start_with? obj_name.gsub(" ", "_")
+        program.remove
+      end
+    
     end
 
     def self.apply_central_ac_1speed(model, unit, runner, seer, eers, shrs,

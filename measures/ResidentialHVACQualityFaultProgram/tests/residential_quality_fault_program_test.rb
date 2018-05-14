@@ -57,6 +57,26 @@ class ResidentialQualityFaultProgramTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "No central air conditioner or air source heat pump found.")
   end
   
+  def test_apply_fault_to_faulted_single_speed_central_ac
+    args_hash = {}
+    args_hash["rated_cfm_per_ton"] = "450"
+    args_hash["actual_cfm_per_ton"] = "500"
+    expected_num_del_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>2, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_new_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>2, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>0.111}, "SensorLocation"=>"living zone"}
+    _test_measure("SFD_HVACSizing_Equip_GF_Faulted_AC1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+
+  def test_apply_fault_to_faulted_single_speed_ashp
+    args_hash = {}
+    args_hash["rated_cfm_per_ton"] = "350"
+    args_hash["actual_cfm_per_ton"] = "300"
+    expected_num_del_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_new_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>-0.143}, "SensorLocation"=>"living zone"}
+    _test_measure("SFD_HVACSizing_Equip_Faulted_ASHP1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
   private
   
   def _test_error(osm_file_or_model, args_hash)
@@ -148,13 +168,41 @@ class ResidentialQualityFaultProgramTest < MiniTest::Test
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
+    check_ems(model)
+
+    actual_values = {}
 
     all_new_objects.each do |obj_type, new_objects|
-        new_objects.each do |new_object|
-            next if not new_object.respond_to?("to_#{obj_type}")
-            new_object = new_object.public_send("to_#{obj_type}").get
-
+      new_objects.each do |new_object|
+        next if not new_object.respond_to?("to_#{obj_type}")
+        new_object = new_object.public_send("to_#{obj_type}").get
+        unless actual_values.keys.include? new_object.name.to_s
+          actual_values[new_object.name.to_s] = {}
         end
+        if ["EnergyManagementSystemProgram"].include? obj_type
+          new_object.lines.each do |line|
+            next unless line.downcase.start_with? "set"
+            lhs, rhs = line.split("=")
+            lhs = lhs.gsub("Set", "").gsub("set", "").strip
+            rhs = rhs.gsub(",", "").gsub(";", "").strip
+            actual_values[new_object.name.to_s][lhs] = rhs
+          end
+        elsif obj_type == "EnergyManagementSystemSensor"
+          next unless new_object.outputVariable.is_initialized
+          next if new_object.outputVariable.get.name.to_s != "Zone Mean Air Temperature"
+          actual_values["SensorLocation"] = new_object.keyName
+        end
+      end
+    end
+
+    expected_values.each do |obj_name, values|
+      if values.respond_to? :to_str
+        assert_equal(values, actual_values[obj_name])
+      else
+        values.each do |lhs, rhs|
+          assert_in_epsilon(rhs, actual_values[obj_name][lhs].to_f, 0.0125)
+        end
+      end
     end
     
     return model

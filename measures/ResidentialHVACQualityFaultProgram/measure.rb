@@ -69,7 +69,9 @@ class ResidentialQualityFaultProgram < OpenStudio::Measure::ModelMeasure
 
     # Output variables
     output_vars = Airflow.create_output_vars(model, ["Zone Mean Air Temperature", "Zone Outdoor Air Drybulb Temperature"])
-    
+
+    HVAC.remove_fault_ems(model, Constants.ObjectNameInstallationQualityFault)
+
     # Get building units
     units = Geometry.get_building_units(model, runner)
     if units.nil?

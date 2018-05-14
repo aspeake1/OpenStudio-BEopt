@@ -9,7 +9,7 @@ class HVAC
 
     def self.write_fault_ems(model, unit, runner, control_zone, rated_airflow_rate, installed_airflow_rate, is_heat_pump, output_vars)
 
-      obj_name = Constants.ObjectNameInstallationQualityFault(unit.name.to_s)
+      obj_name = Constants.ObjectNameInstallationQualityFault(unit.name.to_s.gsub("unit ", "")).gsub("|", "_")
 
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
 
@@ -120,6 +120,32 @@ class HVAC
       
       return true
 
+    end
+    
+    def self.remove_fault_ems(model, obj_name)
+    
+      # Remove existing EMS
+
+      model.getEnergyManagementSystemProgramCallingManagers.each do |pcm|
+        next unless pcm.name.to_s.start_with? obj_name
+        pcm.remove
+      end
+      
+      model.getEnergyManagementSystemSensors.each do |sensor|
+        next unless sensor.name.to_s.start_with? obj_name.gsub(" ", "_")
+        sensor.remove
+      end
+      
+      model.getEnergyManagementSystemActuators.each do |actuator|
+        next unless actuator.name.to_s.start_with? obj_name.gsub(" ", "_")
+        actuator.remove
+      end
+      
+      model.getEnergyManagementSystemPrograms.each do |program|
+        next unless program.name.to_s.start_with? obj_name.gsub(" ", "_")
+        program.remove
+      end
+    
     end
 
     def self.apply_central_ac_1speed(model, unit, runner, seer, eers, shrs,
