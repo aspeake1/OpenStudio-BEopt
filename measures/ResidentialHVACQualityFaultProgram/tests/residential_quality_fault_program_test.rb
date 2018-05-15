@@ -33,8 +33,10 @@ class ResidentialQualityFaultProgramTest < MiniTest::Test
   
   def test_apply_fault_to_two_speed_central_ac
     args_hash = {}
-    result = _test_error("SFD_HVACSizing_Equip_EF_AC2_Fixed.osm", args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Currently can only apply fault program to single-speed equipment.")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_HVACSizing_Equip_EF_AC2_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
   
   def test_apply_fault_to_single_speed_ashp
@@ -47,14 +49,18 @@ class ResidentialQualityFaultProgramTest < MiniTest::Test
   
   def test_apply_fault_to_two_speed_ashp
     args_hash = {}
-    result = _test_error("SFD_HVACSizing_Equip_ASHP2_Fixed.osm", args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Currently can only apply fault program to single-speed equipment.")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_HVACSizing_Equip_ASHP2_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
   
   def test_apply_fault_to_mshp
     args_hash = {}
-    result = _test_error("SFD_HVACSizing_Equip_MSHP_BB_Fixed.osm", args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "No central air conditioner or air source heat pump found.")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_HVACSizing_Equip_MSHP_BB_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
   
   def test_apply_fault_to_faulted_single_speed_central_ac

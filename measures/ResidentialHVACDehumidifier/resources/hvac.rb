@@ -22,14 +22,6 @@ class HVAC
         end
       end
 
-      tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Mean Air Temperature"])
-      tin_sensor.setName("#{obj_name} tin s")
-      tin_sensor.setKeyName(unit_living.name.to_s)
-
-      tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Outdoor Air Drybulb Temperature"])
-      tout_sensor.setName("#{obj_name} tt s")
-      tout_sensor.setKeyName(unit_living.name.to_s)
-
       system, clg_coil, htg_coil, air_loop = get_unitary_system_air_loop(model, runner, control_zone)
       unless htg_coil.nil?
         htg_coil = get_coil_from_hvac_component(htg_coil)
@@ -40,10 +32,18 @@ class HVAC
       
       if clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized
 
-        runner.registerError("Currently can only apply fault program to single-speed equipment.")
+        runner.registerWarning("Currently can only apply fault program to single-speed equipment.")
         return true
 
       end
+
+      tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Mean Air Temperature"])
+      tin_sensor.setName("#{obj_name} tin s")
+      tin_sensor.setKeyName(unit_living.name.to_s)
+
+      tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Outdoor Air Drybulb Temperature"])
+      tout_sensor.setName("#{obj_name} tt s")
+      tout_sensor.setKeyName(unit_living.name.to_s)
 
       cool_cap_fff_curve = clg_coil.totalCoolingCapacityFunctionOfFlowFractionCurve
       cool_eir_fff_curve = clg_coil.energyInputRatioFunctionOfFlowFractionCurve

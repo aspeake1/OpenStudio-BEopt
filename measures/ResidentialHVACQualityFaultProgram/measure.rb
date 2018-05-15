@@ -90,7 +90,7 @@ class ResidentialQualityFaultProgram < OpenStudio::Measure::ModelMeasure
 
         else
 
-          runner.registerError("No central air conditioner or air source heat pump found.")
+          runner.registerWarning("No central air conditioner or air source heat pump found.")
           return true
 
         end
