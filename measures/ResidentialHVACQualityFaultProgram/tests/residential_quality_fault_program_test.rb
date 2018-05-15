@@ -27,7 +27,7 @@ class ResidentialQualityFaultProgramTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>2, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
-    expected_values = {}
+    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>0}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_HVACSizing_Equip_GF_AC1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -41,7 +41,7 @@ class ResidentialQualityFaultProgramTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
-    expected_values = {}
+    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>0}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_HVACSizing_Equip_ASHP1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -59,22 +59,50 @@ class ResidentialQualityFaultProgramTest < MiniTest::Test
   
   def test_apply_fault_to_faulted_single_speed_central_ac
     args_hash = {}
-    args_hash["rated_cfm_per_ton"] = "450"
-    args_hash["actual_cfm_per_ton"] = "500"
+    args_hash["actual_cfm_per_ton"] = "280"
     expected_num_del_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>2, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_num_new_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>2, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
-    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>0.111}, "SensorLocation"=>"living zone"}
+    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>-0.3}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_HVACSizing_Equip_GF_Faulted_AC1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_apply_fault_to_faulted_single_speed_ashp
     args_hash = {}
-    args_hash["rated_cfm_per_ton"] = "350"
-    args_hash["actual_cfm_per_ton"] = "300"
+    args_hash["actual_cfm_per_ton"] = "280"
     expected_num_del_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_num_new_objects = {"EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
-    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>-0.143}, "SensorLocation"=>"living zone"}
+    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>-0.3}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_HVACSizing_Equip_Faulted_ASHP1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_single_family_attached_apply_fault_to_single_speed_central_ac
+    num_units = 4
+    args_hash = {}
+    args_hash["actual_cfm_per_ton"] = "280"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"EnergyManagementSystemSensor"=>2*num_units, "EnergyManagementSystemActuator"=>2*num_units, "EnergyManagementSystemProgram"=>1*num_units, "EnergyManagementSystemProgramCallingManager"=>1*num_units}
+    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_2_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_3_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_4_prog"=>{"F"=>-0.3}}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_multifamily_apply_fault_to_single_speed_central_ac
+    num_units = 8
+    args_hash = {}
+    args_hash["actual_cfm_per_ton"] = "280"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"EnergyManagementSystemSensor"=>2*num_units, "EnergyManagementSystemActuator"=>2*num_units, "EnergyManagementSystemProgram"=>1*num_units, "EnergyManagementSystemProgramCallingManager"=>1*num_units}
+    expected_values = {"res_installation_quality_fault_1_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_2_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_3_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_4_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_5_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_6_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_7_prog"=>{"F"=>-0.3}, \
+                       "res_installation_quality_fault_8_prog"=>{"F"=>-0.3}}
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   private
@@ -147,8 +175,8 @@ class ResidentialQualityFaultProgramTest < MiniTest::Test
     result = runner.result
     
     # save the model to test output directory
-    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/test.osm")
-    model.save(output_file_path, true)
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/test.osm")
+    # model.save(output_file_path, true)
     
     # show_output(result)
     
