@@ -7,7 +7,7 @@ require "#{File.dirname(__FILE__)}/schedules"
 
 class HVAC
 
-    def self.write_fault_ems(model, unit, runner, control_zone, rated_airflow_rate, installed_airflow_rate, is_heat_pump, output_vars)
+    def self.write_fault_ems(model, unit, runner, control_zone, rated_airflow_rate, installed_airflow_rate, is_heat_pump)
 
       obj_name = Constants.ObjectNameInstallationQualityFault(unit.name.to_s.gsub("unit ", "")).gsub("|", "_")
 
@@ -36,6 +36,9 @@ class HVAC
         return true
 
       end
+
+      # Output variables
+      output_vars = Airflow.create_output_vars(model, ["Zone Mean Air Temperature", "Zone Outdoor Air Drybulb Temperature"])
 
       tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Zone Mean Air Temperature"])
       tin_sensor.setName("#{obj_name} tin s")
@@ -151,8 +154,8 @@ class HVAC
     def self.apply_central_ac_1speed(model, unit, runner, seer, eers, shrs,
                                      fan_power_rated, fan_power_installed,
                                      crankcase_capacity, crankcase_temp,
-                                     eer_capacity_derates, capacity, dse, 
-                                     existing_objects={})
+                                     eer_capacity_derates, capacity, dse,
+                                     rated_airflow_rate, existing_objects={})
     
       num_speeds = 1
 
@@ -169,8 +172,8 @@ class HVAC
       fan_speed_ratios = [1.0]
       
       # Cooling Coil
-      rated_airflow_rate = 386.1 # cfm
-      cfms_ton_rated = calc_cfms_ton_rated(rated_airflow_rate, fan_speed_ratios, capacity_ratios)
+      rated_airflow_rate_cooling = rated_airflow_rate # cfm/ton
+      cfms_ton_rated = calc_cfms_ton_rated(rated_airflow_rate_cooling, fan_speed_ratios, capacity_ratios)
       cooling_eirs = calc_cooling_eirs(num_speeds, eers, fan_power_rated)
       shrs_rated_gross = calc_shrs_rated_gross(num_speeds, shrs, fan_power_rated, cfms_ton_rated)
       cOOL_CLOSS_FPLR_SPEC = [calc_plr_coefficients_cooling(num_speeds, seer)]
@@ -640,7 +643,7 @@ class HVAC
                                        crankcase_capacity, crankcase_temp,
                                        eer_capacity_derates, cop_capacity_derates,
                                        heat_pump_capacity, supplemental_efficiency,
-                                       supplemental_capacity, dse)
+                                       supplemental_capacity, dse, rated_airflow_rate)
     
       if heat_pump_capacity == Constants.SizingAutoMaxLoad
           runner.registerWarning("Using #{Constants.SizingAutoMaxLoad} is not recommended for single-speed heat pumps. When sized larger than the cooling load, this can lead to humidity concerns due to reduced dehumidification performance by the heat pump.")
@@ -666,14 +669,14 @@ class HVAC
       fan_speed_ratios_heating = [1.0]
       
       # Cooling Coil
-      rated_airflow_rate_cooling = 394.2 # cfm
+      rated_airflow_rate_cooling = rated_airflow_rate # cfm/ton
       cfms_ton_rated_cooling = calc_cfms_ton_rated(rated_airflow_rate_cooling, fan_speed_ratios_cooling, capacity_ratios)
       cooling_eirs = calc_cooling_eirs(num_speeds, eers, fan_power_rated)
       shrs_rated_gross = calc_shrs_rated_gross(num_speeds, shrs, fan_power_rated, cfms_ton_rated_cooling)
       cOOL_CLOSS_FPLR_SPEC = [calc_plr_coefficients_cooling(num_speeds, seer)]
 
       # Heating Coil
-      rated_airflow_rate_heating = 384.1 # cfm
+      rated_airflow_rate_heating = rated_airflow_rate # cfm/ton
       cfms_ton_rated_heating = calc_cfms_ton_rated(rated_airflow_rate_heating, fan_speed_ratios_heating, capacity_ratios)
       heating_eirs = calc_heating_eirs(num_speeds, cops, fan_power_rated)
       hEAT_CLOSS_FPLR_SPEC = [calc_plr_coefficients_heating(num_speeds, hspf)]

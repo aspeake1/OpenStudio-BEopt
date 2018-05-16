@@ -47,6 +47,9 @@ class Constants
 
   # Strings --------------------
   
+  def self.ActualAirFlowRate
+    'actual air flow rate'
+  end
   def self.AirFilm
     return 'AirFilm'
   end

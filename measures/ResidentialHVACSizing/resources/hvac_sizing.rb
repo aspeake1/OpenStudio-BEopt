@@ -1928,6 +1928,12 @@ class HVACSizing
             # Autosized airflow rate
             unit_final.Heat_Airflow = calc_heat_cfm(unit_final.Heat_Capacity, mj8.acf, mj8.heat_setpoint, hvac.HtgSupplyAirTemp)
         end
+        
+    elsif hvac.HasCentralAirConditioner
+
+        unless hvac.ActualAirFlowRate.nil?
+            unit_final.Cool_Airflow = hvac.ActualAirFlowRate * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") # cfm
+        end
 
     elsif hvac.HasAirSourceHeatPump
         
@@ -1943,6 +1949,11 @@ class HVACSizing
             unit_final.Heat_Airflow = unit_final.Heat_Capacity / (1.1 * mj8.acf * (hvac.HtgSupplyAirTemp - mj8.heat_setpoint))
         else
             unit_final.Heat_Airflow = unit_final.Heat_Capacity_Supp / (1.1 * mj8.acf * (hvac.HtgSupplyAirTemp - mj8.heat_setpoint))
+        end
+
+        unless hvac.ActualAirFlowRate.nil?
+            unit_final.Cool_Airflow = hvac.ActualAirFlowRate * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") # cfm
+            unit_final.Heat_Airflow = unit_final.Cool_Airflow # cfm
         end
 
     elsif hvac.HasMiniSplitHeatPump
@@ -2931,6 +2942,10 @@ class HVACSizing
                 capacityDerateFactorEER = get_unit_feature(runner, unit, Constants.SizingInfoHVACCapacityDerateFactorEER, 'string')
                 return nil if capacityDerateFactorEER.nil?
                 hvac.CapacityDerateFactorEER = capacityDerateFactorEER.split(",").map(&:to_f)
+            end
+            
+            if hvac.HasCentralAirConditioner or hvac.HasAirSourceHeatPump
+                hvac.ActualAirFlowRate = get_unit_feature(runner, unit, Constants.ActualAirFlowRate, 'double')
             end
 
         elsif clg_coil.is_a? OpenStudio::Model::CoilCoolingDXMultiSpeed
@@ -4531,7 +4546,7 @@ class HVACInfo
                 :FanspeedRatioCooling, :CapacityDerateFactorEER, :CapacityDerateFactorCOP,
                 :BoilerDesignTemp, :Dehumidifier_Water_Remove_Cap_Ft_DB_RH, :CoilBF,
                 :GroundHXVertical, :HeatingEIR, :CoolingEIR, 
-                :HXDTDesign, :HXCHWDesign, :HXHWDesign)
+                :HXDTDesign, :HXCHWDesign, :HXHWDesign, :ActualAirFlowRate)
 
 end
 
