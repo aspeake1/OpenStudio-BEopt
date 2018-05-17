@@ -1906,7 +1906,7 @@ class HVACSizing
     ''' 
     Finalize Sizing Calculations
     '''
-    
+
     return nil if mj8.nil? or unit_final.nil? or unit_init.nil?
     
     unit_final.Heat_Capacity_Supp = 0
@@ -1928,12 +1928,6 @@ class HVACSizing
             # Autosized airflow rate
             unit_final.Heat_Airflow = calc_heat_cfm(unit_final.Heat_Capacity, mj8.acf, mj8.heat_setpoint, hvac.HtgSupplyAirTemp)
         end
-        
-    elsif hvac.HasCentralAirConditioner
-
-        unless hvac.ActualAirFlowRate.nil?
-            unit_final.Cool_Airflow = hvac.ActualAirFlowRate * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") # cfm
-        end
 
     elsif hvac.HasAirSourceHeatPump
         
@@ -1949,11 +1943,6 @@ class HVACSizing
             unit_final.Heat_Airflow = unit_final.Heat_Capacity / (1.1 * mj8.acf * (hvac.HtgSupplyAirTemp - mj8.heat_setpoint))
         else
             unit_final.Heat_Airflow = unit_final.Heat_Capacity_Supp / (1.1 * mj8.acf * (hvac.HtgSupplyAirTemp - mj8.heat_setpoint))
-        end
-
-        unless hvac.ActualAirFlowRate.nil?
-            unit_final.Cool_Airflow = hvac.ActualAirFlowRate * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") # cfm
-            unit_final.Heat_Airflow = unit_final.Cool_Airflow # cfm
         end
 
     elsif hvac.HasMiniSplitHeatPump
@@ -4019,11 +4008,26 @@ class HVACSizing
     thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
     control_and_slave_zones = HVAC.get_control_and_slave_zones(thermal_zones)
     
+    if hvac.HasCentralAirConditioner
+
+      unless hvac.ActualAirFlowRate.nil?
+          unit_final.Cool_Airflow = hvac.ActualAirFlowRate * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") # cfm
+      end
+    
+    elsif hvac.HasAirSourceHeatPump
+    
+      unless hvac.ActualAirFlowRate.nil?
+          unit_final.Cool_Airflow = hvac.ActualAirFlowRate * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") # cfm
+          unit_final.Heat_Airflow = unit_final.Cool_Airflow # cfm
+      end
+      
+    end
+    
     # Unitary System - Air Loop
     thermal_zones.each do |thermal_zone|
         system, clg_coil, htg_coil, air_loop = HVAC.get_unitary_system_air_loop(model, runner, thermal_zone)
         next if system.nil?
-        
+
         clg_airflow = UnitConversions.convert([unit_final.Cool_Airflow, 0.00001].max,"cfm","m^3/s") # A value of 0 does not change from autosize
         htg_airflow = UnitConversions.convert([unit_final.Heat_Airflow, 0.00001].max,"cfm","m^3/s") # A value of 0 does not change from autosize
         
