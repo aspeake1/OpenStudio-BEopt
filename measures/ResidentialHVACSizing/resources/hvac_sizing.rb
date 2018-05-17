@@ -2945,7 +2945,7 @@ class HVACSizing
             end
             
             if hvac.HasCentralAirConditioner or hvac.HasAirSourceHeatPump
-                hvac.ActualAirFlowRate = get_unit_feature(runner, unit, Constants.ActualAirFlowRate, 'double')
+                hvac.ActualAirFlowRate = get_unit_feature(runner, unit, Constants.SizingInfoHVACActualCFMperTonCooling, 'double')
             end
 
         elsif clg_coil.is_a? OpenStudio::Model::CoilCoolingDXMultiSpeed

@@ -326,9 +326,9 @@ class ProcessSingleSpeedAirSourceHeatPump < OpenStudio::Measure::ModelMeasure
           return false if not success
         end
 
-        unit.setFeature(Constants.ActualAirFlowRate, actual_cfm_per_ton)
-
       end
+
+      unit.setFeature(Constants.SizingInfoHVACActualCFMperTonCooling, actual_cfm_per_ton)
 
     end # unit
 

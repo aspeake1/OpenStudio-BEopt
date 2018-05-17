@@ -47,9 +47,6 @@ class Constants
 
   # Strings --------------------
   
-  def self.ActualAirFlowRate
-    'actual air flow rate'
-  end
   def self.AirFilm
     return 'AirFilm'
   end
@@ -765,6 +762,9 @@ class Constants
         s_obj = "|#{obj.handle.to_s}"
     end
     return "#{property}#{s_obj}"
+  end
+  def self.SizingInfoHVACActualCFMperTonCooling
+    return self.SizingInfo(__method__.to_s)
   end
   def self.SizingInfoCMUWallFurringInsRvalue(surface) # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s, surface)
