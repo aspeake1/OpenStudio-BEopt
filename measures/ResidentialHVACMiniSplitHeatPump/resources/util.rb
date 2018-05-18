@@ -372,7 +372,7 @@ class UtilityBill
     return timeseries
   end
   
-  def self.calculate_simple_electric(load, gen, ur_monthly_fixed_charge, ur_flat_buy_rate, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate)
+  def self.calculate_simple_electric(load, gen, ur_monthly_fixed_charge, ur_flat_buy_rate, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, test_name)
   
     analysis_period = 1
     degradation = [0]
@@ -412,11 +412,21 @@ class UtilityBill
     utility_bills = SscApi.get_array(p_data, "utility_bill_w_sys")
     total_bill = utility_bills[1]
     
+    unless test_name.nil?
+      hourly = SscApi.get_array(p_data, "year1_hourly_ec_with_system")
+      CSV.open("./measures/UtilityBillCalculations/tests/#{test_name}.csv", "w") do |csv|
+        csv << ["year1_hourly_ec_with_system"]
+        hourly.each do |val|
+          csv << [val]
+        end
+      end
+    end
+    
     return total_bill
   
   end
   
-  def self.calculate_detailed_electric(load, gen, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, tariff)
+  def self.calculate_detailed_electric(load, gen, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, tariff, test_name)
   
     analysis_period = 1
     degradation = [0]
@@ -520,6 +530,16 @@ class UtilityBill
 
     utility_bills = SscApi.get_array(p_data, "utility_bill_w_sys")
     total_bill = utility_bills[1]
+    
+    unless test_name.nil?
+      hourly = SscApi.get_array(p_data, "year1_hourly_ec_with_system")
+      CSV.open("./measures/UtilityBillCalculations/tests/#{test_name}.csv", "w") do |csv|
+        csv << ["year1_hourly_ec_with_system"]
+        hourly.each do |val|
+          csv << [val]
+        end
+      end
+    end
     
     return total_bill
   

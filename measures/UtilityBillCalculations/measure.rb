@@ -328,7 +328,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
  
   end
   
-  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, electric_bill_type, tariffs)
+  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, electric_bill_type, tariffs, test_name=nil)
   
     if electric_bill_type == "Detailed" and tariffs.empty?
       runner.registerError("Could not locate tariff(s).")
@@ -384,9 +384,8 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
           if electric_bill_type == "Simple"
 
-            elec_bill = UtilityBill.calculate_simple_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], fixed_rates[fuel], marginal_rate, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate)
+            elec_bill = UtilityBill.calculate_simple_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], fixed_rates[fuel], marginal_rate, pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, test_name)
             runner.registerValue(fuel, elec_bill)
-            # total_bill += elec_bill
 
           elsif electric_bill_type == "Detailed"
 
@@ -397,7 +396,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
               utility_name = get_utility_and_name_from_label(cols, label)
               if UtilityBill.validate_tariff(tariff)
-                elec_bill = UtilityBill.calculate_detailed_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, tariff)
+                elec_bill = UtilityBill.calculate_detailed_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], pv_compensation_type, pv_annual_excess_sellback_rate_type, pv_sellback_rate, pv_tariff_rate, tariff, test_name)
                 unless elec_bills.keys.include? tariff[:eiaid]
                   elec_bills[tariff[:eiaid]] = []
                 end
