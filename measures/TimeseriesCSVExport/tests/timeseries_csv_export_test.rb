@@ -6,7 +6,7 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class TimeseriesCSVExportTest < MiniTest::Test
-  
+
   def test_leap_year_and_output_vars
     measure = TimeseriesCSVExport.new
     args_hash = {}
@@ -24,9 +24,9 @@ class TimeseriesCSVExportTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 196, 184, 196)
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 196, 183, 196)
   end
-  
+
   private
 
   def model_in_path_default(osm_file_or_model)
