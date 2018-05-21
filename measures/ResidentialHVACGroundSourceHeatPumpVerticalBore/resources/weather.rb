@@ -227,10 +227,10 @@ class WeatherProcess
           return false if !@design.send(k).is_initialized
           @design.send(k+"=", @design.send(k).get)
         end
-        
+
         return true
       end
-  
+
       def process_epw(epw_path)
         if not File.exist?(epw_path)
           @runner.registerError("Cannot find weather file at #{epw_path}.")
@@ -253,7 +253,7 @@ class WeatherProcess
         @header.LocalPressure = Math::exp(-0.0000368 * @header.Altitude) # atm
 
         @design, epwHasDesignData = get_design_info_from_epw(@design, epw_file, @header.Altitude)
-        
+
         # Timeseries data:
         epw_file_data = epw_file.data
         hourdata = []
@@ -352,7 +352,7 @@ class WeatherProcess
         @data.WSF = get_ashrae_622_wsf(@header.Station)
         
         if not epwHasDesignData
-          @runner.registerWarning("No DDY file found; calculating design conditions from EPW weather data.")
+          @runner.registerWarning("No design condition info found; calculating design conditions from EPW weather data.")
           @design = calc_design_info(@design, hourdata, @header.Altitude)
           @design.DailyTemperatureRange = @data.MonthlyAvgDailyHighDrybulbs[7] - @data.MonthlyAvgDailyLowDrybulbs[7]
         end
