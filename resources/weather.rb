@@ -227,10 +227,10 @@ class WeatherProcess
           return false if !@design.send(k).is_initialized
           @design.send(k+"=", @design.send(k).get)
         end
-        
+
         return true
       end
-  
+
       def process_epw(epw_path)
         if not File.exist?(epw_path)
           @runner.registerError("Cannot find weather file at #{epw_path}.")
@@ -251,14 +251,9 @@ class WeatherProcess
         @header.Timezone = epw_file.timeZone
         @header.Altitude = UnitConversions.convert(epw_file.elevation,"m","ft")
         @header.LocalPressure = Math::exp(-0.0000368 * @header.Altitude) # atm
-        
-        ddy_path = epw_path.gsub(".epw",".ddy")
-        epwHasDesignData = false
-        if File.exist?(ddy_path)
-          epwHasDesignData = true
-          @design = get_design_info_from_ddy(@design, ddy_path, @header.Altitude)
-        end
-        
+
+        @design, epwHasDesignData = get_design_info_from_epw(@design, epw_file, @header.Altitude)
+
         # Timeseries data:
         epw_file_data = epw_file.data
         hourdata = []
@@ -357,7 +352,7 @@ class WeatherProcess
         @data.WSF = get_ashrae_622_wsf(@header.Station)
         
         if not epwHasDesignData
-          @runner.registerWarning("No DDY file found; calculating design conditions from EPW weather data.")
+          @runner.registerWarning("No design condition info found; calculating design conditions from EPW weather data.")
           @design = calc_design_info(@design, hourdata, @header.Altitude)
           @design.DailyTemperatureRange = @data.MonthlyAvgDailyHighDrybulbs[7] - @data.MonthlyAvgDailyLowDrybulbs[7]
         end
@@ -567,31 +562,26 @@ class WeatherProcess
         return wsf_avg
             
       end
-      
-      def get_design_info_from_ddy(design, ddy_path, altitude)
-        ddy_model = OpenStudio::EnergyPlus.loadAndTranslateIdf(ddy_path).get
-        dehum02per_dp = nil
-        ddy_model.getObjectsByType("OS:SizingPeriod:DesignDay".to_IddObjectType).each do |d|
-          designDay = d.to_DesignDay.get
-          if d.name.get.include?("Ann Htg 99% Condns DB")
-            design.HeatingDrybulb = UnitConversions.convert(designDay.maximumDryBulbTemperature,"C","F")
-          elsif d.name.get.include?("Ann Htg Wind 99% Condns WS=>MCDB")
-            # FIXME: Is this correct? Or should be wind speed coincident with heating drybulb?
-            design.HeatingWindspeed = designDay.windSpeed
-          elsif d.name.get.include?("Ann Clg 1% Condns DB=>MWB")
-            design.CoolingDrybulb = UnitConversions.convert(designDay.maximumDryBulbTemperature,"C","F")
-            design.CoolingWetbulb = UnitConversions.convert(designDay.humidityIndicatingConditionsAtMaximumDryBulb,"C","F")
-            design.CoolingWindspeed = designDay.windSpeed
-            design.DailyTemperatureRange = UnitConversions.convert(designDay.dailyDryBulbTemperatureRange,"K","R")
-          elsif d.name.get.include?("Ann Clg 2% Condns DP=>MDB")
-            design.DehumidDrybulb = UnitConversions.convert(designDay.maximumDryBulbTemperature,"C","F")
-            dehum02per_dp = UnitConversions.convert(designDay.humidityIndicatingConditionsAtMaximumDryBulb,"C","F")
-          end
+
+      def get_design_info_from_epw(design, epw_file, altitude)
+        epw_design_conditions = epw_file.designConditions
+        epwHasDesignData = false
+        if epw_design_conditions.length > 0
+          epwHasDesignData = true
+          epw_design_conditions = epw_design_conditions[0]
+          design.HeatingDrybulb = UnitConversions.convert(epw_design_conditions.heatingDryBulb99,"C","F")
+          design.HeatingWindspeed = epw_design_conditions.heatingColdestMonthWindSpeed1 # FIXME: Is this correct?
+          design.CoolingDrybulb = UnitConversions.convert(epw_design_conditions.coolingDryBulb1,"C","F")
+          design.CoolingWetbulb = UnitConversions.convert(epw_design_conditions.coolingMeanCoincidentWetBulb1,"C","F")
+          design.CoolingWindspeed = epw_design_conditions.coolingMeanCoincidentWindSpeed0pt4
+          design.DailyTemperatureRange = UnitConversions.convert(epw_design_conditions.coolingDryBulbRange,"K","R")
+          design.DehumidDrybulb = UnitConversions.convert(epw_design_conditions.coolingDehumidificationMeanCoincidentDryBulb2,"C","F")
+          dehum02per_dp = UnitConversions.convert(epw_design_conditions.coolingDehumidificationDewPoint2,"C","F")
+          std_press = Psychrometrics.Pstd_fZ(altitude)
+          design.CoolingHumidityRatio = Psychrometrics.w_fT_Twb_P(design.CoolingDrybulb, design.CoolingWetbulb, std_press)
+          design.DehumidHumidityRatio = Psychrometrics.w_fT_Twb_P(dehum02per_dp, dehum02per_dp, std_press)
         end
-        std_press = Psychrometrics.Pstd_fZ(altitude)
-        design.CoolingHumidityRatio = Psychrometrics.w_fT_Twb_P(design.CoolingDrybulb, design.CoolingWetbulb, std_press)
-        design.DehumidHumidityRatio = Psychrometrics.w_fT_Twb_P(dehum02per_dp, dehum02per_dp, std_press)
-        return design
+        return design, epwHasDesignData
       end
       
       def calc_design_info(design, hourdata, altitude)
