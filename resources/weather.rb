@@ -58,7 +58,49 @@ class WeatherProcess
   def epw_path
     return @epw_path
   end
-  
+
+  def add_design_days_for_autosizing(model, epw_file)
+    epw_design_conditions = epw_file.designConditions
+    epwHasDesignData = false
+    if epw_design_conditions.length > 0
+      epwHasDesignData = true
+      epw_design_conditions = epw_design_conditions[0]
+      
+      heating_design_day = OpenStudio::Model::DesignDay.new(model)
+      heating_design_day.setName("Ann Htg 99.6% Condns DB")
+      heating_design_day.setMaximumDryBulbTemperature(epw_design_conditions.heatingDryBulb99pt6)
+      heating_design_day.setHumidityIndicatingConditionsAtMaximumDryBulb(epw_design_conditions.heatingDryBulb99pt6) # TODO: confirm
+      heating_design_day.setBarometricPressure(UnitConversions.convert(Psychrometrics.Pstd_fZ(UnitConversions.convert(epw_file.elevation,"m","ft")),"psi","pa"))
+      heating_design_day.setWindSpeed(epw_design_conditions.heatingMeanCoincidentWindSpeed99pt6)
+      heating_design_day.setWindDirection(epw_design_conditions.heatingPrevailingCoincidentWindDirection99pt6)
+      heating_design_day.setDayOfMonth(21) # TODO: get from somewhere else?
+      heating_design_day.setMonth(12) # TODO: get from somewhere else?
+      heating_design_day.setDayType("WinterDesignDay")
+      heating_design_day.setHumidityIndicatingType("Wetbulb")
+      heating_design_day.setDryBulbTemperatureRangeModifierType("DefaultMultipliers")
+      heating_design_day.setSolarModelIndicator("ASHRAEClearSky")
+
+      cooling_design_day = OpenStudio::Model::DesignDay.new(model)
+      cooling_design_day.setName("Ann Clg .4% Condns DB=>MWB")
+      cooling_design_day.setMaximumDryBulbTemperature(epw_design_conditions.coolingDryBulb0pt4)
+      cooling_design_day.setDailyDryBulbTemperatureRange(epw_design_conditions.coolingDryBulbRange)
+      cooling_design_day.setHumidityIndicatingConditionsAtMaximumDryBulb(epw_design_conditions.coolingMeanCoincidentWetBulb0pt4)
+      cooling_design_day.setBarometricPressure(UnitConversions.convert(Psychrometrics.Pstd_fZ(UnitConversions.convert(epw_file.elevation,"m","ft")),"psi","pa"))
+      cooling_design_day.setWindSpeed(epw_design_conditions.coolingMeanCoincidentWindSpeed0pt4)
+      cooling_design_day.setWindDirection(epw_design_conditions.coolingPrevailingCoincidentWindDirection0pt4)
+      cooling_design_day.setDayOfMonth(21) # TODO: get from somewhere else?
+      cooling_design_day.setMonth(7) # TODO: get from somewhere else?
+      cooling_design_day.setDayType("SummerDesignDay")
+      cooling_design_day.setHumidityIndicatingType("Wetbulb")
+      cooling_design_day.setDryBulbTemperatureRangeModifierType("DefaultMultipliers")
+      cooling_design_day.setSolarModelIndicator("ASHRAETau")
+      cooling_design_day.setAshraeTaub(0.424) # TODO: get from somewhere else?
+      cooling_design_day.setAshraeTaud(2.012) # TODO: get from somewhere else?
+
+    end
+    return epwHasDesignData
+  end
+
   def self.actual_timestamps(model, runner, measure_dir)
     epw_path = get_epw_path(model, runner, measure_dir)
     epw_file = OpenStudio::EpwFile.new(epw_path)

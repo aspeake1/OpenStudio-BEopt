@@ -65,6 +65,22 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     if weather.error?
         return false
     end
+
+    # Determine e+ autosizing or not
+    simulation_control = model.getSimulationControl
+    if simulation_control.runSimulationforSizingPeriods
+
+      epw_file = OpenStudio::EpwFile.new(weather.epw_path, true)
+      epwHasDesignData = weather.add_design_days_for_autosizing(model, epw_file)
+      if epwHasDesignData
+        runner.registerInfo("Design days for #{File.basename(weather.epw_path)} added to the model for autosizing.")
+      else
+        runner.registerInfo("No design condition info found.")
+      end
+
+      return true
+
+    end
     
     units.each do |unit|
     
