@@ -172,8 +172,8 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Cool_SensCap' => 11440,
             'Heat_Capacity' => 17764,
             'SuppHeat_Capacity' => 41587,
-            'Cool_AirFlowRate' => 720,
-            'Heat_AirFlowRate' => 560,
+            'Cool_AirFlowRate' => 577,
+            'Heat_AirFlowRate' => 577,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_FB_GRG_FA_ASHP_DuctsInFB.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -284,8 +284,8 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Cool_SensCap' => 10540,
             'Heat_Capacity' => 16366,
             'SuppHeat_Capacity' => 46460,
-            'Cool_AirFlowRate' => 664,
-            'Heat_AirFlowRate' => 516,
+            'Cool_AirFlowRate' => 533,
+            'Heat_AirFlowRate' => 533,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_UB_GRG_FA_ASHP_DuctsInUB.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
@@ -1128,8 +1128,8 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Cool_SensCap' => 10287,
             'Heat_Capacity' => 15974,
             'SuppHeat_Capacity' => 41478,
-            'Cool_AirFlowRate' => 667,
-            'Heat_AirFlowRate' => 503,
+            'Cool_AirFlowRate' => 534,
+            'Heat_AirFlowRate' => 534,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_PB_UA_Vented_ASHP_DuctsInPB.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
@@ -1184,8 +1184,8 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Cool_SensCap' => 20375,
             'Heat_Capacity' => 31638,
             'SuppHeat_Capacity' => 42640,
-            'Cool_AirFlowRate' => 1266,
-            'Heat_AirFlowRate' => 997,
+            'Cool_AirFlowRate' => 1015,
+            'Heat_AirFlowRate' => 1015,
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_1story_PB_UA_Vented_ASHP_DuctsInUA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
