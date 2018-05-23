@@ -379,6 +379,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
             unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4"))
           end
           require "#{File.dirname(__FILE__)}/resources/ssc_api"
+
           timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
           timeseries["ElectricityProduced:Facility"] = UtilityBill.remove_leap_day(timeseries["ElectricityProduced:Facility"])
 
@@ -443,7 +444,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     elsif electric_bill_type == "Detailed"
       runner.registerInfo("Calculated utility bill: #{utility_name} = $%.2f" % (total_bill))
     end
-    
+
     return true
 
   end
@@ -452,7 +453,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
   
     cols = CSV.read("#{File.dirname(__FILE__)}/resources/by_nsrdb.csv").transpose
     closest_usaf = closest_usaf_to_epw(epw_latitude, epw_longitude, cols.transpose) # minimize distance to simulation epw
-    runner.registerInfo("Closest usaf to #{epw_latitude}, #{epw_longitude}: #{closest_usaf}")      
+    runner.registerInfo("Closest usaf to #{epw_latitude}, #{epw_longitude}: #{closest_usaf}")
     usafs = cols[1].collect { |i| i.to_s }
     usaf_ixs = usafs.each_index.select{|i| usafs[i] == closest_usaf}
     utilityids = [] # [eiaid1, eiaid2, ...]
@@ -482,7 +483,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       end
     end
 
-    tariffs = {} # {label: tariff, ...} 
+    tariffs = {} # {label: tariff, ...}
     utilityid_to_filename.each do |utilityid, filenames|
       filenames.each do |filename|
         zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
@@ -496,7 +497,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
             return []
           end
         end
-      end          
+      end
     end
     
     return tariffs
