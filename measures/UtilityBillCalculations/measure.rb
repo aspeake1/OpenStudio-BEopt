@@ -374,9 +374,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
         if fuel == Constants.FuelTypeElectric and not timeseries["Electricity:Facility"].empty?
 
-          if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
-            unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
-            unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"))
+          if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4"
+            unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4.zip")
+            unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4"))
           end
           require "#{File.dirname(__FILE__)}/resources/ssc_api"
           timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
