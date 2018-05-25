@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>utility_bill_calculations</name>
   <uid>872cd20c-55df-459e-9ac9-f42c93ab665c</uid>
-  <version_id>3a6cc105-c590-4ff0-8785-53c8a621be57</version_id>
-  <version_modified>20180523T174933Z</version_modified>
+  <version_id>d387b5cd-e254-479f-aa0a-f8df2ce33559</version_id>
+  <version_modified>20180525T164808Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
   <class_name>UtilityBillCalculations</class_name>
   <display_name>Calculate Utility Bills</display_name>
@@ -13,7 +13,7 @@
     <argument>
       <name>electric_bill_type</name>
       <display_name>Electricity: Simple or Detailed</display_name>
-      <description>Choose either 'Simple' or 'Detailed'. If 'Simple' is selected, electric utility bills are calculated based on user-defined fixed charge and marginal rate. If 'Detailed' is selected, electric utility bills are calculated based on tariff  from the OpenEI Utility Rate Database (URDB).</description>
+      <description>Choose either 'Simple' or 'Detailed'. If 'Simple' is selected, electric utility bills are calculated based on user-defined fixed charge and marginal rate. If 'Detailed' is selected, electric utility bills are calculated based on either: a tariff from the OpenEI Utility Rate Database (URDB), or a real-time pricing rate.</description>
       <type>Choice</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -32,7 +32,7 @@
     <argument>
       <name>tariff_label</name>
       <display_name>Electricity: Tariff</display_name>
-      <description>Choose either 'Autoselect Tariff(s)', 'Custom Tariff', or a prepackaged tariff. If 'Autoselect Tariff(s)' is selected, tariff(s) from nearby utilities will be selected.</description>
+      <description>Choose either 'Autoselect Tariff(s)', 'Custom Tariff', 'Custom Real-Time Pricing Rate', 'Sample Real-Time Pricing Rate', or a prepackaged tariff. If 'Autoselect Tariff(s)' is selected, tariff(s) from nearby utilities will be selected.</description>
       <type>Choice</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -45,6 +45,14 @@
         <choice>
           <value>Custom Tariff</value>
           <display_name>Custom Tariff</display_name>
+        </choice>
+        <choice>
+          <value>Custom Real-Time Pricing Rate</value>
+          <display_name>Custom Real-Time Pricing Rate</display_name>
+        </choice>
+        <choice>
+          <value>Sample Real-Time Pricing Rate</value>
+          <display_name>Sample Real-Time Pricing Rate</display_name>
         </choice>
         <choice>
           <value>Blue Ridge Mountain E M C (North Carolina) - Residential</value>
@@ -18506,8 +18514,8 @@
     </argument>
     <argument>
       <name>custom_tariff</name>
-      <display_name>Electricity: Custom Tariff File Location</display_name>
-      <description>Absolute path to custom tariff file. See resources/tariffs.zip for example tariff files. Only applies if Tariff is 'Custom Tariff'.</description>
+      <display_name>Electricity: Custom Tariff or Real-Time Pricing Rate File Location</display_name>
+      <description>Absolute path to custom tariff or real-time pricing rate file. See resources/tariffs.zip for example tariff files. See resources/Sample Real-Time Pricing Rate.json for example real-time pricing rate file. Only applies if Tariff is 'Custom Tariff' or 'Custom Real-Time Pricing Rate'.</description>
       <type>String</type>
       <required>false</required>
       <model_dependent>false</model_dependent>
@@ -18728,18 +18736,6 @@
       <checksum>91D17463</checksum>
     </file>
     <file>
-      <filename>util.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>B03E05CE</checksum>
-    </file>
-    <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>F83BDF24</checksum>
-    </file>
-    <file>
       <filename>539f6d9eec4f024411ecb875.json</filename>
       <filetype>json</filetype>
       <usage_type>test</usage_type>
@@ -18750,12 +18746,6 @@
       <filetype>json</filetype>
       <usage_type>test</usage_type>
       <checksum>14FAB340</checksum>
-    </file>
-    <file>
-      <filename>586bda1b5457a3ef521c9605.json</filename>
-      <filetype>json</filetype>
-      <usage_type>test</usage_type>
-      <checksum>16E304B4</checksum>
     </file>
     <file>
       <filename>586be0bd5457a30d661c9605.json</filename>
@@ -18782,12 +18772,6 @@
       <checksum>13EC7BDD</checksum>
     </file>
     <file>
-      <filename>utility_bill_calculations_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>95E15E70</checksum>
-    </file>
-    <file>
       <filename>sam-sdk-2017-9-5-r4.zip</filename>
       <filetype>zip</filetype>
       <usage_type>resource</usage_type>
@@ -18800,6 +18784,42 @@
       <checksum>FE8C0464</checksum>
     </file>
     <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>C4E956C1</checksum>
+    </file>
+    <file>
+      <filename>539fc966ec4f024d2f53f146.json</filename>
+      <filetype>json</filetype>
+      <usage_type>test</usage_type>
+      <checksum>4D5D747E</checksum>
+    </file>
+    <file>
+      <filename>Sample Real-Time Pricing Rate.json</filename>
+      <filetype>json</filetype>
+      <usage_type>test</usage_type>
+      <checksum>1417452B</checksum>
+    </file>
+    <file>
+      <filename>Sample Real-Time Pricing Rate.json</filename>
+      <filetype>json</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>1417452B</checksum>
+    </file>
+    <file>
+      <filename>utility_bill_calculations_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>CFB13C03</checksum>
+    </file>
+    <file>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>3608221E</checksum>
+    </file>
+    <file>
       <version>
         <software_program>OpenStudio</software_program>
         <identifier>2.0.5</identifier>
@@ -18808,7 +18828,7 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>D7E3CF91</checksum>
+      <checksum>7F712C9E</checksum>
     </file>
   </files>
 </measure>

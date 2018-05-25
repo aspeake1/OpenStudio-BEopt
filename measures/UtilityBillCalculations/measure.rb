@@ -53,13 +53,15 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     electric_bill_types << "Detailed"
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("electric_bill_type", electric_bill_types, true)
     arg.setDisplayName("Electricity: Simple or Detailed")
-    arg.setDescription("Choose either 'Simple' or 'Detailed'. If 'Simple' is selected, electric utility bills are calculated based on user-defined fixed charge and marginal rate. If 'Detailed' is selected, electric utility bills are calculated based on tariff  from the OpenEI Utility Rate Database (URDB).")
+    arg.setDescription("Choose either 'Simple' or 'Detailed'. If 'Simple' is selected, electric utility bills are calculated based on user-defined fixed charge and marginal rate. If 'Detailed' is selected, electric utility bills are calculated based on either: a tariff from the OpenEI Utility Rate Database (URDB), or a real-time pricing rate.")
     arg.setDefaultValue("Simple")
     args << arg
-    
+
     tariff_options = OpenStudio::StringVector.new
     tariff_options << "Autoselect Tariff(s)"
     tariff_options << "Custom Tariff"
+    tariff_options << "Custom Real-Time Pricing Rate"
+    tariff_options << "Sample Real-Time Pricing Rate"
     cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
     zip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
     zip_file.listFiles.each do |label|
@@ -69,15 +71,15 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     end
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("tariff_label", tariff_options, true)
     arg.setDisplayName("Electricity: Tariff")
-    arg.setDescription("Choose either 'Autoselect Tariff(s)', 'Custom Tariff', or a prepackaged tariff. If 'Autoselect Tariff(s)' is selected, tariff(s) from nearby utilities will be selected.")
+    arg.setDescription("Choose either 'Autoselect Tariff(s)', 'Custom Tariff', 'Custom Real-Time Pricing Rate', 'Sample Real-Time Pricing Rate', or a prepackaged tariff. If 'Autoselect Tariff(s)' is selected, tariff(s) from nearby utilities will be selected.")
     arg.setDefaultValue("Autoselect Tariff(s)")
     args << arg
-    
+
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("custom_tariff", false)
-    arg.setDisplayName("Electricity: Custom Tariff File Location")
-    arg.setDescription("Absolute path to custom tariff file. See resources/tariffs.zip for example tariff files. Only applies if Tariff is 'Custom Tariff'.")
+    arg.setDisplayName("Electricity: Custom Tariff or Real-Time Pricing Rate File Location")
+    arg.setDescription("Absolute path to custom tariff or real-time pricing rate file. See resources/tariffs.zip for example tariff files. See resources/Sample Real-Time Pricing Rate.json for example real-time pricing rate file. Only applies if Tariff is 'Custom Tariff' or 'Custom Real-Time Pricing Rate'.")
     args << arg
-    
+
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_fixed", true)
     arg.setDisplayName("Electricity: Fixed Charge")
     arg.setUnits("$/month")
@@ -263,7 +265,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       runner.registerError("Can't find a weather runperiod, make sure you ran an annual simulation, not just the design days.")
       return false
     end
-    
+
     if electric_bill_type == "Detailed"
       tariffs = {}
       if tariff_label == "Custom Tariff" and custom_tariff.is_initialized
@@ -273,6 +275,14 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
           label = File.basename(File.expand_path(custom_tariff)).chomp(".json")
           tariffs[label] = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
         end
+        
+      elsif ( tariff_label == "Custom Real-Time Pricing Rate" and custom_tariff.is_initialized ) or tariff_label == "Sample Real-Time Pricing Rate"
+      
+        if tariff_label == "Sample Real-Time Pricing Rate"
+          custom_tariff = "#{File.dirname(__FILE__)}/resources/Sample Real-Time Pricing Rate.json"
+        end
+        electric_bill_type = "RealTime"
+        tariffs = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
 
       elsif tariff_label != "Autoselect Tariff(s)" # tariff is selected from the list
       
@@ -374,11 +384,13 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
         if fuel == Constants.FuelTypeElectric and not timeseries["Electricity:Facility"].empty?
 
-          if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4"
-            unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4.zip")
-            unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4"))
+          if ["Simple", "Detailed"].include? electric_bill_type
+            if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4"
+              unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4.zip")
+              unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-9-5-r4"))
+            end
+            require "#{File.dirname(__FILE__)}/resources/ssc_api"
           end
-          require "#{File.dirname(__FILE__)}/resources/ssc_api"
 
           timeseries["Electricity:Facility"] = UtilityBill.remove_leap_day(timeseries["Electricity:Facility"])
           timeseries["ElectricityProduced:Facility"] = UtilityBill.remove_leap_day(timeseries["ElectricityProduced:Facility"])
@@ -419,6 +431,11 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
             end
             runner.registerValue(fuel, avg_elec_bills.join(";"))
 
+          elsif electric_bill_type == "RealTime"
+
+            elec_bill = UtilityBill.calculate_realtime_electric(timeseries["Electricity:Facility"], timeseries["ElectricityProduced:Facility"], tariffs, test_name)
+            runner.registerValue(fuel, elec_bill)
+
           end
           total_bill += elec_bill
 
@@ -439,7 +456,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       end
     end
     
-    if electric_bill_type == "Simple"
+    if ["Simple", "RealTime"].include? electric_bill_type
       runner.registerInfo("Calculated utility bill: $%.2f" % total_bill)
     elsif electric_bill_type == "Detailed"
       runner.registerInfo("Calculated utility bill: #{utility_name} = $%.2f" % (total_bill))

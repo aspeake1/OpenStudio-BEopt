@@ -506,7 +506,7 @@ class UtilityBill
     unless tariff[:demandratestructure].nil?
       SscApi.set_number(p_data, "ur_dc_enable", 1)
       SscApi.set_matrix(p_data, "ur_dc_sched_weekday", Matrix.rows(tariff[:demandweekdayschedule]))
-      SscApi.set_matrix(p_data, "ur_dc_sched_weekend", Matrix.rows(tariff[:demandweekendschedule]))      
+      SscApi.set_matrix(p_data, "ur_dc_sched_weekend", Matrix.rows(tariff[:demandweekendschedule]))
       tariff[:demandratestructure].each_with_index do |period, i|
         period_num = i + 1
         period.each_with_index do |tier, j|
@@ -533,6 +533,28 @@ class UtilityBill
     
     unless test_name.nil?
       hourly = SscApi.get_array(p_data, "year1_hourly_ec_with_system")
+      CSV.open("./measures/UtilityBillCalculations/tests/#{test_name}.csv", "w") do |csv|
+        csv << ["year1_hourly_ec_with_system"]
+        hourly.each do |val|
+          csv << [val]
+        end
+      end
+    end
+    
+    return total_bill
+  
+  end
+  
+  def self.calculate_realtime_electric(load, gen, tariffs, test_name)
+  
+    rates = tariffs[:realtimepricing].split(",").collect{|i| i.to_f}
+    net_facility = load.zip(gen).map{|x, y| x - y}
+    hourly = net_facility.zip(rates).map{|x, y| x * y}
+    marginal = hourly.inject(0){|sum, x| sum + x}
+    fixed = tariffs[:fixedmonthlycharge].to_f * 12.0
+    total_bill = marginal + fixed
+    
+    unless test_name.nil?
       CSV.open("./measures/UtilityBillCalculations/tests/#{test_name}.csv", "w") do |csv|
         csv << ["year1_hourly_ec_with_system"]
         hourly.each do |val|
