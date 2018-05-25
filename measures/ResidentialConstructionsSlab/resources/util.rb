@@ -436,14 +436,11 @@ class UtilityBill
     ur_flat_sell_rate = 0
     ur_nm_yearend_sell_rate = 0
     ur_enable_net_metering = 1
-    ur_excess_monthly_energy_or_dollars = 0
-    if pv_annual_excess_sellback_rate_type == Constants.RetailElectricityCost
-      pv_sellback_rate = 0
-      ur_excess_monthly_energy_or_dollars = 1
+    ur_excess_monthly_energy_or_dollars = 1
+    if pv_annual_excess_sellback_rate_type == Constants.UserSpecified
+      pv_sellback_rate = pv_sellback_rate.to_f
     end
-    if pv_compensation_type == Constants.PVNetMetering
-      ur_nm_yearend_sell_rate = pv_sellback_rate.to_f
-    elsif pv_compensation_type == Constants.PVFeedInTariff
+    if pv_compensation_type == Constants.PVFeedInTariff
       ur_enable_net_metering = 0
       ur_flat_sell_rate = pv_tariff_rate.to_f
     end
@@ -492,8 +489,8 @@ class UtilityBill
           rate += tier[:adj]
         end
         SscApi.set_number(p_data, "ur_ec_p#{period_num}_t#{tier_num}_br", rate)
-        unless tier[:sell].nil?
-          SscApi.set_number(p_data, "ur_ec_p#{period_num}_t#{tier_num}_sr", tier[:sell])
+        if pv_annual_excess_sellback_rate_type == Constants.RetailElectricityCost
+          SscApi.set_number(p_data, "ur_ec_p#{period_num}_t#{tier_num}_sr", rate)
         end
         max = 1000000000.0
         unless tier[:max].nil?
