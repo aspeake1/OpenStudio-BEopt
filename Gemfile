@@ -37,6 +37,7 @@ gem 'rubyzip'
 
 gem 'ruby-prof'
 
+gem 'openstudio-standards', '~> 0.2.0'
 gem 'aes', '~> 0.5.0'
 gem 'geocoder', '~> 1.4.4'
 gem 'highline'
