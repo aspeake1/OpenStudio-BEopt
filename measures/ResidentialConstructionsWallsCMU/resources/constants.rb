@@ -332,7 +332,28 @@ class Constants
       s_unit = "|#{unit_name}"
     end
     return "residential central ac#{s_unit}"
-  end  
+  end
+  def self.ObjectNameCentralSystemBoilerBaseboards(unit_name=self.ObjectNameBuildingUnit)
+    s_unit = ""
+    if unit_name != self.ObjectNameBuildingUnit
+      s_unit = "|#{unit_name}"
+    end
+    return "res central system boiler baseboards#{s_unit}"
+  end
+  def self.ObjectNameCentralSystemFanCoil(unit_name=self.ObjectNameBuildingUnit)
+    s_unit = ""
+    if unit_name != self.ObjectNameBuildingUnit
+      s_unit = "|#{unit_name}"
+    end
+    return "res central system fan coil#{s_unit}"
+  end
+  def self.ObjectNameCentralSystemPTAC(unit_name=self.ObjectNameBuildingUnit)
+    s_unit = ""
+    if unit_name != self.ObjectNameBuildingUnit
+      s_unit = "|#{unit_name}"
+    end
+    return "res central system ptac#{s_unit}"
+  end
   def self.ObjectNameClothesWasher(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""
     if unit_name != self.ObjectNameBuildingUnit

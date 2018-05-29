@@ -323,30 +323,31 @@ class ProcessGroundSourceHeatPumpVerticalBoreTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_GSHPVertBore.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
   end
   
-  def test_single_family_attached_new_construction
+  def test_retrofit_replace_central_system_boiler_baseboards
     num_units = 4
     args_hash = {}
-    args_hash["heat_pump_capacity"] = "3.0"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units*2, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
-    expected_values = {"HeatingCOP"=>3.65, "CoolingCOP"=>5.36, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "GlycolFrac"=>0.3}
-    model = _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4)
-    # Retrofit
-    expected_num_del_objects = expected_num_new_objects
-    model = _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*7)
-  end
-
-  def test_multifamily_new_construction
-    num_units = 8
-    args_hash = {}
-    args_hash["heat_pump_capacity"] = "3.0"
-    expected_num_del_objects = {}
+    expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units, "SetpointManagerScheduled"=>1}
     expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
     expected_values = {"HeatingCOP"=>3.65, "CoolingCOP"=>5.36, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "GlycolFrac"=>0.3}
-    model = _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*3)
-    # Retrofit
-    expected_num_del_objects = expected_num_new_objects
-    model = _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*6)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Boiler_Baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4+1)
+  end
+  
+  def test_retrofit_replace_central_system_fan_coil
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units, "SetpointManagerScheduled"=>2}
+    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
+    expected_values = {"HeatingCOP"=>3.65, "CoolingCOP"=>5.36, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "GlycolFrac"=>0.3}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Fan_Coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4+2)
+  end
+  
+  def test_retrofit_replace_central_system_ptac
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>num_units, "CoilHeatingWater"=>num_units, "FanConstantVolume"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units, "SetpointManagerScheduled"=>1}
+    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
+    expected_values = {"HeatingCOP"=>3.65, "CoolingCOP"=>5.36, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "GlycolFrac"=>0.3}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4+1)
   end
   
   private
@@ -418,7 +419,7 @@ class ProcessGroundSourceHeatPumpVerticalBoreTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

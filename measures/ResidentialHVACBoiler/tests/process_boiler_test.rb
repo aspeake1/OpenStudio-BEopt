@@ -235,29 +235,32 @@ class ProcessBoilerTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_GSHPVertBore.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end  
 
-  def test_single_family_attached_new_construction
+  def test_retrofit_replace_central_system_boiler_baseboards
     num_units = 4
     args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"BoilerHotWater"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units*2, "PlantLoop"=>num_units, "CoilHeatingWaterBaseboard"=>num_units*2, "SetpointManagerScheduled"=>num_units, "PumpVariableSpeed"=>num_units}
-    expected_values = {"Efficiency"=>0.8, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
-    model = _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*3)
-    # Retrofit
-    expected_num_del_objects = expected_num_new_objects
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*6)
-  end
-
-  def test_multifamily_new_construction
-    num_units = 8
-    args_hash = {}
-    expected_num_del_objects = {}
+    expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units, "SetpointManagerScheduled"=>1}
     expected_num_new_objects = {"BoilerHotWater"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units, "PlantLoop"=>num_units, "CoilHeatingWaterBaseboard"=>num_units, "SetpointManagerScheduled"=>num_units, "PumpVariableSpeed"=>num_units}
     expected_values = {"Efficiency"=>0.8, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
-    model = _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*2)
-    # Retrofit
-    expected_num_del_objects = expected_num_new_objects
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4)
-  end  
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Boiler_Baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*3+1)
+  end
+  
+  def test_retrofit_replace_central_system_fan_coil
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units, "SetpointManagerScheduled"=>2}
+    expected_num_new_objects = {"BoilerHotWater"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units, "PlantLoop"=>num_units, "CoilHeatingWaterBaseboard"=>num_units, "SetpointManagerScheduled"=>num_units, "PumpVariableSpeed"=>num_units}
+    expected_values = {"Efficiency"=>0.8, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Fan_Coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*3+2)
+  end
+  
+  def test_retrofit_replace_central_system_ptac
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>num_units, "CoilHeatingWater"=>num_units, "FanConstantVolume"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units, "SetpointManagerScheduled"=>1}
+    expected_num_new_objects = {"BoilerHotWater"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units, "PlantLoop"=>num_units, "CoilHeatingWaterBaseboard"=>num_units, "SetpointManagerScheduled"=>num_units, "PumpVariableSpeed"=>num_units}
+    expected_values = {"Efficiency"=>0.8, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*3+1)
+  end
   
   private
   
@@ -328,7 +331,7 @@ class ProcessBoilerTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
