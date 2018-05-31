@@ -1857,9 +1857,54 @@ class Geometry
       if neighbor_offset != 0
         model.getSpaces.each do |space|
           space.surfaces.each do |existing_surface|
-            next if existing_surface.outsideBoundaryCondition.downcase != "outdoors" and existing_surface.outsideBoundaryCondition.downcase != "adiabatic"
-            next if existing_surface.adjacentSurface.is_initialized
-            next if existing_surface.outsideBoundaryCondition.downcase == "adiabatic" and !Geometry.is_corridor(space)
+            if existing_surface.outsideBoundaryCondition.downcase == "outdoors"
+            elsif existing_surface.adjacentSurface.is_initialized
+              next
+            elsif self.getSurfaceZValues([existing_surface]).all? {|z| z <= 0}
+              next
+            elsif existing_surface.outsideBoundaryCondition.downcase == "adiabatic" and existing_surface.surfaceType.downcase == "floor"
+              next
+            elsif existing_surface.outsideBoundaryCondition.downcase == "adiabatic" and existing_surface.surfaceType.downcase == "roofceiling"
+              shares_a_plane = false
+              existing_vertices = existing_surface.vertices
+              model.getSurfaces.each do |other_surface|
+                next if existing_surface == other_surface
+                if other_surface.outsideBoundaryCondition.downcase == "adiabatic" and other_surface.surfaceType.downcase == "floor"
+                else
+                  next
+                end
+                other_vertices = other_surface.vertices.reverse
+                if (OpenStudio::getDistance(existing_vertices[0], other_vertices[0]) <= 0.001 and OpenStudio::getDistance(existing_vertices[1], other_vertices[1]) <= 0.001 and OpenStudio::getDistance(existing_vertices[2], other_vertices[2]) <= 0.001 and OpenStudio::getDistance(existing_vertices[3], other_vertices[3]) <= 0.001) or \
+                (OpenStudio::getDistance(existing_vertices[1], other_vertices[0]) <= 0.001 and OpenStudio::getDistance(existing_vertices[2], other_vertices[1]) <= 0.001 and OpenStudio::getDistance(existing_vertices[3], other_vertices[2]) <= 0.001 and OpenStudio::getDistance(existing_vertices[0], other_vertices[3]) <= 0.001) or \
+                (OpenStudio::getDistance(existing_vertices[2], other_vertices[0]) <= 0.001 and OpenStudio::getDistance(existing_vertices[3], other_vertices[1]) <= 0.001 and OpenStudio::getDistance(existing_vertices[0], other_vertices[2]) <= 0.001 and OpenStudio::getDistance(existing_vertices[1], other_vertices[3]) <= 0.001) or \
+                (OpenStudio::getDistance(existing_vertices[3], other_vertices[0]) <= 0.001 and OpenStudio::getDistance(existing_vertices[0], other_vertices[1]) <= 0.001 and OpenStudio::getDistance(existing_vertices[1], other_vertices[2]) <= 0.001 and OpenStudio::getDistance(existing_vertices[2], other_vertices[3]) <= 0.001)
+                  shares_a_plane = true
+                end
+                break if shares_a_plane
+              end
+              next if shares_a_plane
+            elsif existing_surface.outsideBoundaryCondition.downcase == "adiabatic" and existing_surface.surfaceType.downcase == "wall"
+              shares_a_plane = false
+              existing_vertices = existing_surface.vertices
+              model.getSurfaces.each do |other_surface|
+                next if existing_surface == other_surface
+                if other_surface.outsideBoundaryCondition.downcase == "adiabatic" and other_surface.surfaceType.downcase == "wall"
+                else
+                  next
+                end
+                other_vertices = other_surface.vertices.reverse
+                if (OpenStudio::getDistance(existing_vertices[0], other_vertices[0]) <= 0.001 and OpenStudio::getDistance(existing_vertices[1], other_vertices[1]) <= 0.001 and OpenStudio::getDistance(existing_vertices[2], other_vertices[2]) <= 0.001 and OpenStudio::getDistance(existing_vertices[3], other_vertices[3]) <= 0.001) or \
+                (OpenStudio::getDistance(existing_vertices[1], other_vertices[0]) <= 0.001 and OpenStudio::getDistance(existing_vertices[2], other_vertices[1]) <= 0.001 and OpenStudio::getDistance(existing_vertices[3], other_vertices[2]) <= 0.001 and OpenStudio::getDistance(existing_vertices[0], other_vertices[3]) <= 0.001) or \
+                (OpenStudio::getDistance(existing_vertices[2], other_vertices[0]) <= 0.001 and OpenStudio::getDistance(existing_vertices[3], other_vertices[1]) <= 0.001 and OpenStudio::getDistance(existing_vertices[0], other_vertices[2]) <= 0.001 and OpenStudio::getDistance(existing_vertices[1], other_vertices[3]) <= 0.001) or \
+                (OpenStudio::getDistance(existing_vertices[3], other_vertices[0]) <= 0.001 and OpenStudio::getDistance(existing_vertices[0], other_vertices[1]) <= 0.001 and OpenStudio::getDistance(existing_vertices[1], other_vertices[2]) <= 0.001 and OpenStudio::getDistance(existing_vertices[2], other_vertices[3]) <= 0.001)
+                  shares_a_plane = true
+                end
+                break if shares_a_plane
+              end
+              next if shares_a_plane
+            else
+              next
+            end
             m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
             m[0,3] = -x_offset
             m[1,3] = -y_offset
