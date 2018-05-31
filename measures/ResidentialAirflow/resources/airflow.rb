@@ -1010,7 +1010,7 @@ class Airflow
       temp_hourly_wked << ssn_schedule_wked
     end
     
-    temp_sch = HourlyByMonthSchedule.new(model, runner, obj_name_natvent + " temp schedule", temp_hourly_wkdy, temp_hourly_wked, normalize_values = false)
+    temp_sch = HourlyByMonthSchedule.new(model, runner, obj_name_natvent + " temp schedule", temp_hourly_wkdy, temp_hourly_wked, normalize_values=false)
     
     nv_output = NaturalVentilationOutput.new(area, max_flow_rate, temp_sch, c_s, c_w, season_type)
     return true, nv_output
@@ -1796,18 +1796,24 @@ class Airflow
   
   def self.create_infil_mech_vent_objects(model, runner, output_vars, obj_name_infil, obj_name_mech_vent, unit_living, infil, mech_vent, wind_speed, mv_output, infil_output, tin_sensor, tout_sensor, vwind_sensor, duct_lk_supply_fan_equiv_var, duct_lk_return_fan_equiv_var, cfis_output, nbeds)
 
+    # Design day schedules used when autosizing
+    winter_design_day_sch = OpenStudio::Model::ScheduleDay.new(model)
+    winter_design_day_sch.addValue(OpenStudio::Time.new(0,24,0,0), 0)
+    summer_design_day_sch = OpenStudio::Model::ScheduleDay.new(model)
+    summer_design_day_sch.addValue(OpenStudio::Time.new(0,24,0,0), 1)
+  
     # Sensors
   
     range_array = [0.0] * 24
     range_array[mech_vent.range_exhaust_hour - 1] = 1.0
-    range_hood_sch = HourlyByMonthSchedule.new(model, runner, obj_name_mech_vent + " range exhaust schedule", [range_array] * 12, [range_array] * 12, normalize_values = false)
+    range_hood_sch = HourlyByMonthSchedule.new(model, runner, obj_name_mech_vent + " range exhaust schedule", [range_array] * 12, [range_array] * 12, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
     range_sch_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Schedule Value"])
     range_sch_sensor.setName("#{obj_name_infil} range sch s")
     range_sch_sensor.setKeyName(range_hood_sch.schedule.name.to_s)
 
     bathroom_array = [0.0] * 24
     bathroom_array[mech_vent.bathroom_exhaust_hour - 1] = 1.0
-    bath_exhaust_sch = HourlyByMonthSchedule.new(model, runner, obj_name_mech_vent + " bath exhaust schedule", [bathroom_array] * 12, [bathroom_array] * 12, normalize_values = false)
+    bath_exhaust_sch = HourlyByMonthSchedule.new(model, runner, obj_name_mech_vent + " bath exhaust schedule", [bathroom_array] * 12, [bathroom_array] * 12, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
     bath_sch_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, output_vars["Schedule Value"])
     bath_sch_sensor.setName("#{obj_name_infil} bath sch s")
     bath_sch_sensor.setKeyName(bath_exhaust_sch.schedule.name.to_s)

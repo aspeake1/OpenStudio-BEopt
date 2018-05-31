@@ -2322,7 +2322,7 @@ class HVAC
         next unless sch.name.to_s == Constants.ObjectNameHeatingSeason
         sch.remove
       end
-      
+
       heating_season_schedule = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameHeatingSeason, Array.new(24, 1), Array.new(24, 1), heating_season, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false)
       unless heating_season_schedule.validated?
         return false
@@ -2368,7 +2368,13 @@ class HVAC
         next unless sch.name.to_s == Constants.ObjectNameHeatingSetpoint
         sch.remove
       end
-      
+
+      # Design day schedules used when autosizing
+      winter_design_day_sch = OpenStudio::Model::ScheduleDay.new(model)
+      winter_design_day_sch.addValue(OpenStudio::Time.new(0,24,0,0), UnitConversions.convert(70, "F", "C"))
+      summer_design_day_sch = OpenStudio::Model::ScheduleDay.new(model)
+      summer_design_day_sch.addValue(OpenStudio::Time.new(0,24,0,0), UnitConversions.convert(75, "F", "C"))
+
       # Make the setpoint schedules
       heating_setpoint = nil
       cooling_setpoint = nil
@@ -2434,9 +2440,9 @@ class HVAC
             next unless sch.name.to_s == Constants.ObjectNameCoolingSetpoint
             sch.remove
           end
-          
-          heating_setpoint = HourlyByMonthSchedule.new(model, runner, Constants.ObjectNameHeatingSetpoint, htg_wkdy_monthly, htg_wked_monthly, normalize_values=false)
-          cooling_setpoint = HourlyByMonthSchedule.new(model, runner, Constants.ObjectNameCoolingSetpoint, clg_wkdy_monthly, clg_wked_monthly, normalize_values=false)
+
+          heating_setpoint = HourlyByMonthSchedule.new(model, runner, Constants.ObjectNameHeatingSetpoint, htg_wkdy_monthly, htg_wked_monthly, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
+          cooling_setpoint = HourlyByMonthSchedule.new(model, runner, Constants.ObjectNameCoolingSetpoint, clg_wkdy_monthly, clg_wked_monthly, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
 
           unless heating_setpoint.validated? and cooling_setpoint.validated?
             return false
@@ -2457,8 +2463,8 @@ class HVAC
             clg_monthly_sch[m-1] = Constants.NoCoolingSetpoint
           end
           
-          heating_setpoint = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameHeatingSetpoint, weekday_setpoints, weekend_setpoints, htg_monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false)
-          cooling_setpoint = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameCoolingSetpoint, Array.new(24, 1), Array.new(24, 1), clg_monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false)
+          heating_setpoint = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameHeatingSetpoint, weekday_setpoints, weekend_setpoints, htg_monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
+          cooling_setpoint = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameCoolingSetpoint, Array.new(24, 1), Array.new(24, 1), clg_monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
 
           unless heating_setpoint.validated? and cooling_setpoint.validated?
             return false
@@ -2557,8 +2563,14 @@ class HVAC
       model.getScheduleRulesets.each do |sch|
         next unless sch.name.to_s == Constants.ObjectNameCoolingSetpoint
         sch.remove
-      end    
-      
+      end
+
+      # Design day schedules used when autosizing
+      winter_design_day_sch = OpenStudio::Model::ScheduleDay.new(model)
+      winter_design_day_sch.addValue(OpenStudio::Time.new(0,24,0,0), UnitConversions.convert(70, "F", "C"))
+      summer_design_day_sch = OpenStudio::Model::ScheduleDay.new(model)
+      summer_design_day_sch.addValue(OpenStudio::Time.new(0,24,0,0), UnitConversions.convert(75, "F", "C"))
+
       # Make the setpoint schedules
       heating_setpoint = nil
       cooling_setpoint = nil
@@ -2625,8 +2637,8 @@ class HVAC
             sch.remove
           end        
           
-          heating_setpoint = HourlyByMonthSchedule.new(model, runner, Constants.ObjectNameHeatingSetpoint, htg_wkdy_monthly, htg_wked_monthly, normalize_values=false)
-          cooling_setpoint = HourlyByMonthSchedule.new(model, runner, Constants.ObjectNameCoolingSetpoint, clg_wkdy_monthly, clg_wked_monthly, normalize_values=false)
+          heating_setpoint = HourlyByMonthSchedule.new(model, runner, Constants.ObjectNameHeatingSetpoint, htg_wkdy_monthly, htg_wked_monthly, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
+          cooling_setpoint = HourlyByMonthSchedule.new(model, runner, Constants.ObjectNameCoolingSetpoint, clg_wkdy_monthly, clg_wked_monthly, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
 
           unless heating_setpoint.validated? and cooling_setpoint.validated?
             return false
@@ -2647,8 +2659,8 @@ class HVAC
             htg_monthly_sch[m-1] = Constants.NoHeatingSetpoint
           end
           
-          heating_setpoint = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameHeatingSetpoint, Array.new(24, 1), Array.new(24, 1), htg_monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false)
-          cooling_setpoint = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameCoolingSetpoint, weekday_setpoints, weekend_setpoints, clg_monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false)
+          heating_setpoint = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameHeatingSetpoint, Array.new(24, 1), Array.new(24, 1), htg_monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
+          cooling_setpoint = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameCoolingSetpoint, weekday_setpoints, weekend_setpoints, clg_monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
 
           unless heating_setpoint.validated? and cooling_setpoint.validated?
             return false
