@@ -2393,21 +2393,24 @@ class NaturalVentilationOutput
 end
 
 class MechanicalVentilation
-  def initialize(type, infil_credit, total_efficiency, frac_62_2, fan_power, sensible_efficiency, ashrae_std, cfis_open_time, cfis_airflow_frac, dryer_exhaust, range_exhaust_hour, bathroom_exhaust_hour)
+  def initialize(type, infil_credit, total_efficiency, frac_62_2, whole_house_cfm, fan_power, sensible_efficiency, ashrae_std, cfis_open_time, cfis_airflow_frac, dryer_exhaust, range_exhaust, range_exhaust_hour, bathroom_exhaust, bathroom_exhaust_hour)
     @type = type
     @infil_credit = infil_credit
     @total_efficiency = total_efficiency
     @frac_62_2 = frac_62_2
+    @whole_house_cfm = whole_house_cfm
     @fan_power = fan_power
     @sensible_efficiency = sensible_efficiency
     @ashrae_std = ashrae_std
     @cfis_open_time = cfis_open_time
     @cfis_airflow_frac = cfis_airflow_frac
     @dryer_exhaust = dryer_exhaust
+    @range_exhaust = range_exhaust
     @range_exhaust_hour = range_exhaust_hour
+    @bathroom_exhaust = bathroom_exhaust
     @bathroom_exhaust_hour = bathroom_exhaust_hour
   end
-  attr_accessor(:type, :infil_credit, :total_efficiency, :frac_62_2, :fan_power, :sensible_efficiency, :ashrae_std, :cfis_open_time, :cfis_airflow_frac, :dryer_exhaust, :range_exhaust_hour, :bathroom_exhaust_hour)
+  attr_accessor(:type, :infil_credit, :total_efficiency, :frac_62_2, :whole_house_cfm, :fan_power, :sensible_efficiency, :ashrae_std, :cfis_open_time, :cfis_airflow_frac, :dryer_exhaust, :range_exhaust, :range_exhaust_hour, :bathroom_exhaust, :bathroom_exhaust_hour)
 end
 
 class MechanicalVentilationOutput

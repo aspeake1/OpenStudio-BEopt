@@ -18,7 +18,7 @@ class ProcessCeilingFanTest < MiniTest::Test
     args_hash = {}
     args_hash["use_benchmark_energy"] = "false"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ceiling_fans_design_level"=>22.5}
     _test_measure("SFD_2000sqft_2story_FB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -29,7 +29,7 @@ class ProcessCeilingFanTest < MiniTest::Test
     args_hash["specified_num"] = "NA"
     args_hash["use_benchmark_energy"] = "false"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ceiling_fans_design_level"=>49.5}
     _test_measure("SFD_2000sqft_2story_FB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end   
@@ -41,7 +41,7 @@ class ProcessCeilingFanTest < MiniTest::Test
     args_hash["use_benchmark_energy"] = "false"
     args_hash["cooling_setpoint_offset"] = "4.0"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values_clg_wkday_setpoints = [80]*24
     expected_values_clg_wked_setpoints = [80]*24
     expected_values = {"ceiling_fans_design_level"=>49.5, "clg_wkday_setpoints"=>expected_values_clg_wkday_setpoints, "clg_wked_setpoints"=>expected_values_clg_wked_setpoints}
@@ -55,7 +55,7 @@ class ProcessCeilingFanTest < MiniTest::Test
     args_hash["use_benchmark_energy"] = "false"
     args_hash["cooling_setpoint_offset"] = "4.0"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>24, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>24, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values_clg_wkday_setpoints = [80,79,78,78,79,80,80,79,78,78,79,80,80,79,78,78,79,80,80,79,78,78,79,80]
     expected_values_clg_wked_setpoints = [81,82,83,83,82,81,81,82,83,83,82,81,81,82,83,83,82,81,81,82,83,83,82,81]
     expected_values = {"ceiling_fans_design_level"=>49.5, "clg_wkday_setpoints"=>expected_values_clg_wkday_setpoints, "clg_wked_setpoints"=>expected_values_clg_wked_setpoints}
@@ -67,7 +67,7 @@ class ProcessCeilingFanTest < MiniTest::Test
     args_hash["control"] = Constants.CeilingFanControlSmart
     args_hash["use_benchmark_energy"] = "false"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ceiling_fans_design_level"=>11.25}
     _test_measure("SFD_2000sqft_2story_FB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -76,7 +76,7 @@ class ProcessCeilingFanTest < MiniTest::Test
     args_hash = {}
     args_hash["use_benchmark_energy"] = "false"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ScheduleRule"=>12, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ceiling_fans_design_level"=>22.5}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
@@ -86,7 +86,7 @@ class ProcessCeilingFanTest < MiniTest::Test
     args_hash = {}
     args_hash["use_benchmark_energy"] = "false"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*1, "ScheduleRule"=>num_units*12, "EnergyManagementSystemProgram"=>num_units*1, "EnergyManagementSystemActuator"=>num_units*1, "EnergyManagementSystemSensor"=>num_units*2, "EnergyManagementSystemProgramCallingManager"=>num_units*1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>num_units*1, "ElectricEquipment"=>num_units*1}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*1, "ScheduleRule"=>num_units*12, "EnergyManagementSystemProgram"=>num_units*1, "EnergyManagementSystemActuator"=>num_units*1, "EnergyManagementSystemSensor"=>num_units*2, "EnergyManagementSystemProgramCallingManager"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1, "ElectricEquipment"=>num_units*1}
     expected_values = {"ceiling_fans_design_level"=>22.5}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
@@ -96,7 +96,7 @@ class ProcessCeilingFanTest < MiniTest::Test
     args_hash = {}
     args_hash["use_benchmark_energy"] = "false"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>num_units*1, "ScheduleRule"=>num_units*12, "EnergyManagementSystemProgram"=>num_units*1, "EnergyManagementSystemActuator"=>num_units*1, "EnergyManagementSystemSensor"=>num_units*2, "EnergyManagementSystemProgramCallingManager"=>num_units*1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>num_units*1, "ElectricEquipment"=>num_units*1}
+    expected_num_new_objects = {"ScheduleRuleset"=>num_units*1, "ScheduleRule"=>num_units*12, "EnergyManagementSystemProgram"=>num_units*1, "EnergyManagementSystemActuator"=>num_units*1, "EnergyManagementSystemSensor"=>num_units*2, "EnergyManagementSystemProgramCallingManager"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1, "ElectricEquipment"=>num_units*1}
     expected_values = {"ceiling_fans_design_level"=>22.5}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
@@ -104,7 +104,7 @@ class ProcessCeilingFanTest < MiniTest::Test
   def test_retrofit_specify_instead_of_benchmark
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>2, "ScheduleRule"=>24, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "OutputVariable"=>2, "ElectricEquipmentDefinition"=>4, "ElectricEquipment"=>4}
+    expected_num_new_objects = {"ScheduleRuleset"=>2, "ScheduleRule"=>24, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipmentDefinition"=>4, "ElectricEquipment"=>4}
     expected_values = {"ceiling_fans_design_level"=>0, "misc_elec_load_design_level"=>12.86}
     model = _test_measure("SFD_2000sqft_2story_FB_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["specified_num"] = "2"
