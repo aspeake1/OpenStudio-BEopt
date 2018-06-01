@@ -101,7 +101,7 @@ class ProcessCentralSystemHotWaterBoilerBaseboardsTest < MiniTest::Test
   def test_retrofit_replace_mshp
     num_units = 4
     args_hash = {}
-    expected_num_del_objects = {"FanOnOff"=>num_units, "AirConditionerVariableRefrigerantFlow"=>num_units, "ZoneHVACTerminalUnitVariableRefrigerantFlow"=>num_units, "CoilCoolingDXVariableRefrigerantFlow"=>num_units, "CoilHeatingDXVariableRefrigerantFlow"=>num_units, "ZoneHVACBaseboardConvectiveElectric"=>num_units, "OutputVariable"=>2*num_units, "EnergyManagementSystemSensor"=>2*num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "EnergyManagementSystemActuator"=>num_units, "EnergyManagementSystemProgram"=>num_units, "EnergyManagementSystemProgramCallingManager"=>num_units}
+    expected_num_del_objects = {"FanOnOff"=>num_units, "AirConditionerVariableRefrigerantFlow"=>num_units, "ZoneHVACTerminalUnitVariableRefrigerantFlow"=>num_units, "CoilCoolingDXVariableRefrigerantFlow"=>num_units, "CoilHeatingDXVariableRefrigerantFlow"=>num_units, "ZoneHVACBaseboardConvectiveElectric"=>num_units, "EnergyManagementSystemSensor"=>2*num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "EnergyManagementSystemActuator"=>num_units, "EnergyManagementSystemProgram"=>num_units, "EnergyManagementSystemProgramCallingManager"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units}
     expected_values = {}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
