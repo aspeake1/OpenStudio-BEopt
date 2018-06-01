@@ -1820,7 +1820,6 @@ class Geometry
     greatest_x = -9e99
     least_y = 9e99
     greatest_y = -9e99
-    least_z = 0
     greatest_z = -9e99
     surfaces.each do |surface|
       next unless surface.surfaceType.downcase == "wall"
