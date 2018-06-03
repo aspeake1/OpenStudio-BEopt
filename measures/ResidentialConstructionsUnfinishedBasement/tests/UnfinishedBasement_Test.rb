@@ -126,20 +126,12 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
-  def test_exposed_perimeter_with_garage
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>6, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
-    expected_values = {"ExposedPerimeter"=>107}
-    _test_measure("SFD_2000sqft_2story_UB_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
 
   def test_single_family_attached_new_construction
     num_units = 10
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>22, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_num_new_objects = {"Material"=>16, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
     expected_values = {"ExposedPerimeter"=>360}
     _test_measure("SFA_10units_2story_UB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -148,7 +140,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     num_units = 10+1
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>24, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_num_new_objects = {"Material"=>17, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
     expected_values = {"ExposedPerimeter"=>401.8}
     _test_measure("MF_40units_4story_UB_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end

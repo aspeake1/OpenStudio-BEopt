@@ -68,7 +68,7 @@ class MiscLoads
 
               if sch.nil?
                   # Create schedule
-                  sch = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameMiscPlugLoads + " schedule", weekday_sch, weekend_sch, monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
+                  sch = MonthWeekdayWeekendSchedule.new(model, runner, Constants.ObjectNameMiscPlugLoads + " schedule", weekday_sch, weekend_sch, monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=true, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
                   if not sch.validated?
                       return false
                   end
@@ -145,7 +145,7 @@ class MiscLoads
       
           if sch.nil?
               # Create schedule
-              sch = MonthWeekdayWeekendSchedule.new(model, runner, unit_obj_name + " schedule", weekday_sch, weekend_sch, monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
+              sch = MonthWeekdayWeekendSchedule.new(model, runner, unit_obj_name + " schedule", weekday_sch, weekend_sch, monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=true, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
               if not sch.validated?
                   return false
               end
@@ -225,7 +225,7 @@ class MiscLoads
       
           if sch.nil?
               # Create schedule
-              sch = MonthWeekdayWeekendSchedule.new(model, runner, unit_obj_name + " schedule", weekday_sch, weekend_sch, monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=false, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
+              sch = MonthWeekdayWeekendSchedule.new(model, runner, unit_obj_name + " schedule", weekday_sch, weekend_sch, monthly_sch, mult_weekday=1.0, mult_weekend=1.0, normalize_values=true, create_sch_object=true, winter_design_day_sch, summer_design_day_sch)
               if not sch.validated?
                   return false
               end
