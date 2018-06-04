@@ -180,7 +180,7 @@ class ResidentialHotWaterHeaterTank < OpenStudio::Measure::ModelMeasure
             success = Waterheater.apply_tank(model, unit, runner, space, fuel_type, 
                                              capacity, tank_volume, energy_factor, 
                                              recovery_efficiency, setpoint_temp, 
-                                             oncycle_power, offcycle_power)
+                                             oncycle_power, offcycle_power, 1.0)
             return false if not success
 
         end
