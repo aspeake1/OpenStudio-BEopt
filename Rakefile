@@ -95,13 +95,6 @@ def regenerate_osms
     end
     
     cli_path = OpenStudio.getOpenStudioCLI
-    puts "cli_path is #{cli_path.to_s}"
-    puts "cli_path abs is #{File.absolute_path(cli_path.to_s)}"
-    cli_path_exists = false
-    if File.exists? cli_path.to_s
-      cli_path_exists = true
-    end
-    puts "cli_path exists: #{cli_path_exists}"
 
     num_osws = 0
     osw_files.each do |osw|

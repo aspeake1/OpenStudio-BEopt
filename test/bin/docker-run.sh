@@ -20,7 +20,7 @@ case $CIRCLE_NODE_INDEX in
   0)
     # We currently only use one node to make Coveralls happy.
     rake test:regenerate_osms
-    #rake test:all
+    rake test:all
     ;;
   #1)
   #  ;;
