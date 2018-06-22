@@ -18,7 +18,7 @@ class WorkflowTest < MiniTest::Test
   def run_and_check(in_osw, parent_dir)
     # Run energy_rating_index workflow
     cli_path = OpenStudio.getOpenStudioCLI
-    command = "cd #{parent_dir} && \"#{cli_path}\" run -w #{in_osw}"
+    command = "cd #{parent_dir} && \"#{cli_path}\" --no-ssl run -w #{in_osw}"
     system(command)
   
     # Check all output files exist
