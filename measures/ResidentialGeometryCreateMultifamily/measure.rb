@@ -162,6 +162,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeRight}"
     building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeBack}"
     building_facades << "#{Constants.FacadeBack}, #{Constants.FacadeRight}"
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
 
     #make an argument for shared building facade
     shared_building_facades = OpenStudio::Measure::OSArgument::makeChoiceArgument("shared_building_facades", building_facades, true)
