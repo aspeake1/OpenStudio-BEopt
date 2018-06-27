@@ -174,7 +174,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  def test_shared_building_facades
+  def test_two_shared_building_facades
     num_finished_spaces = 4
     args_hash = {}
     args_hash["num_units"] = 4
@@ -182,7 +182,19 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     args_hash["shared_building_facades"] = "left, back"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>12, "Material"=>1, "Construction"=>1}
-    expected_values = {"FinishedFloorArea"=>900*1*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>4*900, "BuildingHeight"=>3+8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>15}
+    expected_values = {"FinishedFloorArea"=>900*1*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>4*900, "BuildingHeight"=>3+8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>20}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+  
+  def test_three_shared_building_facades
+    num_finished_spaces = 4
+    args_hash = {}
+    args_hash["num_units"] = 4
+    args_hash["foundation_type"] = "crawlspace"
+    args_hash["shared_building_facades"] = "left, right, back"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>12, "Material"=>1, "Construction"=>1}
+    expected_values = {"FinishedFloorArea"=>900*1*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>4*900, "BuildingHeight"=>3+8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>26}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -471,7 +483,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
           actual_values["EavesDepth"] = [UnitConversions.convert(l,"m","ft"), UnitConversions.convert(w,"m","ft")].min
           assert_in_epsilon(expected_values["EavesDepth"], actual_values["EavesDepth"], 0.01)
         elsif obj_type == "Surface"
-          if new_object.outsideBoundaryCondition.downcase == "outdoors"
+          if ["outdoors", "foundation"].include? new_object.outsideBoundaryCondition.downcase
             if new_object.construction.is_initialized
               new_object.construction.get.to_LayeredConstruction.get.layers.each do |layer|
                 next unless layer.name.to_s.include? Constants.SurfaceTypeAdiabatic

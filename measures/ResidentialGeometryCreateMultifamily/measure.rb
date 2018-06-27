@@ -925,10 +925,11 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
       shared_building_facades.each do |shared_building_facade|
         model.getSurfaces.each do |surface|
           next unless surface.surfaceType.downcase == "wall"
-          next unless surface.outsideBoundaryCondition.downcase == "outdoors"
+          next unless ["outdoors", "foundation"].include? surface.outsideBoundaryCondition.downcase
           next if surface.adjacentSurface.is_initialized
           next unless Geometry.get_facade_for_surface(surface) == shared_building_facade
           surface.setConstruction(constr)
+          surface.setOutsideBoundaryCondition("Adiabatic")
         end
       end
     end

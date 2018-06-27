@@ -2424,11 +2424,11 @@ class SurfaceTypes
                     surfaces[Constants.SurfaceTypeWallFndGrndCS] << surface
                     
                 # Adiabatic finished
-                elsif obc_is_adiabatic and is_finished
+                elsif obc_is_adiabatic and is_finished and not surface.construction.is_initialized
                     surfaces[Constants.SurfaceTypeWallIntFinUninsFin] << surface
                 
                 # Adiabatic unfinished
-                elsif obc_is_adiabatic and not is_finished
+                elsif obc_is_adiabatic and not is_finished and not surface.construction.is_initialized
                     surfaces[Constants.SurfaceTypeWallIntUnfinUninsUnfin] << surface
                 
                 end
