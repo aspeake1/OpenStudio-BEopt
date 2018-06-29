@@ -64,15 +64,6 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     _test_measure("MF_40units_4story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-    def test_multifamily_new_construction_shared_facade
-    num_units = 10+1
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>13, "Construction"=>22, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"ExposedPerimeter"=>401.8-2*10}
-    _test_measure("MF_40units_4story_SL_SFLeftRight_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-
   def test_argument_error_perimeter_r_negative
     args_hash = {}
     args_hash["perimeter_r"] = -1

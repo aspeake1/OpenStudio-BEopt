@@ -95,6 +95,38 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     expected_values = {"AssemblyR"=>assembly_r}
     _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  def test_10in_grid_icf_etc_shared_walls
+    args_hash = {}
+    args_hash["thick_in_1"] = 2.75
+    args_hash["thick_in_2"] = 3.725
+    args_hash["thick_in_3"] = 3.5
+    args_hash["conductivity_1"] = 0.4429
+    args_hash["conductivity_2"] = 3.457
+    args_hash["conductivity_3"] = 0.927
+    args_hash["density_1"] = 66.48
+    args_hash["density_2"] = 97.0
+    args_hash["density_3"] = 52.03
+    args_hash["specific_heat_1"] = 0.25
+    args_hash["specific_heat_2"] = 0.21
+    args_hash["specific_heat_3"] = 0.25
+    args_hash["drywall_thick_in"] = 1.0
+    args_hash["osb_thick_in"] = 0
+    args_hash["rigid_r"] = 10
+    args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
+    args_hash["shared_building_facades"] = "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>9, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    ext_finish_r = 0.1016/0.793375
+    drywall_r = 0.0254/0.1602906
+    layer1_r = 0.06985/0.063888325
+    layer2_r = 0.094615/0.49867225
+    layer3_r = 0.0889/0.13371975
+    rigid_r = 0.0508/0.02885
+    assembly_r = ext_finish_r + rigid_r + drywall_r + layer1_r + layer2_r + layer3_r
+    expected_values = {"AssemblyR"=>assembly_r}
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
 
   def test_argument_error_thick_in_zero
     (1..5).each do |layer_num|
@@ -253,7 +285,7 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

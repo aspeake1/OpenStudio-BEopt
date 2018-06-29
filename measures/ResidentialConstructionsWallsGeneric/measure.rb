@@ -206,6 +206,24 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
     exterior_finish.setDefaultValue(Material.ExtFinishVinylLight.name)
     args << exterior_finish
     
+    #make a choice argument for model objects
+    building_facades = OpenStudio::StringVector.new
+    building_facades << Constants.FacadeNone
+    building_facades << Constants.FacadeBack
+    building_facades << Constants.FacadeLeft
+    building_facades << Constants.FacadeRight
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeRight}"
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeBack}"
+    building_facades << "#{Constants.FacadeBack}, #{Constants.FacadeRight}"
+    building_facades << "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
+
+    #make an argument for shared building facade
+    shared_building_facades = OpenStudio::Measure::OSArgument::makeChoiceArgument("shared_building_facades", building_facades, true)
+    shared_building_facades.setDisplayName("Shared Building Facade(s)")
+    shared_building_facades.setDescription("The facade(s) of the building that are shared. Surfaces on these facades become adiabatic.")
+    shared_building_facades.setDefaultValue(Constants.FacadeNone)
+    args << shared_building_facades
+    
     return args
   end #end the arguments method
 
@@ -245,6 +263,7 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
     osb_thick_in = runner.getDoubleArgumentValue("osb_thick_in",user_arguments)
     rigid_r = runner.getDoubleArgumentValue("rigid_r",user_arguments)
     mat_ext_finish = WallConstructions.get_exterior_finish_material(runner.getStringArgumentValue("exterior_finish",user_arguments))
+    shared_building_facades = runner.getStringArgumentValue("shared_building_facades",user_arguments)
     
     if thick_in2.empty? then thick_in2 = nil else thick_in2 = thick_in2.get end
     if thick_in3.empty? then thick_in3 = nil else thick_in3 = thick_in3.get end
@@ -306,6 +325,12 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
     if not ThermalMassConstructions.apply(runner, model, walls_by_type,
                                           drywall_thick_in)
         return false
+    end
+    
+    if shared_building_facades != Constants.FacadeNone
+      if not WallConstructions.apply_adiabatic(runner, model, shared_building_facades)
+        return false
+      end
     end
     
     # Remove any constructions/materials that aren't used

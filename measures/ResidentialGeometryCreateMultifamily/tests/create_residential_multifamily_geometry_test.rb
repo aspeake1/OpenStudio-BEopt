@@ -174,30 +174,6 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  def test_two_shared_building_facades
-    num_finished_spaces = 4
-    args_hash = {}
-    args_hash["num_units"] = 4
-    args_hash["foundation_type"] = "crawlspace"
-    args_hash["shared_building_facades"] = "left, back"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>12, "Material"=>1, "Construction"=>1}
-    expected_values = {"FinishedFloorArea"=>900*1*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>4*900, "BuildingHeight"=>3+8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>20}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
-  end
-  
-  def test_three_shared_building_facades
-    num_finished_spaces = 4
-    args_hash = {}
-    args_hash["num_units"] = 4
-    args_hash["foundation_type"] = "crawlspace"
-    args_hash["shared_building_facades"] = "left, right, back"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1*4, "Surface"=>52, "ThermalZone"=>1*4+1+1, "Space"=>1*4+1+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>12, "Material"=>1, "Construction"=>1}
-    expected_values = {"FinishedFloorArea"=>900*1*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>4*900, "BuildingHeight"=>3+8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>26}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
-  end
-
   def test_argument_error_beds_not_equal_to_baths
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0, 3.0"

@@ -98,6 +98,32 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
+  def test_6in_concrete_filled_etc_shared_walls
+    args_hash = {}
+    args_hash["thick_in"] = 6
+    args_hash["conductivity"] = 5.33
+    args_hash["density"] = 119
+    args_hash["framing_factor"] = 0.076
+    args_hash["furring_r"] = 0
+    args_hash["furring_cavity_depth_in"] = 1
+    args_hash["furring_spacing"] = 24
+    args_hash["drywall_thick_in"] = 1.0
+    args_hash["osb_thick_in"] = 0
+    args_hash["rigid_r"] = 10
+    args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
+    args_hash["shared_building_facades"] = "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>8, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    ext_finish_r = 0.1016/0.793375
+    drywall_r = 0.0254/0.1602906
+    cmu_r = 0.1524/0.5895186350785937
+    furring_r = 0.0254/0.14026226645
+    rigid_r = 0.0508/0.02885
+    assembly_r = ext_finish_r + drywall_r + cmu_r + furring_r +  rigid_r
+    expected_values = {"AssemblyR"=>assembly_r}
+    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
   def test_argument_error_thickness_zero
     args_hash = {}
     args_hash["thick_in"] = 0
@@ -227,7 +253,7 @@ class ProcessConstructionsWallsCMUTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

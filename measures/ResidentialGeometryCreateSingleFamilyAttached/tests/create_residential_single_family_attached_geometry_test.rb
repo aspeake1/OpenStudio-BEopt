@@ -171,34 +171,6 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
-  def test_two_shared_building_facades
-    num_finished_spaces = 12
-    args_hash = {}
-    args_hash["num_floors"] = 2
-    args_hash["num_units"] = 4
-    args_hash["has_rear_units"] = "true"
-    args_hash["foundation_type"] = "finished basement"
-    args_hash["shared_building_facades"] = "back, right"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>80, "ThermalZone"=>2*4+1, "Space"=>(2+1)*4+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>8, "Material"=>1, "Construction"=>1}
-    expected_values = {"FinishedFloorArea"=>900*4, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>300*4, "UnfinishedAtticHeight"=>7.12, "UnfinishedAtticFloorArea"=>300*4, "BuildingHeight"=>8+8+8+7.12, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>13}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
-  end
-  
-  def test_three_shared_building_facades
-    num_finished_spaces = 12
-    args_hash = {}
-    args_hash["num_floors"] = 2
-    args_hash["num_units"] = 4
-    args_hash["has_rear_units"] = "true"
-    args_hash["foundation_type"] = "finished basement"
-    args_hash["shared_building_facades"] = "left, right, back"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>80, "ThermalZone"=>2*4+1, "Space"=>(2+1)*4+1, "SpaceType"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>8, "Material"=>1, "Construction"=>1}
-    expected_values = {"FinishedFloorArea"=>900*4, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>300*4, "UnfinishedAtticHeight"=>7.12, "UnfinishedAtticFloorArea"=>300*4, "BuildingHeight"=>8+8+8+7.12, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>19}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
-  end
-
   def test_argument_error_beds_not_equal_to_baths
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0, 3.0"
