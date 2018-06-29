@@ -74,31 +74,6 @@ class ProcessConstructionsWallsSIPTest < MiniTest::Test
     expected_values = {"AssemblyR"=>assembly_r}
     _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
-  def test_9_4in_eps_osb_interior_etc_shared_walls
-    args_hash = {}
-    args_hash["sip_r"] = 47.5
-    args_hash["thick_in"] = 9.375
-    args_hash["framing_factor"] = 0.156
-    args_hash["sheathing_type"] = Constants.MaterialGypsum
-    args_hash["sheathing_thick_in"] = 0.5
-    args_hash["drywall_thick_in"] = 1.0
-    args_hash["osb_thick_in"] = 0
-    args_hash["rigid_r"] = 10
-    args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
-    args_hash["shared_building_facades"] = "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>8, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
-    ext_finish_r = 0.1016/0.793375
-    drywall_r = 0.0254/0.1602906
-    spline_r = 0.0127/0.0195418669187547
-    ins_r = 0.212725/0.0420404143578947
-    sheath_r = 0.011176/0.1154577
-    rigid_r = 0.0508/0.02885
-    assembly_r = ext_finish_r + rigid_r + drywall_r + spline_r * 2 + ins_r + sheath_r
-    expected_values = {"AssemblyR"=>assembly_r}
-    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
 
   def test_argument_error_sip_rvalue_negative
     args_hash = {}

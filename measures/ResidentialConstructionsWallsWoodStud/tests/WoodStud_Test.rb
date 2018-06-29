@@ -110,29 +110,6 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
     expected_values = {"AssemblyR"=>assembly_r}
     _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
-  def test_r21_2x6_ff15_etc_shared_walls
-    args_hash = {}
-    args_hash["cavity_r"] = 21
-    args_hash["install_grade"] = "1"
-    args_hash["cavity_depth_in"] = 5.5
-    args_hash["cavity_filled"] = true
-    args_hash["framing_factor"] = 0.15
-    args_hash["drywall_thick_in"] = 1.0
-    args_hash["osb_thick_in"] = 0
-    args_hash["rigid_r"] = 10
-    args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
-    args_hash["shared_building_facades"] = "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
-    ext_finish_r = 0.1016/0.793375
-    drywall_r = 0.0254/0.1602906
-    cavity_r = 0.1397/0.0448317763517687
-    rigid_r = 0.0508/0.02885
-    assembly_r = ext_finish_r + rigid_r + drywall_r + cavity_r
-    expected_values = {"AssemblyR"=>assembly_r}
-    _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
 
   def test_argument_error_cavity_r_negative
     args_hash = {}

@@ -75,11 +75,12 @@ The order in which these measures are called is important. For example, the Wind
 ||2. Door Area||
 ||3. Window/Skylight Area||
 |3. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
-||2. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
-||3. Floors||
-||4. Windows/Skylights|Window/Skylight Area, Location|
-||5. Doors|Door Area|
-||6. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
+||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
+||3. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
+||4. Floors||
+||5. Windows/Skylights|Window/Skylight Area, Location|
+||6. Doors|Door Area|
+||7. Shared Building Facades||
 |4. Domestic Hot Water|1. Water Heater - Tank (or Tankless, Heat Pump, etc.)||
 ||2. Hot Water Fixtures|Water Heater|
 ||3. Hot Water Distribution|Hot Water Fixtures, Location|
