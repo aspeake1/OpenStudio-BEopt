@@ -67,6 +67,15 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
+  def test_single_family_attached_new_construction
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>10, "Construction"=>8, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"ExposedPerimeter"=>180}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
   def test_argument_error_wall_ins_height_negative
     args_hash = {}
     args_hash["wall_ins_height"] = -1

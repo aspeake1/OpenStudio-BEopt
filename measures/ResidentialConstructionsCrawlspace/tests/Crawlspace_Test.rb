@@ -60,6 +60,24 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
     _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  def test_single_family_attached_new_construction
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>10, "Construction"=>10, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"ExposedPerimeter"=>254.558}
+    _test_measure("SFA_4units_1story_CS_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+
+  def test_multifamily_new_construction
+    num_units = 8+1
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>15, "Construction"=>20, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"ExposedPerimeter"=>359.411}
+    _test_measure("MF_8units_1story_CS_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
 
   def test_argument_error_wall_rigid_r_negative
     args_hash = {}
@@ -169,8 +187,8 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
-
+    # show_output(result)
+    
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     
