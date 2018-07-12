@@ -1,12 +1,12 @@
 class Simulation
 
-    def self.apply(model, runner, timesteps=1, convlim_min=nil)
+    def self.apply(model, runner, timesteps_per_hr=1, min_system_timestep=nil)
 
         sim = model.getSimulationControl
         sim.setRunSimulationforSizingPeriods(false)
         
         tstep = model.getTimestep
-        tstep.setNumberOfTimestepsPerHour(timesteps)
+        tstep.setNumberOfTimestepsPerHour(timesteps_per_hr)
         
         shad = model.getShadowCalculation
         shad.setCalculationFrequency(20)
@@ -21,9 +21,9 @@ class Simulation
         zonecap = model.getZoneCapacitanceMultiplierResearchSpecial
         zonecap.setHumidityCapacityMultiplier(15)
 
-        if not convlim_min.nil?
+        if not min_system_timestep.nil?
           convlim = model.getConvergenceLimits
-          convlim.setMinimumSystemTimestep(convlim_min)
+          convlim.setMinimumSystemTimestep(min_system_timestep)
         end
         
         return true
