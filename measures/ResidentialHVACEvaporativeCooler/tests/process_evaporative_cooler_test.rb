@@ -8,27 +8,37 @@ require 'fileutils'
 
 class ProcessEvaporativeCoolerTest < MiniTest::Test  
   
-  def test_new_construction_seer_13_evapcooler
+  def test_new_construction_evapcooler
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>1, }
-    expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)  
+    expected_num_new_objects = {"AirLoopHVAC"=>1, "EvaporativeCoolerDirectResearchSpecial"=>1,  "AirTerminalSingleDuctUncontrolled"=>1, 'ScheduleConstant'=>1 }
+    
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects,  1)  
+  end
+  
+  def test_new_construction_fbsmt_80_dse_evapcooler
+    args_hash = {}
+    #args_hash["capacity"] = "3.0"
+    args_hash["dse"] = "0.8"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"AirLoopHVAC"=>1, "EvaporativeCoolerDirectResearchSpecial"=>1,  "AirTerminalSingleDuctUncontrolled"=>2, 'ScheduleConstant'=>1}
+    #expected_values = {}
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, 2)
   end
   
   def test_retrofit_replace_furnace
     args_hash = {}
-    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1}
-    expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
-    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 8)
+    expected_num_del_objects = {"CoilHeatingGas"=>1,"AirTerminalSingleDuctUncontrolled"=>2}
+    expected_num_new_objects = {"AirLoopHVAC"=>1, "EvaporativeCoolerDirectResearchSpecial"=>1, "CoilHeatingGas"=>1,"AirTerminalSingleDuctUncontrolled"=>2}
+    expected_values = {}
+   _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values,  2)
   end
-  
+ 
   
   
   def _test_error(osm_file_or_model, args_hash)
     # create an instance of the measure
-    measure = ProcessEvaporativeCoolerDirectResearchSpecial.new
+    measure = ResidentialHvacEvaporativeCooler.new
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
@@ -59,9 +69,9 @@ class ProcessEvaporativeCoolerTest < MiniTest::Test
     return result
   end
   
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
+  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects,  num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
-    measure = ProcessSingleSpeedAirSourceHeatPump.new
+    measure = ResidentialHvacEvaporativeCooler.new
 
     # check for standard methods
     assert(!measure.name.empty?)
@@ -93,7 +103,7 @@ class ProcessEvaporativeCoolerTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    # show_output(result)
+    show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -104,7 +114,8 @@ class ProcessEvaporativeCoolerTest < MiniTest::Test
     final_objects = get_objects(model)
     
     # get new and deleted objects
-    obj_type_exclusions = ["CurveQuadratic", "CurveBiquadratic", "CurveCubic", "Node", "AirLoopHVACZoneMixer", "SizingSystem", "AirLoopHVACZoneSplitter", "ScheduleTypeLimits", "CurveExponent", "ScheduleConstant", "SizingPlant", "PipeAdiabatic", "ConnectorSplitter", "ModelObjectList", "ConnectorMixer", "AvailabilityManagerAssignmentList"]
+    obj_type_exclusions = ['ScheduleTypeLimits', 'Node', 'AirLoopHVACZoneSplitter', 
+    'AirLoopHVACZoneMixer', 'SizingSystem', 'AvailabilityManagerAssignmentList']
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
     
@@ -112,7 +123,7 @@ class ProcessEvaporativeCoolerTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 #TODO Understand what to do here??
-=begin 
+
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -144,7 +155,7 @@ class ProcessEvaporativeCoolerTest < MiniTest::Test
             end
         end
     end
-=end    
+
     return model
   end  
   

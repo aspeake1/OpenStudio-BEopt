@@ -25,36 +25,12 @@ class ResidentialHvacEvaporativeCooler < OpenStudio::Measure::ModelMeasure
   end
   
   def modeler_description
-    return "Any supply components or baseboard convective electrics/waters are removed from any existing air/plant loops or zones. Any existing air/plant loops are also removed. An evaporative cooler element "EvaporativeCoolerDirectResearchSpecial" and an on/off supply fan are added to a unitary air loop. The unitary air loop is added to the supply inlet node of the air loop. This air loop is added to a branch for the living zone.# A diffuser is added to the branch for the living zone as well as for the finished basement if it exists."
+    return "Any supply components or baseboard convective electrics/waters are removed from any existing air/plant loops or zones. Any existing air/plant loops are also removed. An evaporative cooler element \"EvaporativeCoolerDirectResearchSpecial\" and an on/off supply fan are added to a unitary air loop. The unitary air loop is added to the supply inlet node of the air loop. This air loop is added to a branch for the living zone.# A diffuser is added to the branch for the living zone as well as for the finished basement if it exists."
   end   
   
   #define the arguments that the user will input
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
-
-    #make a string argument for ashp installed seer
-    seer = OpenStudio::Measure::OSArgument::makeDoubleArgument("seer", true)
-    seer.setDisplayName("Installed SEER")
-    seer.setUnits("Btu/W-h")
-    seer.setDescription("The installed Seasonal Energy Efficiency Ratio (SEER) of the heat pump.")
-    seer.setDefaultValue(13.0)
-    args << seer
-
-    #make a double argument for ashp rated supply fan power
-    fan_power_rated = OpenStudio::Measure::OSArgument::makeDoubleArgument("fan_power_rated", true)
-    fan_power_rated.setDisplayName("Rated Supply Fan Power")
-    fan_power_rated.setUnits("W/cfm")
-    fan_power_rated.setDescription("Fan power (in W) per delivered airflow rate (in cfm) of the outdoor fan under conditions prescribed by AHRI Standard 210/240 for SEER testing.")
-    fan_power_rated.setDefaultValue(0.365)
-    args << fan_power_rated
-    
-    #make a double argument for ashp installed supply fan power
-    fan_power_installed = OpenStudio::Measure::OSArgument::makeDoubleArgument("fan_power_installed", true)
-    fan_power_installed.setDisplayName("Installed Supply Fan Power")
-    fan_power_installed.setUnits("W/cfm")
-    fan_power_installed.setDescription("Fan power (in W) per delivered airflow rate (in cfm) of the outdoor fan for the maximum fan speed under actual operating conditions.")
-    fan_power_installed.setDefaultValue(0.5)
-    args << fan_power_installed     
     
     #make a string argument for distribution system efficiency
     dse = OpenStudio::Measure::OSArgument::makeStringArgument("dse", true)
@@ -75,9 +51,6 @@ class ResidentialHvacEvaporativeCooler < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    seer = runner.getDoubleArgumentValue("seer",user_arguments)
-    fan_power_rated = runner.getDoubleArgumentValue("fan_power_rated",user_arguments)
-    fan_power_installed = runner.getDoubleArgumentValue("fan_power_installed",user_arguments)
     dse = runner.getStringArgumentValue("dse",user_arguments)
     if dse.to_f > 0
       dse = dse.to_f
@@ -96,14 +69,11 @@ class ResidentialHvacEvaporativeCooler < OpenStudio::Measure::ModelMeasure
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
       HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
         ([control_zone] + slave_zones).each do |zone|
-          HVAC.remove_hvac_equipment(model, runner, zone, unit,
-                                     Constants.ObjectNameAirSourceHeatPump)
+           HVAC.remove_hvac_equipment(model, runner, zone, unit, Constants.ObjectNameEvaporativeCooler)
         end
       end
       
-      success = HVAC.apply_central_ashp_1speed(model, unit, runner, seer, 
-                                               fan_power_rated, fan_power_installed,
-                                               dse)
+      success = HVAC.apply_evap_cooler(model, unit, runner, dse)
       return false if not success
                                                
     end # unit
@@ -115,4 +85,4 @@ class ResidentialHvacEvaporativeCooler < OpenStudio::Measure::ModelMeasure
 end #end the measure
 
 #this allows the measure to be use by the application
-ProcessEvaporativeCoolerDirectResearchSpecial.new.registerWithApplication
+ResidentialHvacEvaporativeCooler.new.registerWithApplication
