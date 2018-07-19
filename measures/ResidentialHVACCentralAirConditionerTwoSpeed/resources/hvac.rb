@@ -114,10 +114,8 @@ class HVAC
 
         diffuser_living = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
         diffuser_living.setName(obj_name + " #{control_zone.name} direct air")
-        # air_loop.addBranchForZone(control_zone, diffuser_living.to_StraightComponent)
         air_loop.multiAddBranchForZone(control_zone, diffuser_living)
 
-        # air_loop.addBranchForZone(control_zone)
         air_loop.multiAddBranchForZone(control_zone)
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
 
@@ -127,10 +125,8 @@ class HVAC
 
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
           diffuser_fbsmt.setName(obj_name + " #{slave_zone.name} direct air")
-          # air_loop.addBranchForZone(slave_zone, diffuser_fbsmt.to_StraightComponent)
           air_loop.multiAddBranchForZone(slave_zone, diffuser_fbsmt)
 
-          # air_loop.addBranchForZone(slave_zone)
           air_loop.multiAddBranchForZone(slave_zone)
           runner.registerInfo("Added '#{air_loop.name}' to '#{slave_zone.name}' of #{unit.name}")
 
@@ -263,10 +259,8 @@ class HVAC
 
         diffuser_living = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
         diffuser_living.setName(obj_name + " #{control_zone.name} direct air")
-        # air_loop.addBranchForZone(control_zone, diffuser_living.to_StraightComponent)
         air_loop.multiAddBranchForZone(control_zone, diffuser_living)
 
-        # air_loop.addBranchForZone(control_zone)
         air_loop.multiAddBranchForZone(control_zone)
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
 
@@ -276,10 +270,8 @@ class HVAC
 
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
           diffuser_fbsmt.setName(obj_name + " #{slave_zone.name} direct air")
-          # air_loop.addBranchForZone(slave_zone, diffuser_fbsmt.to_StraightComponent)
           air_loop.multiAddBranchForZone(slave_zone, diffuser_fbsmt)
 
-          # air_loop.addBranchForZone(slave_zone)
           air_loop.multiAddBranchForZone(slave_zone)
           runner.registerInfo("Added '#{air_loop.name}' to '#{slave_zone.name}' of #{unit.name}")
 
@@ -415,10 +407,8 @@ class HVAC
 
         diffuser_living = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
         diffuser_living.setName(obj_name + " #{control_zone.name} direct air")
-        # air_loop.addBranchForZone(control_zone, diffuser_living.to_StraightComponent)
         air_loop.multiAddBranchForZone(control_zone, diffuser_living)
 
-        # air_loop.addBranchForZone(control_zone)
         air_loop.multiAddBranchForZone(control_zone)
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
 
@@ -428,10 +418,8 @@ class HVAC
 
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
           diffuser_fbsmt.setName(obj_name + " #{slave_zone.name} direct air")
-          # air_loop.addBranchForZone(slave_zone, diffuser_fbsmt.to_StraightComponent)
           air_loop.multiAddBranchForZone(slave_zone, diffuser_fbsmt)
 
-          # air_loop.addBranchForZone(slave_zone)
           air_loop.multiAddBranchForZone(slave_zone)
           runner.registerInfo("Added '#{air_loop.name}' to '#{slave_zone.name}' of #{unit.name}")
 
@@ -604,10 +592,8 @@ class HVAC
 
         diffuser_living = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
         diffuser_living.setName(obj_name + " #{control_zone.name} direct air")
-        # air_loop.addBranchForZone(control_zone, diffuser_living.to_StraightComponent)
         air_loop.multiAddBranchForZone(control_zone, diffuser_living)
 
-        # air_loop.addBranchForZone(control_zone)
         air_loop.multiAddBranchForZone(control_zone)
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
 
@@ -617,10 +603,8 @@ class HVAC
 
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
           diffuser_fbsmt.setName(obj_name + " #{slave_zone.name} direct air")
-          # air_loop.addBranchForZone(slave_zone, diffuser_fbsmt.to_StraightComponent)
           air_loop.multiAddBranchForZone(slave_zone, diffuser_fbsmt)
 
-          # air_loop.addBranchForZone(slave_zone)
           air_loop.multiAddBranchForZone(slave_zone)
           runner.registerInfo("Added '#{air_loop.name}' to '#{slave_zone.name}' of #{unit.name}")
 
@@ -804,10 +788,8 @@ class HVAC
 
         diffuser_living = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
         diffuser_living.setName(obj_name + " #{control_zone.name} direct air")
-        # air_loop.addBranchForZone(control_zone, diffuser_living.to_StraightComponent)
         air_loop.multiAddBranchForZone(control_zone, diffuser_living)
 
-        # air_loop.addBranchForZone(control_zone)
         air_loop.multiAddBranchForZone(control_zone)
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
 
@@ -817,10 +799,8 @@ class HVAC
 
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
           diffuser_fbsmt.setName(obj_name + " #{slave_zone.name} direct air")
-          # air_loop.addBranchForZone(slave_zone, diffuser_fbsmt.to_StraightComponent)
           air_loop.multiAddBranchForZone(slave_zone, diffuser_fbsmt)
 
-          # air_loop.addBranchForZone(slave_zone)
           air_loop.multiAddBranchForZone(slave_zone)
           runner.registerInfo("Added '#{air_loop.name}' to '#{slave_zone.name}' of #{unit.name}")
 
@@ -1010,10 +990,8 @@ class HVAC
 
         diffuser_living = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
         diffuser_living.setName(obj_name + " #{control_zone.name} direct air")
-        # air_loop.addBranchForZone(control_zone, diffuser_living.to_StraightComponent)
         air_loop.multiAddBranchForZone(control_zone, diffuser_living)
 
-        # air_loop.addBranchForZone(control_zone)
         air_loop.multiAddBranchForZone(control_zone)
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
 
@@ -1023,10 +1001,8 @@ class HVAC
 
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
           diffuser_fbsmt.setName(obj_name + " #{slave_zone.name} direct air")
-          # air_loop.addBranchForZone(slave_zone, diffuser_fbsmt.to_StraightComponent)
           air_loop.multiAddBranchForZone(slave_zone, diffuser_fbsmt)
 
-          # air_loop.addBranchForZone(slave_zone)
           air_loop.multiAddBranchForZone(slave_zone)
           runner.registerInfo("Added '#{air_loop.name}' to '#{slave_zone.name}' of #{unit.name}")
 
@@ -1538,10 +1514,8 @@ class HVAC
 
         diffuser_living = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
         diffuser_living.setName(obj_name + " #{control_zone.name} direct air")
-        # air_loop.addBranchForZone(control_zone, diffuser_living.to_StraightComponent)
         air_loop.multiAddBranchForZone(control_zone, diffuser_living)
 
-        # air_loop.addBranchForZone(control_zone)
         air_loop.multiAddBranchForZone(control_zone)
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
 
@@ -1551,10 +1525,8 @@ class HVAC
 
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
           diffuser_fbsmt.setName(obj_name + " #{slave_zone.name} direct air")
-          # air_loop.addBranchForZone(slave_zone, diffuser_fbsmt.to_StraightComponent)
           air_loop.multiAddBranchForZone(slave_zone, diffuser_fbsmt)
 
-          # air_loop.addBranchForZone(slave_zone)
           air_loop.multiAddBranchForZone(slave_zone)
           runner.registerInfo("Added '#{air_loop.name}' to '#{slave_zone.name}' of #{unit.name}")
 
@@ -1741,10 +1713,8 @@ class HVAC
 
         diffuser_living = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
         diffuser_living.setName(obj_name + " #{control_zone.name} direct air")
-        # air_loop.addBranchForZone(control_zone, diffuser_living.to_StraightComponent)
         air_loop.multiAddBranchForZone(control_zone, diffuser_living)
 
-        # air_loop.addBranchForZone(control_zone)
         air_loop.multiAddBranchForZone(control_zone)
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
       
@@ -1754,10 +1724,8 @@ class HVAC
         
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
           diffuser_fbsmt.setName(obj_name + " #{slave_zone.name} direct air")
-          # air_loop.addBranchForZone(slave_zone, diffuser_fbsmt.to_StraightComponent)
           air_loop.multiAddBranchForZone(slave_zone, diffuser_fbsmt)
 
-          # air_loop.addBranchForZone(slave_zone)
           air_loop.multiAddBranchForZone(slave_zone)
           runner.registerInfo("Added '#{air_loop.name}' to '#{slave_zone.name}' of #{unit.name}")
         
