@@ -259,10 +259,10 @@ class ProcessFurnaceTest < MiniTest::Test
     result = runner.result
     
     # show the output
-    show_output(result)
+    # show_output(result)
     
-    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/test.osm")
-    model.save(output_file_path, true)
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/test.osm")
+    # model.save(output_file_path, true)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
