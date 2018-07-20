@@ -628,7 +628,7 @@ class ResidentialAirflowTest < MiniTest::Test
     final_objects = get_objects(model)
 
     # get new and deleted objects
-    obj_type_exclusions = ["ScheduleDay", "ZoneHVACEquipmentList", "PortList", "Node", "SizingZone", "ScheduleConstant", "ScheduleTypeLimits", "CurveCubic", "CurveExponent", "OutputVariable", "ScheduleRule"]
+    obj_type_exclusions = ["ScheduleDay", "ZoneHVACEquipmentList", "PortList", "Node", "SizingZone", "ScheduleConstant", "ScheduleTypeLimits", "CurveCubic", "CurveExponent", "ScheduleRule"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
 
@@ -655,8 +655,7 @@ class ResidentialAirflowTest < MiniTest::Test
             actual_values[new_object.name.to_s][lhs] = rhs
           end
         elsif obj_type == "EnergyManagementSystemSensor"
-          next unless new_object.outputVariable.is_initialized
-          next if new_object.outputVariable.get.name.to_s != "Zone Air Temperature"
+          next if new_object.outputVariableOrMeterName != "Zone Air Temperature"
           actual_values["DuctLocation"] = new_object.keyName
         elsif obj_type == "ThermalZone"
           actual_values[new_object.name.to_s]["RADuctVol"] = UnitConversions.convert(new_object.volume.get, "m^3", "ft^3")

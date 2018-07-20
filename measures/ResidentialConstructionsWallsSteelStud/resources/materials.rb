@@ -169,7 +169,7 @@ class Material
     end
 
     def self.Concrete(thick_in)
-        return self.new(name="Concrete 8 in.", thick_in=thick_in, mat_base=BaseMaterial.Concrete, k_in=nil, rho=nil, cp=nil, tAbs=0.9)
+        return self.new(name="Concrete #{thick_in} in.", thick_in=thick_in, mat_base=BaseMaterial.Concrete, k_in=nil, rho=nil, cp=nil, tAbs=0.9)
     end
 
     def self.ExtFinishStuccoMedDark
@@ -280,12 +280,12 @@ class Material
         return self.RoofMaterial("Galvanized Steel", 0.88, 0.7)
     end
 
-    def self.Soil12in
-        return self.new(name="Soil 12 in.", thick_in=12, mat_base=BaseMaterial.Soil)
+    def self.Soil(thick_in)
+        return self.new(name="Soil #{thick_in} in.", thick_in=thick_in, mat_base=BaseMaterial.Soil)
     end
 
     def self.Stud2x(thick_in)
-        return self.new(name="Stud 2x#{thick_in.to_s}", thick_in=thick_in, mat_base=BaseMaterial.Wood)
+        return self.new(name="Stud 2x #{thick_in.to_s} in.", thick_in=thick_in, mat_base=BaseMaterial.Wood)
     end
     
     def self.Stud2x4
@@ -294,6 +294,10 @@ class Material
 
     def self.Stud2x6
         return self.new(name="Stud 2x6", thick_in=5.5, mat_base=BaseMaterial.Wood)
+    end
+
+    def self.Stud2x8
+        return self.new(name="Stud 2x8", thick_in=7.25, mat_base=BaseMaterial.Wood)
     end
 
     def self.Plywood(thick_in)
