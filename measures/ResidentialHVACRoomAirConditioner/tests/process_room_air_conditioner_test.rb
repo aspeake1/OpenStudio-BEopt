@@ -98,18 +98,18 @@ class ProcessRoomAirConditionerTest < MiniTest::Test
   
   def test_retrofit_replace_furnace_central_air_conditioner
     args_hash = {}
-    expected_num_del_objects = {"CoilCoolingDXSingleSpeed"=>1}
+    expected_num_del_objects = {"CoilCoolingDXSingleSpeed"=>1, "AirLoopHVAC"=>1, "AirLoopHVACUnitarySystem"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
     expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1}
     expected_values = {"COP"=>2.49, "hvac_priority"=>2}
-    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_retrofit_replace_furnace_central_air_conditioner2
     args_hash = {}
-    expected_num_del_objects = {"CoilCoolingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>2} # FIXME: should also have "UnitarySystemPerformanceMultispeed"=>1
+    expected_num_del_objects = {"CoilCoolingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>2, "AirLoopHVAC"=>1, "AirLoopHVACUnitarySystem"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "UnitarySystemPerformanceMultispeed"=>1}
     expected_num_new_objects = {"CoilHeatingElectric"=>1, "FanOnOff"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1}
     expected_values = {"COP"=>2.49, "hvac_priority"=>2}
-    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC2.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC2.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
   def test_retrofit_replace_furnace_room_air_conditioner
@@ -229,6 +229,8 @@ class ProcessRoomAirConditionerTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

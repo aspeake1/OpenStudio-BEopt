@@ -2195,7 +2195,7 @@ class ProcessHVACSizingTest < MiniTest::Test
 
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, apply_volume_adj=false)
 
-    print_debug_info = false # set to true for more detailed output
+    print_debug_info = true # set to true for more detailed output
 
     # create an instance of the measure
     measure = ProcessHVACSizing.new

@@ -3162,8 +3162,8 @@ class HVACSizing
                 
                 hvac.NumSpeedsHeating = hvac.CapacityRatioHeating.size
 
-                hvac.MinOutdoorTemp = UnitConversions.convert(vrf.minimumOutdoorTemperatureinHeatingMode,"C","F")
                 vrf = get_vrf_from_terminal_unit(model, htg_equip)
+                hvac.MinOutdoorTemp = UnitConversions.convert(vrf.minimumOutdoorTemperatureinHeatingMode,"C","F")                
                 curves = [vrf.heatingCapacityRatioModifierFunctionofLowTemperatureCurve.get]
                 hvac.HEAT_CAP_FT_SPEC = get_2d_vector_from_CAP_FT_SPEC_curves(curves, hvac.NumSpeedsHeating)
                 
@@ -4028,6 +4028,7 @@ class HVACSizing
     
     # Unitary System - Air Loop
     thermal_zones.each do |thermal_zone|
+
         unitary_system_air_loops = HVAC.get_unitary_system_air_loops(model, runner, thermal_zone)
         unitary_system_air_loops.each do |unitary_system_air_loop|
             system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
@@ -4063,14 +4064,20 @@ class HVACSizing
             fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(fan_airflow + 0.01,"cfm","m^3/s"))
             
             if not air_loop.nil?
+
                 # Air Loop
                 air_loop.setDesignSupplyAirFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(fan_airflow,"cfm","m^3/s"))
                 
-                if thermal_zone.airLoopHVACTerminal.is_initialized
-                    # Air Loop Terminal
-                    aterm = thermal_zone.airLoopHVACTerminal.get.to_AirTerminalSingleDuctUncontrolled.get
-                    aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone])
+                air_loop.thermalZones.each do |tz|
+                    break unless tz == thermal_zone
+                    air_loop.demandComponents.each do |demand_component|
+                        # Air Loop Terminal
+                        next unless demand_component.to_AirTerminalSingleDuctUncontrolled.is_initialized
+                        aterm = demand_component.to_AirTerminalSingleDuctUncontrolled.get
+                        aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone])
+                    end
                 end
+
             end
             
             # Coils

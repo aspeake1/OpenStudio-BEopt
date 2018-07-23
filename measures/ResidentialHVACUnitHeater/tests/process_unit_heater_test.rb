@@ -108,18 +108,18 @@ class ProcessUnitHeaterTest < MiniTest::Test
   
   def test_retrofit_replace_furnace_central_air_conditioner
     args_hash = {}
-    expected_num_del_objects = {"CoilHeatingGas"=>1}
+    expected_num_del_objects = {"CoilHeatingGas"=>1, "AirLoopHVAC"=>1, "AirLoopHVACUnitarySystem"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
-    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end
   
   def test_retrofit_replace_furnace_central_air_conditioner2
     args_hash = {}
-    expected_num_del_objects = {"CoilHeatingGas"=>1}
+    expected_num_del_objects = {"CoilHeatingGas"=>1, "AirLoopHVAC"=>1, "AirLoopHVACUnitarySystem"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "CoilHeatingGas"=>2, "FanOnOff"=>2}
     expected_values = {"Efficiency"=>0.78, "MaximumSupplyAirTemperature"=>48.88, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
-    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC2.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC2.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end
   
   def test_retrofit_replace_furnace_room_air_conditioner
