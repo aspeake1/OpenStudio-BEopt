@@ -1308,25 +1308,23 @@ class Airflow
 
     if has_forced_air_equipment
 
-      air_demand_inlet_node = nil
-      supply_fan = nil
-      living_zone_return_air_node = nil
+      air_demand_inlet_nodes = []
+      supply_fans = []
+      living_zone_return_air_nodes = []
 
-      model.getAirLoopHVACs.each do |air_loop|
-        next unless air_loop.thermalZones.include? unit_living.zone # get the correct air loop for this unit
-        air_demand_inlet_node = air_loop.demandInletNode
+      unit_living.zone.airLoopHVACs.each do |air_loop|
+        air_demand_inlet_nodes << air_loop.demandInletNode
         air_loop.supplyComponents.each do |supply_component|
           next unless supply_component.to_AirLoopHVACUnitarySystem.is_initialized
           air_loop_unitary = supply_component.to_AirLoopHVACUnitarySystem.get
-          supply_fan = air_loop_unitary.supplyFan.get
+          supply_fans << air_loop_unitary.supplyFan.get
         end
-        break
       end
 
-      if air_demand_inlet_node.nil? and supply_fan.nil? # for mshp
+      if air_demand_inlet_nodes.empty? and supply_fans.empty? # for mshp
         model.getZoneHVACTerminalUnitVariableRefrigerantFlows.each do |tu_vrf|
-          air_demand_inlet_node = tu_vrf.outletNode.get
-          supply_fan = tu_vrf.supplyAirFan
+          air_demand_inlet_nodes << tu_vrf.outletNode.get
+          supply_fans << tu_vrf.supplyAirFan
         end
       end
 
@@ -1335,9 +1333,7 @@ class Airflow
         unit_finished_basement.zone.setReturnPlenum(ra_duct_zone)
       end
 
-      if unit_living.zone.returnAirModelObject.is_initialized
-        living_zone_return_air_node = unit_living.zone.returnAirModelObject.get
-      end
+      living_zone_return_air_nodes << unit_living.zone.returnAirModelObjects # FIXME: Kyle needs to implement this method
 
     end
     

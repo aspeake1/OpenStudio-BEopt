@@ -1738,15 +1738,15 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 0.963903000253,
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 0.95490377820 + 0.53836229132,
             'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Cooling Operation {m3/s}' => 0.547225600243,
             'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 0.963903000253,
             'Coil:Heating:Fuel_Nominal Capacity {W}' => 27112.097878,
             'Coil:Cooling:DX:SingleSpeed_Rated Total Cooling Capacity {W}' => 8172.77025244,
             'Coil:Cooling:DX:SingleSpeed_Rated Air Flow Rate {m3/s}' => 0.423414437383,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.963907719728,
-            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.918704299692,
-            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.0451987005619,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.95490849768 + 0.5383670108,
+            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.91068426774 + 0.5134319082,
+            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.024930383058 + 0.044219510464,
                       }
     _test_measure("SFD_HVACSizing_Equip_GF_AC1_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
@@ -1757,15 +1757,15 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 1.04204392683,
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 1.04204392683 + 0.53836229132,
             'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Cooling Operation {m3/s}' => 0.547225600243,
             'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 1.04204392683,
             'Coil:Heating:Fuel_Nominal Capacity {W}' => 29310.0,
             'Coil:Cooling:DX:SingleSpeed_Rated Total Cooling Capacity {W}' => 17586.0,
             'Coil:Cooling:DX:SingleSpeed_Rated Air Flow Rate {m3/s}' => 0.91109453292,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 1.0420486463,
-            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.996845226269,
-            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.0451987005619,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 1.04204392683 + 0.53836229132,
+            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.996845226269 + 0.515516693267,
+            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.044219510464 + 0.022845598060,
                       }
     _test_measure("SFD_HVACSizing_Equip_GF_AC1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
@@ -1776,7 +1776,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 0.963903000253,
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 0.540553509998 + 0.954903778205,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 1 Supply Air Flow Rate During Heating Operation {m3/s}' => 0.963903000253,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 2 Supply Air Flow Rate During Heating Operation {m3/s}' => 0.963903000253,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 1 Supply Air Flow Rate During Cooling Operation {m3/s}' => 0.472529488808,
@@ -1790,9 +1790,9 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Coil:Cooling:DX:MultiSpeed_Speed 1 Rated Air Flow Rate {m3/s}' => 0.336357664177,
             'Coil:Cooling:DX:MultiSpeed_Speed 2 Rated Total Cooling Capacity {W}' => 8206.0347047,
             'Coil:Cooling:DX:MultiSpeed_Speed 2 Rated Air Flow Rate {m3/s}' => 0.391113562997,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.963907719728,
-            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.918704299692,
-            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.0451987005619,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.95490849768 + 0.54055822947,
+            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.91068426774 + 0.51552165638,
+            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.04421951046 + 0.025031853614,
                       }
     _test_measure("SFD_HVACSizing_Equip_EF_AC2_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
@@ -1803,7 +1803,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 1.04204392683,
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 1.04204392683 + 0.54055350999,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 1 Supply Air Flow Rate During Heating Operation {m3/s}' => 1.04204392683,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 2 Supply Air Flow Rate During Heating Operation {m3/s}' => 1.04204392683,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 1 Supply Air Flow Rate During Cooling Operation {m3/s}' => 0.472529488808,
@@ -1817,9 +1817,9 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Coil:Cooling:DX:MultiSpeed_Speed 1 Rated Air Flow Rate {m3/s}' => 0.720833641958,
             'Coil:Cooling:DX:MultiSpeed_Speed 2 Rated Total Cooling Capacity {W}' => 17586.0,
             'Coil:Cooling:DX:MultiSpeed_Speed 2 Rated Air Flow Rate {m3/s}' => 0.83817865344,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 1.0420486463,
-            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.996845226269,
-            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.0451987005619,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 1.0420486577 + 0.54055822947,
+            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.99782442782 + 0.51761492678,
+            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.022938583214 + 0.044219510464,
                       }
     _test_measure("SFD_HVACSizing_Equip_EF_AC2_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
@@ -1830,7 +1830,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 1.1470445703,
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 1.1363354960 + 0.65159283411,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 1 Supply Air Flow Rate During Heating Operation {m3/s}' => 0.963903000253,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 2 Supply Air Flow Rate During Heating Operation {m3/s}' => 0.963903000253,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 3 Supply Air Flow Rate During Heating Operation {m3/s}' => 0.963903000253,
@@ -1856,9 +1856,9 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Coil:Cooling:DX:MultiSpeed_Speed 3 Rated Air Flow Rate {m3/s}' => 0.352235149146,
             'Coil:Cooling:DX:MultiSpeed_Speed 4 Rated Total Cooling Capacity {W}' => 9642.32987074,
             'Coil:Cooling:DX:MultiSpeed_Speed 4 Rated Air Flow Rate {m3/s}' => 0.419159827484,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 1.14705018648,
-            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.918704299692,
-            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.0451987005619,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 1.1363411122 + 0.65159845029,
+            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.91068426774 + 0.52220083334,
+            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.04421951046 + 0.025356170115,
                       }
     _test_measure("SFD_HVACSizing_Equip_GF_ACV_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
@@ -1869,7 +1869,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 1.24003227293,
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 1.240032286 + 0.65159283411,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 1 Supply Air Flow Rate During Heating Operation {m3/s}' => 1.04204392683,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 2 Supply Air Flow Rate During Heating Operation {m3/s}' => 1.04204392683,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 3 Supply Air Flow Rate During Heating Operation {m3/s}' => 1.04204392683,
@@ -1895,9 +1895,9 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Coil:Cooling:DX:MultiSpeed_Speed 3 Rated Air Flow Rate {m3/s}' => 0.74520500776,
             'Coil:Cooling:DX:MultiSpeed_Speed 4 Rated Total Cooling Capacity {W}' => 20399.76,
             'Coil:Cooling:DX:MultiSpeed_Speed 4 Rated Air Flow Rate {m3/s}' => 0.886793959234,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 1.2400378891,
-            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.996845226269,
-            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.0451987005619,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 1.2400379027 + 0.65159845029,
+            'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.99782442782 + 0.52432122447,
+            'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.044219510464 + 0.02323577898,
                       }
     _test_measure("SFD_HVACSizing_Equip_GF_ACV_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
@@ -2195,7 +2195,7 @@ class ProcessHVACSizingTest < MiniTest::Test
 
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, apply_volume_adj=false)
 
-    print_debug_info = true # set to true for more detailed output
+    print_debug_info = false # set to true for more detailed output
 
     # create an instance of the measure
     measure = ProcessHVACSizing.new

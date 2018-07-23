@@ -4062,18 +4062,17 @@ class HVACSizing
             # Fan
             fanonoff = system.supplyFan.get.to_FanOnOff.get
             fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(fan_airflow + 0.01,"cfm","m^3/s"))
-            
+
             if not air_loop.nil?
 
                 # Air Loop
+                puts fan_airflow
                 air_loop.setDesignSupplyAirFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(fan_airflow,"cfm","m^3/s"))
-                
-                air_loop.thermalZones.each do |tz|
-                    break unless tz == thermal_zone
-                    air_loop.demandComponents.each do |demand_component|
-                        # Air Loop Terminal
-                        next unless demand_component.to_AirTerminalSingleDuctUncontrolled.is_initialized
-                        aterm = demand_component.to_AirTerminalSingleDuctUncontrolled.get
+
+                air_loop.demandComponents.each do |demand_component|
+                    thermal_zone.inletPortList.airLoopHVACModelObjects.each do |component|
+                        next if demand_component != component
+                        aterm = component.to_Node.get.inletModelObject.get.to_AirTerminalSingleDuctUncontrolled.get
                         aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone])
                     end
                 end
