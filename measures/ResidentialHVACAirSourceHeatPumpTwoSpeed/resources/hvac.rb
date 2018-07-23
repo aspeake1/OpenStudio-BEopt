@@ -3620,6 +3620,124 @@ class HVAC
       return dehums
     end
     
+    # Num Equipment methods
+
+    def self.num_central_ac(model, runner, thermal_zone)
+      num = 0
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next if clg_coil.nil?
+        if ( clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized or clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized ) and htg_coil.nil?
+          num += 1
+        end
+      end
+      return num
+    end
+
+    def self.num_ashp(model, runner, thermal_zone)
+      num = 0
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next if clg_coil.nil? or htg_coil.nil?
+        if ( clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized and htg_coil.to_CoilHeatingDXSingleSpeed.is_initialized ) or ( clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized and htg_coil.to_CoilHeatingDXMultiSpeed.is_initialized )
+          num += 1
+        end
+      end
+      return num
+    end
+    
+    def self.num_gshp(model, runner, thermal_zone)
+      num = 0
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next if clg_coil.nil? or htg_coil.nil?
+        if clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized and htg_coil.to_CoilHeatingWaterToAirHeatPumpEquationFit.is_initialized
+          num += 1
+        end
+      end
+      return num
+    end
+    
+    def self.num_furnace(model, runner, thermal_zone)
+      num = 0
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next if htg_coil.nil?
+        if htg_coil.to_CoilHeatingGas.is_initialized or htg_coil.to_CoilHeatingElectric.is_initialized
+          num += 1
+        end
+      end
+      return num
+    end
+    
+    def self.num_mshp(model, runner, thermal_zone)
+      return self.get_vrfs(model, runner, thermal_zone).length
+    end
+    
+    def self.num_room_ac(model, runner, thermal_zone)
+      return self.get_ptacs(model, runner, thermal_zone).length
+    end
+    
+    def self.num_boiler(model, runner, thermal_zone)
+      return self.get_baseboard_waters(model, runner, thermal_zone).length
+    end
+    
+    def self.num_electric_baseboard(model, runner, thermal_zone)
+      return self.get_baseboard_electrics(model, runner, thermal_zone).length
+    end
+    
+    def self.num_unit_heater(model, runner, thermal_zone)
+      return self.get_unitary_system_zone_hvacs(model, runner, thermal_zone).length
+    end
+
+    def self.num_air_loop_hvac_unitary_system_clg_coils(model, runner, thermal_zone)
+      clg_coils = []
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next if clg_coil.nil?
+        clg_coils << clg_coil
+      end
+      return clg_coils.length
+    end
+
+    def self.num_air_loop_hvac_unitary_system_htg_coils(model, runner, thermal_zone)
+      htg_coils = []
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, htg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next if htg_coil.nil?
+        htg_coils << htg_coil
+      end
+      return htg_coils.length
+    end
+
+    def self.num_zone_hvac_unitary_system_clg_coils(model, runner, thermal_zone)
+      clg_coils = []
+      unitary_system_zone_hvacs = self.get_unitary_system_zone_hvacs(model, runner, thermal_zone)
+      unitary_system_zone_hvacs.each do |unitary_system_zone_hvac|
+        system, clg_coil, htg_coil = unitary_system_zone_hvac
+        next if clg_coil.nil?
+        clg_coils << clg_coil
+      end
+      return clg_coils.length
+    end
+
+    def self.num_zone_hvac_unitary_system_htg_coils(model, runner, thermal_zone)
+      htg_coils = []
+      unitary_system_zone_hvacs = self.get_unitary_system_zone_hvacs(model, runner, thermal_zone)
+      unitary_system_zone_hvacs.each do |unitary_system_zone_hvac|
+        system, htg_coil, htg_coil = unitary_system_zone_hvac
+        next if htg_coil.nil?
+        htg_coils << htg_coil
+      end
+      return htg_coils.length
+    end
+
     # Has Equipment methods
     
     def self.has_central_ac(model, runner, thermal_zone)
