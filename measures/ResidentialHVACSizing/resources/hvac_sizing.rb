@@ -4065,7 +4065,12 @@ class HVACSizing
                     thermal_zone.inletPortList.airLoopHVACModelObjects.each do |component|
                         next if demand_component != component
                         aterm = component.to_Node.get.inletModelObject.get.to_AirTerminalSingleDuctUncontrolled.get
-                        aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone])
+                        if not clg_coil.nil?
+                            aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / HVAC.num_air_loop_hvac_unitary_system_clg_coils(model, runner, thermal_zone))
+                        end
+                        if not htg_coil.nil?
+                            aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / HVAC.num_air_loop_hvac_unitary_system_htg_coils(model, runner, thermal_zone))
+                        end
                     end
                 end
 
