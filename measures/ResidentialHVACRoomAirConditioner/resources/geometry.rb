@@ -623,11 +623,9 @@ class Geometry
       return true
   end
 
-  # Takes in a list of ground exposed floor surfaces for which to calculate the perimeter;
-  # checks for edges shared by a ground exposed floor and 1) exterior exposed or 2) interzonal wall.
-  # TODO: Has not been tested on buildings with multiple foundations
-  #        (aside from basements/crawls with attached garages over slabs)
-  # TODO: Update code to work for non-rectangular buildings.
+  # Takes in a list of floor surfaces for which to calculate the exposed perimeter.
+  # Returns the total exposed perimeter.
+  # NOTE: Does not work for buildings with non-orthogonal walls.
   def self.calculate_exposed_perimeter(model, ground_floor_surfaces, has_foundation_walls=false)
 
       perimeter = 0
@@ -635,27 +633,32 @@ class Geometry
       # Get ground edges
       if not has_foundation_walls
           # Use edges from floor surface
-          ground_edges = self.get_edges_for_surfaces(ground_floor_surfaces, false)
+          ground_edges = self.get_edges_for_surfaces(ground_floor_surfaces, false, false)
       else
           # Use top edges from foundation walls instead
           surfaces = []
           ground_floor_surfaces.each do |ground_floor_surface|
               next if not ground_floor_surface.space.is_initialized
               foundation_space = ground_floor_surface.space.get
+              wall_surfaces = []
               foundation_space.surfaces.each do |surface|
                   next if not surface.surfaceType.downcase == "wall"
+                  next if surface.adjacentSurface.is_initialized
+                  wall_surfaces << surface
+              end
+              self.get_walls_connected_to_floor(wall_surfaces, ground_floor_surface).each do |surface|
                   next if surfaces.include? surface
                   surfaces << surface
               end
           end
-          ground_edges = self.get_edges_for_surfaces(surfaces, true)
+          ground_edges = self.get_edges_for_surfaces(surfaces, true, false)
       end
 
-      # Get bottom edges of exterior exposed walls or interzonal walls or pier & beam walls
+      # Get bottom edges of exterior walls (building footprint)
       surfaces = []
       model.getSurfaces.each do |surface|
           next if not surface.surfaceType.downcase == "wall"
-          next if not (self.is_exterior_surface(surface) or self.is_interzonal_surface(surface) or self.is_pier_beam_surface(surface))
+          next if surface.outsideBoundaryCondition.downcase != "outdoors"
           surfaces << surface
       end
       model_edges = self.get_edges_for_surfaces(surfaces, false, true)
@@ -684,20 +687,29 @@ class Geometry
   end
 
   def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false)
+
+      top_z = -99999
+      bottom_z = 99999
+      surfaces.each do |surface|
+          top_z = [self.getSurfaceZValues([surface]).max, top_z].max
+          bottom_z = [self.getSurfaceZValues([surface]).min, bottom_z].min
+      end
+
       edges = []
       edge_counter = 0
       surfaces.each do |surface|
-          # ensure we only process bottom or top edge of wall surfaces
+
           if use_top_edge
-              matchz = self.getSurfaceZValues([surface]).max
+              matchz = top_z
           else
-              matchz = self.getSurfaceZValues([surface]).min
+              matchz = bottom_z
           end
+          
           # get vertices
           vertex_hash = {}
           vertex_counter = 0
           surface.vertices.each do |vertex|
-              next if (UnitConversions.convert(vertex.z, "m", "ft") - matchz).abs > 0.0001
+              next if (UnitConversions.convert(vertex.z, "m", "ft") - matchz).abs > 0.0001 # ensure we only process bottom/top edge of wall surfaces
               vertex_counter += 1
               vertex_hash[vertex_counter] = [vertex.x + surface.space.get.xOrigin,
                                              vertex.y + surface.space.get.yOrigin,
@@ -771,6 +783,31 @@ class Geometry
           abort("Unhandled situation.")
       end
       return false
+  end
+  
+  def self.get_walls_connected_to_floor(wall_surfaces, floor_surface)
+      adjacent_wall_surfaces = []
+      
+      # Note: Algorithm assumes that walls span an entire edge of the floor.
+      wall_surfaces.each do |wall_surface|
+          next if wall_surface.space.get != floor_surface.space.get
+          wall_vertices = wall_surface.vertices
+          wall_vertices.each_with_index do |wv1, widx|
+              wv2 = wall_vertices[widx-1]
+              floor_vertices = floor_surface.vertices
+              floor_vertices.each_with_index do |fv1, fidx|
+                  fv2 = floor_vertices[fidx-1]
+                  # Identical edge?
+                  if self.equal_vertices([wv1.x, wv1.y, 0], [fv1.x, fv1.y, 0]) and self.equal_vertices([wv2.x, wv2.y, 0], [fv2.x, fv2.y, 0])
+                      adjacent_wall_surfaces << wall_surface
+                  elsif self.equal_vertices([wv1.x, wv1.y, 0], [fv2.x, fv2.y, 0]) and self.equal_vertices([wv2.x, wv2.y, 0], [fv1.x, fv1.y, 0])
+                      adjacent_wall_surfaces << wall_surface
+                  end
+              end
+          end
+      end
+      
+      return adjacent_wall_surfaces.uniq!
   end
 
   def self.is_living(space_or_zone)
