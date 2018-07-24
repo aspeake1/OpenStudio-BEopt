@@ -704,12 +704,7 @@ class Geometry
           else
               matchz = bottom_z
           end
-
-          if use_top_edge
-              matchz = self.getSurfaceZValues([surface]).max
-          else
-              matchz = self.getSurfaceZValues([surface]).min
-          end
+          
           # get vertices
           vertex_hash = {}
           vertex_counter = 0
