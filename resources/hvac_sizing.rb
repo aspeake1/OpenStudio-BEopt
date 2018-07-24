@@ -2852,6 +2852,7 @@ class HVACSizing
     hvac.NumCoilHeatingDXVariableRefrigerantFlow = 0
     hvac.NumCoilHeatingWaterToAirHeatPumpEquationFit = 0
     hvac.NumZoneHVACBaseboardConvectiveElectric = 0
+    hvac.NumDehumidifier = 0
     
     clg_equips = []
     htg_equips = []
@@ -3206,6 +3207,7 @@ class HVACSizing
         curve = dehumids[0].waterRemovalCurve.to_CurveBiquadratic.get
         hvac.Dehumidifier_Water_Remove_Cap_Ft_DB_RH = [curve.coefficient1Constant, curve.coefficient2x, curve.coefficient3xPOW2, curve.coefficient4y, curve.coefficient5yPOW2, curve.coefficient6xTIMESY]
     end
+    hvac.NumDehumidifier = dehumids.size
     
     # GSHP
     if hvac.HasGroundSourceHeatPump
@@ -4287,7 +4289,7 @@ class HVACSizing
             if dehum.ratedWaterRemoval == Constants.small # Autosized
                 # Use a minimum capacity of 20 pints/day
                 water_removal_rate = [unit_final.Dehumid_WaterRemoval, UnitConversions.convert(20.0,"pint","L")].max # L/day
-                dehum.setRatedWaterRemoval(water_removal_rate)
+                dehum.setRatedWaterRemoval(water_removal_rate / hvac.NumDehumidifier)
             else
                 water_removal_rate = dehum.ratedWaterRemoval
             end
@@ -4316,7 +4318,7 @@ class HVACSizing
             if dehum.ratedAirFlowRate == Constants.small # Autosized
                 # Calculate the dehumidifier air flow rate by assuming 2.75 cfm/pint/day (based on experimental test data)
                 air_flow_rate = UnitConversions.convert(water_removal_rate,"L","pint") * UnitConversions.convert(2.75,"cfm","m^3/s")
-                dehum.setRatedAirFlowRate(air_flow_rate)
+                dehum.setRatedAirFlowRate(air_flow_rate / hvac.NumDehumidifier)
             end
 
         end            
@@ -4578,7 +4580,7 @@ class HVACInfo
                 :NumCoilHeatingWaterBaseboard, :NumCoilHeatingDXSingleSpeed,
                 :NumCoilHeatingDXMultiSpeed, :NumCoilHeatingDXVariableRefrigerantFlow, 
                 :NumCoilHeatingWaterToAirHeatPumpEquationFit,
-                :NumZoneHVACBaseboardConvectiveElectric)
+                :NumZoneHVACBaseboardConvectiveElectric, :NumDehumidifier)
 
 end
 

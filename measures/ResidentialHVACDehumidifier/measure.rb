@@ -85,7 +85,7 @@ class ProcessDehumidifier < OpenStudio::Measure::ModelMeasure
     units.each do |unit|
     
       Geometry.get_thermal_zones_from_spaces(unit.spaces).each do |zone|
-        HVAC.remove_dehumidifier(runner, model, zone, unit)
+        #HVAC.remove_dehumidifier(runner, model, zone, unit)
       end
     
       success = HVAC.apply_dehumidifier(model, unit, runner, energy_factor, 
