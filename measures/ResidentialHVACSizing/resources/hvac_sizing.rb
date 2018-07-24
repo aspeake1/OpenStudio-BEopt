@@ -2852,7 +2852,6 @@ class HVACSizing
     hvac.NumCoilHeatingDXVariableRefrigerantFlow = 0
     hvac.NumCoilHeatingWaterToAirHeatPumpEquationFit = 0
     hvac.NumZoneHVACBaseboardConvectiveElectric = 0
-    hvac.NumCoilHeatingElectric = 0
     
     clg_equips = []
     htg_equips = []
@@ -4256,28 +4255,25 @@ class HVACSizing
             # Baseboard Coil
             coilHeatingWaterBaseboard = baseboard.heatingCoil.to_CoilHeatingWaterBaseboard.get
             coilHeatingWaterBaseboard.setUFactorTimesAreaValue(bb_UA)
-            coilHeatingWaterBaseboard.setMaximumWaterFlowRate(bb_max_flow / baseboards.length)
+            coilHeatingWaterBaseboard.setMaximumWaterFlowRate(bb_max_flow / hvac.NumCoilHeatingWaterBaseboard)
             coilHeatingWaterBaseboard.setHeatingDesignCapacityMethod("autosize")
-            
-            model_plant_loops.each do |pl|
-                found_boiler = false
-                pl.components.each do |plc|
-                    next if not plc.to_BoilerHotWater.is_initialized
-                    
-                    # Boiler
-                    boiler = plc.to_BoilerHotWater.get
-                    boiler.setNominalCapacity(UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") / model_plant_loops.length)
-                    
-                    pl.supplyComponents.each do |plc|
-                        next if not plc.to_PumpVariableSpeed.is_initialized
-                        
-                        # Pump
-                        pump = plc.to_PumpVariableSpeed.get
-                        pump.setRatedFlowRate(UnitConversions.convert(unit_final.Heat_Capacity/20.0/500.0,"gal/min","m^3/s") / model_plant_loops.length)
-                    end
-                end
-            end
 
+            pl = baseboard.heatingCoil.plantLoop.get
+            pl.components.each do |plc|
+
+                # Boiler
+                if plc.to_BoilerHotWater.is_initialized
+                    boiler = plc.to_BoilerHotWater.get
+                    boiler.setNominalCapacity(UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") / hvac.NumCoilHeatingWaterBaseboard)
+                end
+
+                # Pump
+                if plc.to_PumpVariableSpeed.is_initialized
+                    pump = plc.to_PumpVariableSpeed.get
+                    pump.setRatedFlowRate(UnitConversions.convert(unit_final.Heat_Capacity/20.0/500.0,"gal/min","m^3/s") / hvac.NumCoilHeatingWaterBaseboard)
+                end
+
+            end
         end
     end
     
@@ -4347,7 +4343,7 @@ class HVACSizing
             return false
         end
         clg_coil.setRatedTotalCoolingCapacity(UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","W") / hvac.NumCoilCoolingDXSingleSpeed)
-        clg_coil.setRatedAirFlowRate(UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") * UnitConversions.convert(ratedCFMperTonCooling[0],"cfm","m^3/s"))
+        clg_coil.setRatedAirFlowRate(UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") * UnitConversions.convert(ratedCFMperTonCooling[0],"cfm","m^3/s") / hvac.NumCoilCoolingDXSingleSpeed)
         
         # Adjust COP as appropriate
         clg_coil.setRatedCOP(OpenStudio::OptionalDouble.new(clg_coil.ratedCOP.get * unit_final.EER_Multiplier))
@@ -4421,7 +4417,7 @@ class HVACSizing
     
     # Supplemental heating coil
     if supp_htg_coil.is_a? OpenStudio::Model::CoilHeatingElectric
-        supp_htg_coil.setNominalCapacity(UnitConversions.convert(unit_final.Heat_Capacity_Supp,"Btu/hr","W") / hvac.CoilHeatingElectric)
+        supp_htg_coil.setNominalCapacity(UnitConversions.convert(unit_final.Heat_Capacity_Supp,"Btu/hr","W") / hvac.NumCoilHeatingElectric)
         
     end
 
@@ -4577,8 +4573,8 @@ class HVACInfo
                 :NumCoilHeatingElectric, :NumCoilHeatingGas, 
                 :NumCoilHeatingWaterBaseboard, :NumCoilHeatingDXSingleSpeed,
                 :NumCoilHeatingDXMultiSpeed, :NumCoilHeatingDXVariableRefrigerantFlow, 
-                :NumCoilHeatingWaterToAirHeatPumpEquationFit, :NumZoneHVACBaseboardConvectiveElectric,
-                :NumZoneHVACBaseboardConvectiveElectric, :NumCoilHeatingElectric)
+                :NumCoilHeatingWaterToAirHeatPumpEquationFit,
+                :NumZoneHVACBaseboardConvectiveElectric)
 
 end
 

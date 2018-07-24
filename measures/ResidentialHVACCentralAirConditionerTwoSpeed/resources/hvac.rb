@@ -3709,7 +3709,7 @@ class HVAC
       htg_coils = []
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
-        system, htg_coil, htg_coil, air_loop = unitary_system_air_loop
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
         next if htg_coil.nil?
         htg_coils << htg_coil
       end
@@ -3731,7 +3731,7 @@ class HVAC
       htg_coils = []
       unitary_system_zone_hvacs = self.get_unitary_system_zone_hvacs(model, runner, thermal_zone)
       unitary_system_zone_hvacs.each do |unitary_system_zone_hvac|
-        system, htg_coil, htg_coil = unitary_system_zone_hvac
+        system, clg_coil, htg_coil = unitary_system_zone_hvac
         next if htg_coil.nil?
         htg_coils << htg_coil
       end
