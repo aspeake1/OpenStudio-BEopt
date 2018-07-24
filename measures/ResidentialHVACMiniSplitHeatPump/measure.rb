@@ -248,8 +248,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
       HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
         ([control_zone] + slave_zones).each do |zone|
-          HVAC.remove_hvac_equipment(model, runner, zone, unit,
-                                     Constants.ObjectNameMiniSplitHeatPump)
+          #HVAC.remove_hvac_equipment(model, runner, zone, unit, Constants.ObjectNameMiniSplitHeatPump)
         end
       end
       

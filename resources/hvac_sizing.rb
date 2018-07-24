@@ -4163,7 +4163,7 @@ class HVACSizing
     thermal_zones.each do |thermal_zone|
         ptacs = HVAC.get_ptacs(model, runner, thermal_zone)
         ptacs.each do |ptac|
-        
+
             # PTAC
             ptac.setSupplyAirFlowRateDuringCoolingOperation(UnitConversions.convert(unit_final.Cool_Airflow,"cfm","m^3/s") / ptacs.length)
             ptac.setSupplyAirFlowRateDuringHeatingOperation(0.00001) # A value of 0 does not change from autosize
@@ -4182,9 +4182,10 @@ class HVACSizing
             # Heating Coil override
             ptac_htg_coil = ptac.heatingCoil.to_CoilHeatingElectric.get
             ptac_htg_coil.setNominalCapacity(0.0)
+
         end
     end
-    
+
     # VRFs
     found_vrf = false
     thermal_zones.each do |thermal_zone|        
@@ -4196,8 +4197,8 @@ class HVACSizing
             mshp_indices = mshp_indices.split(",").map(&:to_i)
             mshp_index = mshp_indices[-1]
                 
-            htg_cap = UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") * hvac.CapacityRatioHeating[mshp_index] * unit_final.Zone_Ratios[thermal_zone]
-            clg_cap = UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","W") * hvac.CapacityRatioCooling[mshp_index] * unit_final.Zone_Ratios[thermal_zone]
+            htg_cap = UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") * hvac.CapacityRatioHeating[mshp_index] * unit_final.Zone_Ratios[thermal_zone] / vrfs.length
+            clg_cap = UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","W") * hvac.CapacityRatioCooling[mshp_index] * unit_final.Zone_Ratios[thermal_zone] / vrfs.length
             htg_airflow = UnitConversions.convert(unit_final.Heat_Airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / vrfs.length
             clg_airflow = UnitConversions.convert(unit_final.Cool_Airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / vrfs.length
             fan_airflow = UnitConversions.convert([unit_final.Heat_Airflow, unit_final.Cool_Airflow].max + 0.01,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / vrfs.length
@@ -4375,7 +4376,9 @@ class HVACSizing
     
     # Heating coil
     if htg_coil.is_a? OpenStudio::Model::CoilHeatingElectric
-        htg_coil.setNominalCapacity(zone_ratio * UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") / hvac.NumCoilHeatingElectric)
+        if not equip.is_a? OpenStudio::Model::ZoneHVACPackagedTerminalAirConditioner
+            htg_coil.setNominalCapacity(zone_ratio * UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") / hvac.NumCoilHeatingElectric)
+        end
         
     elsif htg_coil.is_a? OpenStudio::Model::CoilHeatingGas
         htg_coil.setNominalCapacity(zone_ratio * UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") / hvac.NumCoilHeatingGas)
