@@ -4094,7 +4094,7 @@ class HVACSizing
                     if plc.to_GroundHeatExchangerVertical.is_initialized
                         # Ground Heat Exchanger Vertical
                         ground_heat_exch_vert = plc.to_GroundHeatExchangerVertical.get
-                        ground_heat_exch_vert.setDesignFlowRate(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s"))
+                        ground_heat_exch_vert.setDesignFlowRate(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s") / hvac.NumCoilCoolingWaterToAirHeatPumpEquationFit)
                         ground_heat_exch_vert.setNumberofBoreHoles(unit_final.GSHP_Bore_Holes.to_i)
                         ground_heat_exch_vert.setBoreHoleLength(UnitConversions.convert(unit_final.GSHP_Bore_Depth,"ft","m"))
                         ground_heat_exch_vert.removeAllGFunctions
@@ -4105,13 +4105,14 @@ class HVACSizing
                     elsif plc.to_PumpVariableSpeed.is_initialized
                         # Pump
                         pump = plc.to_PumpVariableSpeed.get
-                        pump.setRatedFlowRate(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s"))
+                        pump.setRatedFlowRate(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s") / hvac.NumCoilCoolingWaterToAirHeatPumpEquationFit)
                         
                     end
                 end
                 
                 # Plant Loop
-                pl.setMaximumLoopFlowRate(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s"))
+                pl.setMaximumLoopFlowRate(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s") / hvac.NumCoilCoolingWaterToAirHeatPumpEquationFit)
+
             end
         end
     end
@@ -4408,9 +4409,9 @@ class HVACSizing
         end
         
     elsif htg_coil.is_a? OpenStudio::Model::CoilHeatingWaterToAirHeatPumpEquationFit
-        htg_coil.setRatedAirFlowRate(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.Heat_Airflow,"cfm","m^3/s")) / hvac.NumCoilHeatingWaterToAirHeatPumpEquationFit)
-        htg_coil.setRatedWaterFlowRate(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s")) / hvac.NumCoilHeatingWaterToAirHeatPumpEquationFit)
-        htg_coil.setRatedHeatingCapacity(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W")))
+        htg_coil.setRatedAirFlowRate(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.Heat_Airflow,"cfm","m^3/s") / hvac.NumCoilHeatingWaterToAirHeatPumpEquationFit))
+        htg_coil.setRatedWaterFlowRate(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s") / hvac.NumCoilHeatingWaterToAirHeatPumpEquationFit))
+        htg_coil.setRatedHeatingCapacity(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") / hvac.NumCoilHeatingWaterToAirHeatPumpEquationFit))
         
     elsif htg_coil.is_a? OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow
         htg_coil.setRatedTotalHeatingCapacity(zone_ratio * UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") * hvac.CapacityRatioHeating[mshp_index] / hvac.NumCoilHeatingDXVariableRefrigerantFlow)
