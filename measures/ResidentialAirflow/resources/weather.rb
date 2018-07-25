@@ -69,7 +69,6 @@ class WeatherProcess
       heating_design_day = OpenStudio::Model::DesignDay.new(model)
       heating_design_day.setName("Ann Htg 99.6% Condns DB")
       heating_design_day.setMaximumDryBulbTemperature(epw_design_conditions.heatingDryBulb99pt6)
-      # heating_design_day.setDailyDryBulbTemperatureRange(0) # TODO: confirm
       heating_design_day.setHumidityIndicatingConditionsAtMaximumDryBulb(epw_design_conditions.heatingDryBulb99pt6) # TODO: confirm
       heating_design_day.setBarometricPressure(UnitConversions.convert(Psychrometrics.Pstd_fZ(UnitConversions.convert(epw_file.elevation,"m","ft")),"psi","pa"))
       heating_design_day.setWindSpeed(epw_design_conditions.heatingMeanCoincidentWindSpeed99pt6)
