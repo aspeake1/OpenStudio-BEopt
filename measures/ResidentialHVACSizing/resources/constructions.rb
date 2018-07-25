@@ -1526,27 +1526,6 @@ class FoundationConstructions
         return true
     end
     
-    def self.get_walls_connected_to_floor(wall_surfaces, floor_surface)
-        adjacent_wall_surfaces = []
-
-        tol = 0.001
-        wall_surfaces.each do |wall_surface|
-            next if wall_surface.space.get != floor_surface.space.get
-            num_shared_vertices = 0
-            wall_surface.vertices.each do |v1|
-                floor_surface.vertices.each do |v2|
-                    if (v1.x - v2.x).abs < tol and (v1.y - v2.y).abs < tol and (v1.z - v2.z).abs < tol
-                        num_shared_vertices += 1
-                    end
-                end
-            end
-            next unless num_shared_vertices > 1
-            adjacent_wall_surfaces << wall_surface
-        end
-        
-        return adjacent_wall_surfaces
-    end
-    
     private
     
     def self.calc_interior_wall_r_value(runner, cavity_depth_in, cavity_r, filled_cavity,
