@@ -410,8 +410,7 @@ class ProcessSingleSpeedCentralAirConditionerTest < MiniTest::Test
             actual_values[new_object.name.to_s][lhs] = rhs
           end
         elsif obj_type == "EnergyManagementSystemSensor"
-          next unless new_object.outputVariable.is_initialized
-          next if new_object.outputVariable.get.name.to_s != "Zone Mean Air Temperature"
+          next if new_object.outputVariableOrMeterName != "Zone Mean Air Temperature"
           actual_values["SensorLocation"] = new_object.keyName
         end
       end
