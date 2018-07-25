@@ -45,6 +45,32 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     expected_values = {"SumRValues"=>0.077+1.76+3.52+0.293, "SumWidths"=>0, "SumDepths"=>0.1016, "ExposedPerimeter"=>134.167}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  def test_exposed_perimeter_with_garage
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>4, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
+    expected_values = {"ExposedPerimeter"=>104}
+    _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+
+  def test_single_family_attached_new_construction
+    num_units = 4
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>8, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"ExposedPerimeter"=>254.558}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+
+  def test_multifamily_new_construction
+    num_units = 8+1
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>11, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_values = {"ExposedPerimeter"=>339.411}
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
 
   def test_argument_error_perimeter_r_negative
     args_hash = {}
