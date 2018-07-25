@@ -525,6 +525,7 @@ class Geometry
 
   # Takes in a list of spaces and returns the average space height
   def self.spaces_avg_height(spaces)
+      return nil if spaces.size == 0
       sum_height = 0
       spaces.each do |space|
           sum_height += self.space_height(space)
@@ -622,11 +623,9 @@ class Geometry
       return true
   end
 
-  # Takes in a list of ground exposed floor surfaces for which to calculate the perimeter;
-  # checks for edges shared by a ground exposed floor and 1) exterior exposed or 2) interzonal wall.
-  # TODO: Has not been tested on buildings with multiple foundations
-  #        (aside from basements/crawls with attached garages over slabs)
-  # TODO: Update code to work for non-rectangular buildings.
+  # Takes in a list of floor surfaces for which to calculate the exposed perimeter.
+  # Returns the total exposed perimeter.
+  # NOTE: Does not work for buildings with non-orthogonal walls.
   def self.calculate_exposed_perimeter(model, ground_floor_surfaces, has_foundation_walls=false)
 
       perimeter = 0
@@ -634,27 +633,32 @@ class Geometry
       # Get ground edges
       if not has_foundation_walls
           # Use edges from floor surface
-          ground_edges = self.get_edges_for_surfaces(ground_floor_surfaces, false)
+          ground_edges = self.get_edges_for_surfaces(ground_floor_surfaces, false, false)
       else
           # Use top edges from foundation walls instead
           surfaces = []
           ground_floor_surfaces.each do |ground_floor_surface|
               next if not ground_floor_surface.space.is_initialized
               foundation_space = ground_floor_surface.space.get
+              wall_surfaces = []
               foundation_space.surfaces.each do |surface|
                   next if not surface.surfaceType.downcase == "wall"
+                  next if surface.adjacentSurface.is_initialized
+                  wall_surfaces << surface
+              end
+              self.get_walls_connected_to_floor(wall_surfaces, ground_floor_surface).each do |surface|
                   next if surfaces.include? surface
                   surfaces << surface
               end
           end
-          ground_edges = self.get_edges_for_surfaces(surfaces, true)
+          ground_edges = self.get_edges_for_surfaces(surfaces, true, false)
       end
 
-      # Get bottom edges of exterior exposed walls or interzonal walls or pier & beam walls
+      # Get bottom edges of exterior walls (building footprint)
       surfaces = []
       model.getSurfaces.each do |surface|
           next if not surface.surfaceType.downcase == "wall"
-          next if not (self.is_exterior_surface(surface) or self.is_interzonal_surface(surface) or self.is_pier_beam_surface(surface))
+          next if surface.outsideBoundaryCondition.downcase != "outdoors"
           surfaces << surface
       end
       model_edges = self.get_edges_for_surfaces(surfaces, false, true)
@@ -683,20 +687,29 @@ class Geometry
   end
 
   def self.get_edges_for_surfaces(surfaces, use_top_edge, combine_adjacent=false)
+
+      top_z = -99999
+      bottom_z = 99999
+      surfaces.each do |surface|
+          top_z = [self.getSurfaceZValues([surface]).max, top_z].max
+          bottom_z = [self.getSurfaceZValues([surface]).min, bottom_z].min
+      end
+
       edges = []
       edge_counter = 0
       surfaces.each do |surface|
-          # ensure we only process bottom or top edge of wall surfaces
+
           if use_top_edge
-              matchz = self.getSurfaceZValues([surface]).max
+              matchz = top_z
           else
-              matchz = self.getSurfaceZValues([surface]).min
+              matchz = bottom_z
           end
+          
           # get vertices
           vertex_hash = {}
           vertex_counter = 0
           surface.vertices.each do |vertex|
-              next if (UnitConversions.convert(vertex.z, "m", "ft") - matchz).abs > 0.0001
+              next if (UnitConversions.convert(vertex.z, "m", "ft") - matchz).abs > 0.0001 # ensure we only process bottom/top edge of wall surfaces
               vertex_counter += 1
               vertex_hash[vertex_counter] = [vertex.x + surface.space.get.xOrigin,
                                              vertex.y + surface.space.get.yOrigin,
@@ -770,6 +783,31 @@ class Geometry
           abort("Unhandled situation.")
       end
       return false
+  end
+  
+  def self.get_walls_connected_to_floor(wall_surfaces, floor_surface)
+      adjacent_wall_surfaces = []
+      
+      # Note: Algorithm assumes that walls span an entire edge of the floor.
+      wall_surfaces.each do |wall_surface|
+          next if wall_surface.space.get != floor_surface.space.get
+          wall_vertices = wall_surface.vertices
+          wall_vertices.each_with_index do |wv1, widx|
+              wv2 = wall_vertices[widx-1]
+              floor_vertices = floor_surface.vertices
+              floor_vertices.each_with_index do |fv1, fidx|
+                  fv2 = floor_vertices[fidx-1]
+                  # Identical edge?
+                  if self.equal_vertices([wv1.x, wv1.y, 0], [fv1.x, fv1.y, 0]) and self.equal_vertices([wv2.x, wv2.y, 0], [fv2.x, fv2.y, 0])
+                      adjacent_wall_surfaces << wall_surface
+                  elsif self.equal_vertices([wv1.x, wv1.y, 0], [fv2.x, fv2.y, 0]) and self.equal_vertices([wv2.x, wv2.y, 0], [fv1.x, fv1.y, 0])
+                      adjacent_wall_surfaces << wall_surface
+                  end
+              end
+          end
+      end
+      
+      return adjacent_wall_surfaces.uniq!
   end
 
   def self.is_living(space_or_zone)
@@ -1791,11 +1829,6 @@ class Geometry
       return false
     end
 
-    least_x = 9e99
-    greatest_x = -9e99
-    least_y = 9e99
-    greatest_y = -9e99
-
     surfaces = model.getSurfaces
     if surfaces.size == 0
       runner.registerInfo("No surfaces found to copy for neighboring buildings.")
@@ -1819,71 +1852,72 @@ class Geometry
       return true
     end
 
-    # Get x and y minima and maxima of wall surfaces
+    # Get x, y, z minima and maxima of wall surfaces
+    least_x = 9e99
+    greatest_x = -9e99
+    least_y = 9e99
+    greatest_y = -9e99
+    greatest_z = -9e99
     surfaces.each do |surface|
-      if surface.surfaceType.downcase == "wall"
-        vertices = surface.vertices
-        vertices.each do |vertex|
-          if vertex.x > greatest_x
-            greatest_x = vertex.x
-          end
-          if vertex.x < least_x
-            least_x = vertex.x
-          end
-          if vertex.y > greatest_y
-            greatest_y = vertex.y
-          end
-          if vertex.y < least_y
-            least_y = vertex.y
-          end
+      next unless surface.surfaceType.downcase == "wall"
+      space = surface.space.get
+      surface.vertices.each do |vertex|
+        if vertex.x > greatest_x
+          greatest_x = vertex.x
+        end
+        if vertex.x < least_x
+          least_x = vertex.x
+        end
+        if vertex.y > greatest_y
+          greatest_y = vertex.y
+        end
+        if vertex.y < least_y
+          least_y = vertex.y
+        end
+        if vertex.z + space.zOrigin > greatest_z
+          greatest_z = vertex.z + space.zOrigin
         end
       end
+
     end
 
-    # This is maximum building length or width + user specified neighbor offset
-    left_offset = ((greatest_x - least_x) + left_neighbor_offset)
-    right_offset = -((greatest_x - least_x) + right_neighbor_offset)
-    back_offset = -((greatest_y - least_y) + back_neighbor_offset)
-    front_offset = ((greatest_y - least_y) + front_neighbor_offset)
-
-    directions = [[Constants.FacadeLeft, left_neighbor_offset, left_offset, 0], [Constants.FacadeRight, right_neighbor_offset, right_offset, 0], [Constants.FacadeBack, back_neighbor_offset, 0, back_offset], [Constants.FacadeFront, front_neighbor_offset, 0, front_offset]]
+    directions = [[Constants.FacadeLeft, left_neighbor_offset], [Constants.FacadeRight, right_neighbor_offset], [Constants.FacadeBack, back_neighbor_offset], [Constants.FacadeFront, front_neighbor_offset]]
 
     shading_surface_group = OpenStudio::Model::ShadingSurfaceGroup.new(model)
     shading_surface_group.setName(Constants.ObjectNameNeighbors)
 
     num_added = 0
-    directions.each do |facade, neighbor_offset, x_offset, y_offset|
-      if neighbor_offset != 0
-        model.getSpaces.each do |space|
-          space.surfaces.each do |existing_surface|
-            next if existing_surface.outsideBoundaryCondition.downcase != "outdoors" and existing_surface.outsideBoundaryCondition.downcase != "adiabatic"
-            next if existing_surface.adjacentSurface.is_initialized
-            next if existing_surface.outsideBoundaryCondition.downcase == "adiabatic" and !Geometry.is_corridor(space)
-            m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
-            m[0,3] = -x_offset
-            m[1,3] = -y_offset
-            m[2,3] = space.zOrigin
-            transformation = OpenStudio::Transformation.new(m)
-            new_vertices = transformation * existing_surface.vertices
-            shading_surface = OpenStudio::Model::ShadingSurface.new(new_vertices, model)
-            shading_surface.setName(Constants.ObjectNameNeighbors(facade))
-            shading_surface.setShadingSurfaceGroup(shading_surface_group)
-            num_added += 1
-          end
-        end
-        model.getShadingSurfaces.each do |existing_shading_surface|
-          next unless existing_shading_surface.name.to_s.downcase.include? Constants.ObjectNameEaves
-          m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
-          m[0,3] = -x_offset
-          m[1,3] = -y_offset
-          transformation = OpenStudio::Transformation.new(m)
-          new_vertices = transformation * existing_shading_surface.vertices
-          shading_surface = OpenStudio::Model::ShadingSurface.new(new_vertices, model)
-          shading_surface.setName(Constants.ObjectNameNeighbors(facade))
-          shading_surface.setShadingSurfaceGroup(shading_surface_group)
-          num_added += 1
-        end
+    directions.each do |facade, neighbor_offset|
+      next unless neighbor_offset > 0
+      vertices = OpenStudio::Point3dVector.new
+      m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+      transformation = OpenStudio::Transformation.new(m)
+      if facade == Constants.FacadeLeft
+        vertices << OpenStudio::Point3d.new(least_x - neighbor_offset, least_y, 0)
+        vertices << OpenStudio::Point3d.new(least_x - neighbor_offset, least_y, greatest_z)
+        vertices << OpenStudio::Point3d.new(least_x - neighbor_offset, greatest_y, greatest_z)
+        vertices << OpenStudio::Point3d.new(least_x - neighbor_offset, greatest_y, 0)
+      elsif facade == Constants.FacadeRight
+        vertices << OpenStudio::Point3d.new(greatest_x + neighbor_offset, greatest_y, 0)
+        vertices << OpenStudio::Point3d.new(greatest_x + neighbor_offset, greatest_y, greatest_z)
+        vertices << OpenStudio::Point3d.new(greatest_x + neighbor_offset, least_y, greatest_z)
+        vertices << OpenStudio::Point3d.new(greatest_x + neighbor_offset, least_y, 0)
+      elsif facade == Constants.FacadeFront
+        vertices << OpenStudio::Point3d.new(greatest_x, least_y - neighbor_offset, 0)
+        vertices << OpenStudio::Point3d.new(greatest_x, least_y - neighbor_offset, greatest_z)
+        vertices << OpenStudio::Point3d.new(least_x, least_y - neighbor_offset, greatest_z)
+        vertices << OpenStudio::Point3d.new(least_x, least_y - neighbor_offset, 0)
+      elsif facade == Constants.FacadeBack
+        vertices << OpenStudio::Point3d.new(least_x, greatest_y + neighbor_offset, 0)
+        vertices << OpenStudio::Point3d.new(least_x, greatest_y + neighbor_offset, greatest_z)
+        vertices << OpenStudio::Point3d.new(greatest_x, greatest_y + neighbor_offset, greatest_z)
+        vertices << OpenStudio::Point3d.new(greatest_x, greatest_y + neighbor_offset, 0)
       end
+      vertices = transformation * vertices
+      shading_surface = OpenStudio::Model::ShadingSurface.new(vertices, model)
+      shading_surface.setName(Constants.ObjectNameNeighbors(facade))
+      shading_surface.setShadingSurfaceGroup(shading_surface_group)
+      num_added += 1
     end
     
     runner.registerInfo("Added #{num_added} #{Constants.ObjectNameNeighbors} shading surfaces.")

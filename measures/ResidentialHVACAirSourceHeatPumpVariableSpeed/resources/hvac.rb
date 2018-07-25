@@ -1161,13 +1161,6 @@ class HVAC
       constant_cubic_curve = create_curve_cubic_constant(model)
       defrost_eir_curve = create_curve_biquadratic(model, [0.1528, 0, 0, 0, 0, 0], "DefrostEIR", -100, 100, -100, 100)
     
-      if pan_heater_power > 0    
-        vrf_heating_output_var = OpenStudio::Model::OutputVariable.new("VRF Heat Pump Heating Electric Energy", model)
-        vrf_heating_output_var.setName(Constants.ObjectNameMiniSplitHeatPump(unit.name.to_s) + " vrf heat energy output var")
-        zone_outdoor_air_drybulb_temp_output_var = OpenStudio::Model::OutputVariable.new("Zone Outdoor Air Drybulb Temperature", model)
-        zone_outdoor_air_drybulb_temp_output_var.setName(Constants.ObjectNameMiniSplitHeatPump(unit.name.to_s) + " zone outdoor air drybulb temp output var")
-      end
-
       obj_name = Constants.ObjectNameMiniSplitHeatPump(unit.name.to_s)
     
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
@@ -1274,13 +1267,13 @@ class HVAC
         
         if pan_heater_power > 0
 
-          vrf_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, vrf_heating_output_var)
+          vrf_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "VRF Heat Pump Heating Electric Energy")
           vrf_sensor.setName("#{obj_name} vrf energy sensor".gsub("|","_"))
           vrf_sensor.setKeyName(obj_name + " #{control_zone.name} ac vrf")
           
           vrf_fbsmt_sensor = nil
           slave_zones.each do |slave_zone|
-            vrf_fbsmt_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, vrf_heating_output_var)
+            vrf_fbsmt_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "VRF Heat Pump Heating Electric Energy")
             vrf_fbsmt_sensor.setName("#{obj_name} vrf fbsmt energy sensor".gsub("|","_"))
             vrf_fbsmt_sensor.setKeyName(obj_name + " #{slave_zone.name} ac vrf")
           end
@@ -1298,7 +1291,7 @@ class HVAC
           pan_heater_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(equip, "ElectricEquipment", "Electric Power Level")
           pan_heater_actuator.setName("#{obj_name} pan heater actuator".gsub("|","_"))
 
-          tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_outdoor_air_drybulb_temp_output_var)
+          tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Zone Outdoor Air Drybulb Temperature")
           tout_sensor.setName("#{obj_name} tout sensor".gsub("|","_"))
           thermal_zones.each do |thermal_zone|
             if Geometry.is_living(thermal_zone)
@@ -2117,6 +2110,43 @@ class HVAC
       return true
     end
     
+    def self.apply_ideal_air_loads(model, unit, runner)
+      thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
+
+      control_slave_zones_hash = get_control_and_slave_zones(thermal_zones)
+      control_slave_zones_hash.each do |control_zone, slave_zones|
+
+        ideal_air = OpenStudio::Model::ZoneHVACIdealLoadsAirSystem.new(model)
+        ideal_air.setMaximumHeatingSupplyAirTemperature(50)
+        ideal_air.setMinimumCoolingSupplyAirTemperature(10)
+        ideal_air.setMaximumHeatingSupplyAirHumidityRatio(0.015)
+        ideal_air.setMinimumCoolingSupplyAirHumidityRatio(0.01)
+        ideal_air.setHeatingLimit('NoLimit')
+        ideal_air.setCoolingLimit('NoLimit')
+        ideal_air.setDehumidificationControlType('None')
+        ideal_air.setHumidificationControlType('None')
+        ideal_air.addToThermalZone(control_zone)
+        
+        slave_zones.each do |slave_zone|
+        
+          ideal_air = OpenStudio::Model::ZoneHVACIdealLoadsAirSystem.new(model)
+          ideal_air.setMaximumHeatingSupplyAirTemperature(50)
+          ideal_air.setMinimumCoolingSupplyAirTemperature(10)
+          ideal_air.setMaximumHeatingSupplyAirHumidityRatio(0.015)
+          ideal_air.setMinimumCoolingSupplyAirHumidityRatio(0.01)
+          ideal_air.setHeatingLimit('NoLimit')
+          ideal_air.setCoolingLimit('NoLimit')
+          ideal_air.setDehumidificationControlType('None')
+          ideal_air.setHumidificationControlType('None')
+          ideal_air.addToThermalZone(slave_zone)
+          
+        end
+        
+      end
+    
+      return true
+    end
+    
     def self.remove_hvac_equipment(model, runner, thermal_zone, unit, new_equip)
       # TODO: Split into remove_heating and remove_cooling
       counterpart_equip = nil
@@ -2737,23 +2767,6 @@ class HVAC
         return false
       end    
       
-      ["Schedule Value", "Zone Mean Air Temperature"].each do |output_var_name|
-        unless model.getOutputVariables.any? {|existing_output_var| existing_output_var.name.to_s == output_var_name} 
-          output_var = OpenStudio::Model::OutputVariable.new(output_var_name, model)
-          output_var.setName(output_var_name)
-        end
-      end
-
-      schedule_value_output_var = nil
-      zone_mean_air_temp_output_var = nil
-      model.getOutputVariables.each do |output_var|
-        if output_var.name.to_s == "Schedule Value"
-          schedule_value_output_var = output_var
-        elsif output_var.name.to_s == "Zone Mean Air Temperature"
-          zone_mean_air_temp_output_var = output_var
-        end
-      end
-      
       obj_name = Constants.ObjectNameCeilingFan(unit.name.to_s)
     
       num_bedrooms, num_bathrooms = Geometry.get_unit_beds_baths(model, unit, runner)      
@@ -2929,11 +2942,11 @@ class HVAC
       equip.setSchedule(ceiling_fan_master_sch)
       
       # Sensor that reports the value of the schedule CeilingFan (0 if cooling setpoint setup is in effect, 1 otherwise).
-      sched_val_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, schedule_value_output_var)
+      sched_val_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Schedule Value")
       sched_val_sensor.setName("#{obj_name} sched val sensor".gsub("|","_"))
       sched_val_sensor.setKeyName(obj_name + " schedule")
 
-      tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_temp_output_var)
+      tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Zone Mean Air Temperature")
       tin_sensor.setName("#{obj_name} tin sensor".gsub("|","_"))
       tin_sensor.setKeyName(living_zone.name.to_s)
       
@@ -3505,6 +3518,11 @@ class HVAC
         runner.registerInfo("Found ground source heat pump in #{thermal_zone.name}.")
         cooling_equipment << system
       end
+      if self.has_ideal_air(model, runner, thermal_zone)
+        runner.registerInfo("Found ideal air system in #{thermal_zone.name}.")
+        ideal_air = self.get_ideal_air(model, runner, thermal_zone)
+        cooling_equipment << ideal_air
+      end
       return cooling_equipment
     end
     
@@ -3547,6 +3565,11 @@ class HVAC
         runner.registerInfo("Found unit heater in #{thermal_zone.name}.")
         system, clg_coil, htg_coil = self.get_unitary_system_zone_hvac(model, runner, thermal_zone)
         heating_equipment << system
+      end
+      if self.has_ideal_air(model, runner, thermal_zone)
+        runner.registerInfo("Found ideal air system in #{thermal_zone.name}.")
+        ideal_air = self.get_ideal_air(model, runner, thermal_zone)
+        heating_equipment << ideal_air
       end
       return heating_equipment
     end
@@ -3700,6 +3723,15 @@ class HVAC
       return nil
     end
     
+    def self.get_ideal_air(model, runner, thermal_zone)
+      # Returns the ideal air loads system if available
+      model.getZoneHVACIdealLoadsAirSystems.each do |ideal_air|
+        next unless thermal_zone.handle.to_s == ideal_air.thermalZone.get.handle.to_s
+        return ideal_air
+      end
+      return nil
+    end
+    
     # Has Equipment methods
     
     def self.has_central_ac(model, runner, thermal_zone)
@@ -3821,6 +3853,14 @@ class HVAC
       return true
     end
     
+    def self.has_ideal_air(model, runner, thermal_zone)
+      ideal_air = self.get_ideal_air(model, runner, thermal_zone)
+      if not ideal_air.nil?
+        return true
+      end
+      return false
+    end
+    
     def self.has_ducted_equipment(model, runner, thermal_zone)
       if has_central_ac(model, runner, thermal_zone)
         return true
@@ -3897,15 +3937,6 @@ class HVAC
 
       obj_name = Constants.ObjectNameMiniSplitHeatPump(unit.name.to_s)
       
-      model.getOutputVariables.each do |output_var|
-        next unless output_var.name.to_s == "#{obj_name} vrf heat energy output var"
-        output_var.remove
-      end
-      model.getOutputVariables.each do |output_var|
-        next unless output_var.name.to_s == "#{obj_name} zone outdoor air drybulb temp output var"
-        output_var.remove
-      end
-
       model.getEnergyManagementSystemSensors.each do |sensor|
         next unless sensor.name.to_s == "#{obj_name} vrf energy sensor".gsub(" ","_").gsub("|","_")
         sensor.remove
