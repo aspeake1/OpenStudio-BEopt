@@ -112,8 +112,7 @@ def regenerate_osms
         puts "[#{num_tot}/#{num_osws}] Regenerating osm from #{osw}..."
         osw = File.expand_path("../test/osw_files/#{osw}", __FILE__)
         osm = File.expand_path("../test/osw_files/run/in.osm", __FILE__)
-        osw_gem = File.expand_path("gems/OpenStudio-workflow-gem/lib/") # Speed up osm generation
-        command = "\"#{cli_path}\" -I #{osw_gem} run -w #{osw} -m >> log"
+        command = "\"#{cli_path}\" --no-ssl run -w #{osw} -m >> log"
         for _retry in 1..3
             system(command)
             break if File.exists?(osm)
@@ -258,7 +257,7 @@ task :update_measures do
   
   # Update measure xmls
   cli_path = OpenStudio.getOpenStudioCLI
-  command = "\"#{cli_path}\" measure --update_all #{measures_dir} >> log"
+  command = "\"#{cli_path}\" --no-ssl measure --update_all #{measures_dir} >> log"
   puts "Updating measure.xml files..."
   system(command)
   
