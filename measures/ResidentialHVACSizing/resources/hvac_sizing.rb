@@ -4062,16 +4062,15 @@ class HVACSizing
                 # Air Loop
                 air_loop.setDesignSupplyAirFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(fan_airflow,"cfm","m^3/s"))
 
-                air_loop.demandComponents.each do |demand_component|
-                    thermal_zone.inletPortList.airLoopHVACModelObjects.each do |component|
-                        next if demand_component != component
-                        aterm = component.to_Node.get.inletModelObject.get.to_AirTerminalSingleDuctUncontrolled.get
-                        if not clg_coil.nil?
-                            aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / HVAC.num_air_loop_hvac_unitary_system_clg_coils(model, runner, thermal_zone))
-                        end
-                        if not htg_coil.nil?
-                            aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / HVAC.num_air_loop_hvac_unitary_system_htg_coils(model, runner, thermal_zone))
-                        end
+                thermal_zone.airLoopHVACTerminals.each do |aterm|
+                    next if air_loop != aterm.airLoopHVAC.get
+                    next unless aterm.to_AirTerminalSingleDuctUncontrolled.is_initialized
+                    aterm = aterm.to_AirTerminalSingleDuctUncontrolled.get
+                    if not clg_coil.nil?
+                        aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / HVAC.num_air_loop_hvac_unitary_system_clg_coils(model, runner, thermal_zone))
+                    end
+                    if not htg_coil.nil?
+                        aterm.setMaximumAirFlowRate(UnitConversions.convert(fan_airflow,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone] / HVAC.num_air_loop_hvac_unitary_system_htg_coils(model, runner, thermal_zone))
                     end
                 end
 
