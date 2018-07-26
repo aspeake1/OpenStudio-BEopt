@@ -9,7 +9,7 @@ class ProcessConstructionsFacadesSharedTest < MiniTest::Test
   
   def test_single_family_detached
     args_hash = {}
-    args_hash["shared_building_facades"] = "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
+    args_hash["shared_building_facades"] = Constants.FacadeNone
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"SharedWalls"=>0}
