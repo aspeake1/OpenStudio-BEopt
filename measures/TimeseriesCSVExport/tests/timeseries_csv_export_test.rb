@@ -14,7 +14,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 112, 98, 115)
+    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 122, 98, 115)
   end
 
   def test_tmy_and_subcategories
@@ -91,7 +91,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     end
 
     cli_path = OpenStudio.getOpenStudioCLI
-    cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
+    cmd = "\"#{cli_path}\" --no-ssl run -w \"#{osw_path}\""
     puts cmd
     system(cmd)
     

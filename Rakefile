@@ -9,101 +9,6 @@ require 'pp'
 require 'colored'
 require 'json'
 
-
-desc 'perform tasks related to BCL'
-namespace :measures do
-  # change the file: users/username/.bcl/config.yml
-  # to the ID of the BCL group you want your measures to go into
-  # get the group id number from the URL of the group on BCL
-  # https://bcl.nrel.gov/node/37347 - the group ID here is 37347
-  # you must be an administrator or editor member of a group to
-  # upload content to that group
-
-  desc 'Generate measures to prepare for upload to BCL '
-  task :generate do
-    require 'bcl'
-    # verify staged directory exists
-    FileUtils.mkdir_p('./staged')
-    dirs = Dir.glob('./measures/*')
-    dirs.each do |dir|
-      next if dir.include?('Rakefile')
-      current_d = Dir.pwd
-      measure_name = File.basename(dir)
-      puts "Generating #{measure_name}"
-
-      Dir.chdir(dir)
-      # puts Dir.pwd
-
-      destination = "../../staged/#{measure_name}.tar.gz"
-      FileUtils.rm(destination) if File.exist?(destination)
-      files = Pathname.glob('**/*')
-      files.each do |f|
-        puts "  #{f}"
-      end
-      paths = []
-      files.each do |file|
-        paths << file.to_s
-      end
-
-      BCL.tarball(destination, paths)
-      Dir.chdir(current_d)
-    end
-  end
-
-  desc 'Push generated measures to the BCL group defined in .bcl/config.yml'
-  task :push do
-    require 'bcl'
-    # grab all the tar files and push to bcl
-    measures = []
-    paths = Pathname.glob('./staged/*.tar.gz')
-    paths.each do |path|
-      puts path
-      measures << path.to_s
-    end
-    bcl = BCL::ComponentMethods.new
-    bcl.login
-    bcl.push_contents(measures, true, 'nrel_measure')
-  end
-
-  desc 'update generated measures on the BCL'
-  task :update do
-    require 'bcl'
-    # grab all the tar files and push to bcl
-    measures = []
-    paths = Pathname.glob('./staged/*.tar.gz')
-    paths.each do |path|
-      puts path
-      measures << path.to_s
-    end
-    bcl = BCL::ComponentMethods.new
-    bcl.login
-    bcl.update_contents(measures, true)
-  end
-
-  desc 'test the BCL login credentials defined in .bcl/config.yml'
-  task :test_bcl_login do
-    require 'bcl'
-    bcl = BCL::ComponentMethods.new
-    bcl.login
-  end
-
-  desc 'Create measure zip files for upload to BCL '
-  task :zip do
-    Dir.glob('./measures/*').each do |dir|
-      current_d = Dir.pwd
-      Dir.chdir(dir)
-      if File.exists?("measure.zip")
-        File.delete("measure.zip")
-      end
-      command = '"c:/Program Files/7-Zip\7z.exe" a measure.zip *'
-      system(command)
-      Dir.chdir(current_d)
-    end
-  end
-  
-end # end the :measures namespace
-
-
 desc 'perform tasks related to unit tests'
 namespace :test do
 
@@ -207,8 +112,7 @@ def regenerate_osms
         puts "[#{num_tot}/#{num_osws}] Regenerating osm from #{osw}..."
         osw = File.expand_path("../test/osw_files/#{osw}", __FILE__)
         osm = File.expand_path("../test/osw_files/run/in.osm", __FILE__)
-        osw_gem = File.expand_path("gems/OpenStudio-workflow-gem/lib/") # Speed up osm generation
-        command = "\"#{cli_path}\" -I #{osw_gem} run -w #{osw} -m >> log"
+        command = "\"#{cli_path}\" --no-ssl run -w #{osw} -m >> log"
         for _retry in 1..3
             system(command)
             break if File.exists?(osm)
@@ -353,7 +257,7 @@ task :update_measures do
   
   # Update measure xmls
   cli_path = OpenStudio.getOpenStudioCLI
-  command = "\"#{cli_path}\" measure --update_all #{measures_dir} >> log"
+  command = "\"#{cli_path}\" --no-ssl measure --update_all #{measures_dir} >> log"
   puts "Updating measure.xml files..."
   system(command)
   

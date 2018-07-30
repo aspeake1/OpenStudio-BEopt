@@ -398,6 +398,36 @@ class ResidentialClothesDryerTest < MiniTest::Test
                 end
                 actual_values["Location"] << new_object.space.get.spaceType.get.standardsSpaceType.get
                 assert_equal(HelperMethods.eplus_fuel_map(expected_values["FuelType"]), new_object.fuelType)
+            elsif obj_type == "ScheduleRuleset" # check that a cw schedule value is exactly one hour before the same cd schedule value
+              cw_val = nil
+              cd_val = nil
+              new_object.scheduleRules.each do |cd_rule|
+                cd_day_schedule = cd_rule.daySchedule
+                cd_time = nil
+                cd_day_schedule.values.each_with_index do |val, i|
+                  next unless val > 0
+                  cd_time = cd_day_schedule.times[i]
+                  cd_val = val
+                  break
+                end
+                unless cd_time.nil?
+                  model.getScheduleRulesets.each do |cw_sch|
+                    next unless cw_sch.name.to_s.include? Constants.ObjectNameClothesWasher
+                    cw_sch.scheduleRules.each do |cw_rule|
+                      next unless cw_rule.specificDates[0].monthOfYear.value == cd_rule.specificDates[0].monthOfYear.value
+                      next unless cw_rule.specificDates[0].dayOfMonth == cd_rule.specificDates[0].dayOfMonth
+                      cw_day_schedule = cw_rule.daySchedule
+                      cw_day_schedule.values.each_with_index do |val, i|
+                        next unless cw_day_schedule.times[i].hours == cd_time.hours - 1
+                        next unless cw_day_schedule.times[i].minutes == cd_time.minutes
+                        cw_val = val
+                      end
+                    end
+                  end
+                  break
+                end
+              end
+              assert_equal(cw_val, cd_val)
             end
         end
     end
