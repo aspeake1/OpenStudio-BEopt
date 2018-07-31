@@ -2147,7 +2147,7 @@ class HVAC
       return true
     end
     
-    def self.remove_hvac_equipment(model, runner, thermal_zone, unit, new_equip)
+    def self.remove_hvac_equipment(model, runner, thermal_zone, unit, new_equip, heating=false, cooling=false)
       # TODO: Split into remove_heating and remove_cooling
       counterpart_equip = nil
       perf = nil
@@ -2299,12 +2299,16 @@ class HVAC
       when Constants.ObjectNameCentralSystemFanCoil
         removed_ashp = self.remove_ashp(model, runner, thermal_zone)
         removed_mshp = self.remove_mshp(model, runner, thermal_zone, unit)
-        removed_ac = self.remove_central_ac(model, runner, thermal_zone)
-        removed_room_ac = self.remove_room_ac(model, runner, thermal_zone)
-        removed_furnace = self.remove_furnace(model, runner, thermal_zone)
-        removed_boiler = self.remove_boiler(model, runner, thermal_zone)
-        removed_heater = self.remove_unit_heater(model, runner, thermal_zone)
-        removed_elec_baseboard = self.remove_electric_baseboard(model, runner, thermal_zone)
+        if cooling
+          removed_ac = self.remove_central_ac(model, runner, thermal_zone)
+          removed_room_ac = self.remove_room_ac(model, runner, thermal_zone)
+        end
+        if heating
+          removed_furnace = self.remove_furnace(model, runner, thermal_zone)
+          removed_boiler = self.remove_boiler(model, runner, thermal_zone)
+          removed_heater = self.remove_unit_heater(model, runner, thermal_zone)
+          removed_elec_baseboard = self.remove_electric_baseboard(model, runner, thermal_zone)
+        end
         removed_gshp = self.remove_gshp(model, runner, thermal_zone)
         if removed_ashp or removed_ac or removed_furnace or removed_gshp
           self.remove_air_loop(model, runner, thermal_zone)

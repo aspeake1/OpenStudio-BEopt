@@ -101,7 +101,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 6)
   end
   
-  def test_retrofit_replace_furnace
+  def test_retrofit_replace_furnace_heating_and_cooling
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilHeatingGas"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units}
@@ -109,14 +109,34 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_values = {}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
   end
+
+  def test_retrofit_replace_furnace_cooling_only
+    num_units = 4
+    args_hash = {}
+    args_hash["fan_coil_heating"] = "false"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>num_units, "CoilCoolingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units, "CoilHeatingElectric"=>num_units}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+  end
   
-  def test_retrofit_replace_central_air_conditioner
+  def test_retrofit_replace_central_air_conditioner_heating_and_cooling
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
+  end
+
+  def test_retrofit_replace_central_air_conditioner_heating_only
+    num_units = 4
+    args_hash = {}
+    args_hash["fan_coil_cooling"] = "false"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>num_units, "ZoneHVACUnitHeater"=>num_units, "FanConstantVolume"=>num_units, "CoilHeatingWater"=>num_units}
+    expected_values = {}
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
   end
 
   def test_retrofit_replace_electric_baseboard
