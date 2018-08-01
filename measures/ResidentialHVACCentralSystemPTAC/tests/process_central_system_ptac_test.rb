@@ -7,6 +7,14 @@ require 'fileutils'
 
 class ProcessCentralSystemPTACTest < MiniTest::Test
 
+  def test_single_family_detached_unfinshed_zone
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>1, "CoilHeatingWater"=>1, "FanConstantVolume"=>1, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1}
+    expected_values = {}
+    _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 2)
+  end
+
   def test_single_family_attached_ptac
     num_units = 4
     args_hash = {}

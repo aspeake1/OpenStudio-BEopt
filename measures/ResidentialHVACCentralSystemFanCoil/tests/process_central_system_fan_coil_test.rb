@@ -7,6 +7,14 @@ require 'fileutils'
 
 class ProcessCentralSystemFanCoilTest < MiniTest::Test
 
+  def test_single_family_detached_unfinshed_zone
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2, "CoilCoolingWater"=>1, "CoilHeatingWater"=>1, "FanOnOff"=>1, "ZoneHVACFourPipeFanCoil"=>1}
+    expected_values = {}
+    _test_measure("SFD_2000sqft_2story_UB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 3)
+  end
+
   def test_single_family_attached_fan_coil_heating_and_cooling
     num_units = 4
     args_hash = {}
