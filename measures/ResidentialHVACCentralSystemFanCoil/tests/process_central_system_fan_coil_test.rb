@@ -13,7 +13,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>4*num_units, "CoilCoolingWater"=>2*num_units, "CoilHeatingWater"=>2*num_units, "FanOnOff"=>2*num_units, "ZoneHVACFourPipeFanCoil"=>2*num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 6)
   end
 
   def test_multifamily_fan_coil_heating_and_cooling
@@ -22,7 +22,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>4*num_units, "CoilCoolingWater"=>2*num_units, "CoilHeatingWater"=>2*num_units, "FanOnOff"=>2*num_units, "ZoneHVACFourPipeFanCoil"=>2*num_units}
     expected_values = {}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 10)
   end
   
   def test_single_family_attached_fan_coil_heating_only
@@ -32,7 +32,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>2*num_units, "ZoneHVACUnitHeater"=>2*num_units, "FanConstantVolume"=>2*num_units, "CoilHeatingWater"=>2*num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
   end
 
   def test_multifamily_fan_coil_heating_only
@@ -42,7 +42,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>2*num_units, "ZoneHVACUnitHeater"=>2*num_units, "FanConstantVolume"=>2*num_units, "CoilHeatingWater"=>2*num_units}
     expected_values = {}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
   end
   
   def test_single_family_attached_fan_coil_cooling_only
@@ -52,7 +52,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>2*num_units, "FanOnOff"=>2*num_units, "ZoneHVACFourPipeFanCoil"=>2*num_units, "CoilHeatingElectric"=>2*num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
   end
 
   def test_multifamily_fan_coil_cooling_only
@@ -62,7 +62,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>2*num_units, "FanOnOff"=>2*num_units, "ZoneHVACFourPipeFanCoil"=>2*num_units, "CoilHeatingElectric"=>2*num_units}
     expected_values = {}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
   end
 
   def test_error_single_family_attached_fan_coil_no_heating_no_cooling
@@ -80,7 +80,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Fan_Coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 7)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Fan_Coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 12)
   end
   
   def test_retrofit_replace_central_system_boiler_baseboards
@@ -89,7 +89,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Boiler_Baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 6)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Boiler_Baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 11)
   end
 
   def test_retrofit_replace_central_system_ptac
@@ -98,7 +98,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>num_units, "CoilHeatingWater"=>num_units, "FanConstantVolume"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 6)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 11)
   end
   
   def test_retrofit_replace_furnace_heating_and_cooling
@@ -107,7 +107,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilHeatingGas"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 14)
   end
 
   def test_retrofit_replace_furnace_cooling_only
@@ -117,7 +117,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>num_units, "CoilCoolingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units, "CoilHeatingElectric"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
   end
   
   def test_retrofit_replace_central_air_conditioner_heating_and_cooling
@@ -126,7 +126,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 14)
   end
 
   def test_retrofit_replace_central_air_conditioner_heating_only
@@ -136,7 +136,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>num_units, "ZoneHVACUnitHeater"=>num_units, "FanConstantVolume"=>num_units, "CoilHeatingWater"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
   end
 
   def test_retrofit_replace_electric_baseboard
@@ -145,7 +145,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"ZoneHVACBaseboardConvectiveElectric"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_ElectricBaseboard.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_ElectricBaseboard.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 10)
   end
   
   def test_retrofit_replace_ashp
@@ -154,7 +154,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilHeatingElectric"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "CoilHeatingDXSingleSpeed"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_ASHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_ASHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 14)
   end
   
   def test_retrofit_replace_mshp
@@ -163,7 +163,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"FanOnOff"=>num_units, "AirConditionerVariableRefrigerantFlow"=>num_units, "ZoneHVACTerminalUnitVariableRefrigerantFlow"=>num_units, "CoilCoolingDXVariableRefrigerantFlow"=>num_units, "CoilHeatingDXVariableRefrigerantFlow"=>num_units, "ZoneHVACBaseboardConvectiveElectric"=>num_units, "EnergyManagementSystemSensor"=>2*num_units, "ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "EnergyManagementSystemActuator"=>num_units, "EnergyManagementSystemProgram"=>num_units, "EnergyManagementSystemProgramCallingManager"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 14)
   end
   
   def test_retrofit_replace_boiler
@@ -172,7 +172,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"PlantLoop"=>num_units, "BoilerHotWater"=>num_units, "CoilHeatingWaterBaseboard"=>num_units, "PumpVariableSpeed"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Boiler.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Boiler.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 14)
   end
   
   def test_retrofit_replace_unit_heater
@@ -181,7 +181,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"CoilHeatingGas"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "FanOnOff"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_UnitHeater.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_UnitHeater.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 10)
   end
   
   def test_retrofit_replace_room_air_conditioner
@@ -190,7 +190,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"CoilHeatingElectric"=>num_units, "FanOnOff"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 10)
   end
 
   def test_retrofit_replace_gshp_vert_bore
@@ -199,7 +199,7 @@ class ProcessCentralSystemFanCoilTest < MiniTest::Test
     expected_num_del_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_GSHPVertBore.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 13)
+    _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_GSHPVertBore.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 18)
   end
 
   private

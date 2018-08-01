@@ -2109,6 +2109,50 @@ class HVAC
     
       return true
     end
+
+    def self.apply_central_system_boiler_baseboards(model, unit, runner, std, 
+                                                    hot_water_loop)
+
+      zones = []
+      unit.spaces.each do |space|
+        zone = space.thermalZone.get
+        next if zones.include? zone
+        zones << zone
+      end
+
+      std.model_add_baseboard(model, hot_water_loop, zones)
+      runner.registerInfo("Added baseboards onto '#{hot_water_loop.name}' for '#{unit.name}'.")
+
+      return true
+
+    end
+
+    def self.apply_central_system_fan_coil(model, unit, runner, std, 
+                                           fan_coil_heating, fan_coil_cooling, 
+                                           hot_water_loop, chilled_water_loop)
+
+      zones = []
+      unit.spaces.each do |space|
+        zone = space.thermalZone.get
+        next if zones.include? zone
+        zones << zone
+      end
+
+      if fan_coil_heating and not fan_coil_cooling
+        std.model_add_unitheater(model, sys_name=nil, zones, hvac_op_sch=nil, fan_control_type="ConstantVolume", fan_pressure_rise=OpenStudio.convert(0.2, "inH_{2}O", "Pa").get, "DistrictHeating", hot_water_loop)
+        runner.registerInfo("Added zone hvac unit heaters onto '#{hot_water_loop.name}' for #{unit.name}.")        
+      else
+        std.model_add_four_pipe_fan_coil(model, hot_water_loop, chilled_water_loop, zones)
+        if hot_water_loop.nil?
+          runner.registerInfo("Added fan coil units onto '#{chilled_water_loop.name}' for '#{unit.name}'.'")
+        else
+          runner.registerInfo("Added fan coil units onto '#{hot_water_loop.name}' and '#{chilled_water_loop.name}' for '#{unit.name}'.")
+        end
+      end
+      
+      return true
+
+    end
     
     def self.apply_ideal_air_loads(model, unit, runner)
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
