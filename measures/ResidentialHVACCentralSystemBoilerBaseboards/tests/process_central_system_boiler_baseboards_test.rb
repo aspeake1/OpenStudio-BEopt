@@ -13,7 +13,7 @@ class ProcessCentralSystemHotWaterBoilerBaseboardsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>2*num_units, "ZoneHVACBaseboardConvectiveWater"=>2*num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
   end
 
   def test_single_family_attached_steam_boiler
@@ -23,14 +23,14 @@ class ProcessCentralSystemHotWaterBoilerBaseboardsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>2*num_units, "ZoneHVACBaseboardConvectiveWater"=>2*num_units}
     expected_values = {}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
   end
 
   def test_multifamily_hot_water_boiler
-    num_units = 4
+    num_units = 8
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>2*num_units, "ZoneHVACBaseboardConvectiveWater"=>2*num_units}
+    expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units}
     expected_values = {}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 9)
   end

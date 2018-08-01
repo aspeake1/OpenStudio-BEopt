@@ -2120,8 +2120,10 @@ class HVAC
         zones << zone
       end
 
-      std.model_add_baseboard(model, hot_water_loop, zones)
-      runner.registerInfo("Added baseboards onto '#{hot_water_loop.name}' for '#{unit.name}'.")
+      baseboards = std.model_add_baseboard(model, hot_water_loop, zones)
+      baseboards.each do |baseboard|
+        runner.registerInfo("Added '#{baseboard.name}' onto '#{hot_water_loop.name}' for '#{unit.name}'.")
+      end
 
       return true
 
@@ -2139,18 +2141,39 @@ class HVAC
       end
 
       if fan_coil_heating and not fan_coil_cooling
-        std.model_add_unitheater(model, sys_name=nil, zones, hvac_op_sch=nil, fan_control_type="ConstantVolume", fan_pressure_rise=OpenStudio.convert(0.2, "inH_{2}O", "Pa").get, "DistrictHeating", hot_water_loop)
-        runner.registerInfo("Added zone hvac unit heaters onto '#{hot_water_loop.name}' for #{unit.name}.")        
+        unit_heaters = std.model_add_unitheater(model, sys_name=nil, zones, hvac_op_sch=nil, fan_control_type="ConstantVolume", fan_pressure_rise=OpenStudio.convert(0.2, "inH_{2}O", "Pa").get, "DistrictHeating", hot_water_loop)
+        unit_heaters.each do |unit_heater|
+          runner.registerInfo("Added '#{unit_heater.name}' onto '#{hot_water_loop.name}' for #{unit.name}.")        
+        end
       else
-        std.model_add_four_pipe_fan_coil(model, hot_water_loop, chilled_water_loop, zones)
-        if hot_water_loop.nil?
-          runner.registerInfo("Added fan coil units onto '#{chilled_water_loop.name}' for '#{unit.name}'.'")
-        else
-          runner.registerInfo("Added fan coil units onto '#{hot_water_loop.name}' and '#{chilled_water_loop.name}' for '#{unit.name}'.")
+        fcus = std.model_add_four_pipe_fan_coil(model, hot_water_loop, chilled_water_loop, zones)
+        fcus.each do |fcu|
+          if hot_water_loop.nil?
+            runner.registerInfo("Added '#{fcu.name}' onto '#{chilled_water_loop.name}' for '#{unit.name}'.'")
+          else
+            runner.registerInfo("Added '#{fcu.name}' onto '#{hot_water_loop.name}' and '#{chilled_water_loop.name}' for '#{unit.name}'.")
+          end
         end
       end
       
       return true
+
+    end
+
+    def self.apply_central_system_ptac(model, unit, runner, std,
+                                       hot_water_loop)
+
+      zones = []
+      unit.spaces.each do |space|
+        zone = space.thermalZone.get
+        next if zones.include? zone
+        zones << zone
+      end
+
+      ptacs = std.model_add_ptac(model, sys_name=nil, hot_water_loop, zones, fan_type="ConstantVolume", "Water", cooling_type="Single Speed DX AC")
+      ptacs.each do |ptac|
+        runner.registerInfo("Added '#{ptac.name}' onto '#{hot_water_loop.name}' for '#{unit.name}'.")
+      end
 
     end
     
