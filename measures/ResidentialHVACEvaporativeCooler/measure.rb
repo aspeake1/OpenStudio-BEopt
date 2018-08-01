@@ -12,7 +12,7 @@ require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/hvac"
 
 #start the measure
-class ResidentialHvacEvaporativeCooler < OpenStudio::Measure::ModelMeasure
+class ResidentialHVACEvaporativeCooler < OpenStudio::Measure::ModelMeasure
 
   #define the name that a user will see, this method may be deprecated as
   #the display name in PAT comes from the name field in measure.xml
@@ -85,4 +85,4 @@ class ResidentialHvacEvaporativeCooler < OpenStudio::Measure::ModelMeasure
 end #end the measure
 
 #this allows the measure to be use by the application
-ResidentialHvacEvaporativeCooler.new.registerWithApplication
+ResidentialHVACEvaporativeCooler.new.registerWithApplication

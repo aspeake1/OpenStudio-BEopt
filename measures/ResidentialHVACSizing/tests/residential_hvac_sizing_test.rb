@@ -2113,6 +2113,8 @@ class ProcessHVACSizingTest < MiniTest::Test
                       }
     _test_measure("SFD_HVACSizing_Equip_MSHP_BB_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
+  
+  # Two new tests: one for fixed size, one for autosize
 
   def test_equip_dehumidifier_autosize_atlanta
     args_hash = {}
