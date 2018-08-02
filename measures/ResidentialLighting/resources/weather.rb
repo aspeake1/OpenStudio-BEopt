@@ -59,46 +59,33 @@ class WeatherProcess
     return @epw_path
   end
 
-  def add_design_days_for_autosizing(model, epw_file)
-    epw_design_conditions = epw_file.designConditions
-    epwHasDesignData = false
-    if epw_design_conditions.length > 0
-      epwHasDesignData = true
-      epw_design_conditions = epw_design_conditions[0]
-      
-      heating_design_day = OpenStudio::Model::DesignDay.new(model)
-      heating_design_day.setName("Ann Htg 99.6% Condns DB")
-      heating_design_day.setMaximumDryBulbTemperature(epw_design_conditions.heatingDryBulb99pt6)
-      heating_design_day.setHumidityIndicatingConditionsAtMaximumDryBulb(epw_design_conditions.heatingDryBulb99pt6) # TODO: confirm
-      heating_design_day.setBarometricPressure(UnitConversions.convert(Psychrometrics.Pstd_fZ(UnitConversions.convert(epw_file.elevation,"m","ft")),"psi","pa"))
-      heating_design_day.setWindSpeed(epw_design_conditions.heatingMeanCoincidentWindSpeed99pt6)
-      heating_design_day.setWindDirection(epw_design_conditions.heatingPrevailingCoincidentWindDirection99pt6)
-      heating_design_day.setDayOfMonth(21) # TODO: get from somewhere else?
-      heating_design_day.setMonth(12) # TODO: get from somewhere else?
-      heating_design_day.setDayType("WinterDesignDay")
-      heating_design_day.setHumidityIndicatingType("Wetbulb")
-      heating_design_day.setDryBulbTemperatureRangeModifierType("DefaultMultipliers")
-      heating_design_day.setSolarModelIndicator("ASHRAEClearSky")
-
-      cooling_design_day = OpenStudio::Model::DesignDay.new(model)
-      cooling_design_day.setName("Ann Clg .4% Condns DB=>MWB")
-      cooling_design_day.setMaximumDryBulbTemperature(epw_design_conditions.coolingDryBulb0pt4)
-      cooling_design_day.setDailyDryBulbTemperatureRange(epw_design_conditions.coolingDryBulbRange)
-      cooling_design_day.setHumidityIndicatingConditionsAtMaximumDryBulb(epw_design_conditions.coolingMeanCoincidentWetBulb0pt4)
-      cooling_design_day.setBarometricPressure(UnitConversions.convert(Psychrometrics.Pstd_fZ(UnitConversions.convert(epw_file.elevation,"m","ft")),"psi","pa"))
-      cooling_design_day.setWindSpeed(epw_design_conditions.coolingMeanCoincidentWindSpeed0pt4)
-      cooling_design_day.setWindDirection(epw_design_conditions.coolingPrevailingCoincidentWindDirection0pt4)
-      cooling_design_day.setDayOfMonth(21) # TODO: get from somewhere else?
-      cooling_design_day.setMonth(7) # TODO: get from somewhere else?
-      cooling_design_day.setDayType("SummerDesignDay")
-      cooling_design_day.setHumidityIndicatingType("Wetbulb")
-      cooling_design_day.setDryBulbTemperatureRangeModifierType("DefaultMultipliers")
-      cooling_design_day.setSolarModelIndicator("ASHRAETau")
-      cooling_design_day.setAshraeTaub(0.424) # TODO: get from somewhere else?
-      cooling_design_day.setAshraeTaud(2.012) # TODO: get from somewhere else?
-
-    end
-    return epwHasDesignData
+  def add_design_days_for_autosizing(model)
+    heating_design_day = OpenStudio::Model::DesignDay.new(model)
+    heating_design_day.setName("Ann Htg 99% Condns DB")
+    heating_design_day.setMaximumDryBulbTemperature(UnitConversions.convert(@design.HeatingDrybulb,"F","C"))
+    heating_design_day.setHumidityIndicatingConditionsAtMaximumDryBulb(UnitConversions.convert(@design.HeatingDrybulb,"F","C"))
+    heating_design_day.setBarometricPressure(UnitConversions.convert(Psychrometrics.Pstd_fZ(@header.Altitude),"psi","pa"))
+    heating_design_day.setWindSpeed(@design.HeatingWindspeed)
+    heating_design_day.setDayOfMonth(21)
+    heating_design_day.setMonth(1)
+    heating_design_day.setDayType("WinterDesignDay")
+    heating_design_day.setHumidityIndicatingType("Wetbulb")
+    heating_design_day.setDryBulbTemperatureRangeModifierType("DefaultMultipliers")
+    heating_design_day.setSolarModelIndicator("ASHRAEClearSky")
+    
+    cooling_design_day = OpenStudio::Model::DesignDay.new(model)
+    cooling_design_day.setName("Ann Clg 1% Condns DB=>MWB")
+    cooling_design_day.setMaximumDryBulbTemperature(UnitConversions.convert(@design.CoolingDrybulb,"F","C"))
+    cooling_design_day.setDailyDryBulbTemperatureRange(UnitConversions.convert(@design.DailyTemperatureRange,"R","K"))
+    cooling_design_day.setHumidityIndicatingConditionsAtMaximumDryBulb(UnitConversions.convert(@design.CoolingWetbulb,"F","C"))
+    cooling_design_day.setBarometricPressure(UnitConversions.convert(Psychrometrics.Pstd_fZ(@header.Altitude),"psi","pa"))
+    cooling_design_day.setWindSpeed(@design.CoolingWindspeed)
+    cooling_design_day.setDayOfMonth(21)
+    cooling_design_day.setMonth(7)
+    cooling_design_day.setDayType("SummerDesignDay")
+    cooling_design_day.setHumidityIndicatingType("Wetbulb")
+    cooling_design_day.setDryBulbTemperatureRangeModifierType("DefaultMultipliers")
+    cooling_design_day.setSolarModelIndicator("ASHRAEClearSky")
   end
 
   def self.actual_timestamps(model, runner, measure_dir)
@@ -335,18 +322,6 @@ class WeatherProcess
             @runner.registerError("Cannot retrieve relativeHumidity from the EPW for hour #{hournum+1}.")
             @error = true
           end
-          #if epwdata.extraterrestrialHorizontalRadiation.is_initialized
-          #  hourdict['ethoriz'] = epwdata.extraterrestrialHorizontalRadiation.get
-          #else
-          #  @runner.registerError("Cannot retrieve extraterrestrialHorizontalRadiation from the EPW for hour #{hournum+1}.")
-          #  @error = true
-          #end
-          #if epwdata.globalHorizontalRadiation.is_initialized
-          #  hourdict['ghoriz'] = epwdata.globalHorizontalRadiation.get
-          #else
-          #  @runner.registerError("Cannot retrieve globalHorizontalRadiation from the EPW for hour #{hournum+1}.")
-          #  @error = true
-          #end
           if epwdata.directNormalRadiation.is_initialized
             hourdict['dirnormal'] = epwdata.directNormalRadiation.get # W/m^2
           else
@@ -595,7 +570,7 @@ class WeatherProcess
           epwHasDesignData = true
           epw_design_conditions = epw_design_conditions[0]
           design.HeatingDrybulb = UnitConversions.convert(epw_design_conditions.heatingDryBulb99,"C","F")
-          design.HeatingWindspeed = epw_design_conditions.heatingColdestMonthWindSpeed1 # FIXME: Is this correct?
+          design.HeatingWindspeed = epw_design_conditions.heatingColdestMonthWindSpeed1 # TODO: This field is consistent with BEopt, but should be heatingMeanCoincidentWindSpeed99pt6 instead?
           design.CoolingDrybulb = UnitConversions.convert(epw_design_conditions.coolingDryBulb1,"C","F")
           design.CoolingWetbulb = UnitConversions.convert(epw_design_conditions.coolingMeanCoincidentWetBulb1,"C","F")
           design.CoolingWindspeed = epw_design_conditions.coolingMeanCoincidentWindSpeed0pt4
