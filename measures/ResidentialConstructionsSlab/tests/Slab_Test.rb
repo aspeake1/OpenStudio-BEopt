@@ -54,6 +54,14 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
+  def test_exposed_perimeter_with_door
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>4, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
+    expected_values = {"ExposedPerimeter"=>104.167}
+    _test_measure("SFD_2000sqft_2story_SL_GRG_UA_Windows_Doors.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+
   def test_single_family_attached_new_construction
     num_units = 4
     args_hash = {}
