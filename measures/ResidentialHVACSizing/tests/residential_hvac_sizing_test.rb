@@ -2230,7 +2230,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
-
+    
     if print_debug_info
         show_output(result)
     end
