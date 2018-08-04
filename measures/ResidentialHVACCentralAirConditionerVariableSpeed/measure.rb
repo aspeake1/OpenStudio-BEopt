@@ -282,7 +282,7 @@ class ProcessVariableSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeas
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
       HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
         ([control_zone] + slave_zones).each do |zone|
-          #HVAC.remove_hvac_equipment(model, runner, zone, unit, Constants.ObjectNameCentralAirConditioner)
+          HVAC.remove_hvac_equipment(model, runner, zone, unit, Constants.ObjectNameCentralAirConditioner)
         end
       end
       
