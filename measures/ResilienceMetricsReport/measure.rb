@@ -52,12 +52,14 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
 
   # define the outputs that the measure will create
   def outputs
-    output_vars = ["Zone Mean Air Temperature", "Zone Air Relative Humidity"] # possible list that the user can enter limits for; should get blank column for ones that aren't entered into output_vars arg
+    output_vars = ["Zone Mean Air Temperature", "Zone Air Relative Humidity", "Wet Bulb Globe Temperature"] # possible list that the user can enter limits for; should get blank column for ones that aren't entered into output_vars arg
     buildstock_outputs = []
     output_vars.each do |output_var|
       thermal_zones.each do |zone|
-        buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_below" # hours below lower threshold
-        buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_above" # hours above upper threshold
+        buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_below_lower_threshold" # hours below lower threshold
+        buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_above_upper_threshold" # hours above upper threshold
+        buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_until_lower_threshold" # hours until lower threshold
+        buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_until_upper_threshold" # hours until upper threshold
       end
     end
     result = OpenStudio::Measure::OSOutputVector.new
@@ -81,15 +83,17 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
 
     output_vars = runner.getStringArgumentValue("output_vars",user_arguments).split(",")
 
-    # TODO: request this from E+ team
-    if output_vars == "Wet Bulb Globe Temperature"
-      outputs_vars.delete("Wet Bulb Globe Temperature")
-      outputs_vars << "Zone Outdoor Air Wetbulb Temperature"
-      outputs_vars << "Zone Mean Radiant Temperature"
-    end
-
     output_vars.each do |output_var|
-      result << OpenStudio::IdfObject.load("Output:Variable,*,#{output_var.strip},Hourly;").get
+      output_var.strip!
+      if output_var == "Wet Bulb Globe Temperature"
+        requests = wbgt_vars
+      else
+        requests = [output_var]
+      end
+      requests.each do |request|
+        result << OpenStudio::IdfObject.load("Output:Variable,*,#{request},Hourly;").get
+        runner.registerInfo("Requesting * #{request}.")
+      end
     end
 
     return result
@@ -147,49 +151,79 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
       return false
     end
 
-    output_vars.each_with_index do |output_var, i|
-      sql.availableKeyValues(ann_env_pd, "Hourly", output_var.strip).each do |key_value|
+    timeseries = {}
+    key_values = []
+    output_vars.each do |output_var|
 
-        next unless thermal_zones.any? { |zone| zone.casecmp(key_value) == 0 }
+      output_var.strip!
+      if output_var == "Wet Bulb Globe Temperature"
+        requests = wbgt_vars
+      else
+        requests = [output_var]
+      end
 
-        if output_var != "Wet Bulb Globe Temperature"
-          timeseries = get_timeseries(sql, ann_env_pd, output_var, key_value)
-        else
-          t_w = get_timeseries(sql, ann_env_pd, "Zone Outdoor Air Wetbulb Temperature", key_value)
-          t_g = get_timeseries(sql, ann_env_pd, "Zone Mean Radiant Temperature", key_value)
-          timeseries = 0.7 * t_w + 0.3 * t_g # https://en.wikipedia.org/wiki/Wet-bulb_globe_temperature
+      requests.each do |request|
+
+        sql.availableKeyValues(ann_env_pd, "Hourly", request).each do |key_value|
+
+          next unless thermal_zones.any? { |zone| zone.casecmp(key_value) == 0 }
+
+          timeserie = get_timeseries(sql, ann_env_pd, request, key_value)
+          unless timeserie
+            runner.registerError("No data found for #{key_value} #{request}.")
+            return false
+          end
+
+          timeseries["#{request},#{key_value}"] = timeserie
+          unless key_values.include? key_value
+            key_values << key_value
+          end
+
         end
 
-        unless timeseries
-          runner.registerError("No data found for Hourly #{key_value} #{output_var.strip}.")
-          return false
+      end
+
+    end
+
+    output_vars.each_with_index do |output_var, i|
+
+      output_var.strip!
+      key_values.each do |key_value|
+        
+        if output_var == "Wet Bulb Globe Temperature"
+          t_w = timeseries["Zone Outdoor Air Wetbulb Temperature,#{key_value}"].collect { |n| n * 0.7 }
+          t_r = timeseries["Zone Mean Radiant Temperature,#{key_value}"].collect { |n| n * 0.3 }
+          values = [t_w, t_r].transpose.map {|x| x.reduce(:+)}
+        else
+          values = timeseries["#{output_var},#{key_value}"]
         end
 
         # Hours above or below threshold
 
-        resilience_metric_below, resilience_metric_above = calc_resilience_metric(output_var.strip, values, min_vals[i].strip, max_vals[i].strip)
+        resilience_metric_below, resilience_metric_above = calc_resilience_metric(output_var, values, min_vals[i].strip, max_vals[i].strip)
 
         unless resilience_metric_below.nil?
-          report_output(runner, "#{key_value} #{output_var.strip} below", resilience_metric_below)
+          report_output(runner, "#{key_value} #{output_var} below lower threshold", resilience_metric_below)
         end
 
         unless resilience_metric_above.nil?
-          report_output(runner, "#{key_value} #{output_var.strip} above", resilience_metric_above)
+          report_output(runner, "#{key_value} #{output_var} above upper threshold", resilience_metric_above)
         end
 
-        # Coast times
+        # Coast times until outage
 
-        coast_time_below, coast_time_above = calc_coast_time(output_var.strip, values, min_vals[i].strip, max_vals[i].strip)
+        coast_time_below, coast_time_above = calc_coast_time(output_var, values, min_vals[i].strip, max_vals[i].strip)
 
         unless coast_time_below.nil?
-          report_output(runner, "#{key_value} #{output_var.strip} below", coast_time_below)
+          report_output(runner, "#{key_value} #{output_var} until lower threshold", coast_time_below)
         end
 
         unless coast_time_above.nil?
-          report_output(runner, "#{key_value} #{output_var.strip} above", coast_time_above)
+          report_output(runner, "#{key_value} #{output_var} until upper threshold", coast_time_above)
         end
 
       end
+
     end
 
     sql.close()
@@ -197,9 +231,14 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     return true
   end
 
+  def wbgt_vars
+    return ["Zone Outdoor Air Wetbulb Temperature", "Zone Mean Radiant Temperature"]
+  end
+
   def convert_val(output_var, val)
-    if output_var == "Zone Mean Air Temperature"
-      unless val == "NA"
+    unless val == "NA"
+      val = val.to_f
+      if ["Zone Mean Air Temperature", "Wet Bulb Globe Temperature"].include? output_var
         val = UnitConversions.convert(val, "F", "C")
       end
     end
@@ -278,12 +317,16 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
 
   end
 
-  def get_timeseries(sql, ann_env_pd, output_var, key_value)
-    timeseries = sql.timeSeries(ann_env_pd, "Hourly", output_var.strip, key_value)
+  def get_timeseries(sql, ann_env_pd, request, key_value)
+    timeseries = sql.timeSeries(ann_env_pd, "Hourly", request, key_value)
     if timeseries.empty?
       return false
     else
       values = timeseries.get.values
+    end
+    timeseries = []
+    (0...values.length).to_a.each do |i|
+      timeseries << values[i]
     end
     return timeseries
   end

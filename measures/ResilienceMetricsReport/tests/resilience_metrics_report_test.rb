@@ -20,9 +20,9 @@ class ResilienceMetricsReportTest < MiniTest::Test
   def test_resilience_metrics
     resilience_metrics = {
                          # output_var=>[timeseries, min_val, max_val, hours_spent_below, hours_spent_above]
-                         "Zone Mean Air Temperature"=>[[40]*8760, 60, 80, 0, 8760],
+                         "Zone Mean Air Temperature"=>[[4.4]*8760, 60, 80, 8760, 0],
                          "Zone Air Relative Humidity"=>[[60]*8760, "NA", 60, nil, 0],
-                         "Wet Bulb Globe Temperature"=>[[89]*8760, "NA", 88, nil, 8760]
+                         "Wet Bulb Globe Temperature"=>[[32]*8760, "NA", 88, nil, 8760]
                         }
     _test_resilience_metrics(resilience_metrics)
   end
@@ -30,9 +30,9 @@ class ResilienceMetricsReportTest < MiniTest::Test
   def test_coast_times
     coast_times = {
                   # output_var=>[timeseries, min_val, max_val, hours_until_below, hours_until_above]
-                  "Zone Mean Air Temperature"=>[[20]*10 + [0]*8750, 60, 80, 10, nil],
-                  "Zone Air Relative Humidity"=>[[50]*100 + [60]*8660, "NA", 60, nil, 100],
-                  "Wet Bulb Globe Temperature"=>[[85]*5 + [89]*8760, "NA", 88, nil, 5]
+                  "Zone Mean Air Temperature"=>[[-6.6]*10 + [0]*8750, 60, 80, 0, nil],
+                  "Zone Air Relative Humidity"=>[[50]*100 + [65]*8660, "NA", 60, nil, 100],
+                  "Wet Bulb Globe Temperature"=>[[29.4]*5 + [32]*8755, "NA", 88, nil, 5]
                 }
     _test_coast_times(coast_times)
   end
