@@ -197,8 +197,11 @@ class Constants
   def self.DuctedInfoMiniSplitHeatPump
     return __method__.to_s
   end
-  def self.EndUseHVACFan
-    return 'residential hvac fan'
+  def self.EndUseHVACCoolingFan
+    return 'residential hvac cooling fan'
+  end
+  def self.EndUseHVACHeatingFan
+    return 'residential hvac heating fan'
   end
   def self.EndUseMechVentFan
     return 'residential mech vent fan'
