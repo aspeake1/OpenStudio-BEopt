@@ -3040,6 +3040,10 @@ class HVACSizing
             
             hvac.CoolingEIR = 1.0 / clg_coil.ratedCoolingCoefficientofPerformance
             
+        elsif clg_coil.is_a? OpenStudio::Model::WhateverReturnedFrom HVAC.get_coils_from_hvac_equip(clg_equip)
+        
+          # TODO
+        
         elsif not clg_coil.nil?
             runner.registerError("Unexpected cooling coil: #{clg_coil.name}.")
             return nil
