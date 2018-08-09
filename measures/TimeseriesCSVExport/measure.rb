@@ -167,7 +167,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     if inc_output_variables
       output_vars.each do |output_var|
         output_var.strip!
-        if output_var == "Wetbulb Globe Temperature"
+        if ["Wetbulb Globe Temperature", "Zone Indoor Air Wetbulb Temperature"].include? output_var
           requests = wbgt_vars
         else
           requests = [output_var]
@@ -252,7 +252,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       key_values = []
       output_vars.each do |output_var|
         output_var.strip!
-        if output_var == "Wetbulb Globe Temperature"
+        if ["Wetbulb Globe Temperature", "Zone Indoor Air Wetbulb Temperature"].include? output_var
           requests = wbgt_vars
         else
           requests = [output_var]
@@ -265,7 +265,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
                 runner.registerInfo("Exporting #{key_value} #{output_var}")
               end
             end            
-            if output_var == "Wetbulb Globe Temperature"
+            if ["Wetbulb Globe Temperature", "Zone Indoor Air Wetbulb Temperature"].include? output_var
               values = sql.timeSeries(ann_env_pd, reporting_frequency, request, key_value).get.values
               timeserie = []
               (0...values.length).to_a.each do |i|
@@ -280,13 +280,14 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
           end
         end
       end
-      unless timeseries.empty? # we are requesting wetbulb globe temperature
+      unless timeseries.empty? # we are requesting custom output vars
         key_values.each do |key_value|
           tdb = timeseries["Zone Mean Air Temperature,#{key_value}"]
           w = timeseries["Zone Air Humidity Ratio,#{key_value}"]
           pr = timeseries["Site Outdoor Air Barometric Pressure,Environment"]
           mrt = timeseries["Zone Mean Radiant Temperature,#{key_value}"]
           twb = OutputVariables.zone_indoor_air_wetbulb_temperature(tdb, w, pr)
+          timeseries["Zone Indoor Air Wetbulb Temperature,#{key_value}"] = twb
           timeseries["Wetbulb Globe Temperature,#{key_value}"] = OutputVariables.wetbulb_globe_temperature(twb, mrt)
         end
       end
@@ -304,27 +305,27 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       kv = var_to_graph[2]
 
       # Get the y axis values
-      if var_name != "Wetbulb Globe Temperature"
+      if ["Wetbulb Globe Temperature", "Zone Indoor Air Wetbulb Temperature"].include? var_name
+        y_timeseries = timeseries["#{var_name},#{kv}"]
+      else        
         y_timeseries = sql.timeSeries(ann_env_pd, freq, var_name, kv)
-      else
-        y_timeseries = timeseries["Wetbulb Globe Temperature,#{kv}"]
       end
       if y_timeseries.empty?
         runner.registerWarning("No data found for #{freq} #{var_name} #{kv}.")
         next
       else
-        if var_name != "Wetbulb Globe Temperature"
+        if ["Wetbulb Globe Temperature", "Zone Indoor Air Wetbulb Temperature"].include? var_name
+          values = y_timeseries
+        else
           y_timeseries = y_timeseries.get
           values = y_timeseries.values
-        else
-          values = y_timeseries
         end
       end
 
-      if var_name != "Wetbulb Globe Temperature"
-        old_units = y_timeseries.units
-      else
+      if ["Wetbulb Globe Temperature", "Zone Indoor Air Wetbulb Temperature"].include? var_name
         old_units = "C"
+      else
+        old_units = y_timeseries.units
       end
       new_units = case old_units
                   when "J"
@@ -351,7 +352,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       end
       
       y_vals = ["#{var_name} #{kv} [#{new_units}]"]
-      if var_name != "Wetbulb Globe Temperature"
+      if not ["Wetbulb Globe Temperature", "Zone Indoor Air Wetbulb Temperature"].include? var_name
         y_timeseries.dateTimes.each_with_index do |date_time, i|
           if date_times.empty?
             date_times << "Time"
