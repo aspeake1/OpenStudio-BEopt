@@ -40,14 +40,14 @@ class SetResidentialEPWFileTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"SiteGroundTemperatureDeep"=>1, "RunPeriodControlDaylightSavingTime"=>1, "SiteWaterMainsTemperature"=>1, "WeatherFile"=>1, "ClimateZones"=>1, "Site"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "ShadowCalculation"=>1, "Timestep"=>1, "SimulationControl"=>1}
-    expected_values = {"StartDate"=>"Apr-07", "EndDate"=>"Oct-26", "Year"=>""}
+    expected_values = {"StartDate"=>"Apr-07", "EndDate"=>"Oct-26", "Year"=>"", "HotWaterAnnualTemp"=>10.88, "HotWaterMaxDiffTemp"=>23.15}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
     args_hash = {}
     args_hash["dst_start_date"] = "April 8"
     args_hash["dst_end_date"] = "October 27"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {"StartDate"=>"Apr-08", "EndDate"=>"Oct-27", "Year"=>""}
+    expected_values = {"StartDate"=>"Apr-08", "EndDate"=>"Oct-27", "Year"=>"", "HotWaterAnnualTemp"=>10.88, "HotWaterMaxDiffTemp"=>23.15}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)      
   end
   
@@ -147,6 +147,10 @@ class SetResidentialEPWFileTest < MiniTest::Test
                 assert(new_object.endDate.to_s.include?(expected_values["EndDate"]))
             elsif obj_type == "YearDescription"
                 assert_equal(expected_values["Year"], new_object.calendarYear.to_s)
+            elsif obj_type == "SiteWaterMainsTemperature"
+                puts expected_values.to_s
+                assert_in_epsilon(expected_values["HotWaterAnnualTemp"], new_object.annualAverageOutdoorAirTemperature.get, 0.01)
+                assert_in_epsilon(expected_values["HotWaterMaxDiffTemp"], new_object.maximumDifferenceInMonthlyAverageOutdoorAirTemperatures.get, 0.01)
             end
         end
     end
