@@ -1384,6 +1384,7 @@ class HVAC
             # _processSystemCoolingCoil
 
             clg_coil = OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow.new(model)
+            clg_coil.setName(obj_name + " #{zone.name} always off clg coil")
             clg_coil.setAvailabilitySchedule(model.alwaysOffDiscreteSchedule)
 
             # _processSystemFan
@@ -1425,7 +1426,8 @@ class HVAC
             # _processSystemHeatingCoil
 
             htg_coil = OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow.new(model)
-            htg_coil.setAvailabilitySchedule(model.alwaysOffDiscreteSchedule)
+            htg_coil.setName(obj_name + " #{zone.name} always off htg coil")
+            htg_coil.setAvailabilitySchedule(model.alwaysOffDiscreteSchedule)            
 
             # _processSystemFan
 
@@ -2438,6 +2440,11 @@ class HVAC
           elsif htg_equip.to_ZoneHVACComponent.is_initialized
             htg_obj = htg_equip
           end
+          unless htg_obj.to_CoilHeatingWaterToAirHeatPumpEquationFit.is_initialized
+            if htg_obj.availabilitySchedule == model.alwaysOffDiscreteSchedule
+              htg_obj = nil
+            end
+          end
           unless htg_obj.nil? or htg_obj.to_CoilHeatingWaterToAirHeatPumpEquationFit.is_initialized
             htg_obj.setAvailabilitySchedule(heating_season_schedule.schedule)
             runner.registerInfo("Added availability schedule to #{htg_obj.name}.")
@@ -2632,6 +2639,11 @@ class HVAC
         cooling_equipment = existing_cooling_equipment(model, runner, thermal_zone)
         cooling_equipment.each do |clg_equip|
           clg_coil, htg_coil, supp_htg_coil = get_coils_from_hvac_equip(clg_equip)
+          unless clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
+            if clg_coil.availabilitySchedule == model.alwaysOffDiscreteSchedule
+              clg_coil = nil
+            end
+          end
           unless clg_coil.nil? or clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
             clg_coil.setAvailabilitySchedule(cooling_season_sch.schedule)
             runner.registerInfo("Added availability schedule to #{clg_coil.name}.")
@@ -3622,19 +3634,19 @@ class HVAC
 
       cooling_equipment = []
       if self.has_ashp(model, runner, thermal_zone)
-        runner.registerInfo("Found air source heat pump in #{thermal_zone.name}.")
+        runner.registerInfo("Found air source heat pump providing cooling in #{thermal_zone.name}.")
       end
       if self.has_central_ac(model, runner, thermal_zone)
         runner.registerInfo("Found central air conditioner in #{thermal_zone.name}.")
       end
       if self.has_gshp(model, runner, thermal_zone)
-        runner.registerInfo("Found ground source heat pump in #{thermal_zone.name}.")
+        runner.registerInfo("Found ground source heat pump providing cooling in #{thermal_zone.name}.")
       end
       if self.has_room_ac(model, runner, thermal_zone)
         runner.registerInfo("Found room air conditioner in #{thermal_zone.name}.")
       end
       if self.has_mshp(model, runner, thermal_zone)
-        runner.registerInfo("Found mini split heat pump in #{thermal_zone.name}.")
+        runner.registerInfo("Found mini split heat pump providing cooling in #{thermal_zone.name}.")
       end
 
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
@@ -3670,13 +3682,13 @@ class HVAC
 
       heating_equipment = []
       if self.has_ashp(model, runner, thermal_zone)
-        runner.registerInfo("Found air source heat pump in #{thermal_zone.name}.")
+        runner.registerInfo("Found air source heat pump providing heating in #{thermal_zone.name}.")
       end
       if self.has_furnace(model, runner, thermal_zone)
         runner.registerInfo("Found furnace in #{thermal_zone.name}.")
       end
       if self.has_gshp(model, runner, thermal_zone)
-        runner.registerInfo("Found ground source heat pump in #{thermal_zone.name}.")
+        runner.registerInfo("Found ground source heat pump providing heating in #{thermal_zone.name}.")
       end
       if self.has_boiler(model, runner, thermal_zone)
         runner.registerInfo("Found boiler serving #{thermal_zone.name}.")
@@ -3685,7 +3697,7 @@ class HVAC
         runner.registerInfo("Found electric baseboard in #{thermal_zone.name}.")
       end
       if self.has_mshp(model, runner, thermal_zone)
-        runner.registerInfo("Found mini split heat pump in #{thermal_zone.name}.")
+        runner.registerInfo("Found mini split heat pump providing heating in #{thermal_zone.name}.")
       end
       if self.has_unit_heater(model, runner, thermal_zone)
         runner.registerInfo("Found unit heater in #{thermal_zone.name}.")
@@ -3900,10 +3912,8 @@ class HVAC
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
-        next if clg_coil.nil?
-        if ( clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized or clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized ) and htg_coil.nil?
-          num += 1
-        end
+        next unless system.name.to_s.start_with? Constants.ObjectNameCentralAirConditioner
+        num += 1
       end
       return num
     end
@@ -3913,10 +3923,8 @@ class HVAC
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
-        next if clg_coil.nil? or htg_coil.nil?
-        if ( clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized and htg_coil.to_CoilHeatingDXSingleSpeed.is_initialized ) or ( clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized and htg_coil.to_CoilHeatingDXMultiSpeed.is_initialized )
-          num += 1
-        end
+        next unless system.name.to_s.start_with? Constants.ObjectNameAirSourceHeatPump
+        num += 1
       end
       return num
     end
@@ -3926,10 +3934,8 @@ class HVAC
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
-        next if clg_coil.nil? or htg_coil.nil?
-        if clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized and htg_coil.to_CoilHeatingWaterToAirHeatPumpEquationFit.is_initialized
-          num += 1
-        end
+        next unless system.name.to_s.start_with? Constants.ObjectNameGroundSourceHeatPumpVerticalBore
+        num += 1
       end
       return num
     end
@@ -3939,10 +3945,8 @@ class HVAC
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
-        next if htg_coil.nil?
-        if htg_coil.to_CoilHeatingGas.is_initialized or htg_coil.to_CoilHeatingElectric.is_initialized
-          num += 1
-        end
+        next unless system.name.to_s.start_with? Constants.ObjectNameFurnace
+        num += 1
       end
       return num
     end
@@ -4104,7 +4108,7 @@ class HVAC
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
-        next if clg_coil.nil?
+        next unless system.name.to_s.start_with? Constants.ObjectNameCentralAirConditioner
         runner.registerInfo("Removed '#{clg_coil.name}' from '#{air_loop.name}'.")
         system.resetCoolingCoil
         clg_coil.remove
@@ -4121,16 +4125,20 @@ class HVAC
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
-        next if clg_coil.nil? or htg_coil.nil?
-        next if not ( clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized or clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized ) and not ( htg_coil.to_CoilHeatingDXSingleSpeed.is_initialized or htg_coil.to_CoilHeatingDXMultiSpeed.is_initialized )
-        runner.registerInfo("Removed '#{clg_coil.name}' and '#{htg_coil.name}' from '#{air_loop.name}'.")
-        system.resetHeatingCoil
-        system.resetCoolingCoil              
-        htg_coil.remove
-        clg_coil.remove
+        next unless system.name.to_s.start_with? Constants.ObjectNameAirSourceHeatPump
+        unless htg_coil.nil?
+          runner.registerInfo("Removed '#{htg_coil.name}' from '#{air_loop.name}'.")
+          system.resetHeatingCoil
+          htg_coil.remove          
+        end
+        unless clg_coil.nil?
+          runner.registerInfo("Removed '#{clg_coil.name}' from '#{air_loop.name}'.")
+          system.resetCoolingCoil
+          clg_coil.remove          
+        end
         system.supplyFan.get.remove
         runner.registerInfo("Removed '#{air_loop.name}' from #{thermal_zone.name}.")
-        air_loop.remove
+        air_loop.remove        
       end
       return true
     end
@@ -4142,16 +4150,20 @@ class HVAC
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
-        next if clg_coil.nil? or htg_coil.nil?
-        next if not clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized or not htg_coil.to_CoilHeatingWaterToAirHeatPumpEquationFit.is_initialized
-        runner.registerInfo("Removed '#{clg_coil.name}' and '#{htg_coil.name}' from '#{air_loop.name}'.")
-        system.resetHeatingCoil
-        system.resetCoolingCoil              
-        htg_coil.remove
-        clg_coil.remove
+        next unless system.name.to_s.start_with? Constants.ObjectNameGroundSourceHeatPumpVerticalBore
+        unless htg_coil.nil?
+          runner.registerInfo("Removed '#{htg_coil.name}' from '#{air_loop.name}'.")
+          system.resetHeatingCoil
+          htg_coil.remove
+        end
+        unless clg_coil.nil?
+          runner.registerInfo("Removed '#{clg_coil.name}' from '#{air_loop.name}'.")
+          system.resetCoolingCoil
+          clg_coil.remove
+        end
         system.supplyFan.get.remove
-        runner.registerInfo("Removed '#{air_loop.name}' from #{thermal_zone.name}.")
         air_loop.remove
+        runner.registerInfo("Removed '#{air_loop.name}' from #{thermal_zone.name}.")
       end
       return true
     end
@@ -4162,7 +4174,7 @@ class HVAC
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
-        next if htg_coil.nil?
+        next unless system.name.to_s.start_with? Constants.ObjectNameFurnace
         runner.registerInfo("Removed '#{htg_coil.name}' from '#{air_loop.name}'.")
         system.resetHeatingCoil
         htg_coil.remove
