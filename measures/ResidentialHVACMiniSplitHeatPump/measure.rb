@@ -249,6 +249,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
       HVAC.get_control_and_slave_zones(thermal_zones).each do |control_zone, slave_zones|
         ([control_zone] + slave_zones).each do |zone|
           HVAC.remove_heating(model, runner, zone, unit)
+          HVAC.remove_cooling(model, runner, zone, unit)
         end
       end
       
