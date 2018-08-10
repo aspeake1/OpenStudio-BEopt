@@ -13,8 +13,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
     args_hash["min_vals"] = "60, 5, 0"
     args_hash["max_vals"] = "80, 60, 0"
     result = _test_error(args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of output variable elements specified inconsistent with either number of minimum or maximum values.")
-    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of output variable elements specified inconsistent with either number of minimum or maximum values.")    
   end
 
   def test_resilience_metrics
@@ -22,7 +21,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
                          # output_var=>[timeseries, min_val, max_val, hours_spent_below, hours_spent_above]
                          "Zone Mean Air Temperature"=>[[4.4]*8760, 60, 80, 8760, 0],
                          "Zone Air Relative Humidity"=>[[60]*8760, "NA", 60, nil, 0],
-                         "Wet Bulb Globe Temperature"=>[[32]*8760, "NA", 88, nil, 8760]
+                         "Wetbulb Globe Temperature"=>[[32]*8760, "NA", 88, nil, 8760]
                         }
     _test_resilience_metrics(resilience_metrics)
   end
@@ -32,7 +31,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
                   # output_var=>[timeseries, min_val, max_val, hours_until_below, hours_until_above]
                   "Zone Mean Air Temperature"=>[[-6.6]*10 + [0]*8750, 60, 80, 0, nil],
                   "Zone Air Relative Humidity"=>[[50]*100 + [65]*8660, "NA", 60, nil, 100],
-                  "Wet Bulb Globe Temperature"=>[[29.4]*5 + [32]*8755, "NA", 88, nil, 5]
+                  "Wetbulb Globe Temperature"=>[[29.4]*5 + [32]*8755, "NA", 88, nil, 5]
                 }
     _test_coast_times(coast_times)
   end
