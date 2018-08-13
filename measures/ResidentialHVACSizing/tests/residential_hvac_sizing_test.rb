@@ -1678,7 +1678,7 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Coil:Heating:Fuel_Nominal Capacity {W}' => 12012.1,
             'Coil:Cooling:DX:SingleSpeed_Rated Total Cooling Capacity {W}' => 8172.77025244,
             'Coil:Cooling:DX:SingleSpeed_Rated Air Flow Rate {m3/s}' => 0.423414437383,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.547225600243,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.610228,
             'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}' => 0.482,
             'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}' => 0.056,
                       }
@@ -1780,7 +1780,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 0.540553509998,
+            'AirLoopHVAC_Design Supply Air Flow rate {m3/s}' => 0.963903000253,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 1 Supply Air Flow Rate During Heating Operation {m3/s}' => 0.963903000253,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 2 Supply Air Flow Rate During Heating Operation {m3/s}' => 0.963903000253,
             'AirLoopHVAC:UnitarySystem:MultiSpeed_Speed 1 Supply Air Flow Rate During Cooling Operation {m3/s}' => 0.472529488808,
@@ -2384,7 +2384,6 @@ class ProcessHVACSizingTest < MiniTest::Test
 
         elsif beopt_key == 'GroundHeatExchanger:Vertical_Bore Hole Length {m}'
             model.getGroundHeatExchangerVerticals.each do |ghex|
-                puts ghex
                 length = ghex.boreHoleLength.get
                 # Evaluate total bore length (bore hole length * num bore holes)
                 numholes = ghex.numberofBoreHoles.get
