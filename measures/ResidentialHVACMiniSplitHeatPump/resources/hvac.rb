@@ -1384,8 +1384,6 @@ class HVAC
             # _processSystemCoolingCoil
 
             clg_coil = OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow.new(model)
-            clg_coil.setName(obj_name + " #{zone.name} always off clg coil")
-            clg_coil.setAvailabilitySchedule(model.alwaysOffDiscreteSchedule)
 
             # _processSystemFan
 
@@ -1400,6 +1398,7 @@ class HVAC
             # _processSystemDemandSideAir
             
             tu_vrf = OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow.new(model, clg_coil, htg_coil, fan)
+            tu_vrf.coolingCoil.get.remove
             tu_vrf.setName(obj_name + " #{zone.name} htg vrf")
             tu_vrf.setTerminalUnitAvailabilityschedule(model.alwaysOnDiscreteSchedule)
             tu_vrf.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
@@ -1425,9 +1424,7 @@ class HVAC
 
             # _processSystemHeatingCoil
 
-            htg_coil = OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow.new(model)
-            htg_coil.setName(obj_name + " #{zone.name} always off htg coil")
-            htg_coil.setAvailabilitySchedule(model.alwaysOffDiscreteSchedule)            
+            htg_coil = OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow.new(model)          
 
             # _processSystemFan
 
@@ -1442,6 +1439,7 @@ class HVAC
             # _processSystemDemandSideAir
             
             tu_vrf = OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow.new(model, clg_coil, htg_coil, fan)
+            tu_vrf.heatingCoil.get.remove
             tu_vrf.setName(obj_name + " #{zone.name} clg vrf")
             tu_vrf.setTerminalUnitAvailabilityschedule(model.alwaysOnDiscreteSchedule)
             tu_vrf.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
@@ -2440,11 +2438,6 @@ class HVAC
           elsif htg_equip.to_ZoneHVACComponent.is_initialized
             htg_obj = htg_equip
           end
-          unless htg_obj.to_CoilHeatingWaterToAirHeatPumpEquationFit.is_initialized
-            if htg_obj.availabilitySchedule == model.alwaysOffDiscreteSchedule
-              htg_obj = nil
-            end
-          end
           unless htg_obj.nil? or htg_obj.to_CoilHeatingWaterToAirHeatPumpEquationFit.is_initialized
             htg_obj.setAvailabilitySchedule(heating_season_schedule.schedule)
             runner.registerInfo("Added availability schedule to #{htg_obj.name}.")
@@ -2639,11 +2632,6 @@ class HVAC
         cooling_equipment = existing_cooling_equipment(model, runner, thermal_zone)
         cooling_equipment.each do |clg_equip|
           clg_coil, htg_coil, supp_htg_coil = get_coils_from_hvac_equip(clg_equip)
-          unless clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
-            if clg_coil.availabilitySchedule == model.alwaysOffDiscreteSchedule
-              clg_coil = nil
-            end
-          end
           unless clg_coil.nil? or clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
             clg_coil.setAvailabilitySchedule(cooling_season_sch.schedule)
             runner.registerInfo("Added availability schedule to #{clg_coil.name}.")
