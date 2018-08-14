@@ -300,14 +300,14 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
           date_times << "Time"
         end
         if cols.empty?
-          if reporting_frequency == "Hourly"
-            if actual_timestamps.empty?
-              date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
-            else
-              date_times << actual_timestamps[i] # timestamps from the epw (AMY)
-            end
+          if actual_timestamps.empty?
+            date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
           else
-            date_times << i+1
+            if reporting_frequency == "Hourly" and actual_timestamps.length <= 8784
+              date_times << actual_timestamps[i] # timestamps from the epw (AMY)
+            else
+              date_times << i+1 # TODO: change from reporting integers to appropriate timestamps
+            end
           end
         end
         y_val = values[i]
