@@ -10,7 +10,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
   def test_leap_year_and_output_vars_subhourly
     measure = TimeseriesCSVExport.new
     args_hash = {}
-    args_hash["inc_output_variables"] = "true"
+    args_hash["inc_output_variables"] = "true" # are not included if reporting_frequency!=Hourly
     args_hash["reporting_frequency"] = "Timestep"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
