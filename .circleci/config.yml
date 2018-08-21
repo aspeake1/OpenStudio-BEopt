@@ -5,16 +5,12 @@ jobs:
       - image: nrel/openstudio:2.6.0
     steps:
       - checkout
-      - run: mkdir -p $CIRCLE_TEST_REPORTS/minitest
-      - run: mkdir -p test/reports
-      - run: rm -f Gemfile.lock
-      - run: bundle install
+      - run: rm -f Gemfile.lock && bundle install
       - run: rake update_measures
       - run: rake test:regenerate_osms
       - run: rake test:all
-      - run: ls $CIRCLE_TEST_REPORTS/minitest
-      - run: rsync -av test/reports/ $CIRCLE_TEST_REPORTS/minitest/
-      - run: ls $CIRCLE_TEST_REPORTS/minitest
+      - store_test_results:
+          path: test/reports/
 notify:
   webhooks:
     - url: https://coveralls.io/webhook?repo_token=CzCP5gY6h1Jk3XHYbo5XIcUicbYfB6Vib
