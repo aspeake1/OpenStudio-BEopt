@@ -2134,6 +2134,9 @@ class HVACSizing
         unit_final.GSHP_Bore_Holes = bore_holes
         unit_final.GSHP_G_Functions = [lntts, gfnc_coeff]
 
+    elsif hvac.HasEvaporativeCooler
+        unit_init.Cool_Airflow = unit_init.Cool_Load_Sens / (1.1 * mj8.acf * (mj8.cool_setpoint - unit_init.LAT))
+        
     else
         unit_final.Heat_Capacity = 0
         unit_final.Heat_Airflow = 0
@@ -2795,6 +2798,7 @@ class HVACSizing
   
     # Init
     hvac = HVACInfo.new
+    hvac.HasEvaporativeCooler = false
     hvac.HasDuctedHeating = false
     hvac.HasDuctedCooling = false
     hvac.HasCooling = false
@@ -2875,6 +2879,7 @@ class HVACSizing
     hvac.HasAirSourceHeatPump = HVAC.has_ashp(model, runner, control_zone)
     hvac.HasGroundSourceHeatPump = HVAC.has_gshp(model, runner, control_zone)
     hvac.HasMiniSplitHeatPump = HVAC.has_mshp(model, runner, control_zone)
+    hvac.HasEvaporativeCooler = HVAC.has_evap_cooler(model, runner,control_zone)    
     has_ducted_mshp = HVAC.has_ducted_mshp(model, runner, control_zone)
     
     if hvac.HasAirSourceHeatPump or hvac.HasMiniSplitHeatPump
@@ -3039,7 +3044,7 @@ class HVACSizing
             end
             
             hvac.CoolingEIR = 1.0 / clg_coil.ratedCoolingCoefficientofPerformance
-            
+        
         elsif not clg_coil.nil?
             runner.registerError("Unexpected cooling coil: #{clg_coil.name}.")
             return nil
@@ -4285,8 +4290,23 @@ class HVACSizing
         end
         
     end
-    
+
+    # Evaporative Cooler
+    thermal_zones.each do |thermal_zone|
+        evap_cooler = HVAC.get_evap_cooler_air_loop(model, runner, thermal_zone)
+        next if evap_cooler.nil?
+        
+        # Unitary System
+        evap_cooler.setSupplyAirFlowRateMethodDuringCoolingOperation("SupplyAirFlowRate")
+        if not evap_cooler.nil?
+            evap_cooler.setSupplyAirFlowRateDuringCoolingOperation(UnitConversions.convert([unit_final.Cool_Airflow * unit_final.Zone_Ratios[thermal_zone], 0.00001].max,"cfm","m^3/s")) # A value of 0 does not change from autosize
+        else
+            evap_cooler.setSupplyAirFlowRateDuringCoolingOperation(0.00001) # A value of 0 does not change from autosize
+        end        
+    end
+
   end
+    
   
   def self.setCoilsObjectValues(runner, unit, hvac, equip, unit_final, zone_ratio, mshp_index=nil)
     # zone_ratio is 1.0 unless there are multiple coils for the system (e.g., living coil and finished basement coil)
@@ -4337,7 +4357,7 @@ class HVACSizing
         clg_coil.setRatedTotalCoolingCapacity(zone_ratio * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","W") * hvac.CapacityRatioCooling[mshp_index])
         clg_coil.setRatedAirFlowRate(zone_ratio * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") * UnitConversions.convert(hvac.CoolingCFMs[mshp_index],"cfm","m^3/s"))
     
-    end
+    end        
     
     # Heating coil
     if htg_coil.is_a? OpenStudio::Model::CoilHeatingElectric
@@ -4466,7 +4486,6 @@ class HVACSizing
     end
     runner.registerInfo("#{s}\n")
   end
-
 end
 
 class MJ8
@@ -4526,7 +4545,7 @@ class HVACInfo
                 :HasCentralAirConditioner, :HasRoomAirConditioner, :HasUnitHeater,
                 :HasFurnace, :HasBoiler, :HasElecBaseboard, :HasDehumidifier,
                 :HasAirSourceHeatPump, :HasMiniSplitHeatPump, :HasGroundSourceHeatPump,
-                :NumSpeedsCooling, :NumSpeedsHeating, :CoolingCFMs, :HeatingCFMs, 
+                :HasEvaporativeCooler, :NumSpeedsCooling, :NumSpeedsHeating, :CoolingCFMs, :HeatingCFMs, 
                 :COOL_CAP_FT_SPEC, :HEAT_CAP_FT_SPEC, :COOL_SH_FT_SPEC, :COIL_BF_FT_SPEC,
                 :HtgSupplyAirTemp, :SHRRated, :CapacityRatioCooling, :CapacityRatioHeating, 
                 :MinOutdoorTemp, :HeatingCapacityOffset, :OverSizeLimit, :HPSizedForMaxLoad,
