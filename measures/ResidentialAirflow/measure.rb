@@ -507,7 +507,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
                    Constants.ObjectNameAirflow, 
                    Constants.ObjectNameNaturalVentilation, 
                    Constants.ObjectNameInfiltration, 
-                   Constants.ObjectNameDucts, 
+                   Constants.ObjectNameDucts(""), 
                    Constants.ObjectNameMechanicalVentilation)
     
     # Create the airflow objects

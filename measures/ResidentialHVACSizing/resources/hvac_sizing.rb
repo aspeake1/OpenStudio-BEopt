@@ -4082,7 +4082,7 @@ class HVACSizing
             end
             
             # Coils
-            setCoilsObjectValues(model, runner, unit, hvac, system, unit_final, 1.0)
+            setCoilsObjectValues(runner, unit, hvac, system, unit_final, 1.0)
             
             model_plant_loops.each do |pl|
                 
@@ -4162,7 +4162,7 @@ class HVACSizing
             end
             
             # Coils
-            setCoilsObjectValues(model, runner, unit, hvac, system, unit_final, unit_final.Zone_Ratios[thermal_zone])
+            setCoilsObjectValues(runner, unit, hvac, system, unit_final, unit_final.Zone_Ratios[thermal_zone])
         end
     end
     
@@ -4184,7 +4184,7 @@ class HVACSizing
             fanonoff.setMaximumFlowRate(UnitConversions.convert(unit_final.Cool_Airflow,"cfm","m^3/s") / ptacs.length)
             
             # Coils
-            setCoilsObjectValues(model, runner, unit, hvac, ptac, unit_final, 1.0)
+            setCoilsObjectValues(runner, unit, hvac, ptac, unit_final, 1.0)
             
             # Heating Coil override
             ptac_htg_coil = ptac.heatingCoil.to_CoilHeatingElectric.get
@@ -4240,7 +4240,7 @@ class HVACSizing
                 fanonoff.setMaximumFlowRate(fan_airflow)
                 
                 # Coils
-                setCoilsObjectValues(model, runner, unit, hvac, terminal, unit_final, unit_final.Zone_Ratios[thermal_zone], mshp_index)
+                setCoilsObjectValues(runner, unit, hvac, terminal, unit_final, unit_final.Zone_Ratios[thermal_zone], mshp_index)
             end
         end        
     end
@@ -4266,7 +4266,7 @@ class HVACSizing
             bb_max_flow = UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") / UnitConversions.convert(20.0,"R","K") / 4.186 / 998.2 / 1000.0 * 2.0    
             
             # Coils
-            setCoilsObjectValues(model, runner, unit, hvac, baseboard, unit_final, 1.0)
+            setCoilsObjectValues(runner, unit, hvac, baseboard, unit_final, 1.0)
             
             # Baseboard Coil
             coilHeatingWaterBaseboard = baseboard.heatingCoil.to_CoilHeatingWaterBaseboard.get
@@ -4338,7 +4338,7 @@ class HVACSizing
     
   end
   
-  def self.setCoilsObjectValues(model, runner, unit, hvac, equip, unit_final, zone_ratio, mshp_index=nil)
+  def self.setCoilsObjectValues(runner, unit, hvac, equip, unit_final, zone_ratio, mshp_index=nil)
     # zone_ratio is 1.0 unless there are multiple coils for the system (e.g., living coil and finished basement coil)
   
     clg_coil, htg_coil, supp_htg_coil = HVAC.get_coils_from_hvac_equip(equip)

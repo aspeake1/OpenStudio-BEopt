@@ -89,7 +89,7 @@ class HVAC
         air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central air system")
+        air_loop.setName(obj_name + " asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -234,7 +234,7 @@ class HVAC
         end
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central air system")
+        air_loop.setName(obj_name + " asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -382,7 +382,7 @@ class HVAC
         end
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central air system")
+        air_loop.setName(obj_name + " asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -1399,7 +1399,7 @@ class HVAC
             
             tu_vrf = OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow.new(model, clg_coil, htg_coil, fan)
             tu_vrf.coolingCoil.get.remove
-            tu_vrf.setName(obj_name + " #{zone.name} htg vrf")
+            tu_vrf.setName(obj_name + " #{zone.name} h vrf".gsub(" zone", ""))
             tu_vrf.setTerminalUnitAvailabilityschedule(model.alwaysOnDiscreteSchedule)
             tu_vrf.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
             tu_vrf.setZoneTerminalUnitOnParasiticElectricEnergyUse(0)
@@ -1440,7 +1440,7 @@ class HVAC
             
             tu_vrf = OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow.new(model, clg_coil, htg_coil, fan)
             tu_vrf.heatingCoil.get.remove
-            tu_vrf.setName(obj_name + " #{zone.name} clg vrf")
+            tu_vrf.setName(obj_name + " #{zone.name} c vrf".gsub(" zone", ""))
             tu_vrf.setTerminalUnitAvailabilityschedule(model.alwaysOnDiscreteSchedule)
             tu_vrf.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
             tu_vrf.setZoneTerminalUnitOnParasiticElectricEnergyUse(0)
@@ -1993,7 +1993,7 @@ class HVAC
         air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
 
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central air system")
+        air_loop.setName(obj_name + " asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
