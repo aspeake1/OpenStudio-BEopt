@@ -148,6 +148,12 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
       return false
     end
 
+    # Get the outage start and end indexes
+    ix_outage_start, ix_outage_end = get_outage_indexes(model, runner)
+    if ix_outage_start.nil? and ix_outage_end.nil?
+      return false
+    end
+
     timeseries = {}
     key_values = []
     output_vars.each do |output_var|
@@ -203,7 +209,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
 
         # Hours above or below threshold
 
-        resilience_metric_below, resilience_metric_above = calc_resilience_metric(output_var, values, min_vals[i].strip, max_vals[i].strip)
+        resilience_metric_below, resilience_metric_above = calc_resilience_metric(output_var, values, min_vals[i].strip, max_vals[i].strip, ix_outage_start, ix_outage_end)
 
         unless resilience_metric_below.nil?
           report_output(runner, "#{key_value} #{output_var} below lower threshold", resilience_metric_below)
@@ -215,7 +221,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
 
         # Coast times until outage
 
-        coast_time_below, coast_time_above = calc_coast_time(output_var, values, min_vals[i].strip, max_vals[i].strip)
+        coast_time_below, coast_time_above = calc_coast_time(output_var, values, min_vals[i].strip, max_vals[i].strip, ix_outage_start, ix_outage_end)
 
         unless coast_time_below.nil?
           report_output(runner, "#{key_value} #{output_var} until lower threshold", coast_time_below)
@@ -232,6 +238,48 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     sql.close()
 
     return true
+  end
+
+  def get_outage_indexes(model, runner)
+
+    year_description = model.getYearDescription
+    additional_properties = year_description.additionalProperties
+    power_outage_start_date = additional_properties.getFeatureAsString("PowerOutageStartDate")
+    power_outage_start_hour = additional_properties.getFeatureAsInteger("PowerOutageStartHour")
+    power_outage_duration = additional_properties.getFeatureAsInteger("PowerOutageDuration")
+
+    if power_outage_start_date.nil? or power_outage_start_hour.nil? or power_outage_duration.nil?
+      runner.registerError("Could not find power outage start date, start hour, and duration additional properties.")
+      return nil, nil
+    end
+
+    otg_start_date_month, otg_start_date_day = power_outage_start_date.split
+    otg_start_date_month = OpenStudio::monthOfYear(start_month)
+    otg_start_date_day = otg_start_date_day.to_i
+    
+    leap_offset = 0
+    if year_description.isLeapYear
+      leap_offset = 1
+    end
+
+    months = [OpenStudio::monthOfYear("January"), OpenStudio::monthOfYear("February"), OpenStudio::monthOfYear("March"), OpenStudio::monthOfYear("April"), OpenStudio::monthOfYear("May"), OpenStudio::monthOfYear("June"), OpenStudio::monthOfYear("July"), OpenStudio::monthOfYear("August"), OpenStudio::monthOfYear("September"), OpenStudio::monthOfYear("October"), OpenStudio::monthOfYear("November"), OpenStudio::monthOfYear("December")]
+    startday_m = [0, 31, 59+leap_offset, 90+leap_offset, 120+leap_offset, 151+leap_offset, 181+leap_offset, 212+leap_offset, 243+leap_offset, 273+leap_offset, 304+leap_offset, 334+leap_offset, 365+leap_offset]
+    m_idx = 0
+    for m in months
+      if m == otg_start_date_month
+        otg_start_date_day += startday_m[m_idx]
+      end
+      m_idx += 1
+    end
+
+    ix_outage_start = 24*outage_start_date_day + power_outage_start_hour
+    ix_outage_end = ix_outage_start + power_outage_duration
+
+    runner.registerInfo("Found the outage start index to be #{ix_outage_start}.")
+    runner.registerInfo("Found the outage end index to be #{ix_outage_end}.")
+
+    return ix_outage_start, ix_outage_end
+
   end
 
   def thermal_zones
@@ -256,14 +304,14 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     return val
   end
 
-  def calc_resilience_metric(output_var, values, min_val, max_val) # hours spend below, above specified thresholds
+  def calc_resilience_metric(output_var, values, min_val, max_val, ix_outage_start, ix_outage_end) # hours spend below, above specified thresholds
 
     min_val = convert_val(output_var, min_val)
     max_val = convert_val(output_var, max_val)
 
     min_val == "NA" ? resilience_metric_below = nil : resilience_metric_below = 0
     unless resilience_metric_below.nil?
-      (0...values.length).to_a.each do |i|
+      (ix_outage_start...ix_outage_end).to_a.each do |i|
         if values[i] < min_val
           resilience_metric_below += 1
         end
@@ -272,7 +320,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
 
     max_val == "NA" ? resilience_metric_above = nil : resilience_metric_above = 0
     unless resilience_metric_above.nil?
-      (0...values.length).to_a.each do |i|
+      (ix_outage_start...ix_outage_end).to_a.each do |i|
         if values[i] > max_val
           resilience_metric_above += 1
         end
@@ -283,9 +331,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
 
   end
 
-  def calc_coast_time(output_var, values, min_val, max_val) # hours until hitting below, above specified thresholds
-
-    ix_outage_start = 0 # TODO: get outage start hour index from AdditionalProperties when available
+  def calc_coast_time(output_var, values, min_val, max_val, ix_outage_start, ix_outage_end) # hours until hitting below, above specified thresholds
 
     min_val = convert_val(output_var, min_val)
     max_val = convert_val(output_var, max_val)

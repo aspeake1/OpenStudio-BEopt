@@ -18,20 +18,20 @@ class ResilienceMetricsReportTest < MiniTest::Test
 
   def test_resilience_metrics
     resilience_metrics = {
-                         # output_var=>[timeseries, min_val, max_val, hours_spent_below, hours_spent_above]
-                         "Zone Mean Air Temperature"=>[[4.4]*8760, 60, 80, 8760, 0],
-                         "Zone Air Relative Humidity"=>[[60]*8760, "NA", 60, nil, 0],
-                         "Wetbulb Globe Temperature"=>[[32]*8760, "NA", 88, nil, 8760]
+                         # output_var=>[timeseries, min_val, max_val, hours_spent_below, hours_spent_above, ix_outage_start, ix_outage_end]
+                         "Zone Mean Air Temperature"=>[[4.4]*8760, 60, 80, 15, 0, 10, 25],
+                         "Zone Air Relative Humidity"=>[[60]*8760, "NA", 60, nil, 0, 0, 24],
+                         "Wetbulb Globe Temperature"=>[[32]*8760, "NA", 88, nil, 48, 24, 72]
                         }
     _test_resilience_metrics(resilience_metrics)
   end
 
   def test_coast_times
     coast_times = {
-                  # output_var=>[timeseries, min_val, max_val, hours_until_below, hours_until_above]
-                  "Zone Mean Air Temperature"=>[[-6.6]*10 + [0]*8750, 60, 80, 0, nil],
-                  "Zone Air Relative Humidity"=>[[50]*100 + [65]*8660, "NA", 60, nil, 100],
-                  "Wetbulb Globe Temperature"=>[[29.4]*5 + [32]*8755, "NA", 88, nil, 5]
+                  # output_var=>[timeseries, min_val, max_val, hours_until_below, hours_until_above, ix_outage_start, ix_outage_end]
+                  "Zone Mean Air Temperature"=>[[-6.6]*10 + [0]*8750, 60, 80, 0, nil, 0, 24],
+                  "Zone Air Relative Humidity"=>[[50]*100 + [65]*8660, "NA", 60, nil, 30, 70, 75],
+                  "Wetbulb Globe Temperature"=>[[29.4]*5 + [32]*8755, "NA", 88, nil, 2, 3, 24]
                 }
     _test_coast_times(coast_times)
   end
@@ -45,8 +45,8 @@ class ResilienceMetricsReportTest < MiniTest::Test
     
     # Check for correct resilience metrics values
     resilience_metrics.each do |resilience_metric, resilience_metric_values|
-      values, min_val, max_val, expected_hours_below, expected_hours_above = resilience_metric_values
-      actual_hours_below, actual_hours_above = measure.calc_resilience_metric(resilience_metric, values, min_val, max_val)
+      values, min_val, max_val, expected_hours_below, expected_hours_above, ix_outage_start, ix_outage_end = resilience_metric_values
+      actual_hours_below, actual_hours_above = measure.calc_resilience_metric(resilience_metric, values, min_val, max_val, ix_outage_start, ix_outage_end)
       if expected_hours_below.nil?
         assert_nil(actual_hours_below)
       else
@@ -67,8 +67,8 @@ class ResilienceMetricsReportTest < MiniTest::Test
     
     # Check for correct resilience metrics values
     coast_times.each do |coast_time, coast_time_values|
-      values, min_val, max_val, expected_hours_below, expected_hours_above = coast_time_values
-      actual_hours_below, actual_hours_above = measure.calc_coast_time(coast_time, values, min_val, max_val)
+      values, min_val, max_val, expected_hours_below, expected_hours_above, ix_outage_start, ix_outage_end = coast_time_values
+      actual_hours_below, actual_hours_above = measure.calc_coast_time(coast_time, values, min_val, max_val, ix_outage_start, ix_outage_end)
       if expected_hours_below.nil?
         assert_nil(actual_hours_below)
       else
