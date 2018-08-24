@@ -36,6 +36,14 @@ class ResilienceMetricsReportTest < MiniTest::Test
     _test_coast_times(coast_times)
   end
 
+  def test_end_of_outage_vals
+    end_of_outage_vals = {
+                         # output_var=>[timeseries, end_of_outage_val, ix_outage_end]
+                         "End Of Outage Indoor Drybulb Temperature"=>[[29.4]*50 + [32]*8710, 90, 60]
+                        }
+    _test_end_of_outage_vals(end_of_outage_vals)
+  end
+
   private
   
   def _test_resilience_metrics(resilience_metrics)
@@ -58,6 +66,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
         assert_in_epsilon(expected_hours_above, actual_hours_above, 0.01)
       end
     end
+
   end
 
   def _test_coast_times(coast_times)
@@ -80,6 +89,20 @@ class ResilienceMetricsReportTest < MiniTest::Test
         assert_in_epsilon(expected_hours_above, actual_hours_above, 0.01)
       end
     end
+
+  end
+
+  def _test_end_of_outage_vals(end_of_outage_vals)
+    # create an instance of the measure
+    measure = ResilienceMetricsReport.new
+    
+    # Check for correct resilience metrics values
+    end_of_outage_vals.each do |end_of_outage_val, end_of_outage_val_values|
+      values, expected_val, ix_outage_end = end_of_outage_val_values
+      actual_val = measure.calc_end_of_outage_val(end_of_outage_val, values, ix_outage_end)
+      assert_in_epsilon(expected_val, actual_val, 0.01)
+    end
+
   end
 
   def _test_error(args_hash)
