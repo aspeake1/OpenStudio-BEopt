@@ -30,7 +30,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
     coast_times = {
                   # output_var=>[timeseries, min_val, max_val, hours_until_below, hours_until_above, ix_outage_start, ix_outage_end]
                   "Zone Mean Air Temperature"=>[[-6.6]*10 + [0]*8750, 60, 80, 0, nil, 0, 24],
-                  "Zone Air Relative Humidity"=>[[50]*100 + [65]*8660, "NA", 60, nil, 30, 70, 75],
+                  "Zone Air Relative Humidity"=>[[50]*100 + [65]*8660, "NA", 60, nil, 20, 80, 120],
                   "Wetbulb Globe Temperature"=>[[29.4]*5 + [32]*8755, "NA", 88, nil, 2, 3, 24]
                 }
     _test_coast_times(coast_times)
