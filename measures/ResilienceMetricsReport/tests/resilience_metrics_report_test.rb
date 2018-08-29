@@ -29,9 +29,9 @@ class ResilienceMetricsReportTest < MiniTest::Test
   def test_coast_times
     coast_times = {
                   # output_var=>[timeseries, min_val, max_val, hours_until_below, hours_until_above, ix_outage_start, ix_outage_end]
-                  "Zone Mean Air Temperature"=>[[-6.6]*10 + [0]*8750, 60, 80, 0, nil, 0, 24],
-                  "Zone Air Relative Humidity"=>[[50]*100 + [65]*8660, "NA", 60, nil, 20, 80, 120],
-                  "Wetbulb Globe Temperature"=>[[29.4]*5 + [32]*8755, "NA", 88, nil, 2, 3, 24]
+                  "Zone Mean Air Temperature"=>[[-6.6]*10 + [0]*8750, 60, 80, 1, nil, 0, 24],
+                  "Zone Air Relative Humidity"=>[[50]*100 + [65]*8660, "NA", 60, nil, 21, 80, 120],
+                  "Wetbulb Globe Temperature"=>[[29.4]*5 + [32]*8755, "NA", 88, nil, 3, 3, 24]
                 }
     _test_coast_times(coast_times)
   end
@@ -44,7 +44,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
     _test_end_of_outage_vals(end_of_outage_vals)
   end
 
-  def test_calc_maximum_wetbulb_globe_temperature_during_outage_vals
+  def test_calc_maximum_during_outage_vals
     maximum_wetbulb_globe_temperature_during_outage_vals = {
                                                            # output_var=>[timeseries, maximum_wetbulb_globe_temperature_during_outage_val, ix_outage_start, ix_outage_end]
                                                            "Maximum Wetbulb Globe Temperature During Outage"=>[[29.4]*50 + [32]*8710, 90, 40, 60]
@@ -52,7 +52,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
     _test_maximum_wetbulb_globe_temperature_during_outage_vals(maximum_wetbulb_globe_temperature_during_outage_vals)
   end
 
-  def test_calc_minimum_indoor_drybulb_temperature_during_outage_vals
+  def test_calc_minimum_during_outage_vals
     minimum_indoor_drybulb_temperature_during_outage_vals = {
                                                             # output_var=>[timeseries, minimum_indoor_drybulb_temperature_during_outage_val, ix_outage_start, ix_outage_end]
                                                             "Minimum Indoor Drybulb Temperature During Outage"=>[[29.4]*50 + [32]*8710, 85, 40, 60]
@@ -128,7 +128,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
     # Check for correct resilience metrics values
     maximum_wetbulb_globe_temperature_during_outage_vals.each do |maximum_wetbulb_globe_temperature_during_outage_val, maximum_wetbulb_globe_temperature_during_outage_values|
       values, expected_val, ix_outage_start, ix_outage_end = maximum_wetbulb_globe_temperature_during_outage_values
-      actual_val = measure.calc_maximum_wetbulb_globe_temperature_during_outage_val(maximum_wetbulb_globe_temperature_during_outage_val, values, ix_outage_start, ix_outage_end)
+      actual_val = measure.calc_maximum_during_outage_val(maximum_wetbulb_globe_temperature_during_outage_val, values, ix_outage_start, ix_outage_end)
       assert_in_epsilon(expected_val, actual_val, 0.01)
     end
 
@@ -141,7 +141,7 @@ class ResilienceMetricsReportTest < MiniTest::Test
     # Check for correct resilience metrics values
     minimum_indoor_drybulb_temperature_during_outage_vals.each do |minimum_indoor_drybulb_temperature_during_outage_val, minimum_indoor_drybulb_temperature_during_outage_values|
       values, expected_val, ix_outage_start, ix_outage_end = minimum_indoor_drybulb_temperature_during_outage_values
-      actual_val = measure.calc_minimum_indoor_drybulb_temperature_during_outage_val(minimum_indoor_drybulb_temperature_during_outage_val, values, ix_outage_start, ix_outage_end)
+      actual_val = measure.calc_minimum_during_outage_val(minimum_indoor_drybulb_temperature_during_outage_val, values, ix_outage_start, ix_outage_end)
       assert_in_epsilon(expected_val, actual_val, 0.01)
     end
 
