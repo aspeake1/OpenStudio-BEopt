@@ -9,7 +9,7 @@ require "#{File.dirname(__FILE__)}/hvac"
 
 class Airflow
 
-  def self.apply(model, runner, infil, mech_vent, nat_vent, ducts, measure_dir)
+  def self.apply(model, runner, infil, mech_vent, nat_vent, duct_systems, measure_dir)
   
     @measure_dir = measure_dir
   
@@ -123,18 +123,6 @@ class Airflow
         has_forced_air_equipment = true
       end
 
-      success, infil_output = process_infiltration_for_unit(model, runner, obj_name_infil, infil, wind_speed, building, weather, unit_ag_ffa, unit_ag_ext_wall_area, unit_living, unit_finished_basement)
-      return false if not success
-      
-      success, mv_output = process_mech_vent_for_unit(model, runner, obj_name_mech_vent, unit, infil.is_existing_home, infil_output.a_o, mech_vent, ducts, building, nbeds, nbaths, weather, unit_ffa, unit_living, units.size, has_forced_air_equipment)
-      return false if not success
-      
-      success, nv_output = process_nat_vent_for_unit(model, runner, obj_name_natvent, nat_vent, wind_speed, infil, building, weather, unit_window_area, unit_living)
-      return false if not success
-      
-      success, ducts_output = process_ducts_for_unit(model, runner, ducts, building, unit, unit_index, unit_ffa, unit_has_mshp, unit_living, unit_finished_basement, has_forced_air_equipment)
-      return false if not success
-      
       # Common sensors
 
       tin_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Zone Mean Air Temperature")
@@ -147,13 +135,27 @@ class Airflow
       
       # Update model
       
-      nv_program = create_nat_vent_objects(model, runner, obj_name_natvent, unit_living, nat_vent, nv_output, tin_sensor, tout_sensor, pbar_sensor, vwind_sensor, wout_sensor)
+      success, infil_output = process_infiltration_for_unit(model, runner, obj_name_infil, infil, wind_speed, building, weather, unit_ag_ffa, unit_ag_ext_wall_area, unit_living, unit_finished_basement)
+      return false if not success
       
-      duct_programs, cfis_programs, cfis_outputs = create_ducts_objects(model, runner, unit, unit_living, unit_finished_basement, ducts, mech_vent, ducts_output, tin_sensor, pbar_sensor, has_forced_air_equipment, unit_has_mshp, adiabatic_const)
+      success, mv_output = process_mech_vent_for_unit(model, runner, obj_name_mech_vent, unit, infil.is_existing_home, infil_output.a_o, mech_vent, building, nbeds, nbaths, weather, unit_ffa, unit_living, units.size, has_forced_air_equipment)
+      return false if not success
+      
+      success, nv_output = process_nat_vent_for_unit(model, runner, obj_name_natvent, nat_vent, wind_speed, infil, building, weather, unit_window_area, unit_living)
+      return false if not success
 
-      infil_program = create_infil_mech_vent_objects(model, runner, obj_name_infil, obj_name_mech_vent, unit_living, infil, mech_vent, wind_speed, mv_output, infil_output, tin_sensor, tout_sensor, vwind_sensor, duct_programs, cfis_outputs, nbeds)
-      
-      create_ems_program_managers(model, infil_program, nv_program, cfis_programs, duct_programs, obj_name_airflow)
+      nv_program = create_nat_vent_objects(model, runner, obj_name_natvent, unit_living, nat_vent, nv_output, tin_sensor, tout_sensor, pbar_sensor, vwind_sensor, wout_sensor)
+
+      duct_systems.each do |ducts, air_loops|
+
+        success, ducts_output = process_ducts_for_unit(model, runner, ducts, building, unit, unit_index, unit_ffa, unit_has_mshp, unit_living, unit_finished_basement, has_forced_air_equipment)
+        return false if not success
+
+        duct_programs, cfis_programs, cfis_outputs = create_ducts_objects(model, runner, unit, unit_living, unit_finished_basement, ducts, mech_vent, ducts_output, tin_sensor, pbar_sensor, has_forced_air_equipment, unit_has_mshp, adiabatic_const, air_loops)
+        infil_program = create_infil_mech_vent_objects(model, runner, obj_name_infil, obj_name_mech_vent, unit_living, infil, mech_vent, wind_speed, mv_output, infil_output, tin_sensor, tout_sensor, vwind_sensor, duct_programs, cfis_outputs, nbeds)
+        create_ems_program_managers(model, infil_program, nv_program, cfis_programs, duct_programs, obj_name_airflow)
+
+      end
                                   
       # Store info for HVAC Sizing measure
       if not unit_living.ELA.nil?
@@ -666,7 +668,7 @@ class Airflow
     
   end
   
-  def self.process_mech_vent_for_unit(model, runner, obj_name_mech_vent, unit, is_existing_home, ela, mech_vent, ducts, building, nbeds, nbaths, weather, unit_ffa, unit_living, num_units, has_forced_air_equipment)
+  def self.process_mech_vent_for_unit(model, runner, obj_name_mech_vent, unit, is_existing_home, ela, mech_vent, building, nbeds, nbaths, weather, unit_ffa, unit_living, num_units, has_forced_air_equipment)
 
     if mech_vent.type == Constants.VentTypeCFIS
       if not has_forced_air_equipment
@@ -1312,7 +1314,7 @@ class Airflow
 
   end
 
-  def self.create_ducts_objects(model, runner, unit, unit_living, unit_finished_basement, ducts, mech_vent, ducts_output, tin_sensor, pbar_sensor, has_forced_air_equipment, unit_has_mshp, adiabatic_const)
+  def self.create_ducts_objects(model, runner, unit, unit_living, unit_finished_basement, ducts, mech_vent, ducts_output, tin_sensor, pbar_sensor, has_forced_air_equipment, unit_has_mshp, adiabatic_const, air_loops)
 
     duct_programs = {}
     cfis_programs = {}
@@ -1323,8 +1325,16 @@ class Airflow
       return duct_programs, cfis_programs, cfis_outputs
     end
 
+    unit_vrfs = []
+    model.getZoneHVACTerminalUnitVariableRefrigerantFlows.each do |vrf|
+      next if unit_living.zone != vrf.thermalZone.get
+      unit_vrfs << vrf
+    end
+
     # Create one duct system per airloop or ducted mshp
-    (unit_living.zone.airLoopHVACs + model.getZoneHVACTerminalUnitVariableRefrigerantFlows).each do |air_loop|
+    air_loops.each do |air_loop|
+      
+      next unless unit_living.zone.airLoopHVACs.include? air_loop or unit_vrfs.include? air_loop # next if airloop or ducted mshp doesn't serve this unit
 
       obj_name_ducts = Constants.ObjectNameDucts(air_loop.name).gsub("|","_")
 
