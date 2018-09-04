@@ -81,14 +81,14 @@ class ResidentialAirflowTest < MiniTest::Test
     args_hash["has_hvac_flue"] = "true"
     args_hash["mech_vent_type"] = Constants.VentTypeCFIS
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>4, "Surface"=>6, "EnergyManagementSystemSubroutine"=>1, "EnergyManagementSystemProgramCallingManager"=>4, "EnergyManagementSystemProgram"=>4, "EnergyManagementSystemSensor"=>20, "EnergyManagementSystemActuator"=>17, "EnergyManagementSystemGlobalVariable"=>26, "EnergyManagementSystemInternalVariable"=>1, "AirLoopHVACReturnPlenum"=>num_airloops, "OtherEquipmentDefinition"=>10, "OtherEquipment"=>10, "ThermalZone"=>1, "ZoneMixing"=>2, "SpaceInfiltrationDesignFlowRate"=>2, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Space"=>1, "Material"=>1, "ElectricEquipmentDefinition"=>3, "ElectricEquipment"=>3, "SurfacePropertyConvectionCoefficients"=>6}
-    expected_values = {"res_infil_1_program"=>{"c"=>0.069658, "Cs"=>0.086238, "Cw"=>0.128435, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds_1 ret air zone"=>{"RADuctVol"=>90}, "res_ds_1_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
-    model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_airloops, 1)
+    expected_num_new_objects = {"ScheduleRuleset"=>4, "EnergyManagementSystemSubroutine"=>num_airloops, "EnergyManagementSystemProgramCallingManager"=>1+3*num_airloops, "EnergyManagementSystemProgram"=>2+2*num_airloops, "EnergyManagementSystemSensor"=>10+10*num_airloops, "EnergyManagementSystemActuator"=>5+12*num_airloops, "EnergyManagementSystemGlobalVariable"=>26*num_airloops, "EnergyManagementSystemInternalVariable"=>num_airloops, "AirLoopHVACReturnPlenum"=>num_airloops, "OtherEquipmentDefinition"=>10*num_airloops, "OtherEquipment"=>10*num_airloops, "ThermalZone"=>num_airloops, "ZoneMixing"=>2*num_airloops, "SpaceInfiltrationDesignFlowRate"=>2, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Space"=>num_airloops, "Material"=>1, "ElectricEquipmentDefinition"=>3, "ElectricEquipment"=>3, "SurfacePropertyConvectionCoefficients"=>6*num_airloops, "Surface"=>6*num_airloops}
+    expected_values = {"res_infil_1_program"=>{"c"=>0.069658, "Cs"=>0.086238, "Cw"=>0.128435, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds res fur gas asys ret air zone"=>{"RADuctVol"=>90}, "res ds res ac asys ret air zone"=>{"RADuctVol"=>90}, "res_ds_res_fur_gas_asys_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, "res_ds_res_ac_asys_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
+    model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 2*num_airloops, 1)
     # test objects are removed correctly
     args_hash["mech_vent_type"] = "none"
     expected_num_del_objects = expected_num_new_objects
-    expected_num_new_objects = mech_vent_none_new_options
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, {}, __method__, 0, 1)
+    expected_num_new_objects = mech_vent_none_new_options(num_airloops)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, {}, __method__, num_airloops, 1)
   end
 
   def test_mech_vent_cfis_no_ducts
@@ -701,7 +701,7 @@ class ResidentialAirflowTest < MiniTest::Test
             heating_seq = thermal_zone.equipmentInHeatingOrder.index(new_object)
             next if heating_seq.nil?
             actual_values[new_object.name.to_s]["Priority"] = heating_seq+1
-          end   
+          end
         end
       end
     end
