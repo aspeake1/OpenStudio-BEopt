@@ -21,7 +21,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -45,7 +45,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -69,7 +69,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -93,7 +93,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>8, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -117,7 +117,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>3, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
     ceiling_ins_r = 0.23495/0.1168615354327202
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
@@ -130,7 +130,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
   def test_exposed_perimeter_with_garage
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>6, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
+    expected_num_new_objects = {"Material"=>8, "Construction"=>6, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
     expected_values = {"ExposedPerimeter"=>107}
     _test_measure("SFD_2000sqft_2story_UB_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -139,7 +139,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>16, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_num_new_objects = {"Material"=>10, "Construction"=>10, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
     expected_values = {"ExposedPerimeter"=>254.558}
     _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -148,7 +148,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     num_units = 8+1
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>17, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
+    expected_num_new_objects = {"Material"=>15, "Construction"=>20, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
     expected_values = {"ExposedPerimeter"=>359.411}
     _test_measure("MF_8units_1story_UB_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -310,7 +310,7 @@ class ProcessConstructionsUnfinishedBasementTest < MiniTest::Test
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
     
     # check we have the expected number of new/deleted objects
-    #check_num_objects(all_new_objects, expected_num_new_objects, "added")
+    check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
     actual_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>0}
