@@ -671,6 +671,7 @@ class ResidentialAirflowTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     check_ems(model)
+    check_hvac_priorities(model, Constants.ZoneHVACPriorityList)
 
     actual_values = {}
 

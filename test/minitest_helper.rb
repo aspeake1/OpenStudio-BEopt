@@ -157,3 +157,27 @@ def check_ems(model)
       assert(line.length <= 100)
     end
 end
+
+def check_hvac_priorities(model, priority_list)
+  # check that any equipment in the list are in the correct order
+  model.getThermalZones.each do |thermal_zone|
+    heating_order = []
+    cooling_order = []
+    thermal_zone.equipmentInHeatingOrder.each do |equip|
+      priority_list.each do |item|
+        next unless equip.respond_to?("to_#{item}")
+        next unless equip.public_send("to_#{item}").is_initialized
+        heating_order << priority_list.index(item)
+      end
+    end
+    thermal_zone.equipmentInCoolingOrder.each do |equip|
+      priority_list.each do |item|
+        next unless equip.respond_to?("to_#{item}")
+        next unless equip.public_send("to_#{item}").is_initialized
+        cooling_order << priority_list.index(item)
+      end
+    end
+    assert_equal(heating_order.sort, heating_order)
+    assert_equal(cooling_order.sort, cooling_order)
+  end
+end
