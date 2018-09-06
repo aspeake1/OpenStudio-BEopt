@@ -519,12 +519,14 @@ class HVACSizing
     # Additional values (compared to values in MJ8 Table 3D-3) have been determined by 
     # linear interpolation to avoid interpolating                    
     clf_avg_nois = [0.24, 0.295, 0.35, 0.365, 0.38, 0.39, 0.4, 0.44, 0.48, 0.44, 0.4, 0.39, 0.38, 0.365, 0.35, 0.295, 0.24]
+    clf_avg_nois_horiz = 0.68
 
     # Average cooling load factors for windows/skylights WITH internal shading for surface 
     # azimuths of 0,22.5,45, ... ,337.5,360
     # Additional values (compared to values in MJ8 Table 3D-3) have been determined 
     # by linear interpolation to avoid interpolating in BMI
     clf_avg_is = [0.18, 0.235, 0.29, 0.305, 0.32, 0.32, 0.32, 0.305, 0.29, 0.305, 0.32, 0.32, 0.32, 0.305, 0.29, 0.235, 0.18]            
+    clf_avg_is_horiz = 0.52
     
     # Hourly cooling load factor (CLF) for windows/skylights WITHOUT an internal shade taken from 
     # ASHRAE HOF Ch.26 Table 36 (subset of data in MJ8 Table A11-5)
@@ -546,7 +548,8 @@ class HVACSizing
                    [0.43, 0.55, 0.62, 0.63, 0.57, 0.48, 0.42, 0.37, 0.33, 0.28, 0.24, 0.19, 0.15],
                    [0.27, 0.43, 0.55, 0.63, 0.64, 0.60, 0.52, 0.45, 0.40, 0.35, 0.29, 0.23, 0.18],
                    [0.14, 0.22, 0.34, 0.48, 0.59, 0.65, 0.65, 0.59, 0.50, 0.43, 0.36, 0.28, 0.22]]
-
+    clf_hr_nois_horiz = [0.24, 0.36, 0.48, 0.58, 0.66, 0.72, 0.74, 0.73, 0.67, 0.59, 0.47, 0.37, 0.29]
+                   
     # Hourly cooling load factor (CLF) for windows/skylights WITH an internal shade taken from 
     # ASHRAE HOF Ch.26 Table 39 (subset of data in MJ8 Table A11-6)
     # Surface Azimuth = 0 (South), 22.5, 45.0, ... ,337.5,360 and Hour = 8,9, ... ,19,20
@@ -567,7 +570,8 @@ class HVACSizing
                  [0.74, 0.81, 0.79, 0.68, 0.49, 0.33, 0.28, 0.25, 0.22, 0.18, 0.13, 0.08, 0.07],
                  [0.54, 0.72, 0.81, 0.81, 0.71, 0.54, 0.38, 0.32, 0.27, 0.22, 0.16, 0.09, 0.08],
                  [0.23, 0.38, 0.58, 0.75, 0.83, 0.80, 0.68, 0.50, 0.35, 0.27, 0.19, 0.11, 0.09]]
-
+    clf_hr_is_horiz = [0.44, 0.59, 0.72, 0.81, 0.85, 0.85, 0.81, 0.71, 0.58, 0.42, 0.25, 0.14, 0.12]
+                 
     # Shade Line Multipliers (SLM) for shaded windows will be calculated using the procedure 
     # described in ASHRAE HOF 1997 instead of using the SLM's from MJ8 Table 3E-1
     
@@ -599,20 +603,30 @@ class HVACSizing
            [152, 162, 172, 181, 189, 196, 202, 208, 212, 215, 217, 217],
            [ 88, 103, 120, 136, 151, 165, 177, 188, 197, 206, 213, 217],
            [ 57,  72,  91, 111, 131, 149, 165, 180, 193, 203, 211, 217]]
-                    
+    psf_horiz = [280, 277, 272, 265, 257, 247, 236, 223, 208, 193, 176, 159]
+           
+    # Hourly Temperature Adjustment Values (HTA_DR) (MJ8 Table A11-3)
+    # Low DR, Medium DR, High DR and Hour = 8,9, ... ,19,20
+    hta = [[ -6.3,  -5.0,  -3.7, -2.5, -1.5, -0.7, -0.2, 0.0, -0.2, -0.7, -1.5, -2.5,  -3.7], # Low DR
+           [-12.6, -10.0,  -7.4, -5.0, -2.9, -1.3, -0.3, 0.0, -0.3, -1.3, -2.9, -5.0,  -7.4], # Medium DR
+           [-18.9, -15.0, -11.1, -7.5, -4.4, -2.0, -0.5, 0.0, -0.5, -2.0, -4.4, -7.5, -11.1]] # High DR
+
     # Determine the PSF's for the building latitude
     psf_lat = []
+    psf_lat_horiz = nil
     latitude = weather.header.Latitude.to_f
     for cnt in 0..16
         if latitude < 20.0
             psf_lat << psf[cnt][0]
             if cnt == 0
                 runner.registerWarning('Latitude of 20 was assumed for Manual J solar load calculations.')
+                psf_lat_horiz = psf_horiz[0]
             end
         elsif latitude > 64.0
             psf_lat << psf[cnt][11]
             if cnt == 0
                 runner.registerWarning('Latitude of 64 was assumed for Manual J solar load calculations.')
+                psf_lat_horiz = psf_horiz[11]
             end
         else
             cnt_lat_s = ((latitude - 20.0) / 4.0).to_i
@@ -620,6 +634,9 @@ class HVACSizing
             lat_s = 20 + 4 * cnt_lat_s
             lat_n = lat_s + 4
             psf_lat << MathTools.interp2(latitude, lat_s, lat_n, psf[cnt][cnt_lat_s], psf[cnt][cnt_lat_n])
+            if cnt == 0
+                psf_lat_horiz = MathTools.interp2(latitude, lat_s, lat_n, psf_horiz[cnt_lat_s], psf_horiz[cnt_lat_n])
+            end
         end
     end
     
@@ -684,39 +701,37 @@ class HVACSizing
                 # If hr == -1: Calculate the Average Load Procedure (ALP) Load
                 # Else: Calculate the hourly Aggregate Fenestration Load (AFL)
                 
+                # clf_d: Average Cooling Load Factor for the given window direction
+                # clf_n: Average Cooling Load Factor for a window facing North (fully shaded)
                 if hr == -1
                     if windowHasIntShading
-                        # Average Cooling Load Factor for the given window direction
                         clf_d = clf_avg_is[cnt225]
-                        #Average Cooling Load Factor for a window facing North (fully shaded)
                         clf_n = clf_avg_is[8]
                     else
-                        # Average Cooling Load Factor for the given window direction
                         clf_d = clf_avg_nois[cnt225]
-                        #Average Cooling Load Factor for a window facing North (fully shaded)
                         clf_n = clf_avg_nois[8]
                     end
                 else
                     if windowHasIntShading
-                        # Average Cooling Load Factor for the given window Direction
                         clf_d = clf_hr_is[cnt225][hr]
-                        # Average Cooling Load Factor for a window facing North (fully shaded)
                         clf_n = clf_hr_is[8][hr]
                     else
-                        # Average Cooling Load Factor for the given window Direction
                         clf_d = clf_hr_nois[cnt225][hr]
-                        # Average Cooling Load Factor for a window facing North (fully shaded)
                         clf_n = clf_hr_nois[8][hr]
                     end
                 end
                 
-                # FIXME: Need to incorporate Hourly Temperature Adjustment Values (Table A11-3) in ctd below?
+                ctd = mj8.ctd
+                if hr > -1
+                    # Calculate hourly CTD adjusted value for mid-summer
+                    ctd += hta[mj8.daily_range_num][hr]
+                end
         
                 # Hourly Heat Transfer Multiplier for the given window Direction
-                htm_d = psf_lat[cnt225] * clf_d * shgc_with_interior_shade_cool / 0.87 + u_window * mj8.ctd
+                htm_d = psf_lat[cnt225] * clf_d * shgc_with_interior_shade_cool / 0.87 + u_window * ctd
         
                 # Hourly Heat Transfer Multiplier for a window facing North (fully shaded)
-                htm_n = psf_lat[8] * clf_n * shgc_with_interior_shade_cool / 0.87 + u_window * mj8.ctd
+                htm_n = psf_lat[8] * clf_n * shgc_with_interior_shade_cool / 0.87 + u_window * ctd
                 
                 if wall_true_azimuth < 180
                     surf_azimuth = wall_true_azimuth
@@ -833,34 +848,40 @@ class HVACSizing
                 # If hr == -1: Calculate the Average Load Procedure (ALP) Load
                 # Else: Calculate the hourly Aggregate Fenestration Load (AFL)
                 
+                # clf_d: Average Cooling Load Factor for the given skylight direction
+                # clf_d: Average Cooling Load Factor for horizontal
                 if hr == -1
                     if skylightHasIntShading
-                        # Average Cooling Load Factor for the given skylight direction
                         clf_d = clf_avg_is[cnt225]
+                        clf_horiz = clf_avg_is_horiz
                     else
-                        # Average Cooling Load Factor for the given skylight direction
                         clf_d = clf_avg_nois[cnt225]
+                        clf_horiz = clf_avg_nois_horiz
                     end
                 else
                     if skylightHasIntShading
-                        # Average Cooling Load Factor for the given skylight Direction
                         clf_d = clf_hr_is[cnt225][hr]
+                        clf_horiz = clf_hr_is_horiz[hr]
                     else
-                        # Average Cooling Load Factor for the given skylight Direction
                         clf_d = clf_hr_nois[cnt225][hr]
+                        clf_horiz = clf_hr_nois_horiz[hr]
                     end
                 end
                 
-                # FIXME: Should use horizontal PSF and CLF values for sol_h calculation?
-                sol_h = Math::cos(inclination_angle.deg2rad) * (psf_lat[cnt225] * clf_d)
+                sol_h = Math::cos(inclination_angle.deg2rad) * (psf_lat_horiz * clf_horiz)
                 sol_v = Math::sin(inclination_angle.deg2rad) * (psf_lat[cnt225] * clf_d)
         
+                ctd = mj8.ctd
+                if hr > -1
+                    # Calculate hourly CTD adjusted value for mid-summer
+                    ctd += hta[mj8.daily_range_num][hr]
+                end
+                
                 # Hourly Heat Transfer Multiplier for the given skylight Direction
-                # FIXME: Need to incorporate Hourly Temperature Adjustment Values (Table A11-3) in ctd below?
                 u_curb = 0.51 # default to wood (Table 2B-3)
                 ar_curb = 0.35 # default to small (Table 2B-3)
                 u_eff_skylight = u_skylight + u_curb * ar_curb
-                htm = (sol_h + sol_v) * (shgc_with_interior_shade_cool / 0.87) + u_eff_skylight * (mj8.ctd + 15)
+                htm = (sol_h + sol_v) * (shgc_with_interior_shade_cool / 0.87) + u_eff_skylight * (ctd + 15)
         
                 if hr == -1
                     alp_load += htm * UnitConversions.convert(skylight.grossArea,"m^2","ft^2")
