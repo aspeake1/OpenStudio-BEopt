@@ -24,7 +24,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
@@ -33,7 +33,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash["weekday_setpoint"] = "75"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>48, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>75, "cooling_setpoint_sch_overlap_season"=>75}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[75]*24, "cooling_setpoint_sch_overlap_season"=>[75]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end  
   
@@ -41,7 +41,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
   
@@ -49,7 +49,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_ASHP_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
   
@@ -57,7 +57,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
   
@@ -65,7 +65,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_RoomAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
   
@@ -73,7 +73,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_GSHPVertBore_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end  
   
@@ -81,11 +81,11 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     model = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
     expected_num_del_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)    
   end  
   
@@ -95,7 +95,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash["weekend_setpoint"] = "70"    
     expected_num_del_objects = {"ScheduleRule"=>24, "ScheduleRuleset"=>2}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3}
-    expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>70.5, "cooling_setpoint_sch_cooling_season"=>70, "cooling_setpoint_sch_overlap_season"=>70.5}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[71]*24, "heating_setpoint_sch_overlap_season"=>[70.5]*24, "cooling_setpoint_sch_cooling_season"=>[70]*24, "cooling_setpoint_sch_overlap_season"=>[70.5]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_NoClgSetpoint.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
   
@@ -104,7 +104,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
   end
 
@@ -113,7 +113,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>num_units}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
   end
   
@@ -122,7 +122,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash["use_auto_season"] = true
     expected_num_del_objects = {"ScheduleRule"=>24, "ScheduleRuleset"=>2}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3}
-    expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[71]*24, "heating_setpoint_sch_overlap_season"=>[71]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_NoClgSetpoint.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
 
@@ -132,7 +132,17 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash["season_end_month"] = "Jun"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[76]*24, "cooling_setpoint_sch_overlap_season"=>[76]*24}
+    _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+  end
+
+  def test_wkdy_wked_are_different_w_setbacks
+    args_hash = {}
+    args_hash["weekday_setpoint"] = "75"
+    args_hash["weekday_setback1"] = ["0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"]
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRule"=>48, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[75,75,75,75,75,75,3,3,3,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75], "cooling_setpoint_sch_overlap_season"=>[75,75,75,75,75,75,3,3,3,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75]}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
   
@@ -226,22 +236,34 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
+			next unless obj_type == "ScheduleRule"
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "ScheduleRule" and new_object.name.to_s.start_with? Constants.ObjectNameHeatingSetpoint and new_object.applyMonday
-                if new_object.startDate.get.monthOfYear.value == 1 # heating season
-                    assert_in_epsilon(expected_values["heating_setpoint_sch_heating_season"], UnitConversions.convert(new_object.daySchedule.values[0],"C","F"), 0.01)
-                elsif new_object.startDate.get.monthOfYear.value == 7 # cooling season
-                    assert_in_epsilon(expected_values["heating_setpoint_sch_overlap_season"], UnitConversions.convert(new_object.daySchedule.values[0],"C","F"), 0.01)
-                elsif new_object.startDate.get.monthOfYear.value == 10 # overlap season
-                    assert_in_epsilon(expected_values["heating_setpoint_sch_overlap_season"], UnitConversions.convert(new_object.daySchedule.values[0],"C","F"), 0.01)
-                end
-            elsif obj_type == "ScheduleRule" and new_object.name.to_s.start_with? Constants.ObjectNameCoolingSetpoint and new_object.applyMonday
-                if new_object.startDate.get.monthOfYear.value == 7 # cooling season
-                    assert_in_epsilon(expected_values["cooling_setpoint_sch_cooling_season"], UnitConversions.convert(new_object.daySchedule.values[0],"C","F"), 0.01)
-                elsif new_object.startDate.get.monthOfYear.value == 10 # overlap season
-                    assert_in_epsilon(expected_values["cooling_setpoint_sch_overlap_season"], UnitConversions.convert(new_object.daySchedule.values[0],"C","F"), 0.01)
-                end
+            actual_values = []
+            step = 0
+            new_object.daySchedule.times.each_with_index do |t, i|
+              h = t.to_s.split(":")[0].to_i
+              (step...h).to_a.each do |j|
+                actual_values << UnitConversions.convert(new_object.daySchedule.values[i],"C","F")
+              end
+              step = h
+            end
+            actual_values.each_with_index do |actual_value, i|
+              if new_object.name.to_s.start_with? Constants.ObjectNameHeatingSetpoint and new_object.applyMonday
+                  if new_object.startDate.get.monthOfYear.value == 1 # heating season
+                      assert_in_epsilon(expected_values["heating_setpoint_sch_heating_season"][i], actual_value, 0.01)
+                  elsif new_object.startDate.get.monthOfYear.value == 7 # cooling season
+                      assert_in_epsilon(expected_values["heating_setpoint_sch_overlap_season"][i], actual_value, 0.01)
+                  elsif new_object.startDate.get.monthOfYear.value == 10 # overlap season
+                      assert_in_epsilon(expected_values["heating_setpoint_sch_overlap_season"][i], actual_value, 0.01)
+                  end
+              elsif new_object.name.to_s.start_with? Constants.ObjectNameCoolingSetpoint and new_object.applyMonday
+                  if new_object.startDate.get.monthOfYear.value == 7 # cooling season
+                      assert_in_epsilon(expected_values["cooling_setpoint_sch_cooling_season"][i], actual_value, 0.01)
+                  elsif new_object.startDate.get.monthOfYear.value == 10 # overlap season
+                      assert_in_epsilon(expected_values["cooling_setpoint_sch_overlap_season"][i], actual_value, 0.01)
+                  end
+              end
             end
         end
     end     
@@ -250,3 +272,6 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
   end  
   
 end
+
+                
+

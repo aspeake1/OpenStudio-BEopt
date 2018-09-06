@@ -56,12 +56,12 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     args << weekday_setback_1  
     
     #Make a string argument for 24 weekend cooling set point values
-    weekend_setpoint = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_1", true)
-    weekend_setpoint.setDisplayName("Weekend_setback_1")
-    weekend_setpoint.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
-    weekend_setpoint.setUnits("degrees F")
-    weekend_setpoint.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
-    args << weekend_setpoint
+    weekend_setback_1 = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_1", true)
+    weekend_setback_1.setDisplayName("Weekend_setback_1")
+    weekend_setback_1.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
+    weekend_setback_1.setUnits("degrees F")
+    weekend_setback_1.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+    args << weekend_setback_1
 
     weekday_setback_2 = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setback_2", true)
     weekday_setback_2.setDisplayName("Weekday Setback_2")
@@ -71,12 +71,12 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     args << weekday_setback_2  
     
     #Make a string argument for 24 weekend cooling set point values
-    weekend_setpoint = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_2", true)
-    weekend_setpoint.setDisplayName("Weekend_setback_2")
-    weekend_setpoint.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
-    weekend_setpoint.setUnits("degrees F")
-    weekend_setpoint.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
-    args << weekend_setpoint
+    weekend_setback_2 = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_2", true)
+    weekend_setback_2.setDisplayName("Weekend_setback_2")
+    weekend_setback_2.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
+    weekend_setback_2.setUnits("degrees F")
+    weekend_setback_2.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+    args << weekend_setback_2
 
     weekday_setback_3 = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setback_3", true)
     weekday_setback_3.setDisplayName("Weekday Setback_3")
@@ -86,12 +86,12 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     args << weekday_setback_3  
     
     #Make a string argument for 24 weekend cooling set point values
-    weekend_setpoint = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_3", true)
-    weekend_setpoint.setDisplayName("Weekend_setback_3")
-    weekend_setpoint.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
-    weekend_setpoint.setUnits("degrees F")
-    weekend_setpoint.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
-    args << weekend_setpoint    
+    weekend_setback_3 = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_3", true)
+    weekend_setback_3.setDisplayName("Weekend_setback_3")
+    weekend_setback_3.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
+    weekend_setback_3.setUnits("degrees F")
+    weekend_setback_3.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+    args << weekend_setback_3    
 
     #make a bool argument for using hsp season or not
     use_auto_season = OpenStudio::Measure::OSArgument::makeBoolArgument("use_auto_season", true)
@@ -143,13 +143,13 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekend_setpoint = runner.getStringArgumentValue("weekend_setpoint",user_arguments)
     
     weekday_setback_1 = runner.getStringArgumentValue("weekday_setback_1",user_arguments)
-    weekend_setpoint_1 = runner.getStringArgumentValue("weekend_setpoint_1",user_arguments)
+    weekend_setback_1 = runner.getStringArgumentValue("weekend_setback_1",user_arguments)
     
     weekday_setback_2 = runner.getStringArgumentValue("weekday_setback_2",user_arguments)
-    weekend_setpoint_2 = runner.getStringArgumentValue("weekend_setpoint_2",user_arguments)
+    weekend_setback_2 = runner.getStringArgumentValue("weekend_setback_2",user_arguments)
 
     weekday_setback_3 = runner.getStringArgumentValue("weekday_setback_3",user_arguments)
-    weekend_setpoint_3 = runner.getStringArgumentValue("weekend_setpoint_3",user_arguments)
+    weekend_setback_3 = runner.getStringArgumentValue("weekend_setback_3",user_arguments)
 
     use_auto_season = runner.getBoolArgumentValue("use_auto_season",user_arguments)
     season_start_month = runner.getOptionalStringArgumentValue("season_start_month",user_arguments)
@@ -173,8 +173,8 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     end
     
     # Create one 24-value string for setback schedule if 3 separate setbacks are defined
-    weekday_setback_sch= [weekday_setback_1.split(".").map(&:to_f) , weekday_setback_2.split(".").map(&:to_f) , weekday_setback_3.split(".").map(&:to_f)].trnaspose{&:sum} 
-    weekend_setback_sch = [weekend_setback_1.split(",").map(&:to_f) , weekend_setpoint_2.split(",").map(&:to_f) , weekend_setback_3.split(",").map(&:to_f)].transpose{&:sum}
+    weekday_setback_sch = [weekday_setback_1.split(".").map(&:to_f) , weekday_setback_2.split(".").map(&:to_f) , weekday_setback_3.split(".").map(&:to_f)].transpose.map {|x| x.reduce(:+)} 
+    weekend_setback_sch = [weekend_setback_1.split(",").map(&:to_f) , weekend_setback_2.split(",").map(&:to_f) , weekend_setback_3.split(",").map(&:to_f)].transpose.map {|x| x.reduce(:+)}
 
     weekday_setpoints -= weekday_setback_sch
     weekend_setpoints -= weekend_setback_sch
@@ -188,7 +188,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     end
     if not season_end_month.is_initialized
       season_end_month = nil
-    elseruby 
+    else 
       season_end_month = month_map[season_end_month.get]
     end
     
