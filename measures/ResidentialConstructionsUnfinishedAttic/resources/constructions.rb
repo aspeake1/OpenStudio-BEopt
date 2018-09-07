@@ -1820,22 +1820,12 @@ class SubsurfaceConstructions
             sm.setRightSideOpeningMultiplier(0)
             sm.setAirflowPermeability(0)
 
-            if type == "Window"
-              # WindowShadingControl
-              sc = OpenStudio::Model::ShadingControl.new(sm)
-              sc.setName("#{type}ShadingControl")
-              sc.setShadingType("InteriorShade")
-              sc.setShadingControlType("OnIfScheduleAllows")
-              sc.setSchedule(sch.schedule)
-            elsif type == "Skylight"
-              # SkylightShadingControl
-              sc = OpenStudio::Model::ShadingControl.new(sm)
-              sc.setName("#{type}ShadingControl")
-              sc.setShadingType("InteriorShade")
-              sc.setShadingControlType("AlwaysOff")
-              # sc.setSchedule(model.alwaysOffDiscreteSchedule)
-            end
-            
+            # ShadingControl
+            sc = OpenStudio::Model::ShadingControl.new(sm)
+            sc.setName("#{type}ShadingControl")
+            sc.setShadingType("InteriorShade")
+            sc.setShadingControlType("OnIfScheduleAllows")
+            sc.setSchedule(sch.schedule)
         end
 
         # Define materials

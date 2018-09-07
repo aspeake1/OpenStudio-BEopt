@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>set_residential_window_skylight_area</name>
   <uid>d05f5b32-1ad6-4c3d-964a-0dbd49a7fde8</uid>
-  <version_id>d438ae7a-69a6-4efe-baf8-6906ad7cdac4</version_id>
-  <version_modified>20180901T140204Z</version_modified>
+  <version_id>211a85f3-0692-43b8-b7ca-60d9d75676e7</version_id>
+  <version_modified>20180905T202409Z</version_modified>
   <xml_checksum>9014E219</xml_checksum>
   <class_name>SetResidentialWindowSkylightArea</class_name>
-  <display_name>Set Residential Window Area</display_name>
-  <description>Sets the window area for the building. Doors with glazing should be set as window area. Also, sets presence/dimensions of overhangs for windows on the specified building facade(s). See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>Automatically creates and positions standard residential windows based on the specified window area on each building facade. Windows are only added to surfaces between finished space and outside. Any existing windows are removed. Also, creates overhang shading surfaces for windows on the specified building facade(s) and specified depth/offset. Any existing overhang shading surfaces are removed.</modeler_description>
+  <display_name>Set Residential Window/Skylight Area</display_name>
+  <description>Sets the window/skylight area for the building. Doors with glazing should be set as window area. Also, sets presence/dimensions of overhangs for windows on the specified building facade(s). See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>Automatically creates and positions standard residential windows/skylights based on the specified window/skylight area on each building facade. Windows are only added to surfaces between finished space and outside. Any existing windows are removed. Also, creates overhang shading surfaces for windows on the specified building facade(s) and specified depth/offset. Any existing overhang shading surfaces are removed.</modeler_description>
   <arguments>
     <argument>
       <name>front_wwr</name>
@@ -190,7 +190,7 @@
     <argument>
       <name>front_skylight_area</name>
       <display_name>Skylights: Front Roof Area</display_name>
-      <description>The amount of skylight area on the building's front facade. Enter 0 if specifying Front Window-to-Wall Ratio instead.</description>
+      <description>The amount of skylight area on the building's front finished roof facade.</description>
       <type>Double</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -199,7 +199,7 @@
     <argument>
       <name>back_skylight_area</name>
       <display_name>Skylights: Back Roof Area</display_name>
-      <description>The amount of skylight area on the building's back facade. Enter 0 if specifying Back Window-to-Wall Ratio instead.</description>
+      <description>The amount of skylight area on the building's back finished roof facade.</description>
       <type>Double</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -208,7 +208,7 @@
     <argument>
       <name>left_skylight_area</name>
       <display_name>Skylights: Left Roof Area</display_name>
-      <description>The amount of skylight area on the building's left facade. Enter 0 if specifying Left Window-to-Wall Ratio instead.</description>
+      <description>The amount of skylight area on the building's left finished roof facade.</description>
       <type>Double</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -217,7 +217,7 @@
     <argument>
       <name>right_skylight_area</name>
       <display_name>Skylights: Right Roof Area</display_name>
-      <description>The amount of skylight area on the building's right facade. Enter 0 if specifying Right Window-to-Wall Ratio instead.</description>
+      <description>The amount of skylight area on the building's right finished roof facade.</description>
       <type>Double</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -274,17 +274,6 @@
       <checksum>498927E9</checksum>
     </file>
     <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.9.0</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>381FB28D</checksum>
-    </file>
-    <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -303,82 +292,93 @@
       <checksum>81550F14</checksum>
     </file>
     <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>374E311F</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.9.0</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>C34B5382</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_SL_UA_Denver_Windows_OneConstruction.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>EED6E717</checksum>
+      <checksum>6233D2D5</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_FA.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>07C41713</checksum>
+      <checksum>91537CFA</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_FA_LeftRight.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>AB8C0A7D</checksum>
+      <checksum>C15AF07A</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_FA_FlatRoof.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>57734A86</checksum>
+      <checksum>5F195E36</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_FA_HipRoof.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>CFF41ABF</checksum>
+      <checksum>1D7AB392</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>F7454448</checksum>
+      <checksum>56F0432A</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>4A6B03F1</checksum>
+      <checksum>7C6A6CB6</checksum>
     </file>
     <file>
       <filename>SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>C10F15EA</checksum>
+      <checksum>F3536F2D</checksum>
     </file>
     <file>
       <filename>SFA_4units_1story_SL_UA_Offset.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>D72DABEB</checksum>
+      <checksum>281A3ED9</checksum>
     </file>
     <file>
       <filename>SFA_4units_1story_FB_UA_Denver.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>C42773C4</checksum>
+      <checksum>EF091EF6</checksum>
     </file>
     <file>
       <filename>MF_8units_1story_SL_Inset.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>D66256A8</checksum>
+      <checksum>AA1D585F</checksum>
     </file>
     <file>
       <filename>MF_8units_1story_SL_Denver.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>0043AC8A</checksum>
-    </file>
-    <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>374E311F</checksum>
+      <checksum>EC034142</checksum>
     </file>
   </files>
 </measure>
