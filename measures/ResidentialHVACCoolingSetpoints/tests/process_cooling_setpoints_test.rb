@@ -136,13 +136,13 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
 
-  def test_wkdy_wked_are_different_w_setbacks
+  def test_wkdy_wked_are_different_w_offsets
     args_hash = {}
     args_hash["weekday_setpoint"] = "75"
-    args_hash["weekday_setback_1"] = "0,0,0,0,0,0,-3,-3,-3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
-    args_hash["weekday_setback_2"] = "3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
-    args_hash["weekday_setback_3"] = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0"
-    args_hash["weekday_setback_4"] = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,-1"
+    args_hash["weekday_offset_1"] = "0,0,0,0,0,0,-3,-3,-3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+    args_hash["weekday_offset_2"] = "3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+    args_hash["weekday_offset_3"] = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0"
+    args_hash["weekday_offset_4"] = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,-1"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>48, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[78,78,78,78,75,75,72,72,72,75,75,75,75,75,75,77,77,77,77,75,75,74,74,74], 
