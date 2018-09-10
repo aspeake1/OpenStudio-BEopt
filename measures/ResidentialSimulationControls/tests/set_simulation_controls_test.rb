@@ -13,7 +13,7 @@ class ResidentialSimulationControlsTest < MiniTest::Test
     result = _test_error_or_NA(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "User-entered #{args_hash["timesteps_per_hr"].to_f} timesteps per hour must be between 1 and 60.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "User-entered #{args_hash["timesteps_per_hr"].to_i} timesteps per hour must be between 1 and 60.")
   end
 
   def test_error_60_divisible_by_timesteps_per_hr
@@ -22,7 +22,7 @@ class ResidentialSimulationControlsTest < MiniTest::Test
     result = _test_error_or_NA(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "User-entered #{args_hash["timesteps_per_hr"].to_f} timesteps per hour does not divide evenly into 60.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "User-entered #{args_hash["timesteps_per_hr"].to_i} timesteps per hour does not divide evenly into 60.")
   end
 
   def test_simulation_timestep
