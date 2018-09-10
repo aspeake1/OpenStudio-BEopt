@@ -25,18 +25,36 @@ class SimulationControlsTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "User-entered #{args_hash["timesteps_per_hr"].to_f} timesteps per hour does not divide evenly into 60.")
   end
 
+  def test_error_bad_begin_month
+    args_hash = {}
+    args_hash["begin_month"] = "0"
+    result = _test_error_or_NA(nil, args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid begin month (#{args_hash["begin_month"].to_i}) and/or end month (12) entered.")
+  end
+
+  def test_error_bad_end_day_of_month
+    args_hash = {}
+    args_hash["end_day_of_month"] = "32"
+    result = _test_error_or_NA(nil, args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid end day of month (#{args_hash["end_day_of_month"].to_i}) entered.")
+  end
+
   def test_change_simulation_timestep
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1}
+    expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "RunPeriod"=>1}
     expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
     args_hash = {}
     args_hash["timesteps_per_hr"] = "4"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
   end
   
   private
