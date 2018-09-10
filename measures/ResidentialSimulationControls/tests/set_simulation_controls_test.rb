@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require_relative '../measure.rb'
 require 'fileutils'
 
-class SimulationControlsTest < MiniTest::Test
+class ResidentialSimulationControlsTest < MiniTest::Test
 
   def test_error_timesteps_per_hr_out_of_range
     args_hash = {}
@@ -23,6 +23,15 @@ class SimulationControlsTest < MiniTest::Test
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_includes(result.errors.map{ |x| x.logMessage }, "User-entered #{args_hash["timesteps_per_hr"].to_f} timesteps per hour does not divide evenly into 60.")
+  end
+
+  def test_simulation_timestep
+    args_hash = {}
+    args_hash["timesteps_per_hr"] = "4"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "RunPeriod"=>1}
+    expected_values = {"TimestepsPerHour"=>args_hash["timesteps_per_hr"].to_i, "BeginMonth"=>1, "BeginDayOfMonth"=>1, "EndMonth"=>12, "EndDayOfMonth"=>31}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
   end
 
   def test_error_bad_begin_month
@@ -43,25 +52,21 @@ class SimulationControlsTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid end day of month (#{args_hash["end_day_of_month"].to_i}) entered.")
   end
 
-  def test_change_simulation_timestep
+  def test_runperiod_begin_and_end
     args_hash = {}
+    args_hash["begin_month"] = "3"
+    args_hash["end_month"] = "3"
     expected_num_del_objects = {}
     expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "RunPeriod"=>1}
-    expected_values = {}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
-    args_hash = {}
-    args_hash["timesteps_per_hr"] = "4"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
+    expected_values = {"TimestepsPerHour"=>6, "BeginMonth"=>args_hash["begin_month"].to_i, "BeginDayOfMonth"=>1, "EndMonth"=>args_hash["end_month"].to_i, "EndDayOfMonth"=>31}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
   end
   
   private
   
   def _test_error_or_NA(osm_file_or_model, args_hash)
     # create an instance of the measure
-    measure = SimulationControls.new
+    measure = ResidentialSimulationControls.new
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
@@ -93,7 +98,7 @@ class SimulationControlsTest < MiniTest::Test
   
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
-    measure = SimulationControls.new
+    measure = ResidentialSimulationControls.new
 
     # check for standard methods
     assert(!measure.name.empty?)
@@ -148,9 +153,13 @@ class SimulationControlsTest < MiniTest::Test
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "RunPeriodControlDaylightSavingTime"
-                assert(new_object.startDate.to_s.include?(expected_values["StartDate"]))
-                assert(new_object.endDate.to_s.include?(expected_values["EndDate"]))
+            if obj_type == "Timestep"
+                assert_in_epsilon(expected_values["TimestepsPerHour"], new_object.numberOfTimestepsPerHour, 0.01)
+            elsif obj_type == "RunPeriod"
+                assert_in_epsilon(expected_values["BeginMonth"], new_object.getBeginMonth, 0.01)
+                assert_in_epsilon(expected_values["BeginDayOfMonth"], new_object.getBeginDayOfMonth, 0.01)
+                assert_in_epsilon(expected_values["EndMonth"], new_object.getEndMonth, 0.01)
+                assert_in_epsilon(expected_values["EndDayOfMonth"], new_object.getEndDayOfMonth, 0.01)
             end
         end
     end

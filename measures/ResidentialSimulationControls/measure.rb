@@ -6,7 +6,7 @@
 require "#{File.dirname(__FILE__)}/resources/simulation"
 
 # start the measure
-class SimulationControls < OpenStudio::Measure::ModelMeasure
+class ResidentialSimulationControls < OpenStudio::Measure::ModelMeasure
 
   # human readable name
   def name
@@ -155,4 +155,4 @@ class SimulationControls < OpenStudio::Measure::ModelMeasure
 end
 
 # register the measure to be used by the application
-SimulationControls.new.registerWithApplication
+ResidentialSimulationControls.new.registerWithApplication
