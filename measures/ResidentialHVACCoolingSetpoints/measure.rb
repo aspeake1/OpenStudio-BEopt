@@ -173,11 +173,16 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     end
     
     # Create one 24-value string for setback schedule if 3 separate setbacks are defined
-    weekday_setback_sch = [weekday_setback_1.split(".").map(&:to_f) , weekday_setback_2.split(".").map(&:to_f) , weekday_setback_3.split(".").map(&:to_f)].transpose.map {|x| x.reduce(:+)} 
+    weekday_setback_sch = [weekday_setback_1.split(",").map(&:to_f) , weekday_setback_2.split(",").map(&:to_f) , weekday_setback_3.split(",").map(&:to_f)].transpose.map {|x| x.reduce(:+)}     
     weekend_setback_sch = [weekend_setback_1.split(",").map(&:to_f) , weekend_setback_2.split(",").map(&:to_f) , weekend_setback_3.split(",").map(&:to_f)].transpose.map {|x| x.reduce(:+)}
 
-    weekday_setpoints -= weekday_setback_sch
-    weekend_setpoints -= weekend_setback_sch
+    # Update the setpoint schedules
+        #weekday schedule
+    weekday_setpoints = weekday_setpoints.zip(weekday_setback_sch).map{|weekday_setpoints, weekday_setback_sch| weekday_setpoints - weekday_setback_sch}
+    puts weekday_setpoints
+        #weekend schedule
+    weekend_setpoints = weekend_setpoints.zip(weekend_setback_sch).map{|weekend_setpoints, weekend_setback_sch| weekend_setpoints - weekend_setback_sch}
+    puts weekend_setpoints
 
     # Convert to month int or nil
     month_map = {"Jan"=>1, "Feb"=>2, "Mar"=>3, "Apr"=>4, "May"=>5, "Jun"=>6, "Jul"=>7, "Aug"=>8, "Sep"=>9, "Oct"=>10, "Nov"=>11, "Dec"=>12}
