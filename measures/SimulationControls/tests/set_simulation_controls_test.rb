@@ -5,57 +5,45 @@ require 'minitest/autorun'
 require_relative '../measure.rb'
 require 'fileutils'
 
-class SetResidentialEPWFileTest < MiniTest::Test
+class SimulationControlsTest < MiniTest::Test
 
-  def test_error_invalid_weather_path
+  def test_error_timesteps_per_hr_out_of_range
     args_hash = {}
-    args_hash["weather_directory"] = "./resuorces" # misspelled
-    args_hash["weather_file_name"] = "USA_CO_Denver_Intl_AP_725650_TMY3.epw"
+    args_hash["timesteps_per_hr"] = "0"
     result = _test_error_or_NA(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "'#{File.expand_path(File.join(File.dirname(__FILE__), '..', args_hash["weather_directory"], args_hash["weather_file_name"]))}' does not exist or is not an .epw file.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "User-entered #{args_hash["timesteps_per_hr"].to_f} timesteps per hour must be between 1 and 60.")
   end
-  
-  def test_error_invalid_daylight_saving
+
+  def test_error_60_divisible_by_timesteps_per_hr
     args_hash = {}
-    args_hash["dst_start_date"] = "April 31"
+    args_hash["timesteps_per_hr"] = "8"
     result = _test_error_or_NA(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid daylight saving date specified.")
-  end   
-  
-  def test_NA_daylight_saving
-    args_hash = {}
-    args_hash["dst_start_date"] = "NA"
-    args_hash["dst_end_date"] = "NA"
-    result = _test_error_or_NA(nil, args_hash)
-    assert(result.errors.size == 0)
-    assert_equal("Success", result.value.valueName)
-    assert_includes(result.info.map{ |x| x.logMessage }, "No daylight saving time set.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "User-entered #{args_hash["timesteps_per_hr"].to_f} timesteps per hour does not divide evenly into 60.")
   end
-  
-  def test_change_daylight_saving
+
+  def test_change_simulation_timestep
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"SiteGroundTemperatureDeep"=>1, "RunPeriodControlDaylightSavingTime"=>1, "SiteWaterMainsTemperature"=>1, "WeatherFile"=>1, "ClimateZones"=>1, "Site"=>1}
-    expected_values = {"StartDate"=>"Apr-07", "EndDate"=>"Oct-26", "Year"=>"", "HotWaterAnnualTemp"=>10.88, "HotWaterMaxDiffTemp"=>23.15}
-    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+    expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1}
+    expected_values = {}
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     args_hash = {}
-    args_hash["dst_start_date"] = "April 8"
-    args_hash["dst_end_date"] = "October 27"
+    args_hash["timesteps_per_hr"] = "4"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {"StartDate"=>"Apr-08", "EndDate"=>"Oct-27", "Year"=>"", "HotWaterAnnualTemp"=>10.88, "HotWaterMaxDiffTemp"=>23.15}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)      
+    expected_values = {}
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
   private
   
   def _test_error_or_NA(osm_file_or_model, args_hash)
     # create an instance of the measure
-    measure = SetResidentialEPWFile.new
+    measure = SimulationControls.new
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
@@ -79,7 +67,7 @@ class SetResidentialEPWFileTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    #show_output(result)
+    # show_output(result)
       
     return result
     
@@ -87,7 +75,7 @@ class SetResidentialEPWFileTest < MiniTest::Test
   
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
-    measure = SetResidentialEPWFile.new
+    measure = SimulationControls.new
 
     # check for standard methods
     assert(!measure.name.empty?)
@@ -119,7 +107,7 @@ class SetResidentialEPWFileTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -145,12 +133,6 @@ class SetResidentialEPWFileTest < MiniTest::Test
             if obj_type == "RunPeriodControlDaylightSavingTime"
                 assert(new_object.startDate.to_s.include?(expected_values["StartDate"]))
                 assert(new_object.endDate.to_s.include?(expected_values["EndDate"]))
-            elsif obj_type == "YearDescription"
-                assert_equal(expected_values["Year"], new_object.calendarYear.to_s)
-            elsif obj_type == "SiteWaterMainsTemperature"
-                puts expected_values.to_s
-                assert_in_epsilon(expected_values["HotWaterAnnualTemp"], new_object.annualAverageOutdoorAirTemperature.get, 0.01)
-                assert_in_epsilon(expected_values["HotWaterMaxDiffTemp"], new_object.maximumDifferenceInMonthlyAverageOutdoorAirTemperatures.get, 0.01)
             end
         end
     end

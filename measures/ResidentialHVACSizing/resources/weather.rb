@@ -88,35 +88,26 @@ class WeatherProcess
     cooling_design_day.setSolarModelIndicator("ASHRAEClearSky")
   end
 
-  def self.actual_timestamps(model, runner, measure_dir)
-    epw_path = get_epw_path(model, runner, measure_dir)
-    epw_file = OpenStudio::EpwFile.new(epw_path)
-    if epw_file.startDateActualYear.is_initialized
+  def actual_year_timestamps(model, runner, measure_dir)
+    timestamps = []
+    if @epw_file.startDateActualYear.is_initialized
       run_period = model.getRunPeriod
       begin_month = run_period.getBeginMonth
       begin_day_of_month = run_period.getBeginDayOfMonth
       end_month = run_period.getEndMonth
       end_day_of_month = run_period.getEndDayOfMonth
-      actual_timestamps = []
-      epw_file.data.each do |epw_data_row|
+      @epw_file.data.each do |epw_data_row|
         epw_year = epw_data_row.year
         epw_month = epw_data_row.month
         epw_day = epw_data_row.day
         epw_hour = epw_data_row.hour
         epw_minute = epw_data_row.minute
         if epw_month >= begin_month and epw_day >= begin_day_of_month and epw_month <= end_month and epw_day <= end_day_of_month # epw timestamp is in the run period
-          actual_timestamps << "#{epw_year.to_s.rjust(2, "0")}/#{epw_month.to_s.rjust(2, "0")}/#{epw_day.to_s.rjust(2, "0")} #{epw_hour.to_s.rjust(2, "0")}:#{epw_minute.to_s.rjust(2, "0")}:00"
+          timestamps << "#{epw_year.to_s.rjust(2, "0")}/#{epw_month.to_s.rjust(2, "0")}/#{epw_day.to_s.rjust(2, "0")} #{epw_hour.to_s.rjust(2, "0")}:#{epw_minute.to_s.rjust(2, "0")}:00"
         end
       end
-      return actual_timestamps
     end
-    return []
-  end
-
-  def self.records_per_hour(model, runner, measure_dir)
-    epw_path = get_epw_path(model, runner, measure_dir)
-    epw_file = OpenStudio::EpwFile.new(epw_path)
-    return epw_file.recordsPerHour
+    return timestamps
   end
   
   def error?
@@ -288,24 +279,24 @@ class WeatherProcess
           return
         end
 
-        epw_file = OpenStudio::EpwFile.new(epw_path, true)
+        @epw_file = OpenStudio::EpwFile.new(epw_path, true)
 
         # Header info:
-        @header.City = epw_file.city
-        @header.State = epw_file.stateProvinceRegion
-        @header.Country = epw_file.country
-        @header.DataSource = epw_file.dataSource
-        @header.Station = epw_file.wmoNumber
-        @header.Latitude = epw_file.latitude
-        @header.Longitude = epw_file.longitude
-        @header.Timezone = epw_file.timeZone
-        @header.Altitude = UnitConversions.convert(epw_file.elevation,"m","ft")
+        @header.City = @epw_file.city
+        @header.State = @epw_file.stateProvinceRegion
+        @header.Country = @epw_file.country
+        @header.DataSource = @epw_file.dataSource
+        @header.Station = @epw_file.wmoNumber
+        @header.Latitude = @epw_file.latitude
+        @header.Longitude = @epw_file.longitude
+        @header.Timezone = @epw_file.timeZone
+        @header.Altitude = UnitConversions.convert(@epw_file.elevation,"m","ft")
         @header.LocalPressure = Math::exp(-0.0000368 * @header.Altitude) # atm
-        @header.RecordsPerHour = epw_file.recordsPerHour
+        @header.RecordsPerHour = @epw_file.recordsPerHour
 
-        epw_file_data = epw_file.data
+        epw_file_data = @epw_file.data
         
-        @design, epwHasDesignData = get_design_info_from_epw(@design, epw_file, @header.Altitude)
+        @design, epwHasDesignData = get_design_info_from_epw(@design, @epw_file, @header.Altitude)
 
         # Timeseries data:        
         rowdata = []

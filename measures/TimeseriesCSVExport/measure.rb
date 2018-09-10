@@ -205,6 +205,10 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     sql = sql.get
     model.setSqlFile(sql)
 
+    # Apply the weather file
+    weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
+    records_per_hour = weather.header.RecordsPerHour
+
     # Get the weather file run period (as opposed to design day run period)
     ann_env_pd = nil
     sql.availableEnvPeriods.each do |env_pd|
@@ -248,12 +252,8 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       end
     end
 
-    # Get the run period
-    run_period = model.getRunPeriod
-
     # Get the timestamps for actual year epw file, and the number of intervals per hour
-    actual_timestamps = WeatherProcess.actual_timestamps(model, runner, File.dirname(__FILE__))
-    records_per_hour = WeatherProcess.records_per_hour(model, runner, File.dirname(__FILE__))
+    actual_year_timestamps = weather.actual_year_timestamps(model, runner, File.dirname(__FILE__))
     
     date_times = []
     cols = []
@@ -304,11 +304,11 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
           date_times << "Time"
         end
         if cols.empty?
-          if actual_timestamps.empty? # weather file is a TMY (i.e., year is always 2009)
+          if actual_year_timestamps.empty? # weather file is a TMY (i.e., year is always 2009)
             date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
           else
             if ( reporting_frequency == "Hourly" and records_per_hour == 1 ) or ( reporting_frequency == "Timestep" and records_per_hour != 1 )
-              date_times << actual_timestamps[i] # timestamps from the epw (AMY)
+              date_times << actual_year_timestamps[i] # timestamps from the epw (AMY)
             else
               date_times << i+1 # TODO: change from reporting integers to appropriate timestamps
             end
