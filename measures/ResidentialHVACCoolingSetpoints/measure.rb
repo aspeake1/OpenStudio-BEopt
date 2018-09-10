@@ -46,8 +46,9 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekend_setpoint.setDescription("Specify a single cooling setpoint or a 24-hour comma-separated cooling schedule for the weekend.")
     weekend_setpoint.setUnits("degrees F")
     weekend_setpoint.setDefaultValue("76")
-    args << weekend_setpoint    
+    args << weekend_setpoint
 
+    #Make a string argument for 24 weekend cooling set-back values
     weekday_setback_1 = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setback_1", true)
     weekday_setback_1.setDisplayName("Weekday Setback_1")
     weekday_setback_1.setDescription("Specify a  24-hour comma-separated cooling offset schedule for the weekdays.")
@@ -55,7 +56,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekday_setback_1.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
     args << weekday_setback_1  
     
-    #Make a string argument for 24 weekend cooling set point values
+    #Make a string argument for 24 weekend cooling set-back values
     weekend_setback_1 = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_1", true)
     weekend_setback_1.setDisplayName("Weekend_setback_1")
     weekend_setback_1.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
@@ -63,6 +64,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekend_setback_1.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
     args << weekend_setback_1
 
+    #Make a string argument for 24 weekend cooling set-back values
     weekday_setback_2 = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setback_2", true)
     weekday_setback_2.setDisplayName("Weekday Setback_2")
     weekday_setback_2.setDescription("Specify a  24-hour comma-separated cooling offset schedule for the weekdays.")
@@ -70,7 +72,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekday_setback_2.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
     args << weekday_setback_2  
     
-    #Make a string argument for 24 weekend cooling set point values
+    #Make a string argument for 24 weekend cooling set-back values
     weekend_setback_2 = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_2", true)
     weekend_setback_2.setDisplayName("Weekend_setback_2")
     weekend_setback_2.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
@@ -78,6 +80,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekend_setback_2.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
     args << weekend_setback_2
 
+    #Make a string argument for 24 weekend cooling set-back values
     weekday_setback_3 = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setback_3", true)
     weekday_setback_3.setDisplayName("Weekday Setback_3")
     weekday_setback_3.setDescription("Specify a  24-hour comma-separated cooling offset schedule for the weekdays.")
@@ -85,13 +88,29 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekday_setback_3.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
     args << weekday_setback_3  
     
-    #Make a string argument for 24 weekend cooling set point values
+    #Make a string argument for 24 weekend cooling set-back values
     weekend_setback_3 = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_3", true)
     weekend_setback_3.setDisplayName("Weekend_setback_3")
     weekend_setback_3.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
     weekend_setback_3.setUnits("degrees F")
     weekend_setback_3.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
-    args << weekend_setback_3    
+    args << weekend_setback_3 
+
+    #Make a string argument for 24 weekend cooling set-back values
+    weekday_setback_4 = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setback_4", true)
+    weekday_setback_4.setDisplayName("Weekday Setback_4")
+    weekday_setback_4.setDescription("Specify a  24-hour comma-separated cooling offset schedule for the weekdays.")
+    weekday_setback_4.setUnits("degrees F")
+    weekday_setback_4.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+    args << weekday_setback_4 
+    
+    #Make a string argument for 24 weekend cooling set-back values
+    weekend_setback_4 = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setback_4", true)
+    weekend_setback_4.setDisplayName("Weekend_setback_4")
+    weekend_setback_4.setDescription("Specify  a 24-hour comma-separated cooling schedule for the weekend.")
+    weekend_setback_4.setUnits("degrees F")
+    weekend_setback_4.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+    args << weekend_setback_4
 
     #make a bool argument for using hsp season or not
     use_auto_season = OpenStudio::Measure::OSArgument::makeBoolArgument("use_auto_season", true)
@@ -151,6 +170,9 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekday_setback_3 = runner.getStringArgumentValue("weekday_setback_3",user_arguments)
     weekend_setback_3 = runner.getStringArgumentValue("weekend_setback_3",user_arguments)
 
+    weekday_setback_4 = runner.getStringArgumentValue("weekday_setback_4",user_arguments)
+    weekend_setback_4 = runner.getStringArgumentValue("weekend_setback_4",user_arguments)
+
     use_auto_season = runner.getBoolArgumentValue("use_auto_season",user_arguments)
     season_start_month = runner.getOptionalStringArgumentValue("season_start_month",user_arguments)
     season_end_month = runner.getOptionalStringArgumentValue("season_end_month",user_arguments)    
@@ -161,28 +183,41 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     end
     
     # Convert to 24-values if a single value entered for the setpoint
+  	# Convert the String of set-back values into float arrays
+
     if not weekday_setpoint.include?(",")
       weekday_setpoints = Array.new(24, weekday_setpoint.to_f)
+      weekday_setback_1 = weekday_setback_1.split(",").map(&:to_f)
+      weekday_setback_2 = weekday_setback_2.split(",").map(&:to_f)
+      weekday_setback_3 = weekday_setback_3.split(",").map(&:to_f)
+      weekday_setback_4 = weekday_setback_4.split(",").map(&:to_f)
     else
       weekday_setpoints = weekday_setpoint.split(",").map(&:to_f)
+      weekday_setback_1 = weekday_setback_1.split(",").map(&:to_f)
+      weekday_setback_2 = weekday_setback_2.split(",").map(&:to_f)
+      weekday_setback_3 = weekday_setback_3.split(",").map(&:to_f)
+      weekday_setback_4 = weekday_setback_4.split(",").map(&:to_f)
     end
     if not weekend_setpoint.include?(",")
       weekend_setpoints = Array.new(24, weekend_setpoint.to_f)
+      weekend_setback_1 = weekend_setback_1.split(",").map(&:to_f)
+      weekend_setback_2 = weekend_setback_2.split(",").map(&:to_f)
+      weekend_setback_3 = weekend_setback_3.split(",").map(&:to_f)
+      weekend_setback_4 = weekend_setback_4.split(",").map(&:to_f)
+
     else
       weekend_setpoints = weekend_setpoint.split(",").map(&:to_f)
+      weekend_setback_1 = weekend_setback_1.split(",").map(&:to_f)
+      weekend_setback_2 = weekend_setback_2.split(",").map(&:to_f)
+      weekend_setback_3 = weekend_setback_3.split(",").map(&:to_f)
+      weekend_setback_4 = weekend_setback_4.split(",").map(&:to_f)
     end
     
-    # Create one 24-value string for setback schedule if 3 separate setbacks are defined
-    weekday_setback_sch = [weekday_setback_1.split(",").map(&:to_f) , weekday_setback_2.split(",").map(&:to_f) , weekday_setback_3.split(",").map(&:to_f)].transpose.map {|x| x.reduce(:+)}     
-    weekend_setback_sch = [weekend_setback_1.split(",").map(&:to_f) , weekend_setback_2.split(",").map(&:to_f) , weekend_setback_3.split(",").map(&:to_f)].transpose.map {|x| x.reduce(:+)}
+    # Update to one 24-value float array for setpoints schedule to count for the setbacks 
+    weekday_setpoints = [ weekday_setpoints, weekday_setback_1, weekday_setback_2, weekday_setback_3, weekday_setback_4].transpose.map {|x| x.reduce(:+)}     
+    weekend_setpoints = [ weekend_setpoints, weekend_setback_1 , weekend_setback_2 , weekend_setback_3, weekend_setback_4].transpose.map {|x| x.reduce(:+)}
 
-    # Update the setpoint schedules
-        #weekday schedule
-    weekday_setpoints = weekday_setpoints.zip(weekday_setback_sch).map{|weekday_setpoints, weekday_setback_sch| weekday_setpoints - weekday_setback_sch}
-    puts weekday_setpoints
-        #weekend schedule
-    weekend_setpoints = weekend_setpoints.zip(weekend_setback_sch).map{|weekend_setpoints, weekend_setback_sch| weekend_setpoints - weekend_setback_sch}
-    puts weekend_setpoints
+    puts weekday_setpoints, weekend_setpoints
 
     # Convert to month int or nil
     month_map = {"Jan"=>1, "Feb"=>2, "Mar"=>3, "Apr"=>4, "May"=>5, "Jun"=>6, "Jul"=>7, "Aug"=>8, "Sep"=>9, "Oct"=>10, "Nov"=>11, "Dec"=>12}
