@@ -205,10 +205,6 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     sql = sql.get
     model.setSqlFile(sql)
 
-    # Apply the weather file
-    weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
-    records_per_hour = weather.header.RecordsPerHour
-
     # Get the weather file run period (as opposed to design day run period)
     ann_env_pd = nil
     sql.availableEnvPeriods.each do |env_pd|
@@ -253,7 +249,9 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end
 
     # Get the timestamps for actual year epw file, and the number of intervals per hour
-    actual_year_timestamps = weather.actual_year_timestamps(model, runner, File.dirname(__FILE__))
+    weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
+    actual_year_timestamps = weather.actual_year_timestamps
+    records_per_hour = weather.header.RecordsPerHour
     
     date_times = []
     cols = []
