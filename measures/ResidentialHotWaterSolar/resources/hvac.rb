@@ -4395,6 +4395,7 @@ class HVAC
         zone.setCoolingPriority(object, 1)
         zone.setHeatingPriority(object, 1)
       end
+      zone.setLoadDistributionScheme("UniformLoad")
     end
     
     def self.calc_heating_and_cooling_seasons(model, weather, runner=nil)
