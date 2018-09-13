@@ -12,17 +12,17 @@ class ResidentialSimulationControls < OpenStudio::Measure::ModelMeasure
   # human readable name
   def name
     # Measure name should be the title case of the class name.
-    return 'ResidentialSimulationControls'
+    return 'Set Residential Simulation Controls'
   end
 
   # human readable description
   def description
-    return 'Set the simulation timesteps per hour and the run period begin and end months and days.'
+    return 'Set the simulation timesteps per hour and the run period begin/end month/day.'
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return 'Set the simulation timesteps per hour and the run period begin and end months and days.'
+    return 'Set the simulation timesteps per hour on the Timestep object, and the run period begin/end month/day on the RunPeriod object.'
   end
 
   # define the arguments that the user will input
