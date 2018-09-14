@@ -20,8 +20,8 @@ class HVACSizing
     # in the SHRRated. It is a function of ODB (MJ design temp) and CFM/Ton (from MJ)
     @shr_biquadratic = [1.08464364, 0.002096954, 0, -0.005766327, 0, -0.000011147]
     
-    @finished_heat_design_temp = 70 # Indoor heating design temperature according to acca MANUAL J
-    @finished_cool_design_temp = 75 # Indoor heating design temperature according to acca MANUAL J
+    @finished_heat_design_temp = 70 # Indoor heating design temperature according to ACCA MANUAL J
+    @finished_cool_design_temp = 75 # Indoor heating design temperature according to ACCA MANUAL J
     @finished_dehum_design_temp = 75
     
     # Manual J: The default values for wind velocity are 15 mph for heating and 7.5 mph for cooling. 
@@ -1019,9 +1019,7 @@ class HVACSizing
     Geometry.get_spaces_below_grade_exterior_walls(thermal_zone.spaces).each do |wall|
     
         wall_ins_rvalue, wall_ins_height, wall_constr_rvalue = get_foundation_wall_insulation_props(runner, wall)
-        if wall_ins_rvalue.nil? or wall_ins_height.nil? or wall_constr_rvalue.nil?
-            return nil
-        end
+        return nil if wall_ins_rvalue.nil? or wall_ins_height.nil? or wall_constr_rvalue.nil?
         
         k_soil = UnitConversions.convert(BaseMaterial.Soil.k_in,"in","ft")
         ins_wall_ufactor = 1.0 / (wall_constr_rvalue + wall_ins_rvalue + Material.AirFilmVertical.rvalue)
@@ -1151,8 +1149,35 @@ class HVACSizing
         floor_ufactor = get_surface_ufactor(runner, floor, floor.surfaceType, true)
         return nil if floor_ufactor.nil?
         adjacent_space = floor.adjacentSurface.get.space.get
-        zone_loads.Cool_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * (mj8.cool_design_temps[adjacent_space] - mj8.cool_setpoint)
-        zone_loads.Heat_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * (mj8.heat_setpoint - mj8.heat_design_temps[adjacent_space])
+        if Geometry.is_crawl(adjacent_space) or Geometry.is_unfinished_basement(adjacent_space)
+
+            # Foundation wall U-factor
+            fnd_wall = nil
+            floor.adjacentSurface.get.space.get.surfaces.each do |surface|
+              next if surface.surfaceType.downcase != 'wall'
+              fnd_wall = surface
+              break
+            end
+            return nil if fnd_wall.nil?
+            wall_ins_rvalue, wall_ins_height, wall_constr_rvalue = get_foundation_wall_insulation_props(runner, fnd_wall)
+            return nil if wall_ins_rvalue.nil? or wall_ins_height.nil? or wall_constr_rvalue.nil?
+            wall_ufactor = 1.0 / (wall_constr_rvalue + wall_ins_rvalue + Material.AirFilmVertical.rvalue)
+            
+            # Calculate partition temperature different cooling (PTDC) per Manual J Figure A12-17
+            # Calculate partition temperature different heating (PTDH) per Manual J Figure A12-5
+            if space_is_vented(adjacent_space, 0.001)
+                ptdc_floor = mj8.ctd / (1.0 + (4.0 * floor_ufactor) / (wall_ufactor + 0.11))
+                ptdh_floor = htd / (1.0 + (4.0 * floor_ufactor) / (wall_ufactor + 0.11))
+            else
+                ptdc_floor = wall_ufactor * mj8.ctd / (4.0 * floor_ufactor + wall_ufactor)
+                ptdh_floor = wall_ufactor * htd / (4.0 * floor_ufactor + wall_ufactor)
+            end
+            zone_loads.Cool_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * ptdc_floor
+            zone_loads.Heat_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * ptdh_floor
+        else # Includes floors over a garage
+            zone_loads.Cool_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * (mj8.cool_design_temps[adjacent_space] - mj8.cool_setpoint)
+            zone_loads.Heat_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * (mj8.heat_setpoint - mj8.heat_design_temps[adjacent_space])
+        end
         zone_loads.Dehumid_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * (mj8.cool_setpoint - mj8.dehum_design_temps[adjacent_space])
     end
      
@@ -1170,17 +1195,76 @@ class HVACSizing
     
     # Ground Floors (Slab)
     Geometry.get_spaces_above_grade_ground_floors(thermal_zone.spaces).each do |floor|
-        #Get stored u-factor since the surface u-factor is fictional
-        #TODO: Revert this some day.
-        #floor_ufactor = get_surface_ufactor(runner, floor, floor.surfaceType, true)
-        #return nil if floor_ufactor.nil?
-        floor_rvalue = get_unit_feature(runner, unit, Constants.SizingInfoSlabRvalue(floor), 'double')
-        return nil if floor_rvalue.nil?
-        floor_ufactor = 1.0/floor_rvalue
-        zone_loads.Heat_Floors += floor_ufactor * UnitConversions.convert(floor.netArea,"m^2","ft^2") * (mj8.heat_setpoint - weather.data.GroundMonthlyTemps[0])
+        slab_f_value = calc_slab_f_value(runner, floor, unit)
+        return nil if slab_f_value.nil?
+        slab_ext_perimeter = UnitConversions.convert(floor.surfacePropertyExposedFoundationPerimeter.get.totalExposedPerimeter.get,"m","ft")
+        zone_loads.Heat_Floors += slab_f_value * slab_ext_perimeter * htd
     end
     
     return zone_loads
+  end
+  
+  def self.calc_slab_f_value(runner, surface, unit)
+  
+    int_horiz_rvalue, int_horiz_width, int_vert_rvalue, ext_vert_rvalue, ext_vert_depth = get_foundation_slab_insulation_props(runner, surface)
+    return nil if int_horiz_rvalue.nil? or int_horiz_width.nil? or int_vert_rvalue.nil? or ext_vert_rvalue.nil? or ext_vert_depth.nil?
+    
+    whole_rvalue = get_unit_feature(runner, unit, Constants.SizingInfoSlabWholeRvalue(surface), 'double')
+    return nil if whole_rvalue.nil?
+
+    slab_thick_in = get_unit_feature(runner, unit, Constants.SizingInfoSlabThicknessIn(surface), 'double')
+    return nil if slab_thick_in.nil?
+    
+    slab_insulation_length = int_horiz_width + ext_vert_depth
+    if whole_rvalue > 0
+        slab_insulation_length = 1000.0
+    end
+    slab_insulation_r_value = int_horiz_rvalue + ext_vert_rvalue + whole_rvalue
+    slab_edge_insulation_r_value = int_vert_rvalue + ext_vert_rvalue
+    
+    soil_r_per_foot = Material.Soil(12.0).rvalue
+    slab_r_gravel_per_inch = 0.65 # Based on calibration by Tony Fontanini
+
+    # Because of uncertainty pertaining to the effective path radius, F-values are calculated 
+    # for six radii (8, 9, 10, 11, 12, and 13 feet) and averaged.
+    f_values = []
+    for path_radius in 8..13
+        u_effective = []
+        for radius in 0..path_radius
+            spl = [Math::PI * radius - 1, 0].max # soil path length (SPL)
+            
+            # Concrete, gravel, and insulation
+            if radius == 0
+                r_concrete = 0.0
+                r_gravel = 0.0 # No gravel on edge
+                r_ins = slab_edge_insulation_r_value
+            else
+                r_concrete = Material.Concrete(slab_thick_in).rvalue
+                r_gravel = [slab_r_gravel_per_inch*(12.0 - slab_thick_in), 0].max
+                if radius <= slab_insulation_length
+                    r_ins = slab_insulation_r_value
+                else
+                    r_ins = 0.0
+                end
+            end
+                    
+            # Air Films = Indoor Finish + Indoor Air Film + Exposed Air Film (Figure A12-6 pg. 517)
+            r_air_film = 0.05 + 0.92 + 0.17
+            
+            # Soil
+            r_soil = soil_r_per_foot * spl # (h-F-ft2/BTU)
+            
+            # Effective R-Value
+            r_air_to_air = r_concrete + r_gravel + r_ins + r_air_film + r_soil
+            
+            # Effective U-Value
+            u_effective << 1.0 / r_air_to_air
+        end
+            
+        f_values << u_effective.inject(0, :+) # sum array
+    end
+        
+    return f_values.inject(0, :+) / f_values.size
   end
   
   def self.process_infiltration_ventilation(runner, mj8, unit, thermal_zone, zone_loads, weather, htd, unit_shelter_class)
@@ -4102,6 +4186,49 @@ class HVACSizing
     wall_constr_rvalue = get_surface_ufactor(runner, surface, surface.surfaceType, true)
     
     return wall_ins_rvalue, wall_ins_height, wall_constr_rvalue
+  end
+  
+  def self.get_foundation_slab_insulation_props(runner, surface)
+    if surface.surfaceType.downcase != "floor"
+        return nil
+    end
+    
+    # Get wall insulation R-value/height from Kiva:Foundation object
+    if not surface.adjacentFoundation.is_initialized
+        runner.registerError("Could not get foundation object for wall '#{surface.name.to_s}'.")
+        return nil
+    end
+    foundation = surface.adjacentFoundation.get
+    
+    int_horiz_rvalue = 0.0
+    int_horiz_width = 0.0
+    if foundation.interiorHorizontalInsulationMaterial.is_initialized
+        int_mat = foundation.interiorHorizontalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+        k = UnitConversions.convert(int_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
+        thick = UnitConversions.convert(int_mat.thickness,"m","ft")
+        int_horiz_rvalue += thick/k
+        int_horiz_width = UnitConversions.convert(foundation.interiorHorizontalInsulationWidth.get,"m","ft").round
+    end
+    
+    int_vert_rvalue = 0.0
+    if foundation.interiorVerticalInsulationMaterial.is_initialized
+        int_mat = foundation.interiorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+        k = UnitConversions.convert(int_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
+        thick = UnitConversions.convert(int_mat.thickness,"m","ft")
+        int_vert_rvalue += thick/k
+    end
+    
+    ext_vert_rvalue = 0.0
+    ext_vert_depth = 0.0
+    if foundation.exteriorVerticalInsulationMaterial.is_initialized
+        int_mat = foundation.exteriorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+        k = UnitConversions.convert(int_mat.thermalConductivity,"W/(m*K)","Btu/(hr*ft*R)")
+        thick = UnitConversions.convert(int_mat.thickness,"m","ft")
+        ext_vert_rvalue += thick/k
+        ext_vert_depth = UnitConversions.convert(foundation.exteriorVerticalInsulationDepth.get,"m","ft").round
+    end
+    
+    return int_horiz_rvalue, int_horiz_width, int_vert_rvalue, ext_vert_rvalue, ext_vert_depth
   end
   
   def self.get_unit_feature(runner, unit, feature, datatype, register_error=true)
