@@ -9,16 +9,6 @@ require 'fileutils'
 
 class ProcessHVACSizingTest < MiniTest::Test
 
-  def test_ub_uninsulated
-    args_hash = {}
-    args_hash["show_debug_info"] = true
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {
-                      }
-    _test_measure("test_ub_uninsulated.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
-  end
-
   def beopt_to_os_mapping
     return {
             "DehumidLoad_Inf_Sens"=>["Unit 1 Zone Loads","Dehumid Infil Sens"],
