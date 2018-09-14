@@ -1360,17 +1360,17 @@ class Airflow
       end
 
       # Set the return plenums
-      unit_living.zone.setReturnPlenum(ra_duct_zone, air_loop)
-      unless unit_finished_basement.nil?
-        unit_finished_basement.zone.setReturnPlenum(ra_duct_zone, air_loop)
+      if air_loop.to_AirLoopHVAC.is_initialized
+        unit_living.zone.setReturnPlenum(ra_duct_zone, air_loop)
+        unless unit_finished_basement.nil?
+          unit_finished_basement.zone.setReturnPlenum(ra_duct_zone, air_loop)
+        end
       end
 
       living_zone_return_air_node = nil
-      unless unit_living.zone.returnAirModelObjects.empty?
-        unit_living.zone.returnAirModelObjects.each do |return_air_model_obj|
-          next if return_air_model_obj.to_Node.get.airLoopHVAC.get != air_loop
-          living_zone_return_air_node = return_air_model_obj 
-        end
+      unit_living.zone.returnAirModelObjects.each do |return_air_model_obj|
+        next if return_air_model_obj.to_Node.get.airLoopHVAC.get != air_loop
+        living_zone_return_air_node = return_air_model_obj 
       end
 
       # Other equipment objects to cancel out the supply air leakage directly into the return plenum
