@@ -344,7 +344,9 @@ class Airflow
           end
           space.remove
         end
-        thermal_zone.removeReturnPlenum
+        thermal_zone.airLoopHVACs.each do |air_loop|
+          thermal_zone.removeReturnPlenum(air_loop)
+        end
         thermal_zone.remove
       end
       
@@ -1358,14 +1360,17 @@ class Airflow
       end
 
       # Set the return plenums
-      unit_living.zone.setReturnPlenum(ra_duct_zone)
+      unit_living.zone.setReturnPlenum(ra_duct_zone, air_loop)
       unless unit_finished_basement.nil?
-        unit_finished_basement.zone.setReturnPlenum(ra_duct_zone)
+        unit_finished_basement.zone.setReturnPlenum(ra_duct_zone, air_loop)
       end
 
       living_zone_return_air_node = nil
-      if unit_living.zone.returnAirModelObject.is_initialized
-        living_zone_return_air_node = unit_living.zone.returnAirModelObject.get
+      unless unit_living.zone.returnAirModelObjects.empty?
+        unit_living.zone.returnAirModelObjects.each do |return_air_model_obj|
+          next if return_air_model_obj.to_Node.get.airLoopHVAC.get != air_loop
+          living_zone_return_air_node = return_air_model_obj 
+        end
       end
 
       # Other equipment objects to cancel out the supply air leakage directly into the return plenum
