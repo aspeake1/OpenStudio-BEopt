@@ -13,13 +13,76 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "Model has not been assigned a weather file.")    
   end
   
-  def test_argument_error_not_24_values
+  def test_setpoint_weekday_argument_error_not_24_values
     args_hash = {}
     args_hash["weekday_setpoint"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
     result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday setpoints schedule.")    
   end  
+
+  def test_setpoint_weekend_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekend_setpoint"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend setpoints schedule.")    
+  end 
+
+  def test_offset_weekday_tod1_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekday_offset_tod_1"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
+  end 
+
+  def test_offset_weekday_tod2_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekday_offset_tod_2"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
+  end
   
+  def test_offset_weekday_tod3_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekday_offset_tod_3"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
+  end
+
+  def test_offset_weekday_tod4_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekday_offset_tod_4"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
+  end
+
+  def test_offset_weekend_tod1_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekend_offset_tod_1"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend offset time of day schedule.")    
+  end
+
+  def test_offset_weekend_tod2_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekend_offset_tod_2"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend offset time of day schedule.")    
+  end
+
+  def test_offset_weekend_tod3_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekend_offset_tod_3"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend offset time of day schedule.")    
+  end
+
+  def test_offset_weekend_tod4_argument_error_not_24_values
+    args_hash = {}
+    args_hash["weekend_offset_tod_4"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend offset time of day schedule.")    
+  end
+
   def test_no_equip
     args_hash = {}
     expected_num_del_objects = {}
@@ -139,14 +202,16 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
   def test_wkdy_wked_are_different_w_offsets
     args_hash = {}
     args_hash["weekday_setpoint"] = "75"
-    args_hash["weekday_offset_1"] = "0,0,0,0,0,0,-3,-3,-3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
-    args_hash["weekday_offset_2"] = "3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
-    args_hash["weekday_offset_3"] = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0"
-    args_hash["weekday_offset_4"] = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,-1"
+    args_hash["weekday_offset_magnitude"] = 3.0
+    args_hash["weekday_offset_tod_1"] = "0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
+    args_hash["weekday_offset_tod_2"] = "1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
+    args_hash["weekday_offset_tod_3"] = "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0"
+    args_hash["weekday_offset_tod_4"] = "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>48, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
-    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24, "cooling_setpoint_sch_cooling_season"=>[78,78,78,78,75,75,72,72,72,75,75,75,75,75,75,77,77,77,77,75,75,74,74,74], 
-      "cooling_setpoint_sch_overlap_season"=>[78,78,78,78,75,75,72,72,72,75,75,75,75,75,75,77,77,77,77,75,75,74,74,74]}
+    expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24,
+     "cooling_setpoint_sch_cooling_season"=>[78, 78, 78, 78, 75, 75, 78, 78, 78, 75, 75, 75, 75, 75, 75, 78, 78, 78, 78, 75, 75, 78, 78, 78],
+      "cooling_setpoint_sch_overlap_season"=>[78, 78, 78, 78, 75, 75, 78, 78, 78, 75, 75, 75, 75, 75, 75, 78, 78, 78, 78, 75, 75, 78, 78, 78]}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
   
@@ -178,11 +243,14 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
 
+    show_output(result)
+
     # assert that it didn't run
     assert_equal("Fail", result.value.valueName)
     assert(result.errors.size == 1)
     
     return result
+
   end  
   
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
@@ -219,7 +287,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    #show_output(result)
+    show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
