@@ -686,7 +686,7 @@ class HVAC
 
         # Store info for HVAC Sizing measure
         unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(clg_air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(clg_air_loop_unitary), cop_capacity_derates.join(","))
+        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(htg_air_loop_unitary), cop_capacity_derates.join(","))
         unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_air_loop_unitary), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
         unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating(htg_air_loop_unitary), cfms_ton_rated_heating.join(","))
         unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(clg_air_loop_unitary), cfms_ton_rated_cooling.join(","))
@@ -964,7 +964,7 @@ class HVAC
         # Store info for HVAC Sizing measure
         unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(clg_air_loop_unitary), capacity_ratios.join(","))
         unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(clg_air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(clg_air_loop_unitary), cop_capacity_derates.join(","))
+        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(htg_air_loop_unitary), cop_capacity_derates.join(","))
         unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_air_loop_unitary), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
         unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating(htg_air_loop_unitary), cfms_ton_rated_heating.join(","))
         unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(clg_air_loop_unitary), cfms_ton_rated_cooling.join(","))
@@ -1247,7 +1247,7 @@ class HVAC
         # Store info for HVAC Sizing measure
         unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(clg_air_loop_unitary), capacity_ratios.join(","))
         unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(clg_air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(clg_air_loop_unitary), cop_capacity_derates.join(","))
+        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(htg_air_loop_unitary), cop_capacity_derates.join(","))
         unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_air_loop_unitary), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
         unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating(htg_air_loop_unitary), cfms_ton_rated_heating.join(","))
         unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(clg_air_loop_unitary), cfms_ton_rated_cooling.join(","))
