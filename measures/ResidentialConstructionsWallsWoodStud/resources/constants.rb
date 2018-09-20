@@ -801,6 +801,12 @@ class Constants
   def self.SizingInfoDuctsSupplySurfaceArea # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s)
   end
+  def self.SizingInfoHVACFracHeatLoadServed(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
+  end
+  def self.SizingInfoHVACFracCoolLoadServed(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
+  end
   def self.SizingInfoGSHPBoreConfig # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s)
   end
@@ -822,17 +828,17 @@ class Constants
   def self.SizingInfoGSHPUTubeSpacingType # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s)
   end
-  def self.SizingInfoHPSizedForMaxLoad # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHPSizedForMaxLoad(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
-  def self.SizingInfoHVACCapacityDerateFactorCOP # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACCapacityDerateFactorCOP(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
-  def self.SizingInfoHVACCapacityDerateFactorEER # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACCapacityDerateFactorEER(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
-  def self.SizingInfoHVACCapacityRatioCooling # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACCapacityRatioCooling(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
   def self.SizingInfoHVACCapacityRatioHeating # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s)
@@ -846,11 +852,11 @@ class Constants
   def self.SizingInfoHVACHeatingCFMs # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s)
   end
-  def self.SizingInfoHVACRatedCFMperTonHeating # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACRatedCFMperTonHeating(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
-  def self.SizingInfoHVACRatedCFMperTonCooling # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACRatedCFMperTonCooling(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
   def self.SizingInfoHVACSHR # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s)
