@@ -2062,7 +2062,8 @@ class HVAC
     
     def self.apply_boiler(model, unit, runner, fuel_type, system_type, afue,
                           oat_reset_enabled, oat_high, oat_low, oat_hwst_high, oat_hwst_low,
-                          capacity, design_temp, is_modulating, dse)
+                          capacity, design_temp, is_modulating, dse,
+                          frac_heat_load_served)
     
       boilerIsCondensing = false
       if system_type == Constants.BoilerTypeCondensing
@@ -2239,6 +2240,8 @@ class HVAC
         end
         
       end
+
+      unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(boiler), frac_heat_load_served)
       
       return true
     end
