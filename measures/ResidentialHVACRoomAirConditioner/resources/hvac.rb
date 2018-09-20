@@ -2258,6 +2258,7 @@ class HVAC
         
       end
 
+      # Store info for HVAC Sizing measure
       unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(boiler), frac_heat_load_served)
       
       return true
@@ -2286,6 +2287,7 @@ class HVAC
          
           prioritize_zone_hvac(model, runner, zone)
 
+          # Store info for HVAC Sizing measure
           unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_coil), frac_heat_load_served)
           
         end
@@ -2297,7 +2299,7 @@ class HVAC
     
     def self.apply_unit_heater(model, unit, runner, fuel_type,
                                efficiency, capacity, fan_power,
-                               airflow_rate)
+                               airflow_rate, frac_heat_load_served)
     
       if fan_power > 0 and airflow_rate == 0
         runner.registerError("If Fan Power > 0, then Airflow Rate cannot be zero.")
@@ -2338,8 +2340,7 @@ class HVAC
             fan.setPressureRise(0)
           end
           fan.setMotorEfficiency(1.0)
-          fan.setMotorInAirstreamFraction(1.0)  
-          
+          fan.setMotorInAirstreamFraction(1.0)          
         
           # _processSystemAir
           
@@ -2362,12 +2363,14 @@ class HVAC
           unitary_system.addToThermalZone(zone)
 
           prioritize_zone_hvac(model, runner, zone)
+
+          # Store info for HVAC Sizing measure
+          unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating(unitary_system), airflow_rate.to_s)
+          unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(unitary_system), frac_heat_load_served)
           
         end
       
       end
-      
-      unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating, airflow_rate.to_s)
     
       return true
     end
