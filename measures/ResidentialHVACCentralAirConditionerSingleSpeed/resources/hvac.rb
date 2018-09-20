@@ -1956,7 +1956,8 @@ class HVAC
     end
     
     def self.apply_furnace(model, unit, runner, fuel_type, afue,
-                           capacity, fan_power_installed, dse)
+                           capacity, fan_power_installed, dse,
+                           frac_heat_load_served)
     
       # Parasitic Electricity (Source: DOE. (2007). Technical Support Document: Energy Efficiency Program for Consumer Products: "Energy Conservation Standards for Residential Furnaces and Boilers". www.eere.energy.gov/buildings/appliance_standards/residential/furnaces_boilers.html)
       furnaceParasiticElecDict = {Constants.FuelTypeGas=>76.0, # W during operation
@@ -2059,7 +2060,9 @@ class HVAC
         
           prioritize_zone_hvac(model, runner, slave_zone)
         
-        end    
+        end
+
+        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(air_loop_unitary), frac_heat_load_served)
       
       end
     
