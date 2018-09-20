@@ -1572,7 +1572,8 @@ class HVAC
                         design_delta_t, pump_head, 
                         u_tube_leg_spacing, u_tube_spacing_type,
                         fan_power, heat_pump_capacity, supplemental_efficiency,
-                        supplemental_capacity, dse)
+                        supplemental_capacity, dse,
+                        frac_heat_load_served, frac_cool_load_served)
     
       if frac_glycol == 0
         fluid_type = Constants.FluidWater
@@ -1719,17 +1720,17 @@ class HVAC
         fan.setMotorEfficiency(1.0)
         fan.setMotorInAirstreamFraction(1.0)
           
-        air_loop_unitary = OpenStudio::Model::AirLoopHVACUnitarySystem.new(model)
-        air_loop_unitary.setName(obj_name + " htg unitary system")
-        air_loop_unitary.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
-        air_loop_unitary.setSupplyFan(fan)
-        air_loop_unitary.setHeatingCoil(htg_coil)
-        air_loop_unitary.setSupplementalHeatingCoil(supp_htg_coil)
-        air_loop_unitary.setFanPlacement("BlowThrough")
-        air_loop_unitary.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
-        air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(170.0,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.    
-        air_loop_unitary.setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(UnitConversions.convert(40.0,"F","C"))
-        air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)          
+        htg_air_loop_unitary = OpenStudio::Model::AirLoopHVACUnitarySystem.new(model)
+        htg_air_loop_unitary.setName(obj_name + " htg unitary system")
+        htg_air_loop_unitary.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
+        htg_air_loop_unitary.setSupplyFan(fan)
+        htg_air_loop_unitary.setHeatingCoil(htg_coil)
+        htg_air_loop_unitary.setSupplementalHeatingCoil(supp_htg_coil)
+        htg_air_loop_unitary.setFanPlacement("BlowThrough")
+        htg_air_loop_unitary.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
+        htg_air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(170.0,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.    
+        htg_air_loop_unitary.setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(UnitConversions.convert(40.0,"F","C"))
+        htg_air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)          
           
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
         air_loop.setName(obj_name + " central htg air system")
@@ -1738,11 +1739,11 @@ class HVAC
         air_demand_inlet_node = air_loop.demandInletNode
         air_demand_outlet_node = air_loop.demandOutletNode    
         
-        air_loop_unitary.addToNode(air_supply_inlet_node)
+        htg_air_loop_unitary.addToNode(air_supply_inlet_node)
         
-        runner.registerInfo("Added '#{htg_coil.name}' to '#{air_loop_unitary.name}' of '#{air_loop.name}'")
+        runner.registerInfo("Added '#{htg_coil.name}' to '#{htg_air_loop_unitary.name}' of '#{air_loop.name}'")
         
-        air_loop_unitary.setControllingZoneorThermostatLocation(control_zone)
+        htg_air_loop_unitary.setControllingZoneorThermostatLocation(control_zone)
         
         zone_splitter = air_loop.zoneSplitter
         zone_splitter.setName(obj_name + " htg zone splitter")
@@ -1812,16 +1813,16 @@ class HVAC
         fan.setMotorEfficiency(1.0)
         fan.setMotorInAirstreamFraction(1.0)
           
-        air_loop_unitary = OpenStudio::Model::AirLoopHVACUnitarySystem.new(model)
-        air_loop_unitary.setName(obj_name + " clg unitary system")
-        air_loop_unitary.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
-        air_loop_unitary.setSupplyFan(fan)
-        air_loop_unitary.setCoolingCoil(clg_coil)
-        air_loop_unitary.setFanPlacement("BlowThrough")
-        air_loop_unitary.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
-        air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(170.0,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.    
-        air_loop_unitary.setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(UnitConversions.convert(40.0,"F","C"))
-        air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)          
+        clg_air_loop_unitary = OpenStudio::Model::AirLoopHVACUnitarySystem.new(model)
+        clg_air_loop_unitary.setName(obj_name + " clg unitary system")
+        clg_air_loop_unitary.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
+        clg_air_loop_unitary.setSupplyFan(fan)
+        clg_air_loop_unitary.setCoolingCoil(clg_coil)
+        clg_air_loop_unitary.setFanPlacement("BlowThrough")
+        clg_air_loop_unitary.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
+        clg_air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(170.0,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.    
+        clg_air_loop_unitary.setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(UnitConversions.convert(40.0,"F","C"))
+        clg_air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)          
           
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
         air_loop.setName(obj_name + " central clg air system")
@@ -1830,11 +1831,11 @@ class HVAC
         air_demand_inlet_node = air_loop.demandInletNode
         air_demand_outlet_node = air_loop.demandOutletNode    
         
-        air_loop_unitary.addToNode(air_supply_inlet_node)
+        clg_air_loop_unitary.addToNode(air_supply_inlet_node)
         
-        runner.registerInfo("Added '#{clg_coil.name}' to '#{air_loop_unitary.name}' of '#{air_loop.name}'")
+        runner.registerInfo("Added '#{clg_coil.name}' to '#{clg_air_loop_unitary.name}' of '#{air_loop.name}'")
         
-        air_loop_unitary.setControllingZoneorThermostatLocation(control_zone)
+        clg_air_loop_unitary.setControllingZoneorThermostatLocation(control_zone)
         
         zone_splitter = air_loop.zoneSplitter
         zone_splitter.setName(obj_name + " clg zone splitter")
@@ -1864,17 +1865,21 @@ class HVAC
           
         end        
       
+        # Store info for HVAC Sizing measure
+        unit.setFeature(Constants.SizingInfoHVACSHR(clg_air_loop_unitary), shr.to_s)
+        unit.setFeature(Constants.SizingInfoGSHPCoil_BF_FT_SPEC(clg_air_loop_unitary), cOIL_BF_FT_SPEC.join(","))
+        unit.setFeature(Constants.SizingInfoGSHPCoilBF(clg_air_loop_unitary), coilBF)
+        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_air_loop_unitary), frac_heat_load_served)
+        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_air_loop_unitary), frac_cool_load_served)
+
       end
-      
+
       # Store info for HVAC Sizing measure
-      unit.setFeature(Constants.SizingInfoHVACSHR, shr.to_s)
-      unit.setFeature(Constants.SizingInfoGSHPCoil_BF_FT_SPEC, cOIL_BF_FT_SPEC.join(","))
-      unit.setFeature(Constants.SizingInfoGSHPCoilBF, coilBF)
-      unit.setFeature(Constants.SizingInfoGSHPBoreSpacing, bore_spacing)
-      unit.setFeature(Constants.SizingInfoGSHPBoreHoles, bore_holes)
-      unit.setFeature(Constants.SizingInfoGSHPBoreDepth, bore_depth)
-      unit.setFeature(Constants.SizingInfoGSHPBoreConfig, bore_config)
-      unit.setFeature(Constants.SizingInfoGSHPUTubeSpacingType, u_tube_spacing_type)
+      unit.setFeature(Constants.SizingInfoGSHPBoreSpacing(ground_heat_exch_vert), bore_spacing)
+      unit.setFeature(Constants.SizingInfoGSHPBoreHoles(ground_heat_exch_vert), bore_holes)
+      unit.setFeature(Constants.SizingInfoGSHPBoreDepth(ground_heat_exch_vert), bore_depth)
+      unit.setFeature(Constants.SizingInfoGSHPBoreConfig(ground_heat_exch_vert), bore_config)
+      unit.setFeature(Constants.SizingInfoGSHPUTubeSpacingType(ground_heat_exch_vert), u_tube_spacing_type)
     
       return true
     end
