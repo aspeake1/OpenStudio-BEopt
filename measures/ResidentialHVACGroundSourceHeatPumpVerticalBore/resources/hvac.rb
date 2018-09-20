@@ -1887,7 +1887,7 @@ class HVAC
     end
     
     def self.apply_room_ac(model, unit, runner, eer, shr,
-                           airflow_rate, capacity)
+                           airflow_rate, capacity, frac_cool_load_served)
     
       # Performance curves
       # From Frigidaire 10.7 EER unit in Winkler et. al. Lab Testing of Window ACs (2013)
@@ -1953,11 +1953,12 @@ class HVAC
           
         end # slave_zone
       
+        # Store info for HVAC Sizing measure
+        unit.setFeature(Constants.SizingInfoHVACCoolingCFMs(ptac), airflow_rate.to_s)
+        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(ptac), cfms_ton_rated.join(","))
+        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(ptac), frac_cool_load_served)
+
       end # control_zone
-      
-      # Store info for HVAC Sizing measure
-      unit.setFeature(Constants.SizingInfoHVACCoolingCFMs, airflow_rate.to_s)
-      unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated.join(","))
       
       return true
     end
