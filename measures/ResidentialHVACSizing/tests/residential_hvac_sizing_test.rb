@@ -720,6 +720,9 @@ class ProcessHVACSizingTest < MiniTest::Test
   private
 
   def _test_error(osm_file_or_model, args_hash)
+
+    print_debug_info = false # set to true for more detailed output
+
     # create an instance of the measure
     measure = ProcessHVACSizing.new
 
@@ -744,6 +747,10 @@ class ProcessHVACSizingTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+
+    if print_debug_info
+      show_output(result)
+    end
 
     # assert that it didn't run
     assert_equal("Fail", result.value.valueName)
