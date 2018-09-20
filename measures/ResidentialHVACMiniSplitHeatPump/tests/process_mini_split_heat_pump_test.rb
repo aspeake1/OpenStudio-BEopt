@@ -361,16 +361,24 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
             end
         end
     end
-    
+
     model.getBuildingUnits.each do |unit|
       next if unit.spaces.size == 0
-      is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
-      if is_ducted.is_initialized
-        is_ducted = is_ducted.get
+      thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
+      thermal_zones.each do |thermal_zone|
+        model.getAirConditionerVariableRefrigerantFlows.each do |vrf|
+          vrf.terminals.each do |terminal|
+            next unless thermal_zone == terminal.thermalZone.get
+            is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump(vrf))
+            if is_ducted.is_initialized
+              is_ducted = is_ducted.get
+            end
+            assert_equal(expected_values["is_ducted"], is_ducted)
+          end
+        end
       end
-      assert_equal(expected_values["is_ducted"], is_ducted)
     end
-    
+
     return model
   end  
   
