@@ -51,7 +51,7 @@ class WeatherProcess
 
     @epw_file = OpenStudio::EpwFile.new(@epw_path, true)
 
-    unit = get_weather_building_unit
+    unit = get_weather_building_unit(@model)
   
     cached = get_cached_weather(unit)
     return if cached or @error
@@ -121,19 +121,19 @@ class WeatherProcess
     return @error
   end
   
-  def get_weather_building_unit
+  def get_weather_building_unit(model)
     unit_name = "EPWWeatherInfo"
     
     # Look for existing unit with weather data
     unit = nil
-    @model.getBuildingUnits.each do |u|
+    model.getBuildingUnits.each do |u|
       next if u.name.to_s != unit_name
       unit = u
     end
     
     if unit.nil?
       # Create new unit to store weather data
-      unit = OpenStudio::Model::BuildingUnit.new(@model)
+      unit = OpenStudio::Model::BuildingUnit.new(model)
       unit.setBuildingUnitType("Residential")
       unit.setName(unit_name)
     end
