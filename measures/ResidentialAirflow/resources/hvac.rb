@@ -10,7 +10,8 @@ class HVAC
     def self.apply_central_ac_1speed(model, unit, runner, seer, eers, shrs,
                                      fan_power_rated, fan_power_installed,
                                      crankcase_capacity, crankcase_temp,
-                                     eer_capacity_derates, capacity, dse)
+                                     eer_capacity_derates, capacity, dse,
+                                     frac_cool_load_served)
     
       num_speeds = 1
 
@@ -133,11 +134,12 @@ class HVAC
           
         end # slave_zone
       
+        # Store info for HVAC Sizing measure
+        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(air_loop_unitary), eer_capacity_derates.join(","))
+        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(air_loop_unitary), cfms_ton_rated.join(","))
+        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(air_loop_unitary), frac_cool_load_served)
+
       end # control_zone
-      
-      # Store info for HVAC Sizing measure
-      unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
-      unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated.join(","))
       
       return true
     
@@ -147,7 +149,8 @@ class HVAC
                                      capacity_ratios, fan_speed_ratios,
                                      fan_power_rated, fan_power_installed,
                                      crankcase_capacity, crankcase_temp,
-                                     eer_capacity_derates, capacity, dse)
+                                     eer_capacity_derates, capacity, dse,
+                                     frac_cool_load_served)
     
       num_speeds = 2
       
@@ -277,12 +280,13 @@ class HVAC
           
         end # slave_zone
       
+        # Store info for HVAC Sizing measure
+        unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(air_loop_unitary), capacity_ratios.join(","))
+        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(air_loop_unitary), eer_capacity_derates.join(","))
+        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(air_loop_unitary), cfms_ton_rated.join(","))
+        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(air_loop_unitary), frac_cool_load_served)
+
       end # control_zone
-      
-      # Store info for HVAC Sizing measure
-      unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios.join(","))
-      unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
-      unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated.join(","))
       
       return true
       
@@ -292,7 +296,8 @@ class HVAC
                                      capacity_ratios, fan_speed_ratios,
                                      fan_power_rated, fan_power_installed,
                                      crankcase_capacity, crankcase_temp,
-                                     eer_capacity_derates, capacity, dse)
+                                     eer_capacity_derates, capacity, dse,
+                                     frac_cool_load_served)
        
       num_speeds = 4
       
@@ -424,12 +429,13 @@ class HVAC
           
         end # slave_zone
       
+        # Store info for HVAC Sizing measure
+        unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(air_loop_unitary), capacity_ratios.join(","))
+        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(air_loop_unitary), eer_capacity_derates.join(","))
+        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(air_loop_unitary), cfms_ton_rated.join(","))
+        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(air_loop_unitary), frac_cool_load_served)
+
       end # control_zone
-      
-      # Store info for HVAC Sizing measure
-      unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios.join(","))
-      unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
-      unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated.join(","))
       
       return true
     end

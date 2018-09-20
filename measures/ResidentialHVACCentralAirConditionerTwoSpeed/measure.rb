@@ -172,7 +172,15 @@ class ProcessTwoSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasure
     dse.setDisplayName("Distribution System Efficiency")
     dse.setDescription("Defines the energy losses associated with the delivery of energy from the equipment to the source of the load.")
     dse.setDefaultValue("NA")
-    args << dse  
+    args << dse
+
+    #make an argument for entering fraction of cool load served
+    frac_cool_load_served = OpenStudio::Measure::OSArgument::makeDoubleArgument("frac_cool_load_served",true)
+    frac_cool_load_served.setDisplayName("Fraction of Cool Load Served")
+    frac_cool_load_served.setUnits("Btu/Btu")
+    frac_cool_load_served.setDescription("The fraction of the total cool load served by this system.")
+    frac_cool_load_served.setDefaultValue(1.0)
+    args << frac_cool_load_served
     
     return args
   end #end the arguments method
@@ -211,6 +219,7 @@ class ProcessTwoSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasure
     else
       dse = 1.0
     end
+    frac_cool_load_served = runner.getDoubleArgumentValue("frac_cool_load_served",user_arguments)
     
     # Get building units
     units = Geometry.get_building_units(model, runner)
@@ -231,7 +240,8 @@ class ProcessTwoSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasure
                                              capacity_ratios, fan_speed_ratios,
                                              fan_power_rated, fan_power_installed,
                                              crankcase_capacity, crankcase_temp,
-                                             eer_capacity_derates, capacity, dse)
+                                             eer_capacity_derates, capacity, dse,
+                                             frac_cool_load_served)
       return false if not success
 
     end # unit
