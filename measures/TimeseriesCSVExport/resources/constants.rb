@@ -197,8 +197,8 @@ class Constants
   def self.CondenserTypeWater
     return 'watercooled'
   end
-  def self.DuctedInfoMiniSplitHeatPump
-    return __method__.to_s
+  def self.DuctedInfoMiniSplitHeatPump(system)
+    return self.SizingInfo(__method__.to_s, system)
   end
   def self.EndUseHVACCoolingFan
     return 'res hvac cooling fan'

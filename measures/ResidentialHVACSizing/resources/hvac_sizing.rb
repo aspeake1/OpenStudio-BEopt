@@ -3056,7 +3056,7 @@ class HVACSizing
                 end
                 
                 if not hvac.HasRoomAirConditioner
-                    capacityDerateFactorEER = get_unit_feature(runner, unit, Constants.SizingInfoHVACCapacityDerateFactorEER, 'string')
+                    capacityDerateFactorEER = get_unit_feature(runner, unit, Constants.SizingInfoHVACCapacityDerateFactorEER(clg_equip), 'string')
                     return nil if capacityDerateFactorEER.nil?
                     hvac.CapacityDerateFactorEER = capacityDerateFactorEER.split(",").map(&:to_f)
                 end
@@ -4464,11 +4464,11 @@ class HVACSizing
   
     clg_coil, htg_coil, supp_htg_coil = HVAC.get_coils_from_hvac_equip(equip)
     
-    ratedCFMperTonCooling = get_unit_feature(runner, unit, Constants.SizingInfoHVACRatedCFMperTonCooling, 'string', false)
+    ratedCFMperTonCooling = get_unit_feature(runner, unit, Constants.SizingInfoHVACRatedCFMperTonCooling(equip), 'string', false)
     if not ratedCFMperTonCooling.nil?
         ratedCFMperTonCooling = ratedCFMperTonCooling.split(",").map(&:to_f)
     end
-    ratedCFMperTonHeating = get_unit_feature(runner, unit, Constants.SizingInfoHVACRatedCFMperTonHeating, 'string', false)
+    ratedCFMperTonHeating = get_unit_feature(runner, unit, Constants.SizingInfoHVACRatedCFMperTonHeating(equip), 'string', false)
     if not ratedCFMperTonHeating.nil?
         ratedCFMperTonHeating = ratedCFMperTonHeating.split(",").map(&:to_f)
     end

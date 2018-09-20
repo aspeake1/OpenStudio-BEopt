@@ -120,7 +120,7 @@ class HVAC
         runner.registerInfo("Added '#{air_loop.name}' to '#{control_zone.name}' of #{unit.name}")
 
         prioritize_zone_hvac(model, runner, control_zone)
-        
+
         slave_zones.each do |slave_zone|
 
           diffuser_fbsmt = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
@@ -1477,6 +1477,21 @@ class HVAC
             runner.registerInfo("Added '#{clg_tu_vrf.name}' to '#{zone.name}' of #{unit.name}")        
             
             prioritize_zone_hvac(model, runner, zone)
+
+            # Store is_ducted bool
+            unit.setFeature(Constants.DuctedInfoMiniSplitHeatPump(vrf), is_ducted)
+            
+            # Store info for HVAC Sizing measure
+            unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(clg_tu_vrf), capacity_ratios_cooling.join(","))
+            unit.setFeature(Constants.SizingInfoHVACCapacityRatioHeating(htg_tu_vrf), capacity_ratios_heating.join(","))
+            unit.setFeature(Constants.SizingInfoHVACCoolingCFMs(clg_tu_vrf), cfms_cooling.join(","))
+            unit.setFeature(Constants.SizingInfoHVACHeatingCFMs(htg_tu_vrf), cfms_heating.join(","))
+            unit.setFeature(Constants.SizingInfoHVACHeatingCapacityOffset(htg_tu_vrf), heating_capacity_offset)
+            unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_tu_vrf), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
+            unit.setFeature(Constants.SizingInfoHVACSHR(clg_tu_vrf), shrs_rated.join(","))
+            unit.setFeature(Constants.SizingInfoMSHPIndices(vrf), mshp_indices.join(","))
+            unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_tu_vrf), frac_heat_load_served)
+            unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_tu_vrf), frac_cool_load_served)
         
         end
         
@@ -1545,21 +1560,6 @@ class HVAC
           program_calling_manager.addProgram(program)
           
         end # pan heater power
-
-        # Store is_ducted bool
-        unit.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
-        
-        # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(clg_tu_vrf), capacity_ratios_cooling.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityRatioHeating(htg_tu_vrf), capacity_ratios_heating.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCoolingCFMs(clg_tu_vrf), cfms_cooling.join(","))
-        unit.setFeature(Constants.SizingInfoHVACHeatingCFMs(htg_tu_vrfs), cfms_heating.join(","))
-        unit.setFeature(Constants.SizingInfoHVACHeatingCapacityOffset(htg_tu_vrf), heating_capacity_offset)
-        unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_tu_vrf), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
-        unit.setFeature(Constants.SizingInfoHVACSHR(clg_tu_vrf), shrs_rated.join(","))
-        unit.setFeature(Constants.SizingInfoMSHPIndices(htg_tu_vrf), mshp_indices.join(","))
-        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_tu_vrf), frac_heat_load_served)
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_tu_vrf), frac_cool_load_served)
       
       end # control_zone
     
@@ -4143,12 +4143,13 @@ class HVAC
       end
       model.getBuildingUnits.each do |unit|
         next if not Geometry.get_thermal_zones_from_spaces(unit.spaces).include?(thermal_zone)
-        is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
-        if not is_ducted.is_initialized
-          runner.registerError("Could not find value for '#{Constants.DuctedInfoMiniSplitHeatPump}' with datatype boolean.")
-          return nil
+        model.getAirConditionerVariableRefrigerantFlows.each do |vrf|
+          vrf.terminals.each do |terminal|
+            next unless thermal_zone.handle.to_s == terminal.thermalZone.get.handle.to_s
+            is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump(vrf)).get
+            return is_ducted
+          end
         end
-        return is_ducted.get
       end
       return false
     end
