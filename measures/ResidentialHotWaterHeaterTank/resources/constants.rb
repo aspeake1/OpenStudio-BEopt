@@ -840,17 +840,17 @@ class Constants
   def self.SizingInfoHVACCapacityRatioCooling(system) # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s, system)
   end
-  def self.SizingInfoHVACCapacityRatioHeating # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACCapacityRatioHeating(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
-  def self.SizingInfoHVACCoolingCFMs # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACCoolingCFMs(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
-  def self.SizingInfoHVACHeatingCapacityOffset # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACHeatingCapacityOffset(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
-  def self.SizingInfoHVACHeatingCFMs # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoHVACHeatingCFMs(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
   def self.SizingInfoHVACRatedCFMperTonHeating(system) # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s, system)
@@ -876,8 +876,8 @@ class Constants
   def self.SizingInfoMechVentWholeHouseRate # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s)
   end
-  def self.SizingInfoMSHPIndices # FUTURE: Use StandardsInfo object
-    return self.SizingInfo(__method__.to_s)
+  def self.SizingInfoMSHPIndices(system) # FUTURE: Use StandardsInfo object
+    return self.SizingInfo(__method__.to_s, system)
   end
   def self.SizingInfoRoofCavityRvalue(surface) # FUTURE: Use StandardsInfo object
     return self.SizingInfo(__method__.to_s, surface)

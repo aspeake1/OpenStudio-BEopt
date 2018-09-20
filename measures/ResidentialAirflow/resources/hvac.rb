@@ -1268,7 +1268,7 @@ class HVAC
                         cap_retention_temp, pan_heater_power, fan_power,
                         is_ducted, heat_pump_capacity,
                         supplemental_efficiency, supplemental_capacity,
-                        dse)
+                        dse, frac_heat_load_served, frac_cool_load_served)
     
       num_speeds = 10
       
@@ -1422,17 +1422,17 @@ class HVAC
             
             # _processSystemDemandSideAir
             
-            tu_vrf = OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow.new(model, clg_coil, htg_coil, fan)
-            tu_vrf.coolingCoil.get.remove
-            tu_vrf.setName(obj_name + " #{zone.name} h vrf".gsub(" zone", ""))
-            tu_vrf.setTerminalUnitAvailabilityschedule(model.alwaysOnDiscreteSchedule)
-            tu_vrf.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
-            tu_vrf.setZoneTerminalUnitOnParasiticElectricEnergyUse(0)
-            tu_vrf.setZoneTerminalUnitOffParasiticElectricEnergyUse(0)
-            tu_vrf.setRatedTotalHeatingCapacitySizingRatio(1)
-            tu_vrf.addToThermalZone(zone)
-            vrf.addTerminal(tu_vrf)
-            runner.registerInfo("Added '#{tu_vrf.name}' to '#{zone.name}' of #{unit.name}")        
+            htg_tu_vrf = OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow.new(model, clg_coil, htg_coil, fan)
+            htg_tu_vrf.coolingCoil.get.remove
+            htg_tu_vrf.setName(obj_name + " #{zone.name} h vrf".gsub(" zone", ""))
+            htg_tu_vrf.setTerminalUnitAvailabilityschedule(model.alwaysOnDiscreteSchedule)
+            htg_tu_vrf.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
+            htg_tu_vrf.setZoneTerminalUnitOnParasiticElectricEnergyUse(0)
+            htg_tu_vrf.setZoneTerminalUnitOffParasiticElectricEnergyUse(0)
+            htg_tu_vrf.setRatedTotalHeatingCapacitySizingRatio(1)
+            htg_tu_vrf.addToThermalZone(zone)
+            vrf.addTerminal(htg_tu_vrf)
+            runner.registerInfo("Added '#{htg_tu_vrf.name}' to '#{zone.name}' of #{unit.name}")        
             
             prioritize_zone_hvac(model, runner, zone)
 
@@ -1464,17 +1464,17 @@ class HVAC
             
             # _processSystemDemandSideAir
             
-            tu_vrf = OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow.new(model, clg_coil, htg_coil, fan)
-            tu_vrf.heatingCoil.get.remove
-            tu_vrf.setName(obj_name + " #{zone.name} c vrf".gsub(" zone", ""))
-            tu_vrf.setTerminalUnitAvailabilityschedule(model.alwaysOnDiscreteSchedule)
-            tu_vrf.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
-            tu_vrf.setZoneTerminalUnitOnParasiticElectricEnergyUse(0)
-            tu_vrf.setZoneTerminalUnitOffParasiticElectricEnergyUse(0)
-            tu_vrf.setRatedTotalHeatingCapacitySizingRatio(1)
-            tu_vrf.addToThermalZone(zone)
-            vrf.addTerminal(tu_vrf)
-            runner.registerInfo("Added '#{tu_vrf.name}' to '#{zone.name}' of #{unit.name}")        
+            clg_tu_vrf = OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow.new(model, clg_coil, htg_coil, fan)
+            clg_tu_vrf.heatingCoil.get.remove
+            clg_tu_vrf.setName(obj_name + " #{zone.name} c vrf".gsub(" zone", ""))
+            clg_tu_vrf.setTerminalUnitAvailabilityschedule(model.alwaysOnDiscreteSchedule)
+            clg_tu_vrf.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
+            clg_tu_vrf.setZoneTerminalUnitOnParasiticElectricEnergyUse(0)
+            clg_tu_vrf.setZoneTerminalUnitOffParasiticElectricEnergyUse(0)
+            clg_tu_vrf.setRatedTotalHeatingCapacitySizingRatio(1)
+            clg_tu_vrf.addToThermalZone(zone)
+            vrf.addTerminal(clg_tu_vrf)
+            runner.registerInfo("Added '#{clg_tu_vrf.name}' to '#{zone.name}' of #{unit.name}")        
             
             prioritize_zone_hvac(model, runner, zone)
         
@@ -1544,22 +1544,24 @@ class HVAC
           program_calling_manager.setCallingPoint("BeginTimestepBeforePredictor")
           program_calling_manager.addProgram(program)
           
-        end # slave_zone
+        end # pan heater power
+
+        # Store is_ducted bool
+        unit.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
+        
+        # Store info for HVAC Sizing measure
+        unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(clg_tu_vrf), capacity_ratios_cooling.join(","))
+        unit.setFeature(Constants.SizingInfoHVACCapacityRatioHeating(htg_tu_vrf), capacity_ratios_heating.join(","))
+        unit.setFeature(Constants.SizingInfoHVACCoolingCFMs(clg_tu_vrf), cfms_cooling.join(","))
+        unit.setFeature(Constants.SizingInfoHVACHeatingCFMs(htg_tu_vrfs), cfms_heating.join(","))
+        unit.setFeature(Constants.SizingInfoHVACHeatingCapacityOffset(htg_tu_vrf), heating_capacity_offset)
+        unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_tu_vrf), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
+        unit.setFeature(Constants.SizingInfoHVACSHR(clg_tu_vrf), shrs_rated.join(","))
+        unit.setFeature(Constants.SizingInfoMSHPIndices(htg_tu_vrf), mshp_indices.join(","))
+        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_tu_vrf), frac_heat_load_served)
+        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_tu_vrf), frac_cool_load_served)
       
       end # control_zone
-      
-      # Store is_ducted bool
-      unit.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
-      
-      # Store info for HVAC Sizing measure
-      unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios_cooling.join(","))
-      unit.setFeature(Constants.SizingInfoHVACCapacityRatioHeating, capacity_ratios_heating.join(","))
-      unit.setFeature(Constants.SizingInfoHVACCoolingCFMs, cfms_cooling.join(","))
-      unit.setFeature(Constants.SizingInfoHVACHeatingCFMs, cfms_heating.join(","))
-      unit.setFeature(Constants.SizingInfoHVACHeatingCapacityOffset, heating_capacity_offset)
-      unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad, (heat_pump_capacity == Constants.SizingAutoMaxLoad))
-      unit.setFeature(Constants.SizingInfoHVACSHR, shrs_rated.join(","))
-      unit.setFeature(Constants.SizingInfoMSHPIndices, mshp_indices.join(","))
     
       return true
     end
