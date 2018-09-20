@@ -47,6 +47,14 @@ class ProcessElectricBaseboard < OpenStudio::Measure::ModelMeasure
     capacity.setUnits("kBtu/hr")
     capacity.setDefaultValue(Constants.SizingAuto)
     args << capacity
+
+    #make an argument for entering fraction of heat load served
+    frac_heat_load_served = OpenStudio::Measure::OSArgument::makeDoubleArgument("frac_heat_load_served",true)
+    frac_heat_load_served.setDisplayName("Fraction of Heat Load Served")
+    frac_heat_load_served.setUnits("Btu/Btu")
+    frac_heat_load_served.setDescription("The fraction of the total heat load served by this system.")
+    frac_heat_load_served.setDefaultValue(1.0)
+    args << frac_heat_load_served
     
     return args
   end #end the arguments method
@@ -65,6 +73,7 @@ class ProcessElectricBaseboard < OpenStudio::Measure::ModelMeasure
     unless capacity == Constants.SizingAuto
       capacity = UnitConversions.convert(capacity.to_f,"kBtu/hr","Btu/hr")
     end
+    frac_heat_load_served = runner.getDoubleArgumentValue("frac_heat_load_served",user_arguments)
    
     # Get building units
     units = Geometry.get_building_units(model, runner)
@@ -81,7 +90,7 @@ class ProcessElectricBaseboard < OpenStudio::Measure::ModelMeasure
         end
       end
     
-      success = HVAC.apply_electric_baseboard(model, unit, runner, efficiency, capacity)
+      success = HVAC.apply_electric_baseboard(model, unit, runner, efficiency, capacity, frac_heat_load_served)
       return false if not success
         
     end

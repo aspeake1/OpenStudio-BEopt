@@ -2252,7 +2252,7 @@ class HVAC
       return true
     end
     
-    def self.apply_electric_baseboard(model, unit, runner, efficiency, capacity)
+    def self.apply_electric_baseboard(model, unit, runner, efficiency, capacity, frac_heat_load_served)
     
       obj_name = Constants.ObjectNameElectricBaseboard(unit.name.to_s)
       
@@ -2274,6 +2274,8 @@ class HVAC
           runner.registerInfo("Added '#{htg_coil.name}' to '#{zone.name}' of #{unit.name}")
          
           prioritize_zone_hvac(model, runner, zone)
+
+          unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_coil), frac_heat_load_served)
           
         end
         
