@@ -1873,16 +1873,14 @@ class HVAC
         unit.setFeature(Constants.SizingInfoGSHPCoilBF(clg_air_loop_unitary), coilBF)
         unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_air_loop_unitary), frac_heat_load_served)
         unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_air_loop_unitary), frac_cool_load_served)
+        unit.setFeature(Constants.SizingInfoGSHPBoreSpacing(clg_air_loop_unitary), bore_spacing)
+        unit.setFeature(Constants.SizingInfoGSHPBoreHoles(clg_air_loop_unitary), bore_holes)
+        unit.setFeature(Constants.SizingInfoGSHPBoreDepth(clg_air_loop_unitary), bore_depth)
+        unit.setFeature(Constants.SizingInfoGSHPBoreConfig(clg_air_loop_unitary), bore_config)
+        unit.setFeature(Constants.SizingInfoGSHPUTubeSpacingType(clg_air_loop_unitary), u_tube_spacing_type)
 
       end
 
-      # Store info for HVAC Sizing measure
-      unit.setFeature(Constants.SizingInfoGSHPBoreSpacing(ground_heat_exch_vert), bore_spacing)
-      unit.setFeature(Constants.SizingInfoGSHPBoreHoles(ground_heat_exch_vert), bore_holes)
-      unit.setFeature(Constants.SizingInfoGSHPBoreDepth(ground_heat_exch_vert), bore_depth)
-      unit.setFeature(Constants.SizingInfoGSHPBoreConfig(ground_heat_exch_vert), bore_config)
-      unit.setFeature(Constants.SizingInfoGSHPUTubeSpacingType(ground_heat_exch_vert), u_tube_spacing_type)
-    
       return true
     end
     
@@ -3764,6 +3762,7 @@ class HVAC
       vrfs = self.get_vrfs(model, runner, thermal_zone)
       vrfs.each do |vrf|
         vrf.terminals.each do |terminal|
+          next if not terminal.coolingCoil.is_initialized
           cooling_equipment << terminal
         end
       end
@@ -3823,6 +3822,7 @@ class HVAC
       vrfs = self.get_vrfs(model, runner, thermal_zone)
       vrfs.each do |vrf|
         vrf.terminals.each do |terminal|
+          next if not terminal.heatingCoil.is_initialized
           heating_equipment << terminal
         end
       end
@@ -3830,6 +3830,7 @@ class HVAC
       unitary_system_zone_hvacs = self.get_unitary_system_zone_hvacs(model, runner, thermal_zone)
       unitary_system_zone_hvacs.each do |unitary_system_zone_hvac|
         system, clg_coil, htg_coil = unitary_system_zone_hvac
+        next if htg_coil.nil?
         heating_equipment << system
       end
 
