@@ -250,6 +250,42 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
                 end
                 
                 tot_sh_gpd += sh_gpd
+
+                # Unmet Shower Energy                
+                vol_shower = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Water Use Equipment Hot Water Volume")
+                vol_shower.setName("Vol_shower")
+                vol_shower.setKeyName(sh_wu.name.to_s)
+
+                t_out_wh = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Water Heater Use Side Outlet Temperature")
+                t_out_wh.setName("T_out_WH")
+                model.getPlantLoops.each do |pl|
+                  next if not pl.name.to_s.start_with? Constants.PlantLoopDomesticWater
+                  t_out_wh.setKeyName(Waterheater.get_water_heater(model, pl, runner).name.to_s)
+                end
+
+                mixsp_wh = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Schedule Value")
+                mixsp_wh.setName("MixSP_HW")
+                mixsp_wh.setKeyName(sh_wu_def.targetTemperatureSchedule.get.name.to_s)
+
+                program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
+                program.setName("WaterHeaterSag")
+                program.addLine("If (Vol_shower > 0) && (MixSP_HW > T_out_WH)")
+                program.addLine("Set ShowerEner = Vol_shower * 990 * 4183 * (MixSP_HW - T_out_WH)")
+                program.addLine("Else")
+                program.addLine("Set ShowerEner = 0")
+                program.addLine("EndIf")                
+
+                program_calling_manager = OpenStudio::Model::EnergyManagementSystemProgramCallingManager.new(model)
+                program_calling_manager.setName("WHSag")
+                program_calling_manager.setCallingPoint("EndOfZoneTimestepBeforeZoneReporting")
+                program_calling_manager.addProgram(program)
+
+                ems_output_var = OpenStudio::Model::EnergyManagementSystemOutputVariable.new(model, "ShowerEner")
+                ems_output_var.setName("Unmet Shower Energy")
+                ems_output_var.setTypeOfDataInVariable("Summed")
+                ems_output_var.setUpdateFrequency("SystemTimestep")
+                ems_output_var.setEMSProgramOrSubroutineName(program)
+                ems_output_var.setUnits("J")
             end
             
             # Sinks
