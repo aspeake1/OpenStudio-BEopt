@@ -119,7 +119,7 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
                      Constants.ObjectNameSink,
                      Constants.ObjectNameBath]
         model.getSpaces.each do |space|
-            remove_existing(runner, space, obj_names)
+            remove_existing(model, runner, space, obj_names)
         end
         
         location_hierarchy = [Constants.SpaceTypeBathroom,
@@ -251,37 +251,43 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
                 
                 tot_sh_gpd += sh_gpd
 
-                # Unmet Shower Energy                
+                # Unmet Shower Energy
+                obj_name_sh = obj_name_sh.gsub("unit ", "").gsub("|","_")
+                
                 vol_shower = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Water Use Equipment Hot Water Volume")
-                vol_shower.setName("Vol_shower")
+                vol_shower.setName("#{obj_name_sh} vol")
                 vol_shower.setKeyName(sh_wu.name.to_s)
 
                 t_out_wh = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Water Heater Use Side Outlet Temperature")
-                t_out_wh.setName("T_out_WH")
+                t_out_wh.setName("#{obj_name_sh} tout")
                 model.getPlantLoops.each do |pl|
                   next if not pl.name.to_s.start_with? Constants.PlantLoopDomesticWater
                   t_out_wh.setKeyName(Waterheater.get_water_heater(model, pl, runner).name.to_s)
                 end
 
-                mixsp_wh = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Schedule Value")
-                mixsp_wh.setName("MixSP_HW")
-                mixsp_wh.setKeyName(sh_wu_def.targetTemperatureSchedule.get.name.to_s)
+                mix_sp_hw = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Schedule Value")
+                mix_sp_hw.setName("#{obj_name_sh} mixsp")
+                mix_sp_hw.setKeyName(sh_wu_def.targetTemperatureSchedule.get.name.to_s)
 
                 program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
-                program.setName("WaterHeaterSag")
-                program.addLine("If (Vol_shower > 0) && (MixSP_HW > T_out_WH)")
-                program.addLine("Set ShowerEner = Vol_shower * 990 * 4183 * (MixSP_HW - T_out_WH)")
+                program.setName("#{obj_name_sh} sag")
+                program.addLine("If (#{vol_shower.name} > 0) && (#{mix_sp_hw.name} > #{t_out_wh.name})")
+                program.addLine("Set ShowerE=#{vol_shower.name}*4141170*(#{mix_sp_hw.name}-#{t_out_wh.name})")
                 program.addLine("Else")
-                program.addLine("Set ShowerEner = 0")
+                program.addLine("Set ShowerE=0")
                 program.addLine("EndIf")                
 
                 program_calling_manager = OpenStudio::Model::EnergyManagementSystemProgramCallingManager.new(model)
-                program_calling_manager.setName("WHSag")
+                program_calling_manager.setName("#{obj_name_sh} sag")
                 program_calling_manager.setCallingPoint("EndOfZoneTimestepBeforeZoneReporting")
                 program_calling_manager.addProgram(program)
 
-                ems_output_var = OpenStudio::Model::EnergyManagementSystemOutputVariable.new(model, "ShowerEner")
-                ems_output_var.setName("Unmet Shower Energy")
+                ems_output_var = OpenStudio::Model::EnergyManagementSystemOutputVariable.new(model, "ShowerE")
+                ix = ""
+                if unit_index > 0
+                  ix = " #{unit_index + 1}"
+                end
+                ems_output_var.setName("Unmet Shower Energy#{ix}")
                 ems_output_var.setTypeOfDataInVariable("Summed")
                 ems_output_var.setUpdateFrequency("SystemTimestep")
                 ems_output_var.setEMSProgramOrSubroutineName(program)
@@ -388,7 +394,7 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
         
     end
     
-    def remove_existing(runner, space, obj_names)
+    def remove_existing(model, runner, space, obj_names)
         # Remove any existing ssb
         objects_to_remove = []
         space.otherEquipment.each do |space_equipment|
@@ -431,6 +437,24 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
             rescue
                 # no op
             end
+        end
+        obj_names.each do |obj_name|
+          model.getEnergyManagementSystemProgramCallingManagers.each do |pcm|
+            if pcm.name.to_s.start_with? obj_name
+              pcm.remove
+            end
+          end
+          model.getEnergyManagementSystemSensors.each do |sensor|
+            if sensor.name.to_s.start_with? obj_name.gsub(" ", "_").gsub("unit ", "").gsub("|","_")
+              sensor.remove
+            end
+          end
+          model.getEnergyManagementSystemOutputVariables.each do |var|
+            if var.emsProgramOrSubroutineName.to_s.start_with? obj_name.gsub(" ", "_").gsub("unit ", "").gsub("|","_")
+              var.emsProgram.get.remove
+              var.remove
+            end
+          end
         end
     end
     
