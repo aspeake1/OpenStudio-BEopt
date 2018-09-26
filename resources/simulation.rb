@@ -31,6 +31,9 @@ class Simulation
         run_period.setBeginDayOfMonth(begin_day_of_month)
         run_period.setEndMonth(end_month)
         run_period.setEndDayOfMonth(end_day_of_month)
+
+        heat_bal_alg = model.getHeatBalanceAlgorithm
+        heat_bal_alg.setAlgorithm("MoisturePenetrationDepthConductionTransferFunction") # EMPD
         
         return true
     end

@@ -9,7 +9,7 @@ class Material
     # rho - Density [lb/ft^3]
     # cp - Specific heat [Btu/lb*F]
     # rvalue - R-value [h-ft^2-F/Btu]
-    def initialize(name=nil, thick_in=nil, mat_base=nil, k_in=nil, rho=nil, cp=nil, tAbs=nil, sAbs=nil, vAbs=nil, rvalue=nil)
+    def initialize(name=nil, thick_in=nil, mat_base=nil, k_in=nil, rho=nil, cp=nil, tAbs=nil, sAbs=nil, vAbs=nil, rvalue=nil, waterVaporDiffusionResistanceFactor=nil, moistureEquationCoefficientA=nil, moistureEquationCoefficientB=nil, moistureEquationCoefficientC=nil, moistureEquationCoefficientD=nil, coatingLayerThickness=nil, coatingLayerWaterVaporDiffusionResistanceFactor=nil)
         @name = name
         
         if not thick_in.nil?
@@ -48,6 +48,13 @@ class Material
         @tAbs = tAbs
         @sAbs = sAbs
         @vAbs = vAbs
+        @waterVaporDiffusionResistanceFactor = waterVaporDiffusionResistanceFactor
+        @moistureEquationCoefficientA = moistureEquationCoefficientA
+        @moistureEquationCoefficientB = moistureEquationCoefficientB
+        @moistureEquationCoefficientC = moistureEquationCoefficientC
+        @moistureEquationCoefficientD = moistureEquationCoefficientD
+        @coatingLayerThickness = coatingLayerThickness
+        @coatingLayerWaterVaporDiffusionResistanceFactor = coatingLayerWaterVaporDiffusionResistanceFactor
         
         # Calculate R-value
         if not rvalue.nil?
@@ -61,8 +68,12 @@ class Material
         end
     end
     
-    attr_accessor :name, :thick, :thick_in, :k, :k_in, :rho, :cp, :rvalue, :tAbs, :sAbs, :vAbs
+    attr_accessor :name, :thick, :thick_in, :k, :k_in, :rho, :cp, :rvalue, :tAbs, :sAbs, :vAbs, :waterVaporDiffusionResistanceFactor, :moistureEquationCoefficientA, :moistureEquationCoefficientB, :moistureEquationCoefficientB, :moistureEquationCoefficientC, :moistureEquationCoefficientD, :coatingLayerThickness, :coatingLayerWaterVaporDiffusionResistanceFactor
     
+    def self.Adiabatic
+        return self.new(name="Adiabatic", thick_in=UnitConversions.convert(0.01, "m", "in"), mat_base=nil, k_in=UnitConversions.convert(0.1, "w/(m*k)", "btu*in/(hr*ft^2*r)"), rho=UnitConversions.convert(100, "kg/m^3", "lbm/ft^3"), cp=UnitConversions.convert(100, "j/(kg*k)", "btu/(lbm*r)"), tAbs=0.9, sAbs=0.5, vAbs=0.1, rvalue=nil, waterVaporDiffusionResistanceFactor=500, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
+    end
+
     def self.AirCavityClosed(thick_in)
         rvalue = Gas.AirGapRvalue
         return self.new(name=nil, thick_in=thick_in, mat_base=nil, k_in=thick_in/rvalue, rho=Gas.Air.rho, cp=Gas.Air.cp)
@@ -221,11 +232,11 @@ class Material
     end
     
     def self.GypsumWall(thick_in)
-        return self.new(name="Drywall #{thick_in.to_s} in.", thick_in=thick_in, mat_base=BaseMaterial.Gypsum, k_in=nil, rho=nil, cp=nil, tAbs=0.9, sAbs=0.5, vAbs=0.1)
+        return self.new(name="Drywall #{thick_in.to_s} in.", thick_in=thick_in, mat_base=BaseMaterial.Gypsum, k_in=nil, rho=nil, cp=nil, tAbs=0.9, sAbs=0.5, vAbs=0.1, rvalue=nil, waterVaporDiffusionResistanceFactor=8.9, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
     end
 
     def self.GypsumCeiling(thick_in)
-        return self.new(name="Drywall #{thick_in.to_s} in.", thick_in=thick_in, mat_base=BaseMaterial.Gypsum, k_in=nil, rho=nil, cp=nil, tAbs=0.9, sAbs=0.3, vAbs=0.1)
+        return self.new(name="Drywall #{thick_in.to_s} in.", thick_in=thick_in, mat_base=BaseMaterial.Gypsum, k_in=nil, rho=nil, cp=nil, tAbs=0.9, sAbs=0.3, vAbs=0.1, rvalue=nil, waterVaporDiffusionResistanceFactor=8.9, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
     end
     
     def self.RoofingAsphaltShinglesDark
@@ -316,20 +327,27 @@ end
 
 class BaseMaterial
 
-    def initialize(rho, cp, k_in)
+    def initialize(rho, cp, k_in, waterVaporDiffusionResistanceFactor=nil, moistureEquationCoefficientA=nil, moistureEquationCoefficientB=nil, moistureEquationCoefficientC=nil, moistureEquationCoefficientD=nil, coatingLayerThickness=nil, coatingLayerWaterVaporDiffusionResistanceFactor=nil)
         @rho = rho
         @cp = cp
         @k_in = k_in
+        @waterVaporDiffusionResistanceFactor = waterVaporDiffusionResistanceFactor
+        @moistureEquationCoefficientA = moistureEquationCoefficientA
+        @moistureEquationCoefficientB = moistureEquationCoefficientB
+        @moistureEquationCoefficientC = moistureEquationCoefficientC
+        @moistureEquationCoefficientD = moistureEquationCoefficientD
+        @coatingLayerThickness = coatingLayerThickness
+        @coatingLayerWaterVaporDiffusionResistanceFactor = coatingLayerWaterVaporDiffusionResistanceFactor
     end
     
-    attr_accessor :rho, :cp, :k_in
+    attr_accessor :rho, :cp, :k_in, :waterVaporDiffusionResistanceFactor, :moistureEquationCoefficientA, :moistureEquationCoefficientB, :moistureEquationCoefficientB, :moistureEquationCoefficientC, :moistureEquationCoefficientD, :coatingLayerThickness, :coatingLayerWaterVaporDiffusionResistanceFactor
 
     def self.Gypsum
-        return self.new(rho=50.0, cp=0.2, k_in=1.1112)
+        return self.new(rho=50.0, cp=0.2, k_in=1.1112, waterVaporDiffusionResistanceFactor=8.9, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
     end
 
     def self.Wood
-        return self.new(rho=32.0, cp=0.29, k_in=0.8004)
+        return self.new(rho=32.0, cp=0.29, k_in=0.8004, waterVaporDiffusionResistanceFactor=97, moistureEquationCoefficientA=0.15, moistureEquationCoefficientB=8.51, moistureEquationCoefficientC=0.167, moistureEquationCoefficientD=0.965, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
     end
     
     def self.Concrete

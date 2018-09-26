@@ -73,7 +73,7 @@ class WallConstructions
         end
         constr.add_layer([mat_framing, mat_cavity, mat_gap], "WallStudAndCavity") 
         if drywall_thick_in > 0
-            constr.add_layer(Material.GypsumWall(drywall_thick_in))
+            constr.add_layer(Material.GypsumWall(drywall_thick_in)) # TODO: pass in material property moisture penetration depth settings, or just default them?
         end
         constr.add_layer(Material.AirFilmVertical)
 
@@ -2008,7 +2008,7 @@ class ThermalMassConstructions
             furnThickness = UnitConversions.convert(furnMass / (furnDensity * furnAreaFraction),'ft','in')
             
             # Define materials
-            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1)
+            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil, waterVaporDiffusionResistanceFactor=150, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
             
             # Set paths
             path_fracs = [1]
@@ -2365,6 +2365,9 @@ class Construction
             end
             if not material.vAbs.nil?
                 mat.setVisibleAbsorptance(material.vAbs)
+            end
+            if not material.waterVaporDiffusionResistanceFactor.nil? and not material.moistureEquationCoefficientA.nil? and not material.moistureEquationCoefficientB.nil? and not material.moistureEquationCoefficientC.nil? and not material.moistureEquationCoefficientD.nil? and not material.coatingLayerThickness.nil? and not material.coatingLayerWaterVaporDiffusionResistanceFactor.nil?
+              mat.createMaterialPropertyMoisturePenetrationDepthSettings(material.waterVaporDiffusionResistanceFactor, material.moistureEquationCoefficientA, material.moistureEquationCoefficientB, material.moistureEquationCoefficientC, material.moistureEquationCoefficientD, material.coatingLayerThickness, material.coatingLayerWaterVaporDiffusionResistanceFactor)
             end
         end
         runner.registerInfo("Material '#{mat.name.to_s}' was created.")

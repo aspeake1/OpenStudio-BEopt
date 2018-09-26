@@ -101,7 +101,7 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
     args_hash["rigid_r"] = 10
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
     ext_finish_r = 0.1016/0.793375
     drywall_r = 0.0254/0.1602906
     cavity_r = 0.1397/0.0448317763517687

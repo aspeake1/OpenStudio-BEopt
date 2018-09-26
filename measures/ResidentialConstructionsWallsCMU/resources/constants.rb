@@ -46,7 +46,7 @@ class Constants
   end
 
   # Strings --------------------
-  
+
   def self.AirFilm
     return 'AirFilm'
   end
