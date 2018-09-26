@@ -736,7 +736,7 @@ class Airflow
       cw_day_shift = 0.0
       model.getElectricEquipments.each do |ee|
         next if ee.name.to_s != Constants.ObjectNameClothesWasher(unit.name.to_s)
-        cw_day_shift = unit.getFeatureAsDouble(Constants.ClothesWasherDayShift(ee)).get
+        cw_day_shift = ee.additionalProperties.getFeatureAsDouble(Constants.ClothesWasherDayShift).get
         break
       end
       dryer_exhaust_day_shift = cw_day_shift + 1.0 / 24.0

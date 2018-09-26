@@ -1327,9 +1327,6 @@ class HVAC
       
       end # control_zone
       
-      # Store is_ducted bool
-      unit.additionalProperties.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
-      
       # Store info for HVAC Sizing measure
       unit.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios_cooling.join(","))
       unit.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioHeating, capacity_ratios_heating.join(","))
@@ -1339,6 +1336,7 @@ class HVAC
       unit.additionalProperties.setFeature(Constants.SizingInfoHPSizedForMaxLoad, (heat_pump_capacity == Constants.SizingAutoMaxLoad))
       unit.additionalProperties.setFeature(Constants.SizingInfoHVACSHR, shrs_rated.join(","))
       unit.additionalProperties.setFeature(Constants.SizingInfoMSHPIndices, mshp_indices.join(","))
+      unit.additionalProperties.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
     
       return true
     end
@@ -3884,7 +3882,7 @@ class HVAC
       end
       model.getBuildingUnits.each do |unit|
         next if not Geometry.get_thermal_zones_from_spaces(unit.spaces).include?(thermal_zone)
-        is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
+        is_ducted = unit.additionalProperties.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
         if not is_ducted.is_initialized
           runner.registerError("Could not find value for '#{Constants.DuctedInfoMiniSplitHeatPump}' with datatype boolean.")
           return nil

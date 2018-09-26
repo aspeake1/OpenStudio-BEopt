@@ -156,8 +156,8 @@ class Geometry
 
   def self.get_unit_beds_baths(model, unit, runner=nil)
     # Returns a list with #beds, #baths, a list of spaces, and the unit name
-    nbeds = unit.getFeatureAsInteger(Constants.BuildingUnitFeatureNumBedrooms)
-    nbaths = unit.getFeatureAsDouble(Constants.BuildingUnitFeatureNumBathrooms)
+    nbeds = unit.additionalProperties.getFeatureAsInteger(Constants.BuildingUnitFeatureNumBedrooms)
+    nbaths = unit.additionalProperties.getFeatureAsDouble(Constants.BuildingUnitFeatureNumBathrooms)
     if not (nbeds.is_initialized or nbaths.is_initialized)
       if !runner.nil?
         runner.registerError("Could not determine number of bedrooms or bathrooms.")

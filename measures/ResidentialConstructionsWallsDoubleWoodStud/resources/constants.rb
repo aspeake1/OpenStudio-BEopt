@@ -170,29 +170,29 @@ class Constants
   def self.CeilingFanControlSmart
     return 'smart'
   end
-  def self.ClothesDryerCEF(clothes_dryer)
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
+  def self.ClothesDryerCEF
+    return __method__.to_s
   end
-  def self.ClothesDryerMult(clothes_dryer)
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
+  def self.ClothesDryerMult
+    return __method__.to_s
   end
-  def self.ClothesDryerFuelType(clothes_dryer)
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
+  def self.ClothesDryerFuelType
+    return __method__.to_s
   end
-  def self.ClothesDryerFuelSplit(clothes_dryer)
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
+  def self.ClothesDryerFuelSplit
+    return __method__.to_s
   end
-  def self.ClothesWasherDrumVolume(clothes_washer)
-    return "#{__method__.to_s}|#{clothes_washer.handle.to_s}"
+  def self.ClothesWasherDrumVolume
+    return __method__.to_s
   end
-  def self.ClothesWasherIMEF(clothes_washer)
-    return "#{__method__.to_s}|#{clothes_washer.handle.to_s}"
+  def self.ClothesWasherIMEF
+    return __method__.to_s
   end
-  def self.ClothesWasherRatedAnnualEnergy(clothes_washer)
-    return "#{__method__.to_s}|#{clothes_washer.handle.to_s}"
+  def self.ClothesWasherRatedAnnualEnergy
+    return __method__.to_s
   end
-  def self.ClothesWasherDayShift(clothes_washer)
-    return "#{__method__.to_s}|#{clothes_washer.handle.to_s}"
+  def self.ClothesWasherDayShift
+    return __method__.to_s
   end
   def self.CondenserTypeWater
     return 'watercooled'
@@ -783,142 +783,142 @@ class Constants
     return "#{property}#{s_obj}"
   end
   def self.SizingInfoCMUWallFurringInsRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsLocationFrac
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsLocationZone
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsReturnLoss
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsReturnRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsReturnSurfaceArea
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsSupplyLoss
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsSupplyRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsSupplySurfaceArea
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPBoreConfig
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPBoreDepth
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPBoreHoles
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPBoreSpacing
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPCoil_BF_FT_SPEC
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPCoilBF
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPUTubeSpacingType
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHPSizedForMaxLoad
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCapacityDerateFactorCOP
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCapacityDerateFactorEER
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCapacityRatioCooling
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCapacityRatioHeating
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCoolingCFMs
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACHeatingCapacityOffset
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACHeatingCFMs
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACRatedCFMperTonHeating
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACRatedCFMperTonCooling
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACSHR
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentType
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentApparentSensibleEffectiveness
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentLatentEffectiveness
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentTotalEfficiency
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentWholeHouseRate
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMSHPIndices
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoRoofCavityRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoRoofColor
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoRoofHasRadiantBarrier
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoRoofMaterial
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoRoofRigidInsRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoSIPWallInsThickness
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoSlabRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoStudWallCavityRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoWallType
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoWallRigidInsRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoWallRigidInsThickness
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoZoneInfiltrationCFM
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoZoneInfiltrationELA
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SpaceTypeBathroom
     return 'bathroom' # only used by multi-zone simulations
