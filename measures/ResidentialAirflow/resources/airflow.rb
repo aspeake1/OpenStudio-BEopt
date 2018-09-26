@@ -78,9 +78,9 @@ class Airflow
     wout_sensor.setName("#{Constants.ObjectNameNaturalVentilation} wt s")
     
     # Adiabatic construction for ducts
-    
-    adiabatic_mat = OpenStudio::Model::MasslessOpaqueMaterial.new(model, "Rough", 176.1)
-    adiabatic_mat.setName("Adiabatic")
+
+    mat = Material.Adiabatic
+    adiabatic_mat = Construction.create_os_material(model, runner, mat)
     adiabatic_const = OpenStudio::Model::Construction.new(model)
     adiabatic_const.setName("AdiabaticConst")
     adiabatic_const.insertLayer(0, adiabatic_mat)
