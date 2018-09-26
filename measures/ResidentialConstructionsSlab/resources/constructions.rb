@@ -2008,7 +2008,7 @@ class ThermalMassConstructions
             furnThickness = UnitConversions.convert(furnMass / (furnDensity * furnAreaFraction),'ft','in')
             
             # Define materials
-            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil, waterVaporDiffusionResistanceFactor=150, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
+            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil, waterVaporDiffusionResistanceFactor=150, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
             
             # Set paths
             path_fracs = [1]
@@ -2368,9 +2368,18 @@ class Construction
             end
             if not material.waterVaporDiffusionResistanceFactor.nil? and not material.moistureEquationCoefficientA.nil? and not material.moistureEquationCoefficientB.nil? and not material.moistureEquationCoefficientC.nil? and not material.moistureEquationCoefficientD.nil? and not material.coatingLayerThickness.nil? and not material.coatingLayerWaterVaporDiffusionResistanceFactor.nil?
               mat.createMaterialPropertyMoisturePenetrationDepthSettings(material.waterVaporDiffusionResistanceFactor, material.moistureEquationCoefficientA, material.moistureEquationCoefficientB, material.moistureEquationCoefficientC, material.moistureEquationCoefficientD, material.coatingLayerThickness, material.coatingLayerWaterVaporDiffusionResistanceFactor)
+              unless material.surfaceLayerPenetrationDepth.nil?
+                mat.setSurfaceLayerPenetrationDepth(material.surfaceLayerPenetrationDepth)
+              end
+              unless material.deepLayerPenetrationDepth.nil?
+                mat.setDeepLayerPenetrationDepth(material.deepLayerPenetrationDepth)
+              end
+              msg = " along with moisture penetration depth settings."              
+            else
+              msg = "."
             end
         end
-        runner.registerInfo("Material '#{mat.name.to_s}' was created.")
+        runner.registerInfo("Material '#{mat.name.to_s}' was created#{msg}")
         return mat
     end
 
