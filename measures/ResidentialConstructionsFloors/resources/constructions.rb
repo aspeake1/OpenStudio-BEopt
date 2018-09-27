@@ -2312,6 +2312,7 @@ class Construction
     def self.create_os_material(model, runner, material)
         name = material.name
         tolerance = 0.0001
+        msg = "."
         if material.is_a? SimpleMaterial
             # Material already exists?
             model.getMasslessOpaqueMaterials.each do |mat|
@@ -2374,9 +2375,7 @@ class Construction
               unless material.deepLayerPenetrationDepth.nil?
                 mat.setDeepLayerPenetrationDepth(material.deepLayerPenetrationDepth)
               end
-              msg = " along with moisture penetration depth settings."              
-            else
-              msg = "."
+              msg = " along with moisture penetration depth settings."
             end
         end
         runner.registerInfo("Material '#{mat.name.to_s}' was created#{msg}")

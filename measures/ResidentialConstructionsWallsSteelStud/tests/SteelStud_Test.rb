@@ -33,7 +33,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     expected_num_new_objects = {"Material"=>1, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     cavity_r = 0.0889/0.0869815880123319
     assembly_r = ext_finish_r + osb_r + drywall_r + cavity_r
-    expected_values = {"AssemblyR"=>assembly_r, "WaterVaporDiffusionResistanceFactor"=>0, "MoistureEquationCoefficientA"=>0, "MoistureEquationCoefficientB"=>0, "MoistureEquationCoefficientC"=>0, "MoistureEquationCoefficientD"=>0, "CoatingLayerThickness"=>0, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>0}
+    expected_values = {"AssemblyR"=>assembly_r}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -234,6 +234,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
         end
     end
     actual_values.each do |prop, val|
+      next if expected_values[prop].nil?
       assert_in_epsilon(expected_values[prop], actual_values[prop], 0.01)  
     end
     

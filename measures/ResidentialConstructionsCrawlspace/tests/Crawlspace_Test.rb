@@ -15,13 +15,13 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
     ceiling_carpet_r = 0.0127/0.0433443509615385
     ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -33,13 +33,13 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
     ceiling_carpet_r = 0.0127/0.0433443509615385
     ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
-    expected_values = {"WallRValue"=>1.76, "WallDepth"=>0.91, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
+    expected_values = {"WallRValue"=>1.76, "WallDepth"=>0.91, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -51,21 +51,21 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
     ceiling_ins_r = 0.23495/0.1168615354327202
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
     ceiling_carpet_r = 0.0127/0.0433443509615385
     ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
+    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_exposed_perimeter_with_garage
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>8, "Construction"=>6, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
-    expected_values = {"ExposedPerimeter"=>107}
+    expected_num_new_objects = {"Material"=>8, "Construction"=>6, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"ExposedPerimeter"=>107, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_CS_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -73,8 +73,8 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>10, "Construction"=>10, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"ExposedPerimeter"=>254.558}
+    expected_num_new_objects = {"Material"=>10, "Construction"=>10, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"ExposedPerimeter"=>254.558, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFA_4units_1story_CS_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -82,8 +82,8 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     num_units = 8+1
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>15, "Construction"=>20, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"ExposedPerimeter"=>359.411}
+    expected_num_new_objects = {"Material"=>15, "Construction"=>20, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"ExposedPerimeter"=>359.411, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("MF_8units_1story_CS_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -195,7 +195,7 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    # show_output(result)
+    #show_output(result)
     
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -212,7 +212,7 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>0}
+    actual_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>0, "WaterVaporDiffusionResistanceFactor"=>0, "MoistureEquationCoefficientA"=>0, "MoistureEquationCoefficientB"=>0, "MoistureEquationCoefficientC"=>0, "MoistureEquationCoefficientD"=>0, "CoatingLayerThickness"=>0, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -246,6 +246,14 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
                         actual_values["ExposedPerimeter"] += UnitConversions.convert(surface.surfacePropertyExposedFoundationPerimeter.get.totalExposedPerimeter.get,"m","ft")
                     end
                 end
+            elsif obj_type == "MaterialPropertyMoisturePenetrationDepthSettings"
+              actual_values["WaterVaporDiffusionResistanceFactor"] += new_object.waterVaporDiffusionResistanceFactor
+              actual_values["MoistureEquationCoefficientA"] += new_object.moistureEquationCoefficientA
+              actual_values["MoistureEquationCoefficientB"] += new_object.moistureEquationCoefficientB
+              actual_values["MoistureEquationCoefficientC"] += new_object.moistureEquationCoefficientC
+              actual_values["MoistureEquationCoefficientD"] += new_object.moistureEquationCoefficientD
+              actual_values["CoatingLayerThickness"] += new_object.coatingLayerThickness
+              actual_values["CoatingLayerWaterVaporDiffusionResistanceFactor"] += new_object.coatingLayerWaterVaporDiffusionResistanceFactor
             end
         end
     end
@@ -262,7 +270,28 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     if not expected_values["ExposedPerimeter"].nil?
       assert_in_epsilon(expected_values["ExposedPerimeter"], actual_values["ExposedPerimeter"], 0.01)
     end
-    
+    if not expected_values["WaterVaporDiffusionResistanceFactor"].nil?
+      assert_in_epsilon(expected_values["WaterVaporDiffusionResistanceFactor"], actual_values["WaterVaporDiffusionResistanceFactor"], 0.01)
+    end
+    if not expected_values["MoistureEquationCoefficientA"].nil?
+      assert_in_epsilon(expected_values["MoistureEquationCoefficientA"], actual_values["MoistureEquationCoefficientA"], 0.01)
+    end
+    if not expected_values["MoistureEquationCoefficientB"].nil?
+      assert_in_epsilon(expected_values["MoistureEquationCoefficientB"], actual_values["MoistureEquationCoefficientB"], 0.01)
+    end
+    if not expected_values["MoistureEquationCoefficientC"].nil?
+      assert_in_epsilon(expected_values["MoistureEquationCoefficientC"], actual_values["MoistureEquationCoefficientC"], 0.01)
+    end
+    if not expected_values["MoistureEquationCoefficientD"].nil?
+      assert_in_epsilon(expected_values["MoistureEquationCoefficientD"], actual_values["MoistureEquationCoefficientD"], 0.01)
+    end
+    if not expected_values["CoatingLayerThickness"].nil?
+      assert_in_epsilon(expected_values["CoatingLayerThickness"], actual_values["CoatingLayerThickness"], 0.01)
+    end
+    if not expected_values["CoatingLayerWaterVaporDiffusionResistanceFactor"].nil?
+      assert_in_epsilon(expected_values["CoatingLayerWaterVaporDiffusionResistanceFactor"], actual_values["CoatingLayerWaterVaporDiffusionResistanceFactor"], 0.01)
+    end
+
     return model
   end
   
