@@ -8,19 +8,6 @@ require 'fileutils'
 class OutageTest < MiniTest::Test
 
   #Test Cases:
-  #Outage length is 0
-  #Outage start hour < 0
-  #Outage start hour > 24
-  #Outage start is before the run period (need run measure to be merged into master)
-  #Outage end is after the run period (need run measure to be merged into master)
-  
-  #Apply an outage that lasts more than 1 day outside of DST for buildings with everything
-  #Apply an outage that lasts exactly 1 day outside of DST for buildings with everything
-  #Apply an outage that lasts less than 1 day outside of DST for buildings with everything
-  #Apply and outage that lasts more than 1 day inside of DST for buildings with everything
-  #Apply and outage that lasts less than 1 day inside of DST for buildings with everything
-  #Apply an outage that lasts exactly 1 day inside of DST for buildings with everything
- 
   #Potential Additional Test Cases:
   #Apply the outage multiple times
   #Apply outage to a building that doesn't have everything
@@ -31,35 +18,35 @@ class OutageTest < MiniTest::Test
     args_hash = {}
     args_hash["otg_date"] = "December 31"
     args_hash["otg_len"] = 48
-    result = _test_error("example_single_family_detatched.osm", args_hash)
+    result = _test_error("example_single_family_detached.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Outage end day is after the run period ends")
   end
   
   def test_outage_len_zero
     args_hash = {}
     args_hash["otg_len"] = 0
-    result = _test_error("example_single_family_detatched.osm", args_hash)
+    result = _test_error("example_single_family_detached.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Outage must last for at least one hour")
   end
   
   def test_outage_over_one_year
     args_hash = {}
     args_hash["otg_len"] = 9000
-    result = _test_error("example_single_family_detatched.osm", args_hash)
+    result = _test_error("example_single_family_detached.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Outage can't run for longer than one year")
   end
   
   def test_outage_negative_start_hour
     args_hash = {}
     args_hash["otg_hr"] = -1
-    result = _test_error("example_single_family_detatched.osm", args_hash)
+    result = _test_error("example_single_family_detached.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Start hour must be between 0 and 24")
   end
   
   def test_outage_start_hour_over_24
     args_hash = {}
     args_hash["otg_hr"] = 25
-    result = _test_error("example_single_family_detatched.osm", args_hash)
+    result = _test_error("example_single_family_detached.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Start hour must be between 0 and 24")
   end
     
@@ -71,7 +58,7 @@ class OutageTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>20,"ScheduleDay"=>20}
     expected_values = {}
-    _test_measure("example_single_family_detatched.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("example_single_family_detached.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_outage_one_day_dst
@@ -82,7 +69,7 @@ class OutageTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>40,"ScheduleDay"=>40}
     expected_values = {}
-    _test_measure("example_single_family_detatched.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("example_single_family_detached.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
     
   def test_outage_more_than_one_day_dst
@@ -104,7 +91,7 @@ class OutageTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>20,"ScheduleDay"=>20}
     expected_values = {}
-    _test_measure("example_single_family_detatched.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("example_single_family_detached.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_outage_one_day
@@ -115,7 +102,7 @@ class OutageTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>40,"ScheduleDay"=>40}
     expected_values = {}
-    _test_measure("example_single_family_detatched.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("example_single_family_detached.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_outage_more_than_one_day
@@ -126,7 +113,7 @@ class OutageTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>60,"ScheduleDay"=>60}
     expected_values = {}
-    _test_measure("example_single_family_detatched.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("example_single_family_detached.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   private
