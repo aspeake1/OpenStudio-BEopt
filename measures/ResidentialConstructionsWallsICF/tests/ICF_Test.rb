@@ -14,14 +14,14 @@ class ProcessConstructionsWallsICFTest < MiniTest::Test
     args_hash["concrete_thick_in"] = 4
     args_hash["framing_factor"] = 0.076
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4, "MaterialPropertyMoisturePenetrationDepthSettings"=>2}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
     form_r = 0.0508/0.031022613770522
     concrete_r = 0.1016/1.2205135596000003
     assembly_r = ext_finish_r + osb_r + drywall_r + form_r * 2 + concrete_r
-    expected_values = {"AssemblyR"=>assembly_r}
+    expected_values = {"AssemblyR"=>assembly_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor+150, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA+0.0069, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB+0.9066, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC+0.0404, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD+22.1121, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness+0, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor+0}
     _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -32,18 +32,19 @@ class ProcessConstructionsWallsICFTest < MiniTest::Test
     args_hash["concrete_thick_in"] = 12
     args_hash["framing_factor"] = 0.076
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_num_new_objects = {"Material"=>7, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4, "MaterialPropertyMoisturePenetrationDepthSettings"=>2}
     ext_finish_r = 0.009525/0.089435
     osb_r = 0.0127/0.1154577
     drywall_r = 0.0127/0.1602906
     form_r = 0.0508/0.0291485667045774
     concrete_r = 0.3048/1.2205135596
     assembly_r = ext_finish_r + osb_r + drywall_r + form_r * 2 + concrete_r
-    expected_values = {"AssemblyR"=>assembly_r}
+    expected_values = {"AssemblyR"=>assembly_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor+150, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA+0.0069, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB+0.9066, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC+0.0404, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD+22.1121, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness+0, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor+0}
     model = _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # Replace
     expected_num_del_objects = {"Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
     expected_num_new_objects = {"Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_values = {"AssemblyR"=>assembly_r}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -58,14 +59,14 @@ class ProcessConstructionsWallsICFTest < MiniTest::Test
     args_hash["rigid_r"] = 10
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>8, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_num_new_objects = {"Material"=>8, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4, "MaterialPropertyMoisturePenetrationDepthSettings"=>2}
     ext_finish_r = 0.1016/0.793375
     drywall_r = 0.0254/0.1602906
     form_r = 0.0508/0.0291461022171113
     concrete_r = 0.3048/1.2205135596
     rigid_r = 0.0508/0.02885
     assembly_r = ext_finish_r + rigid_r + drywall_r + form_r * 2 + concrete_r
-    expected_values = {"AssemblyR"=>assembly_r}
+    expected_values = {"AssemblyR"=>assembly_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Gypsum.waterVaporDiffusionResistanceFactor+150, "MoistureEquationCoefficientA"=>BaseMaterial.Gypsum.moistureEquationCoefficientA+0.0069, "MoistureEquationCoefficientB"=>BaseMaterial.Gypsum.moistureEquationCoefficientB+0.9066, "MoistureEquationCoefficientC"=>BaseMaterial.Gypsum.moistureEquationCoefficientC+0.0404, "MoistureEquationCoefficientD"=>BaseMaterial.Gypsum.moistureEquationCoefficientD+22.1121, "CoatingLayerThickness"=>BaseMaterial.Gypsum.coatingLayerThickness+0, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Gypsum.coatingLayerWaterVaporDiffusionResistanceFactor+0}
     _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -215,7 +216,7 @@ class ProcessConstructionsWallsICFTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"AssemblyR"=>0}
+    actual_values = {"AssemblyR"=>0, "WaterVaporDiffusionResistanceFactor"=>0, "MoistureEquationCoefficientA"=>0, "MoistureEquationCoefficientB"=>0, "MoistureEquationCoefficientC"=>0, "MoistureEquationCoefficientD"=>0, "CoatingLayerThickness"=>0, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -226,10 +227,21 @@ class ProcessConstructionsWallsICFTest < MiniTest::Test
                     material = layer.to_StandardOpaqueMaterial.get
                     actual_values["AssemblyR"] += material.thickness/material.conductivity
                 end
+            elsif obj_type == "MaterialPropertyMoisturePenetrationDepthSettings"
+              actual_values["WaterVaporDiffusionResistanceFactor"] += new_object.waterVaporDiffusionResistanceFactor
+              actual_values["MoistureEquationCoefficientA"] += new_object.moistureEquationCoefficientA
+              actual_values["MoistureEquationCoefficientB"] += new_object.moistureEquationCoefficientB
+              actual_values["MoistureEquationCoefficientC"] += new_object.moistureEquationCoefficientC
+              actual_values["MoistureEquationCoefficientD"] += new_object.moistureEquationCoefficientD
+              actual_values["CoatingLayerThickness"] += new_object.coatingLayerThickness
+              actual_values["CoatingLayerWaterVaporDiffusionResistanceFactor"] += new_object.coatingLayerWaterVaporDiffusionResistanceFactor
             end
         end
     end
-    assert_in_epsilon(expected_values["AssemblyR"], actual_values["AssemblyR"], 0.01)
+    actual_values.each do |prop, val|
+      next if expected_values[prop].nil?
+      assert_in_epsilon(expected_values[prop], actual_values[prop], 0.01)  
+    end
     
     return model
   end
