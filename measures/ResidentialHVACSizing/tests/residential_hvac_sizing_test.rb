@@ -110,7 +110,6 @@ class ProcessHVACSizingTest < MiniTest::Test
   end
 
   def test_loads_2story_crawlspace_garage_finished_attic
-    skip # FIXME: Sometimes fails?
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -119,9 +118,28 @@ class ProcessHVACSizingTest < MiniTest::Test
                       }
     _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
+  
+  def test_loads_2story_crawlspace_garage_finished_attic_skylights
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+                      }
+    _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA_Skylights.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end
+
+  def test_loads_2story_crawlspace_garage_flat_roof_skylights
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+                      }
+    _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FlatRoof_Skylights.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end
 
   def test_loads_2story_crawlspace_garage_finished_attic_ducts_in_crawl
-    skip # FIXME: Sometimes fails?
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -132,7 +150,6 @@ class ProcessHVACSizingTest < MiniTest::Test
   end
 
   def test_loads_2story_crawlspace_garage_finished_attic_ducts_in_living
-    skip # FIXME: Sometimes fails?
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -143,7 +160,6 @@ class ProcessHVACSizingTest < MiniTest::Test
   end
 
   def test_loads_2story_crawlspace_garage_finished_attic_ducts_in_garage
-    skip # FIXME: Fails until we update HVAC sizing for Kiva changes
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -154,7 +170,6 @@ class ProcessHVACSizingTest < MiniTest::Test
   end
 
   def test_loads_2story_slab_garage_finished_attic
-    skip # FIXME: if we remove this skip, our Heat Floors=3250 causes test to fail
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -705,6 +720,9 @@ class ProcessHVACSizingTest < MiniTest::Test
   private
 
   def _test_error(osm_file_or_model, args_hash)
+
+    print_debug_info = false # set to true for more detailed output
+
     # create an instance of the measure
     measure = ProcessHVACSizing.new
 
@@ -729,6 +747,10 @@ class ProcessHVACSizingTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+
+    if print_debug_info
+      show_output(result)
+    end
 
     # assert that it didn't run
     assert_equal("Fail", result.value.valueName)
