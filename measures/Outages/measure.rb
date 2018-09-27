@@ -75,14 +75,17 @@ class ProcessPowerOutage < OpenStudio::Measure::ModelMeasure
         #Check for valid inputs
         if otg_hr < 0 or otg_hr > 24
             runner.registerError("Start hour must be between 0 and 24")
+            return false
         end
         
         if otg_len == 0
             runner.registerError("Outage must last for at least one hour")
+            return false
         end
         
         if otg_len > 8760
             runner.registerError("Outage can't run for longer than one year")
+            return false
         end
         
         begin
@@ -102,8 +105,6 @@ class ProcessPowerOutage < OpenStudio::Measure::ModelMeasure
         end
         
         startday_m = [0, 31, 59+leap_offset, 90+leap_offset, 120+leap_offset, 151+leap_offset, 181+leap_offset, 212+leap_offset, 243+leap_offset, 273+leap_offset, 304+leap_offset, 334+leap_offset, 365+leap_offset]
-        
-        
 
         #calculate how many days the outage goes on for, the hour it starts on the first day and the hour it ends on the last day
         otg_num_days = 0
@@ -114,9 +115,7 @@ class ProcessPowerOutage < OpenStudio::Measure::ModelMeasure
         
         otg_num_days += (otg_len.to_i - 1) / 24
         otg_end_hr = (otg_hr + otg_len) % 24
-        
 
-        
         m_idx = 0
         for m in months
             if m == otg_start_date_month
@@ -134,10 +133,13 @@ class ProcessPowerOutage < OpenStudio::Measure::ModelMeasure
         #runner.registerInfo("run_period_start_month = #{run_period_start_month}, run_period_start_day = #{run_period_start_day}, run_period_end_month = #{run_period_end_month}, run_period_end_day = #{run_period_end_day}")
 
         if otg_start_date_day < run_period_start_day
-            runner.RegisterError("Outage start day is before the run period start")
+            runner.registerError("Outage start day is before the run period start")
+            return false
         elsif otg_end_date_day > run_period_end_day
-            runner.RegisterError("Outage end day is after the run period ends")
+            runner.registerError("Outage end day is after the run period ends")
+            return false
         end
+        
         assumedYear = year_description.assumedYear # prevent excessive OS warnings about 'UseWeatherFile'
         otg_start_date = OpenStudio::Date::fromDayOfYear(otg_start_date_day,assumedYear)
         otg_end_date = OpenStudio::Date::fromDayOfYear(otg_end_date_day,assumedYear)
@@ -154,7 +156,7 @@ class ProcessPowerOutage < OpenStudio::Measure::ModelMeasure
         
         model.getScheduleRulesets.each do |schedule|
             if schedule.name.to_s.include? "shading" or schedule.name.to_s.include? "Schedule Ruleset" or schedule.name.to_s.include? Constants.ObjectNameOccupants
-                runner.registerInfo("Outage NOT applied to #{schedule.name.to_s}!")
+                #runner.registerInfo("Outage NOT applied to #{schedule.name.to_s}!")
             else
                 if schedule.name.to_s.include? Constants.ObjectNameHeatingSetpoint 
                     otg_val = Constants.NoHeatingSetpoint
@@ -163,7 +165,7 @@ class ProcessPowerOutage < OpenStudio::Measure::ModelMeasure
                 else
                     otg_val = 0
                 end
-                runner.registerInfo("Outage applied to #{schedule.name.to_s}!")
+                #runner.registerInfo("Outage applied to #{schedule.name.to_s}!")
                 if otg_num_days == 0
                     otg_rule = OpenStudio::Model::ScheduleRule.new(schedule)
                     otg_rule.setName("#{schedule.name.to_s}" + "_outage_day_#{otg_start_date_day}")
