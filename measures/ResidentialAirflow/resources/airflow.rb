@@ -6,6 +6,7 @@ require "#{File.dirname(__FILE__)}/util"
 require "#{File.dirname(__FILE__)}/psychrometrics"
 require "#{File.dirname(__FILE__)}/unit_conversions"
 require "#{File.dirname(__FILE__)}/hvac"
+require "#{File.dirname(__FILE__)}/constructions"
 
 class Airflow
 

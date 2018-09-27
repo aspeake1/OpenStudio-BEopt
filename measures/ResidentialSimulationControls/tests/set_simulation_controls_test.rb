@@ -29,8 +29,8 @@ class ResidentialSimulationControlsTest < MiniTest::Test
     args_hash = {}
     args_hash["timesteps_per_hr"] = "4"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "RunPeriod"=>1}
-    expected_values = {"TimestepsPerHour"=>args_hash["timesteps_per_hr"].to_i, "BeginMonth"=>1, "BeginDayOfMonth"=>1, "EndMonth"=>12, "EndDayOfMonth"=>31}
+    expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "RunPeriod"=>1, "HeatBalanceAlgorithm"=>1}
+    expected_values = {"TimestepsPerHour"=>args_hash["timesteps_per_hr"].to_i, "BeginMonth"=>1, "BeginDayOfMonth"=>1, "EndMonth"=>12, "EndDayOfMonth"=>31, "Algorithm"=>"MoisturePenetrationDepthConductionTransferFunction"}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
   end
 
@@ -57,8 +57,8 @@ class ResidentialSimulationControlsTest < MiniTest::Test
     args_hash["begin_month"] = "3"
     args_hash["end_month"] = "3"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "RunPeriod"=>1}
-    expected_values = {"TimestepsPerHour"=>6, "BeginMonth"=>args_hash["begin_month"].to_i, "BeginDayOfMonth"=>1, "EndMonth"=>args_hash["end_month"].to_i, "EndDayOfMonth"=>31}
+    expected_num_new_objects = {"SimulationControl"=>1, "Timestep"=>1, "ShadowCalculation"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "RunPeriod"=>1, "HeatBalanceAlgorithm"=>1}
+    expected_values = {"TimestepsPerHour"=>6, "BeginMonth"=>args_hash["begin_month"].to_i, "BeginDayOfMonth"=>1, "EndMonth"=>args_hash["end_month"].to_i, "EndDayOfMonth"=>31, "Algorithm"=>"MoisturePenetrationDepthConductionTransferFunction"}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
   end
   
@@ -160,6 +160,8 @@ class ResidentialSimulationControlsTest < MiniTest::Test
                 assert_in_epsilon(expected_values["BeginDayOfMonth"], new_object.getBeginDayOfMonth, 0.01)
                 assert_in_epsilon(expected_values["EndMonth"], new_object.getEndMonth, 0.01)
                 assert_in_epsilon(expected_values["EndDayOfMonth"], new_object.getEndDayOfMonth, 0.01)
+            elsif obj_type == "HeatBalanceAlgorithm"
+                assert_equal(expected_values["Algorithm"], new_object.algorithm)
             end
         end
     end

@@ -58,10 +58,10 @@ class HelperMethods
                 runner.registerInfo("Removed material '#{resource.name}' because it was orphaned.")
                 resource.remove
             elsif resource.directUseCount == 1 and resource.materialPropertyMoisturePenetrationDepthSettings.is_initialized
-              runner.registerInfo("Removed moisture penetration depth settings from '#{resource.name}'.")
-              resource.materialPropertyMoisturePenetrationDepthSettings.get.remove
-              runner.registerInfo("Removed material '#{resource.name}' because it was orphaned.")
-              resource.remove
+                runner.registerInfo("Removed moisture penetration depth settings from '#{resource.name}'.")
+                resource.materialPropertyMoisturePenetrationDepthSettings.get.remove
+                runner.registerInfo("Removed material '#{resource.name}' because it was orphaned.")
+                resource.remove
             end
         end
     end
