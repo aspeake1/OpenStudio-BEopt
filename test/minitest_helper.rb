@@ -63,11 +63,6 @@ def get_objects(model)
     objects = []
     model.modelObjects.each do |obj|
         obj_type = get_model_object_type(obj)
-        if obj_type == "BuildingUnit"
-          # Skip units with no spaces (i.e., the weather "unit")
-          building_unit = obj.public_send("to_#{obj_type}").get
-          next if building_unit.spaces.size == 0
-        end
         if ["AdditionalProperties","YearDescription"].include? obj_type
           next # Remove this eventually?
         end

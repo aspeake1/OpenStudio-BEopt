@@ -369,7 +369,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
         model.getAirConditionerVariableRefrigerantFlows.each do |vrf|
           vrf.terminals.each do |terminal|
             next unless thermal_zone == terminal.thermalZone.get
-            is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump(vrf))
+            is_ducted = vrf.additionalProperties.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
             if is_ducted.is_initialized
               is_ducted = is_ducted.get
             end

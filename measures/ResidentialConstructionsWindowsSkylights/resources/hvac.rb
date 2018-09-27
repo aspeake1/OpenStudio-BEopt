@@ -135,9 +135,9 @@ class HVAC
         end # slave_zone
       
         # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(air_loop_unitary), cfms_ton_rated.join(","))
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(air_loop_unitary), frac_cool_load_served)
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated.join(","))
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
 
       end # control_zone
       
@@ -281,10 +281,10 @@ class HVAC
         end # slave_zone
       
         # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(air_loop_unitary), capacity_ratios.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(air_loop_unitary), cfms_ton_rated.join(","))
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(air_loop_unitary), frac_cool_load_served)
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios.join(","))
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated.join(","))
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
 
       end # control_zone
       
@@ -430,10 +430,10 @@ class HVAC
         end # slave_zone
       
         # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(air_loop_unitary), capacity_ratios.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(air_loop_unitary), cfms_ton_rated.join(","))
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(air_loop_unitary), frac_cool_load_served)
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios.join(","))
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated.join(","))
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
 
       end # control_zone
       
@@ -685,13 +685,13 @@ class HVAC
         end # slave_zone
 
         # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(clg_air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(htg_air_loop_unitary), cop_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_air_loop_unitary), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating(htg_air_loop_unitary), cfms_ton_rated_heating.join(","))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(clg_air_loop_unitary), cfms_ton_rated_cooling.join(","))
-        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_air_loop_unitary), frac_heat_load_served)
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_air_loop_unitary), frac_cool_load_served)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP, cop_capacity_derates.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHPSizedForMaxLoad, (heat_pump_capacity == Constants.SizingAutoMaxLoad))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating, cfms_ton_rated_heating.join(","))
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated_cooling.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
       
       end # control_zone
     
@@ -962,14 +962,14 @@ class HVAC
         end # slave_zone
 
         # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(clg_air_loop_unitary), capacity_ratios.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(clg_air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(htg_air_loop_unitary), cop_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_air_loop_unitary), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating(htg_air_loop_unitary), cfms_ton_rated_heating.join(","))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(clg_air_loop_unitary), cfms_ton_rated_cooling.join(","))
-        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_air_loop_unitary), frac_heat_load_served)
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_air_loop_unitary), frac_cool_load_served)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios.join(","))
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP, cop_capacity_derates.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHPSizedForMaxLoad, (heat_pump_capacity == Constants.SizingAutoMaxLoad))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating, cfms_ton_rated_heating.join(","))
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated_cooling.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
       
       end # control_zone
     
@@ -1245,14 +1245,14 @@ class HVAC
         end # slave_zone
       
         # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(clg_air_loop_unitary), capacity_ratios.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER(clg_air_loop_unitary), eer_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP(htg_air_loop_unitary), cop_capacity_derates.join(","))
-        unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_air_loop_unitary), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating(htg_air_loop_unitary), cfms_ton_rated_heating.join(","))
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(clg_air_loop_unitary), cfms_ton_rated_cooling.join(","))
-        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_air_loop_unitary), frac_heat_load_served)
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_air_loop_unitary), frac_cool_load_served)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios.join(","))
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP, cop_capacity_derates.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHPSizedForMaxLoad, (heat_pump_capacity == Constants.SizingAutoMaxLoad))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating, cfms_ton_rated_heating.join(","))
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated_cooling.join(","))
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
 
       end # control_zone
       
@@ -1478,20 +1478,18 @@ class HVAC
             
             prioritize_zone_hvac(model, runner, zone)
 
-            # Store is_ducted bool
-            unit.setFeature(Constants.DuctedInfoMiniSplitHeatPump(vrf), is_ducted)
-            
             # Store info for HVAC Sizing measure
-            unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling(clg_tu_vrf), capacity_ratios_cooling.join(","))
-            unit.setFeature(Constants.SizingInfoHVACCapacityRatioHeating(htg_tu_vrf), capacity_ratios_heating.join(","))
-            unit.setFeature(Constants.SizingInfoHVACCoolingCFMs(clg_tu_vrf), cfms_cooling.join(","))
-            unit.setFeature(Constants.SizingInfoHVACHeatingCFMs(htg_tu_vrf), cfms_heating.join(","))
-            unit.setFeature(Constants.SizingInfoHVACHeatingCapacityOffset(htg_tu_vrf), heating_capacity_offset)
-            unit.setFeature(Constants.SizingInfoHPSizedForMaxLoad(htg_tu_vrf), (heat_pump_capacity == Constants.SizingAutoMaxLoad))
-            unit.setFeature(Constants.SizingInfoHVACSHR(clg_tu_vrf), shrs_rated.join(","))
-            unit.setFeature(Constants.SizingInfoMSHPIndices(vrf), mshp_indices.join(","))
-            unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_tu_vrf), frac_heat_load_served)
-            unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_tu_vrf), frac_cool_load_served)
+            vrf.additionalProperties.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
+            clg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios_cooling.join(","))
+            htg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioHeating, capacity_ratios_heating.join(","))
+            clg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHVACCoolingCFMs, cfms_cooling.join(","))
+            htg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHVACHeatingCFMs, cfms_heating.join(","))
+            htg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHVACHeatingCapacityOffset, heating_capacity_offset)
+            htg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHPSizedForMaxLoad, (heat_pump_capacity == Constants.SizingAutoMaxLoad))
+            clg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHVACSHR, shrs_rated.join(","))
+            vrf.additionalProperties.setFeature(Constants.SizingInfoMSHPIndices, mshp_indices.join(","))
+            htg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
+            clg_tu_vrf.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
         
         end
         
@@ -1868,19 +1866,19 @@ class HVAC
         end        
       
         # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACSHR(clg_air_loop_unitary), shr.to_s)
-        unit.setFeature(Constants.SizingInfoGSHPCoil_BF_FT_SPEC(clg_air_loop_unitary), cOIL_BF_FT_SPEC.join(","))
-        unit.setFeature(Constants.SizingInfoGSHPCoilBF(clg_air_loop_unitary), coilBF)
-        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_air_loop_unitary), frac_heat_load_served)
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(clg_air_loop_unitary), frac_cool_load_served)
-        unit.setFeature(Constants.SizingInfoGSHPBoreSpacing(clg_air_loop_unitary), bore_spacing)
-        unit.setFeature(Constants.SizingInfoGSHPBoreHoles(clg_air_loop_unitary), bore_holes)
-        unit.setFeature(Constants.SizingInfoGSHPBoreDepth(clg_air_loop_unitary), bore_depth)
-        unit.setFeature(Constants.SizingInfoGSHPBoreConfig(clg_air_loop_unitary), bore_config)
-        unit.setFeature(Constants.SizingInfoGSHPUTubeSpacingType(clg_air_loop_unitary), u_tube_spacing_type)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACSHR, shr.to_s)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoGSHPCoil_BF_FT_SPEC, cOIL_BF_FT_SPEC.join(","))
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoGSHPCoilBF, coilBF)
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoGSHPBoreSpacing, bore_spacing)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoGSHPBoreHoles, bore_holes)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoGSHPBoreDepth, bore_depth)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoGSHPBoreConfig, bore_config)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoGSHPUTubeSpacingType, u_tube_spacing_type)
 
       end
-
+      
       return true
     end
     
@@ -1952,9 +1950,9 @@ class HVAC
         end # slave_zone
       
         # Store info for HVAC Sizing measure
-        unit.setFeature(Constants.SizingInfoHVACCoolingCFMs(ptac), airflow_rate.to_s)
-        unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling(ptac), cfms_ton_rated.join(","))
-        unit.setFeature(Constants.SizingInfoHVACFracCoolLoadServed(ptac), frac_cool_load_served)
+        ptac.additionalProperties.setFeature(Constants.SizingInfoHVACCoolingCFMs, airflow_rate.to_s)
+        ptac.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_ton_rated.join(","))
+        ptac.additionalProperties.setFeature(Constants.SizingInfoHVACFracCoolLoadServed, frac_cool_load_served)
 
       end # control_zone
       
@@ -2068,7 +2066,7 @@ class HVAC
         
         end
 
-        unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(air_loop_unitary), frac_heat_load_served)
+        air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
       
       end
     
@@ -2257,7 +2255,7 @@ class HVAC
       end
 
       # Store info for HVAC Sizing measure
-      unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(boiler), frac_heat_load_served)
+      boiler.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
       
       return true
     end
@@ -2286,7 +2284,7 @@ class HVAC
           prioritize_zone_hvac(model, runner, zone)
 
           # Store info for HVAC Sizing measure
-          unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(htg_coil), frac_heat_load_served)
+          htg_coil.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
           
         end
         
@@ -2363,8 +2361,8 @@ class HVAC
           prioritize_zone_hvac(model, runner, zone)
 
           # Store info for HVAC Sizing measure
-          unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating(unitary_system), airflow_rate.to_s)
-          unit.setFeature(Constants.SizingInfoHVACFracHeatLoadServed(unitary_system), frac_heat_load_served)
+          unitary_system.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating, airflow_rate.to_s)
+          unitary_system.additionalProperties.setFeature(Constants.SizingInfoHVACFracHeatLoadServed, frac_heat_load_served)
           
         end
       
@@ -4147,7 +4145,7 @@ class HVAC
         model.getAirConditionerVariableRefrigerantFlows.each do |vrf|
           vrf.terminals.each do |terminal|
             next unless thermal_zone.handle.to_s == terminal.thermalZone.get.handle.to_s
-            is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump(vrf)).get
+            is_ducted = vrf.additionalProperties.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump).get
             return is_ducted
           end
         end
