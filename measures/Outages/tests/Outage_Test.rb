@@ -22,6 +22,22 @@ class OutageTest < MiniTest::Test
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Outage end day is after the run period ends")
   end
   
+  def test_outage_starts_before_run_period
+    args_hash = {}
+    args_hash["otg_date"] = "January 30"
+    args_hash["otg_len"] = 48
+    result = _test_error("example_single_family_detached_FebruaryRunPeriod.osm", args_hash)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Outage start day is before the run period start")
+  end
+  
+  def test_outage_ends_after_run_period
+    args_hash = {}
+    args_hash["otg_date"] = "February 28"
+    args_hash["otg_len"] = 48
+    result = _test_error("example_single_family_detached_FebruaryRunPeriod.osm", args_hash)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Outage end day is after the run period ends")
+  end
+  
   def test_outage_len_zero
     args_hash = {}
     args_hash["otg_len"] = 0
@@ -80,7 +96,7 @@ class OutageTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>60,"ScheduleDay"=>60}
     expected_values = {}
-    _test_measure("example_single_family_detatched.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("example_single_family_detached.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_outage_less_than_one_day
