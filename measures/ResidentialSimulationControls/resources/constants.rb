@@ -246,20 +246,23 @@ class Constants
     return 'wood'
   end
   def self.LoadVarsSpaceHeating
-    return ['Heating Coil Total Heating Energy',
-            'Heating Coil Air Heating Energy',
-            'Boiler Heating Energy',
-            'Baseboard Total Heating Energy',
-            'Heating Coil Heating Energy',
-            'Zone Ideal Loads Zone Total Heating Energy']
+    return {'OpenStudio::Model::CoilHeatingDXSingleSpeed' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::CoilHeatingDXMultiSpeed' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::CoilHeatingElectric' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::CoilHeatingGas' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::ZoneHVACBaseboardConvectiveElectric' => ['Baseboard Total Heating Energy'],
+            'OpenStudio::Model::ZoneHVACBaseboardConvectiveWater' => ['Baseboard Total Heating Energy'],
+            'OpenStudio::Model::CoilHeatingWaterToAirHeatPumpEquationFit' => ['Heating Coil Heating Energy']}
   end
   def self.LoadVarsSpaceCooling
-    return ['Cooling Coil Sensible Cooling Energy',
-            'Cooling Coil Latent Cooling Energy',
-            'Zone Ideal Loads Zone Total Cooling Energy']
+    return {'OpenStudio::Model::CoilCoolingDXSingleSpeed' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
+            'OpenStudio::Model::CoilCoolingDXMultiSpeed' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
+            'OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
+            'OpenStudio::Model::CoilCoolingWaterToAirHeatPumpEquationFit' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy']}
   end
   def self.LoadVarsWaterHeating
-    return ['Water Use Connections Plant Hot Water Energy']
+    return {nil => ['Water Use Connections Plant Hot Water Energy']}
   end
   def self.LocationInterior
     return 'interior'
@@ -785,28 +788,25 @@ class Constants
   def self.SizingInfoCMUWallFurringInsRvalue
     return __method__.to_s
   end
-  def self.SizingInfoDuctsLocationFrac
-    return __method__.to_s
-  end
   def self.SizingInfoDuctsLocationZone
     return __method__.to_s
   end
-  def self.SizingInfoDuctsReturnLoss
+  def self.SizingInfoDuctsReturnLeakage
     return __method__.to_s
   end
   def self.SizingInfoDuctsReturnRvalue
     return __method__.to_s
   end
-  def self.SizingInfoDuctsReturnSurfaceArea
+  def self.SizingInfoDuctsReturnArea
     return __method__.to_s
   end
-  def self.SizingInfoDuctsSupplyLoss
+  def self.SizingInfoDuctsSupplyLeakage
     return __method__.to_s
   end
   def self.SizingInfoDuctsSupplyRvalue
     return __method__.to_s
   end
-  def self.SizingInfoDuctsSupplySurfaceArea
+  def self.SizingInfoDuctsSupplyArea
     return __method__.to_s
   end
   def self.SizingInfoGSHPBoreConfig

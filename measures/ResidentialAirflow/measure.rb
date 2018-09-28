@@ -372,14 +372,6 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     duct_ah_return_frac.setDefaultValue(0.267)
     args << duct_ah_return_frac
 
-    # #make a string argument for norm leakage to outside
-    # duct_norm_leakage_25pa = OpenStudio::Measure::OSArgument::makeStringArgument("duct_norm_leakage_25pa", true)
-    # duct_norm_leakage_25pa.setDisplayName("Ducts: Leakage to Outside at 25Pa")
-    # duct_norm_leakage_25pa.setUnits("cfm/100 ft^2 Finished Floor")
-    # duct_norm_leakage_25pa.setDescription("Normalized leakage to the outside when tested at a pressure differential of 25 Pascals (0.1 inches w.g.) across the system.")
-    # duct_norm_leakage_25pa.setDefaultValue("NA")
-    # args << duct_norm_leakage_25pa
-
     #make a string argument for duct location frac
     duct_location_frac = OpenStudio::Measure::OSArgument::makeStringArgument("duct_location_frac", true)
     duct_location_frac.setDisplayName("Ducts: Location Fraction")
@@ -486,23 +478,53 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     # Ducts
     duct_location = runner.getStringArgumentValue("duct_location",user_arguments)
     duct_total_leakage = runner.getDoubleArgumentValue("duct_total_leakage",user_arguments)
-    duct_supply_frac = runner.getDoubleArgumentValue("duct_supply_frac",user_arguments)
-    duct_return_frac = runner.getDoubleArgumentValue("duct_return_frac",user_arguments)
-    duct_ah_supply_frac = runner.getDoubleArgumentValue("duct_ah_supply_frac",user_arguments)
-    duct_ah_return_frac = runner.getDoubleArgumentValue("duct_ah_return_frac",user_arguments)
-    # duct_norm_leakage_25pa = runner.getStringArgumentValue("duct_norm_leakage_25pa",user_arguments)
-    duct_norm_leakage_25pa = "NA"
-    unless duct_norm_leakage_25pa == "NA"
-      duct_norm_leakage_25pa = duct_norm_leakage_25pa.to_f
-    else
-      duct_norm_leakage_25pa = nil
-    end
+    duct_supply_leakage_frac_of_total = runner.getDoubleArgumentValue("duct_supply_frac",user_arguments)
+    duct_return_leakage_frac_of_total = runner.getDoubleArgumentValue("duct_return_frac",user_arguments)
+    duct_ah_supply_leakage_frac_of_total = runner.getDoubleArgumentValue("duct_ah_supply_frac",user_arguments)
+    duct_ah_return_leakage_frac_of_total = runner.getDoubleArgumentValue("duct_ah_return_frac",user_arguments)
     duct_location_frac = runner.getStringArgumentValue("duct_location_frac",user_arguments)
     duct_num_returns = runner.getStringArgumentValue("duct_num_returns",user_arguments)
     duct_supply_area_mult = runner.getDoubleArgumentValue("duct_supply_area_mult",user_arguments)
     duct_return_area_mult = runner.getDoubleArgumentValue("duct_return_area_mult",user_arguments)
     duct_r = runner.getDoubleArgumentValue("duct_r",user_arguments)
-
+    
+    # Building unit ffa & nstories
+    units = Geometry.get_building_units(model, runner)
+    if units.nil?
+      return false
+    end
+    unit_ffas = []
+    unit_nstories = []
+    units.each_with_index do |unit, unit_index|
+      unit_ffas << Float(Integer(Geometry.get_finished_floor_area_from_spaces(unit.spaces, false, runner)))
+      unit_nstories << Geometry.get_building_stories(unit.spaces)
+    end
+    unit_ffa = unit_ffas.inject(:+) / unit_ffas.size
+    unit_nstory = unit_nstories.inject(:+) / unit_nstories.size
+    
+    # Duct calculations
+    num_returns = get_duct_num_returns(duct_num_returns, unit_nstory)
+    duct_supply_area = get_duct_supply_surface_area(duct_supply_area_mult, unit_ffa, unit_nstory)
+    duct_return_area = get_duct_return_surface_area(duct_return_area_mult, unit_ffa, unit_nstory, num_returns)
+    
+    # Normalize duct leakage frac of total values in case they don't add up to 1
+    sum_fracs = duct_supply_leakage_frac_of_total + duct_ah_supply_leakage_frac_of_total + duct_return_leakage_frac_of_total + duct_ah_return_leakage_frac_of_total
+    if sum_fracs > 0
+      duct_supply_leakage_frac_of_total = duct_supply_leakage_frac_of_total / sum_fracs
+      duct_ah_supply_leakage_frac_of_total = duct_ah_supply_leakage_frac_of_total / sum_fracs
+      duct_return_leakage_frac_of_total = duct_return_leakage_frac_of_total / sum_fracs
+      duct_ah_return_leakage_frac_of_total = duct_ah_return_leakage_frac_of_total / sum_fracs
+    end
+    
+    # Calculate total supply/return fractions of airflow
+    duct_supply_leakage_frac = duct_total_leakage * (duct_supply_leakage_frac_of_total + duct_ah_supply_leakage_frac_of_total)
+    duct_return_leakage_frac = duct_total_leakage * (duct_return_leakage_frac_of_total + duct_ah_return_leakage_frac_of_total)
+    
+    # Adjust supply surface area and leakage based on duct_location_frac
+    duct_location_frac = get_duct_location_frac(duct_location_frac, unit_nstory)
+    duct_supply_area *= duct_location_frac
+    duct_supply_leakage_frac -= duct_supply_leakage_frac_of_total * duct_total_leakage * (1.0 - duct_location_frac)
+    
     Airflow.remove(model, 
                    Constants.ObjectNameAirflow, 
                    Constants.ObjectNameNaturalVentilation, 
@@ -515,7 +537,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     infil = Infiltration.new(living_ach50, nil, shelter_coef, garage_ach50, crawl_ach, unfinished_attic_sla, nil, unfinished_basement_ach, finished_basement_ach, pier_beam_ach, has_flue_chimney, is_existing_home, terrain)
     mech_vent = MechanicalVentilation.new(mech_vent_type, mech_vent_infil_credit, mech_vent_total_efficiency, mech_vent_frac_62_2, nil, mech_vent_fan_power, mech_vent_sensible_efficiency, mech_vent_ashrae_std, mech_vent_cfis_open_time, mech_vent_cfis_airflow_frac, clothes_dryer_exhaust, range_exhaust, range_exhaust_hour, bathroom_exhaust, bathroom_exhaust_hour)
     nat_vent = NaturalVentilation.new(nat_vent_htg_offset, nat_vent_clg_offset, nat_vent_ovlp_offset, nat_vent_htg_season, nat_vent_clg_season, nat_vent_ovlp_season, nat_vent_num_weekdays, nat_vent_num_weekends, nat_vent_frac_windows_open, nat_vent_frac_window_area_openable, nat_vent_max_oa_hr, nat_vent_max_oa_rh)
-    ducts = Ducts.new(duct_total_leakage, duct_norm_leakage_25pa, duct_supply_area_mult, duct_return_area_mult, duct_r, duct_supply_frac, duct_return_frac, duct_ah_supply_frac, duct_ah_return_frac, duct_location_frac, duct_num_returns, duct_location)
+    ducts = Ducts.new(duct_supply_leakage_frac, duct_return_leakage_frac, duct_supply_area, duct_return_area, duct_r, duct_r, duct_location)
     
     if not Airflow.apply(model, runner, infil, mech_vent, nat_vent, ducts, File.dirname(__FILE__))
       return false
@@ -523,6 +545,48 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
     return true
 
+  end
+  
+  def get_duct_supply_surface_area(mult, ffa, num_stories)
+    # Duct Surface Areas per 2010 BA Benchmark
+    if num_stories == 1
+      return 0.27 * ffa * mult # ft^2
+    else
+      return 0.2 * ffa * mult
+    end
+  end
+  
+  def get_duct_return_surface_area(mult, ffa, num_stories, num_returns)
+    # Duct Surface Areas per 2010 BA Benchmark
+    if num_stories == 1
+      return [0.05 * num_returns * ffa, 0.25 * ffa].min * mult
+    else
+      return [0.04 * num_returns * ffa, 0.19 * ffa].min * mult
+    end
+  end
+  
+  def get_duct_num_returns(num_returns, num_stories)
+    if num_returns.nil?
+      return 0
+    elsif num_returns == Constants.Auto
+      # Duct Number Returns per 2010 BA Benchmark Addendum
+      return 1 + num_stories
+    end
+    return num_returns.to_i
+  end  
+  
+  def get_duct_location_frac(location_frac, stories)
+    if location_frac == Constants.Auto
+      # Duct location fraction per 2010 BA Benchmark
+      if stories == 1
+        location_frac_leakage = 1
+      else
+        location_frac_leakage = 0.65
+      end
+    else
+      location_frac_leakage = location_frac.to_f
+    end
+    return location_frac_leakage
   end
 
 end

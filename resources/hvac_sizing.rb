@@ -1626,8 +1626,8 @@ class HVACSizing
         dse_h_Return_Cooling = (1.006 * UnitConversions.convert(dse_Tamb_cooling, "F", "C") + weather.design.CoolingHumidityRatio * (2501 + 1.86 * UnitConversions.convert(dse_Tamb_cooling, "F", "C"))) * UnitConversions.convert(1, "kJ", "Btu") * UnitConversions.convert(1, "lbm", "kg")
         
         # Supply and return duct surface areas located outside conditioned space
-        dse_As = ducts.SupplySurfaceArea * ducts.LocationFrac
-        dse_Ar = ducts.ReturnSurfaceArea
+        dse_As = ducts.SupplyArea
+        dse_Ar = ducts.ReturnArea
     
         iterate_Tattic = false
         if Geometry.is_unfinished_attic(ducts.LocationSpace)
@@ -1666,14 +1666,14 @@ class HVACSizing
         unit_final.Cool_Load_Tot  = unit_init.Cool_Load_Tot
         unit_final.Cool_Load_Sens = unit_init.Cool_Load_Sens
         
-        unit_final.Cool_Load_Lat, unit_final.Cool_Load_Sens = calculate_sensible_latent_split(mj8.cool_design_grains, mj8.grains_indoor_cooling, mj8.acf, ducts.ReturnLoss, coolingLoad_Tot_Next, unit_init.Cool_Load_Lat, unit_init.Cool_Airflow)
+        unit_final.Cool_Load_Lat, unit_final.Cool_Load_Sens = calculate_sensible_latent_split(mj8.cool_design_grains, mj8.grains_indoor_cooling, mj8.acf, ducts.ReturnLeakage, coolingLoad_Tot_Next, unit_init.Cool_Load_Lat, unit_init.Cool_Airflow)
         
         for _iter in 1..50
             break if delta.abs <= 0.001
 
             coolingLoad_Tot_Prev = coolingLoad_Tot_Next
             
-            unit_final.Cool_Load_Lat, unit_final.Cool_Load_Sens = calculate_sensible_latent_split(mj8.cool_design_grains, mj8.grains_indoor_cooling, mj8.acf, ducts.ReturnLoss, coolingLoad_Tot_Next, unit_init.Cool_Load_Lat, unit_init.Cool_Airflow)
+            unit_final.Cool_Load_Lat, unit_final.Cool_Load_Sens = calculate_sensible_latent_split(mj8.cool_design_grains, mj8.grains_indoor_cooling, mj8.acf, ducts.ReturnLeakage, coolingLoad_Tot_Next, unit_init.Cool_Load_Lat, unit_init.Cool_Airflow)
             unit_final.Cool_Load_Tot = unit_final.Cool_Load_Lat + unit_final.Cool_Load_Sens
             
             # Calculate the new cooling air flow rate
@@ -1734,8 +1734,8 @@ class HVACSizing
 
         # Dehumidification duct loads
         
-        dse_Qs_Dehumid = ducts.SupplyLoss * unit_final.Cool_Airflow
-        dse_Qr_Dehumid = ducts.ReturnLoss * unit_final.Cool_Airflow
+        dse_Qs_Dehumid = ducts.SupplyLeakage * unit_final.Cool_Airflow
+        dse_Qr_Dehumid = ducts.ReturnLeakage * unit_final.Cool_Airflow
         
         # Supply and return conduction functions, Bs and Br
         dse_Bs_dehumid = Math.exp((-1.0 * dse_As) / (60 * unit_final.Cool_Airflow * @inside_air_dens * Gas.Air.cp * ducts.SupplyRvalue))
@@ -2740,8 +2740,8 @@ class HVACSizing
   def self.calc_heat_duct_load(ducts, acf, heat_setpoint, dse_Fregain, heatingLoad, htg_supply_air_temp, t_amb)
 
     # Supply and return duct surface areas located outside conditioned space
-    dse_As = ducts.SupplySurfaceArea * ducts.LocationFrac
-    dse_Ar = ducts.ReturnSurfaceArea
+    dse_As = ducts.SupplyArea
+    dse_Ar = ducts.ReturnArea
     
     # Initialize for the iteration
     delta = 1
@@ -2794,8 +2794,8 @@ class HVACSizing
   
   def self._calc_dse_init(ducts, acf, cfm_inter, load_Inter_Sens, dse_Tamb, dse_As, dse_Ar, t_setpoint)
     
-    dse_Qs = ducts.SupplyLoss * cfm_inter
-    dse_Qr = ducts.ReturnLoss * cfm_inter
+    dse_Qs = ducts.SupplyLeakage * cfm_inter
+    dse_Qr = ducts.ReturnLeakage * cfm_inter
 
     # Supply and return conduction functions, Bs and Br
     if ducts.NotInLiving
@@ -2853,9 +2853,9 @@ class HVACSizing
     return dse_DEcorr
   end
   
-  def self.calculate_sensible_latent_split(cool_design_grains, grains_indoor_cooling, acf, return_duct_loss, cool_load_tot, coolingLoadLat, cool_Airflow)
+  def self.calculate_sensible_latent_split(cool_design_grains, grains_indoor_cooling, acf, return_duct_leakage, cool_load_tot, coolingLoadLat, cool_Airflow)
     # Calculate the latent duct leakage load (Manual J accounts only for return duct leakage)
-    dse_Cool_Load_Latent = [0, 0.68 * acf * return_duct_loss * cool_Airflow * 
+    dse_Cool_Load_Latent = [0, 0.68 * acf * return_duct_leakage * cool_Airflow * 
                              (cool_design_grains - grains_indoor_cooling)].max
     
     # Calculate final latent and load
@@ -2873,16 +2873,13 @@ class HVACSizing
         ducts.Has = true
         ducts.NotInLiving = false # init
         
-        ducts.SupplySurfaceArea = get_feature(runner, unit, Constants.SizingInfoDuctsSupplySurfaceArea, 'double')
-        ducts.ReturnSurfaceArea = get_feature(runner, unit, Constants.SizingInfoDuctsReturnSurfaceArea, 'double')
-        return nil if ducts.SupplySurfaceArea.nil? or ducts.ReturnSurfaceArea.nil?
+        ducts.SupplyArea = get_feature(runner, unit, Constants.SizingInfoDuctsSupplyArea, 'double')
+        ducts.ReturnArea = get_feature(runner, unit, Constants.SizingInfoDuctsReturnArea, 'double')
+        return nil if ducts.SupplyArea.nil? or ducts.ReturnArea.nil?
         
-        ducts.LocationFrac = get_feature(runner, unit, Constants.SizingInfoDuctsLocationFrac, 'double')
-        return nil if ducts.LocationFrac.nil?
-        
-        ducts.SupplyLoss = get_feature(runner, unit, Constants.SizingInfoDuctsSupplyLoss, 'double')
-        ducts.ReturnLoss = get_feature(runner, unit, Constants.SizingInfoDuctsReturnLoss, 'double')
-        return nil if ducts.SupplyLoss.nil? or ducts.ReturnLoss.nil?
+        ducts.SupplyLeakage = get_feature(runner, unit, Constants.SizingInfoDuctsSupplyLeakage, 'double')
+        ducts.ReturnLeakage = get_feature(runner, unit, Constants.SizingInfoDuctsReturnLeakage, 'double')
+        return nil if ducts.SupplyLeakage.nil? or ducts.ReturnLeakage.nil?
 
         ducts.SupplyRvalue = get_feature(runner, unit, Constants.SizingInfoDuctsSupplyRvalue, 'double')
         ducts.ReturnRvalue = get_feature(runner, unit, Constants.SizingInfoDuctsReturnRvalue, 'double')
@@ -4667,9 +4664,9 @@ class DuctsInfo
   # Model info for ducts
   def initial
   end
-  attr_accessor(:Has, :NotInLiving, :SupplySurfaceArea, :ReturnSurfaceArea, 
-                :SupplyLoss, :ReturnLoss, :SupplyRvalue, :ReturnRvalue,
-                :Location, :LocationSpace, :LocationFrac)
+  attr_accessor(:Has, :NotInLiving, :SupplyArea, :ReturnArea, 
+                :SupplyLeakage, :ReturnLeakage, :SupplyRvalue, :ReturnRvalue,
+                :Location, :LocationSpace)
 end
 
 class Numeric
