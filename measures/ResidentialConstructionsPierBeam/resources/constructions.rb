@@ -2481,14 +2481,10 @@ class SurfaceTypes
                 elsif Geometry.is_crawl(space) and obc_is_foundation
                     surfaces[Constants.SurfaceTypeWallFndGrndCS] << surface
                     
-                # Adiabatic finished
-                elsif obc_is_adiabatic and is_finished
+                # Adiabatic finished or unfinished (need the gypsum layer for EMPD)
+                elsif obc_is_adiabatic
                     surfaces[Constants.SurfaceTypeWallIntFinUninsFin] << surface
-                
-                # Adiabatic unfinished
-                elsif obc_is_adiabatic and not is_finished
-                    surfaces[Constants.SurfaceTypeWallIntUnfinUninsUnfin] << surface
-                
+
                 end
             
             end
