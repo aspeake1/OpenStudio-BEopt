@@ -643,10 +643,8 @@ class ResidentialAirflowTest < MiniTest::Test
       new_objects.each do |new_object|
         next if not new_object.respond_to?("to_#{obj_type}")
         new_object = new_object.public_send("to_#{obj_type}").get
-        unless actual_values.keys.include? new_object.name.to_s
-          actual_values[new_object.name.to_s] = {}
-        end
         if ["EnergyManagementSystemProgram", "EnergyManagementSystemSubroutine"].include? obj_type
+          actual_values[new_object.name.to_s] = {}
           new_object.lines.each do |line|
             next unless line.downcase.start_with? "set"
             lhs, rhs = line.split("=")
@@ -658,8 +656,10 @@ class ResidentialAirflowTest < MiniTest::Test
           next if new_object.outputVariableOrMeterName != "Zone Air Temperature"
           actual_values["DuctLocation"] = new_object.keyName
         elsif obj_type == "ThermalZone"
+          actual_values[new_object.name.to_s] = {}
           actual_values[new_object.name.to_s]["RADuctVol"] = UnitConversions.convert(new_object.volume.get, "m^3", "ft^3")
         elsif obj_type == "ZoneHVACEnergyRecoveryVentilator"
+          actual_values[new_object.name.to_s] = {}
           actual_values[new_object.name.to_s]["SupAirRate"] = new_object.supplyAirFlowRate
           actual_values[new_object.name.to_s]["ExhAirRate"] = new_object.exhaustAirFlowRate
           model.getThermalZones.each do |thermal_zone|
@@ -668,38 +668,18 @@ class ResidentialAirflowTest < MiniTest::Test
             actual_values[new_object.name.to_s]["Priority"] = heating_seq+1
           end
         elsif obj_type == "MaterialPropertyMoisturePenetrationDepthSettings"
-          actual_values["Adiabatic"]["WaterVaporDiffusionResistanceFactor"] = new_object.waterVaporDiffusionResistanceFactor
-          actual_values["Adiabatic"]["MoistureEquationCoefficientA"] = new_object.moistureEquationCoefficientA
-          actual_values["Adiabatic"]["MoistureEquationCoefficientB"] = new_object.moistureEquationCoefficientB
-          actual_values["Adiabatic"]["MoistureEquationCoefficientC"] = new_object.moistureEquationCoefficientC
-          actual_values["Adiabatic"]["MoistureEquationCoefficientD"] = new_object.moistureEquationCoefficientD
-          actual_values["Adiabatic"]["CoatingLayerThickness"] = new_object.coatingLayerThickness
-          actual_values["Adiabatic"]["CoatingLayerWaterVaporDiffusionResistanceFactor"] = new_object.coatingLayerWaterVaporDiffusionResistanceFactor
+          actual_values[new_object.materialName.to_s] = {}
+          actual_values[new_object.materialName.to_s]["WaterVaporDiffusionResistanceFactor"] = new_object.waterVaporDiffusionResistanceFactor
+          actual_values[new_object.materialName.to_s]["MoistureEquationCoefficientA"] = new_object.moistureEquationCoefficientA
+          actual_values[new_object.materialName.to_s]["MoistureEquationCoefficientB"] = new_object.moistureEquationCoefficientB
+          actual_values[new_object.materialName.to_s]["MoistureEquationCoefficientC"] = new_object.moistureEquationCoefficientC
+          actual_values[new_object.materialName.to_s]["MoistureEquationCoefficientD"] = new_object.moistureEquationCoefficientD
+          actual_values[new_object.materialName.to_s]["CoatingLayerThickness"] = new_object.coatingLayerThickness
+          actual_values[new_object.materialName.to_s]["CoatingLayerWaterVaporDiffusionResistanceFactor"] = new_object.coatingLayerWaterVaporDiffusionResistanceFactor
         end
       end
     end
     actual_values["TerrainType"] = model.getSite.terrain.to_s
-    if not expected_values["WaterVaporDiffusionResistanceFactor"].nil?
-      assert_in_epsilon(expected_values["WaterVaporDiffusionResistanceFactor"], actual_values["WaterVaporDiffusionResistanceFactor"], 0.01)
-    end
-    if not expected_values["MoistureEquationCoefficientA"].nil?
-      assert_in_epsilon(expected_values["MoistureEquationCoefficientA"], actual_values["MoistureEquationCoefficientA"], 0.01)
-    end
-    if not expected_values["MoistureEquationCoefficientB"].nil?
-      assert_in_epsilon(expected_values["MoistureEquationCoefficientB"], actual_values["MoistureEquationCoefficientB"], 0.01)
-    end
-    if not expected_values["MoistureEquationCoefficientC"].nil?
-      assert_in_epsilon(expected_values["MoistureEquationCoefficientC"], actual_values["MoistureEquationCoefficientC"], 0.01)
-    end
-    if not expected_values["MoistureEquationCoefficientD"].nil?
-      assert_in_epsilon(expected_values["MoistureEquationCoefficientD"], actual_values["MoistureEquationCoefficientD"], 0.01)
-    end
-    if not expected_values["CoatingLayerThickness"].nil?
-      assert_in_epsilon(expected_values["CoatingLayerThickness"], actual_values["CoatingLayerThickness"], 0.01)
-    end
-    if not expected_values["CoatingLayerWaterVaporDiffusionResistanceFactor"].nil?
-      assert_in_epsilon(expected_values["CoatingLayerWaterVaporDiffusionResistanceFactor"], actual_values["CoatingLayerWaterVaporDiffusionResistanceFactor"], 0.01)
-    end
 
     expected_values.each do |obj_name, values|
       if values.respond_to? :to_str

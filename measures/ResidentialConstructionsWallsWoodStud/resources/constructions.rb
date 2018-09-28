@@ -73,7 +73,7 @@ class WallConstructions
         end
         constr.add_layer([mat_framing, mat_cavity, mat_gap], "WallStudAndCavity") 
         if drywall_thick_in > 0
-            constr.add_layer(Material.GypsumWall(drywall_thick_in)) # TODO: pass in material property moisture penetration depth settings, or just default them?
+            constr.add_layer(Material.GypsumWall(drywall_thick_in))
         end
         constr.add_layer(Material.AirFilmVertical)
 
