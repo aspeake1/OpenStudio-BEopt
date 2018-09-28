@@ -2430,6 +2430,7 @@ class SurfaceTypes
         model.getSpaces.each do |space|
             
             is_finished = Geometry.space_is_finished(space)
+            is_corridor = Geometry.is_corridor(space)
             
             space.surfaces.each do |surface|
             
@@ -2481,9 +2482,13 @@ class SurfaceTypes
                 elsif Geometry.is_crawl(space) and obc_is_foundation
                     surfaces[Constants.SurfaceTypeWallFndGrndCS] << surface
                     
-                # Adiabatic finished or unfinished (need the gypsum layer for EMPD)
-                elsif obc_is_adiabatic
+                # Adiabatic finished
+                elsif obc_is_adiabatic and (is_finished or is_corridor)
                     surfaces[Constants.SurfaceTypeWallIntFinUninsFin] << surface
+            
+                # Adiabatic unfinished
+                elsif obc_is_adiabatic and not is_finished
+                    surfaces[Constants.SurfaceTypeWallIntUnfinUninsUnfin] << surface
 
                 end
             
