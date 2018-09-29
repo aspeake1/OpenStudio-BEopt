@@ -1063,7 +1063,6 @@ class Airflow
       supply_ua = ducts.supply_area / supply_r
       return_ua = ducts.return_area / return_r
     else
-      location_frac_conduction = 0
       supply_ua = 0
       return_ua = 0
       supply_r = 0
