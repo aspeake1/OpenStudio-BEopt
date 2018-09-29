@@ -423,7 +423,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     if !runner.validateUserArguments(arguments(model), user_arguments)
       return false
     end
-
+    
     # Air leakage
     living_ach50 = runner.getDoubleArgumentValue("living_ach50",user_arguments)
     garage_ach50 = runner.getDoubleArgumentValue("garage_ach50",user_arguments)
@@ -488,6 +488,40 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     duct_return_area_mult = runner.getDoubleArgumentValue("duct_return_area_mult",user_arguments)
     duct_r = runner.getDoubleArgumentValue("duct_r",user_arguments)
     
+    # Validate individual duct inputs
+    if duct_total_leakage < 0
+      runner.registerError("Ducts: Total Leakage must be greater than or equal to 0.")
+      return false
+    end
+    if duct_supply_leakage_frac_of_total < 0 or duct_supply_leakage_frac_of_total > 1
+      runner.registerError("Ducts: Supply Leakage Fraction of Total must be greater than or equal to 0 and less than or equal to 1.")
+      return false
+    end
+    if duct_return_leakage_frac_of_total < 0 or duct_return_leakage_frac_of_total > 1
+      runner.registerError("Ducts: Return Leakage Fraction of Total must be greater than or equal to 0 and less than or equal to 1.")
+      return false
+    end
+    if duct_ah_supply_leakage_frac_of_total < 0 or duct_ah_supply_leakage_frac_of_total > 1
+      runner.registerError("Ducts: Supply Air Handler Leakage Fraction of Total must be greater than or equal to 0 and less than or equal to 1.")
+      return false
+    end
+    if duct_ah_return_leakage_frac_of_total < 0 or duct_ah_return_leakage_frac_of_total > 1
+      runner.registerError("Ducts: Return Air Handler Leakage Fraction of Total must be greater than or equal to 0 and less than or equal to 1.")
+      return false
+    end
+    if duct_r < 0
+      runner.registerError("Ducts: Insulation Nominal R-Value must be greater than or equal to 0.")
+      return false
+    end
+    if duct_supply_area_mult < 0
+      runner.registerError("Ducts: Supply Surface Area Multiplier must be greater than or equal to 0.")
+      return false
+    end
+    if duct_return_area_mult < 0
+      runner.registerError("Ducts: Return Surface Area Multiplier must be greater than or equal to 0.")
+      return false
+    end
+    
     # Building unit ffa & nstories
     units = Geometry.get_building_units(model, runner)
     if units.nil?
@@ -537,7 +571,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     infil = Infiltration.new(living_ach50, nil, shelter_coef, garage_ach50, crawl_ach, unfinished_attic_sla, nil, unfinished_basement_ach, finished_basement_ach, pier_beam_ach, has_flue_chimney, is_existing_home, terrain)
     mech_vent = MechanicalVentilation.new(mech_vent_type, mech_vent_infil_credit, mech_vent_total_efficiency, mech_vent_frac_62_2, nil, mech_vent_fan_power, mech_vent_sensible_efficiency, mech_vent_ashrae_std, mech_vent_cfis_open_time, mech_vent_cfis_airflow_frac, clothes_dryer_exhaust, range_exhaust, range_exhaust_hour, bathroom_exhaust, bathroom_exhaust_hour)
     nat_vent = NaturalVentilation.new(nat_vent_htg_offset, nat_vent_clg_offset, nat_vent_ovlp_offset, nat_vent_htg_season, nat_vent_clg_season, nat_vent_ovlp_season, nat_vent_num_weekdays, nat_vent_num_weekends, nat_vent_frac_windows_open, nat_vent_frac_window_area_openable, nat_vent_max_oa_hr, nat_vent_max_oa_rh)
-    ducts = Ducts.new(duct_supply_leakage_frac, duct_return_leakage_frac, duct_supply_area, duct_return_area, duct_r, duct_r, duct_location)
+    ducts = Ducts.new(duct_supply_leakage_frac, nil, duct_return_leakage_frac, nil, duct_supply_area, duct_return_area, duct_r, duct_r, duct_location)
     
     if not Airflow.apply(model, runner, infil, mech_vent, nat_vent, ducts, File.dirname(__FILE__))
       return false

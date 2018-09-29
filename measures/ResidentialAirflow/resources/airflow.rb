@@ -996,12 +996,28 @@ class Airflow
   def self.process_ducts_for_unit(model, runner, obj_name_ducts, ducts, building, unit, unit_index, unit_ffa, unit_has_mshp, unit_living, unit_finished_basement, has_forced_air_equipment)
 
     # Validate Inputs
-    if ducts.supply_leakage_frac < 0 or ducts.supply_leakage_frac > 1
+    if ducts.supply_leakage_frac.nil? == ducts.supply_leakage_cfm25.nil?
+      runner.registerError("Ducts: Must provide either supply leakage fraction or cfm25, but not both.")
+      return false
+    end
+    if not ducts.supply_leakage_frac.nil? and (ducts.supply_leakage_frac < 0 or ducts.supply_leakage_frac > 1)
       runner.registerError("Ducts: Supply Leakage Fraction must be greater than or equal to 0 and less than or equal to 1.")
       return false
     end
-    if ducts.return_leakage_frac < 0 or ducts.return_leakage_frac > 1
+    if not ducts.supply_leakage_cfm25.nil? and ducts.supply_leakage_cfm25 < 0
+      runner.registerError("Ducts: Supply Leakage CFM25 must be greater than or equal to 0.")
+      return false
+    end
+    if ducts.return_leakage_frac.nil? == ducts.return_leakage_cfm25.nil?
+      runner.registerError("Ducts: Must provide either return leakage fraction or cfm25, but not both.")
+      return false
+    end
+    if not ducts.return_leakage_frac.nil? and (ducts.return_leakage_frac < 0 or ducts.return_leakage_frac > 1)
       runner.registerError("Ducts: Return Leakage Fraction must be greater than or equal to 0 and less than or equal to 1.")
+      return false
+    end
+    if not ducts.return_leakage_cfm25.nil? and ducts.return_leakage_cfm25 < 0
+      runner.registerError("Ducts: Return Leakage CFM25 must be greater than or equal to 0.")
       return false
     end
     if ducts.supply_r < 0
@@ -1069,11 +1085,16 @@ class Airflow
       return_volume = 0
     end
 
-    total_unbalance = (ducts.supply_leakage_frac - ducts.return_leakage_frac).abs
+    if not ducts.supply_leakage_frac.nil?
+      has_leakage_imbalance = ((ducts.supply_leakage_frac - ducts.return_leakage_frac).abs > 0)
+    elsif not ducts.supply_leakage_cfm25.nil?
+      has_leakage_imbalance = ((ducts.supply_leakage_cfm25 - ducts.return_leakage_cfm25).abs > 0)
+    end
 
-    if not location_name == unit_living.zone.name.to_s and not location_name == "none" and ducts.supply_leakage_frac > 0
+    # FIXME: Improve this
+    if not location_name == unit_living.zone.name.to_s and not location_name == "none" and (ducts.supply_leakage_frac.to_f > 0 or ducts.supply_leakage_cfm25.to_f > 0)
       # Calculate d.frac_oa = fraction of unbalanced make-up air that is outside air
-      if total_unbalance <=  0
+      if not has_leakage_imbalance
         # Handle the exception for if there is no leakage unbalance.
         frac_oa = 0
       elsif not unit_finished_basement.nil? and unit_finished_basement.zone == location_zone
@@ -1098,13 +1119,15 @@ class Airflow
     # Store info for HVAC Sizing measure
     unit.additionalProperties.setFeature(Constants.SizingInfoDuctsSupplyRvalue, ducts.supply_r.to_f)
     unit.additionalProperties.setFeature(Constants.SizingInfoDuctsReturnRvalue, ducts.return_r.to_f)
-    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsSupplyLeakage, ducts.return_leakage_frac.to_f)
-    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsReturnLeakage, ducts.return_leakage_frac.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsSupplyLeakageFrac, ducts.return_leakage_frac.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsSupplyLeakageCFM25, ducts.return_leakage_cfm25.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsReturnLeakageFrac, ducts.return_leakage_frac.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsReturnLeakageCFM25, ducts.return_leakage_cfm25.to_f)
     unit.additionalProperties.setFeature(Constants.SizingInfoDuctsSupplyArea, ducts.supply_area.to_f)
     unit.additionalProperties.setFeature(Constants.SizingInfoDuctsReturnArea, ducts.return_area.to_f)
     unit.additionalProperties.setFeature(Constants.SizingInfoDuctsLocationZone, location_name)
 
-    ducts_output = DuctsOutput.new(location_name, location_zone, return_volume, frac_oa, total_unbalance, unconditioned_ua, return_ua)
+    ducts_output = DuctsOutput.new(location_name, location_zone, return_volume, frac_oa, unconditioned_ua, return_ua)
     return true, ducts_output
 
   end
@@ -1514,14 +1537,31 @@ class Airflow
 
       duct_subroutine = OpenStudio::Model::EnergyManagementSystemSubroutine.new(model)
       duct_subroutine.setName("#{obj_name_ducts} lk subrout")
-      duct_subroutine.addLine("Set f_sup = #{ducts.supply_leakage_frac}")
-      duct_subroutine.addLine("Set f_ret = #{ducts.return_leakage_frac}")
-      duct_subroutine.addLine("Set f_OA = #{ducts_output.frac_oa * ducts_output.total_unbalance}")
+      if not ducts.supply_leakage_frac.nil?
+        duct_subroutine.addLine("Set f_sup = #{ducts.supply_leakage_frac}")
+        duct_subroutine.addLine("Set f_ret = #{ducts.return_leakage_frac}")
+      elsif not ducts.supply_leakage_cfm25.nil?
+        duct_subroutine.addLine("If #{ah_vfr_var.name} > 0")
+        duct_subroutine.addLine("  Set f_sup = #{UnitConversions.convert(ducts.supply_leakage_cfm25,"cfm","m^3/s").round(6)} / #{ah_vfr_var.name}")
+        duct_subroutine.addLine("  Set f_ret = #{UnitConversions.convert(ducts.return_leakage_cfm25,"cfm","m^3/s").round(6)} / #{ah_vfr_var.name}")
+        duct_subroutine.addLine("Else")
+        duct_subroutine.addLine("  Set f_sup = 0")
+        duct_subroutine.addLine("  Set f_ret = 0")
+        duct_subroutine.addLine("EndIf")
+      end
+      duct_subroutine.addLine("Set f_imbalance = (@Abs (f_sup-f_ret))")
+      duct_subroutine.addLine("Set f_OA = #{ducts_output.frac_oa} * f_imbalance")
       duct_subroutine.addLine("Set oafrate = f_OA * #{ah_vfr_var.name}")
       duct_subroutine.addLine("Set suplkfrate = f_sup * #{ah_vfr_var.name}")
       duct_subroutine.addLine("Set retlkfrate = f_ret * #{ah_vfr_var.name}")
+      
+      if not ducts.return_leakage_frac.nil?
+        has_more_return_leakage = (ducts.return_leakage_frac > ducts.supply_leakage_frac)
+      elsif not ducts.return_leakage_cfm25.nil?
+        has_more_return_leakage = (ducts.return_leakage_cfm25 > ducts.supply_leakage_cfm25)
+      end
 
-      if ducts.return_leakage_frac > ducts.supply_leakage_frac
+      if has_more_return_leakage
         # Supply air flow rate is greater than return flow rate
         # Living zone is pressurized in this case
         duct_subroutine.addLine("Set #{liv_to_ah_flow_rate_var.name} = (@Abs (retlkfrate-suplkfrate-oafrate))")
@@ -2113,29 +2153,30 @@ class Airflow
 end
 
 class Ducts
-  def initialize(supply_leakage_frac, return_leakage_frac, supply_area, return_area, supply_r, return_r, location)
+  def initialize(supply_leakage_frac, supply_leakage_cfm25, return_leakage_frac, return_leakage_cfm25, supply_area, return_area, supply_r, return_r, location)
     @supply_area = supply_area
     @return_area = return_area
     @supply_r = supply_r
     @return_r = return_r
     @supply_leakage_frac = supply_leakage_frac
+    @supply_leakage_cfm25 = supply_leakage_cfm25
     @return_leakage_frac = return_leakage_frac
+    @return_leakage_cfm25 = return_leakage_cfm25
     @location = location
   end
-  attr_accessor(:supply_leakage_frac, :return_leakage_frac, :supply_area, :return_area, :supply_r, :return_r, :location)
+  attr_accessor(:supply_leakage_frac, :supply_leakage_cfm25, :return_leakage_frac, :return_leakage_cfm25, :supply_area, :return_area, :supply_r, :return_r, :location)
 end
 
 class DuctsOutput
-  def initialize(location_name, location_zone, return_volume, frac_oa, total_unbalance, unconditioned_ua, return_ua)
+  def initialize(location_name, location_zone, return_volume, frac_oa, unconditioned_ua, return_ua)
     @location_name = location_name
     @location_zone = location_zone
     @return_volume = return_volume
     @frac_oa = frac_oa
-    @total_unbalance = total_unbalance
     @unconditioned_ua = unconditioned_ua
     @return_ua = return_ua
   end
-  attr_accessor(:location_name, :location_zone, :return_volume, :frac_oa, :total_unbalance, :unconditioned_ua, :return_ua)
+  attr_accessor(:location_name, :location_zone, :return_volume, :frac_oa, :unconditioned_ua, :return_ua)
 end
 
 class Infiltration

@@ -791,7 +791,10 @@ class Constants
   def self.SizingInfoDuctsLocationZone
     return __method__.to_s
   end
-  def self.SizingInfoDuctsReturnLeakage
+  def self.SizingInfoDuctsReturnLeakageFrac
+    return __method__.to_s
+  end
+  def self.SizingInfoDuctsReturnLeakageCFM25
     return __method__.to_s
   end
   def self.SizingInfoDuctsReturnRvalue
@@ -800,7 +803,10 @@ class Constants
   def self.SizingInfoDuctsReturnArea
     return __method__.to_s
   end
-  def self.SizingInfoDuctsSupplyLeakage
+  def self.SizingInfoDuctsSupplyLeakageFrac
+    return __method__.to_s
+  end
+  def self.SizingInfoDuctsSupplyLeakageCFM25
     return __method__.to_s
   end
   def self.SizingInfoDuctsSupplyRvalue
