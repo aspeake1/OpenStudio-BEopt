@@ -279,7 +279,7 @@ task :update_measures do
   
   # Update measure xmls
   cli_path = OpenStudio.getOpenStudioCLI
-  command = "\"#{cli_path}\" --no-ssl measure --update_all #{measures_dir} >> log"
+  command = "del log && \"#{cli_path}\" --no-ssl measure --update_all #{measures_dir} >> log"
   puts "Updating measure.xml files..."
   system(command)
   
