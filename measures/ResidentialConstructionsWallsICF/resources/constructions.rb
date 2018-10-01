@@ -2008,7 +2008,7 @@ class ThermalMassConstructions
             furnThickness = UnitConversions.convert(furnMass / (furnDensity * furnAreaFraction),'ft','in')
             
             # Define materials
-            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil, waterVaporDiffusionResistanceFactor=150, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
+            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil, waterVaporDiffusionResistanceFactor=6, moistureEquationCoefficientA=0.02, moistureEquationCoefficientB=1.0, moistureEquationCoefficientC=0.0, moistureEquationCoefficientD=1.0, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
             
             # Set paths
             path_fracs = [1]
