@@ -9,7 +9,7 @@ class Material
     # rho - Density [lb/ft^3]
     # cp - Specific heat [Btu/lb*F]
     # rvalue - R-value [h-ft^2-F/Btu]
-    def initialize(name=nil, thick_in=nil, mat_base=nil, k_in=nil, rho=nil, cp=nil, tAbs=nil, sAbs=nil, vAbs=nil, rvalue=nil, waterVaporDiffusionResistanceFactor=nil, moistureEquationCoefficientA=nil, moistureEquationCoefficientB=nil, moistureEquationCoefficientC=nil, moistureEquationCoefficientD=nil, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=nil, coatingLayerWaterVaporDiffusionResistanceFactor=nil)
+    def initialize(name=nil, thick_in=nil, mat_base=nil, k_in=nil, rho=nil, cp=nil, tAbs=nil, sAbs=nil, vAbs=nil, rvalue=nil, moist_base=nil)
         @name = name
         
         if not thick_in.nil?
@@ -35,20 +35,29 @@ class Material
             @deepLayerPenetrationDepth = mat_base.deepLayerPenetrationDepth
             @coatingLayerThickness = mat_base.coatingLayerThickness
             @coatingLayerWaterVaporDiffusionResistanceFactor = mat_base.coatingLayerWaterVaporDiffusionResistanceFactor
-        else
+        elsif mat_base.nil?
             @k_in = nil
             @k = nil
             @rho = nil
             @cp = nil
-            @waterVaporDiffusionResistanceFactor = waterVaporDiffusionResistanceFactor
-            @moistureEquationCoefficientA = moistureEquationCoefficientA
-            @moistureEquationCoefficientB = moistureEquationCoefficientB
-            @moistureEquationCoefficientC = moistureEquationCoefficientC
-            @moistureEquationCoefficientD = moistureEquationCoefficientD
-            @surfaceLayerPenetrationDepth = surfaceLayerPenetrationDepth
-            @deepLayerPenetrationDepth = deepLayerPenetrationDepth
-            @coatingLayerThickness = coatingLayerThickness
-            @coatingLayerWaterVaporDiffusionResistanceFactor = coatingLayerWaterVaporDiffusionResistanceFactor
+        end
+
+        if not moist_base.nil?
+            @waterVaporDiffusionResistanceFactor = moist_base.waterVaporDiffusionResistanceFactor
+            @moistureEquationCoefficientA = moist_base.moistureEquationCoefficientA
+            @moistureEquationCoefficientB = moist_base.moistureEquationCoefficientB
+            @moistureEquationCoefficientC = moist_base.moistureEquationCoefficientC
+            @moistureEquationCoefficientD = moist_base.moistureEquationCoefficientD
+            @surfaceLayerPenetrationDepth = moist_base.surfaceLayerPenetrationDepth
+            @deepLayerPenetrationDepth = moist_base.deepLayerPenetrationDepth
+            @coatingLayerThickness = moist_base.coatingLayerThickness
+            @coatingLayerWaterVaporDiffusionResistanceFactor = moist_base.coatingLayerWaterVaporDiffusionResistanceFactor
+        end
+
+        if not moist_base.nil?
+
+        else
+
         end
         
         # Override the base material if both are included
@@ -374,6 +383,10 @@ class BaseMaterial
     def self.Gypcrete
         # http://www.maxxon.com/gyp-crete/data
         return self.new(rho=100.0, cp=0.223, k_in=4.7424)
+    end
+
+    def self.Furniture
+        return self.new(rho=nil, cp=nil, k_in=nil, waterVaporDiffusionResistanceFactor=6, moistureEquationCoefficientA=0.02, moistureEquationCoefficientB=1.0, moistureEquationCoefficientC=0.0, moistureEquationCoefficientD=1.0, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
     end
 
     def self.InsulationRigid
