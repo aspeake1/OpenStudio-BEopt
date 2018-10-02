@@ -277,7 +277,7 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
                 program.addLine("Set ShowerTime=0")
                 program.addLine("EndIf")
                 program.addLine("If (#{vol_shower.name} > 0) && (#{mix_sp_hw.name} > #{t_out_wh.name})")
-                program.addLine("Set ShowerSag={1.0/#{model.getTimestep.numberOfTimestepsPerHour}")
+                program.addLine("Set ShowerSag=1.0/#{model.getTimestep.numberOfTimestepsPerHour}")
                 program.addLine("Set ShowerE=#{vol_shower.name}*4141170*(#{mix_sp_hw.name}-#{t_out_wh.name})")
                 program.addLine("Else")
                 program.addLine("Set ShowerSag=0")
@@ -301,12 +301,14 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
                 ems_output_var.setTypeOfDataInVariable("Summed")
                 ems_output_var.setUpdateFrequency("SystemTimestep")
                 ems_output_var.setEMSProgramOrSubroutineName(program)
+                ems_output_var.setUnits("hr")
 
                 ems_output_var = OpenStudio::Model::EnergyManagementSystemOutputVariable.new(model, "ShowerTime")
                 ems_output_var.setName("Shower Draw Time|#{unit.name}")
                 ems_output_var.setTypeOfDataInVariable("Summed")
                 ems_output_var.setUpdateFrequency("SystemTimestep")
                 ems_output_var.setEMSProgramOrSubroutineName(program)
+                ems_output_var.setUnits("hr")
             end
             
             # Sinks
