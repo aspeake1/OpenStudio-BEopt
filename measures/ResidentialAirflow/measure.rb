@@ -571,7 +571,16 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     infil = Infiltration.new(living_ach50, nil, shelter_coef, garage_ach50, crawl_ach, unfinished_attic_sla, nil, unfinished_basement_ach, finished_basement_ach, pier_beam_ach, has_flue_chimney, is_existing_home, terrain)
     mech_vent = MechanicalVentilation.new(mech_vent_type, mech_vent_infil_credit, mech_vent_total_efficiency, mech_vent_frac_62_2, nil, mech_vent_fan_power, mech_vent_sensible_efficiency, mech_vent_ashrae_std, mech_vent_cfis_open_time, mech_vent_cfis_airflow_frac, clothes_dryer_exhaust, range_exhaust, range_exhaust_hour, bathroom_exhaust, bathroom_exhaust_hour)
     nat_vent = NaturalVentilation.new(nat_vent_htg_offset, nat_vent_clg_offset, nat_vent_ovlp_offset, nat_vent_htg_season, nat_vent_clg_season, nat_vent_ovlp_season, nat_vent_num_weekdays, nat_vent_num_weekends, nat_vent_frac_windows_open, nat_vent_frac_window_area_openable, nat_vent_max_oa_hr, nat_vent_max_oa_rh)
-    ducts = Ducts.new(duct_supply_leakage_frac, nil, duct_return_leakage_frac, nil, duct_supply_area, duct_return_area, duct_r, duct_r, duct_location)
+    if duct_location != 'none'
+      supply_ducts = [Duct.new(duct_supply_area, duct_r, duct_location)]
+      return_ducts = [Duct.new(duct_return_area, duct_r, duct_location)]
+    else
+      supply_ducts = []
+      return_ducts = []
+    end
+    ducts = Ducts.new(duct_supply_leakage_frac, nil, duct_return_leakage_frac, nil)
+    ducts.supply_ducts = supply_ducts
+    ducts.return_ducts = return_ducts
     
     if not Airflow.apply(model, runner, infil, mech_vent, nat_vent, ducts, File.dirname(__FILE__))
       return false
