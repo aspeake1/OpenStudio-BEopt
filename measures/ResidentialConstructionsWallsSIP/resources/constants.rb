@@ -788,31 +788,31 @@ class Constants
   def self.SizingInfoCMUWallFurringInsRvalue
     return __method__.to_s
   end
-  def self.SizingInfoDuctsLocationZone
+  def self.SizingInfoDuctsLocationZones
     return __method__.to_s
   end
-  def self.SizingInfoDuctsReturnLeakageFrac
+  def self.SizingInfoDuctsReturnLeakageFracs
     return __method__.to_s
   end
-  def self.SizingInfoDuctsReturnLeakageCFM25
+  def self.SizingInfoDuctsReturnLeakageCFM25s
     return __method__.to_s
   end
-  def self.SizingInfoDuctsReturnRvalue
+  def self.SizingInfoDuctsReturnAreas
     return __method__.to_s
   end
-  def self.SizingInfoDuctsReturnArea
+  def self.SizingInfoDuctsReturnRvalues
     return __method__.to_s
   end
-  def self.SizingInfoDuctsSupplyLeakageFrac
+  def self.SizingInfoDuctsSupplyLeakageFracs
     return __method__.to_s
   end
-  def self.SizingInfoDuctsSupplyLeakageCFM25
+  def self.SizingInfoDuctsSupplyLeakageCFM25s
     return __method__.to_s
   end
-  def self.SizingInfoDuctsSupplyRvalue
+  def self.SizingInfoDuctsSupplyAreas
     return __method__.to_s
   end
-  def self.SizingInfoDuctsSupplyArea
+  def self.SizingInfoDuctsSupplyRvalues
     return __method__.to_s
   end
   def self.SizingInfoGSHPBoreConfig
