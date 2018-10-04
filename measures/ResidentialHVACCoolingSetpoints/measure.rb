@@ -49,36 +49,36 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     args << weekend_setpoint
 
     #Make a string argument for 24 weekday cooling set point offset magnitude
-    weekday_offset_mag = OpenStudio::Measure::OSArgument::makeDoubleArgument("weekday_offset_magnitude", true)
-    weekday_offset_mag.setDisplayName("Weekday Offset Magnitude")
-    weekday_offset_mag.setDescription("Specify the magnitude of the cooling setpoint offset for the weekdays, which will be applied during hours specified by the offset schedule. A positive offset increases the setpoint while a negative offset decreases the setpoint.")
-    weekday_offset_mag.setUnits("degrees F")
-    weekday_offset_mag.setDefaultValue(0)
-    args << weekday_offset_mag
+    weekday_offset_magnitude = OpenStudio::Measure::OSArgument::makeDoubleArgument("weekday_offset_magnitude", true)
+    weekday_offset_magnitude.setDisplayName("Weekday Offset Magnitude")
+    weekday_offset_magnitude.setDescription("Specify the magnitude of the cooling setpoint offset for the weekdays, which will be applied during hours specified by the offset schedule. A positive offset increases the setpoint while a negative offset decreases the setpoint.")
+    weekday_offset_magnitude.setUnits("degrees F")
+    weekday_offset_magnitude.setDefaultValue(0)
+    args << weekday_offset_magnitude
 
     #Make a string argument for 24 weekend cooling set point offset magnitude
-    weekend_offset_mag = OpenStudio::Measure::OSArgument::makeDoubleArgument("weekend_offset_magnitude", true)
-    weekend_offset_mag.setDisplayName("weekend Offset Magnitude")
-    weekend_offset_mag.setDescription("Specify the magnitude of the cooling setpoint offset for the weekdays, which will be applied during hours specified by the offset schedule. A positive offset increases the setpoint while a negative offset decreases the setpoint.")
-    weekend_offset_mag.setUnits("degrees F")
-    weekend_offset_mag.setDefaultValue(0)
-    args << weekend_offset_mag    
+    weekend_offset_magnitude = OpenStudio::Measure::OSArgument::makeDoubleArgument("weekend_offset_magnitude", true)
+    weekend_offset_magnitude.setDisplayName("weekend Offset Magnitude")
+    weekend_offset_magnitude.setDescription("Specify the magnitude of the cooling setpoint offset for the weekdays, which will be applied during hours specified by the offset schedule. A positive offset increases the setpoint while a negative offset decreases the setpoint.")
+    weekend_offset_magnitude.setUnits("degrees F")
+    weekend_offset_magnitude.setDefaultValue(0)
+    args << weekend_offset_magnitude    
 
     #Make a string argument for 24 weekday cooling offset values
-    weekday_offset_schedule_1 = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_offset_schedule_1", true)
-    weekday_offset_schedule_1.setDisplayName("Weekday offset Schedule 1")
-    weekday_offset_schedule_1.setDescription("Specify a 24-hour comma-separated schedule of 0s and 1s for applying the offset on weekdays.")
-    weekday_offset_schedule_1.setUnits("degrees F")
-    weekday_offset_schedule_1.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
-    args << weekday_offset_schedule_1  
+    weekday_offset_schedule = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_offset_schedule", true)
+    weekday_offset_schedule.setDisplayName("Weekday offset Schedule")
+    weekday_offset_schedule.setDescription("Specify a 24-hour comma-separated schedule of 0s and 1s for applying the offset on weekdays.")
+    weekday_offset_schedule.setUnits("degrees F")
+    weekday_offset_schedule.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+    args << weekday_offset_schedule  
     
     #Make a string argument for 24 weekend cooling offset_tod values
-    weekend_offset_schedule_1 = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_offset_schedule_1", true)
-    weekend_offset_schedule_1.setDisplayName("Weekend offset Schedule 1")
-    weekend_offset_schedule_1.setDescription("Specify a 24-hour comma-separated schedule of 0s and 1s for applying the offset on weekend.")
-    weekend_offset_schedule_1.setUnits("degrees F")
-    weekend_offset_schedule_1.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
-    args << weekend_offset_schedule_1
+    weekend_offset_schedule = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_offset_schedule", true)
+    weekend_offset_schedule.setDisplayName("Weekend offset Schedule")
+    weekend_offset_schedule.setDescription("Specify a 24-hour comma-separated schedule of 0s and 1s for applying the offset on weekend.")
+    weekend_offset_schedule.setUnits("degrees F")
+    weekend_offset_schedule.setDefaultValue("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+    args << weekend_offset_schedule
 
     #make a bool argument for using hsp season or not
     use_auto_season = OpenStudio::Measure::OSArgument::makeBoolArgument("use_auto_season", true)
@@ -129,11 +129,11 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     weekday_setpoint = runner.getStringArgumentValue("weekday_setpoint",user_arguments)
     weekend_setpoint = runner.getStringArgumentValue("weekend_setpoint",user_arguments)
 
-    weekday_offset_mag = runner.getDoubleArgumentValue("weekday_offset_magnitude", user_arguments)
-    weekend_offset_mag = runner.getDoubleArgumentValue("weekend_offset_magnitude", user_arguments)
+    weekday_offset_magnitude = runner.getDoubleArgumentValue("weekday_offset_magnitude", user_arguments)
+    weekend_offset_magnitude = runner.getDoubleArgumentValue("weekend_offset_magnitude", user_arguments)
     
-    weekday_offset_schedule_1 = runner.getStringArgumentValue("weekday_offset_schedule_1",user_arguments)
-    weekend_offset_schedule_1 = runner.getStringArgumentValue("weekend_offset_schedule_1",user_arguments)
+    weekday_offset_schedule = runner.getStringArgumentValue("weekday_offset_schedule",user_arguments)
+    weekend_offset_schedule = runner.getStringArgumentValue("weekend_offset_schedule",user_arguments)
 
     use_auto_season = runner.getBoolArgumentValue("use_auto_season",user_arguments)
     season_start_month = runner.getOptionalStringArgumentValue("season_start_month",user_arguments)
@@ -159,15 +159,15 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     end
 
     #  Convert the string of weekday/end-offset magnitude value into a 24 valued float array
-    weekday_offset_mag = Array.new(24, weekday_offset_mag)
-    weekend_offset_mag = Array.new(24, weekend_offset_mag)
+    weekday_offset_magnitude = Array.new(24, weekday_offset_magnitude)
+    weekend_offset_magnitude = Array.new(24, weekend_offset_magnitude)
 
 
 	# Convert the string of weekday-offset_tod values into float arrays
-    weekday_offset_schedule_1 = weekday_offset_schedule_1.split(",").map(&:to_f)
+    weekday_offset_schedule = weekday_offset_schedule.split(",").map(&:to_f)
 
     # Convert the string of weekend-offset_tod values into float arrays
-    weekend_offset_schedule_1 = weekend_offset_schedule_1.split(",").map(&:to_f)
+    weekend_offset_schedule = weekend_offset_schedule.split(",").map(&:to_f)
 
     # Error-checking
     if weekday_setpoints.length != 24
@@ -182,21 +182,21 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    if weekday_offset_schedule_1.length != 24
+    if weekday_offset_schedule.length != 24
       err_msg = "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule."
       runner.registerError(err_msg)
       return false
     end
 
-    if weekend_offset_schedule_1.length != 24
+    if weekend_offset_schedule.length != 24
       err_msg = "A comma-separated string of 24 numbers must be entered for the weekend offset time of day schedule."
       runner.registerError(err_msg)
       return false
     end
 
     # set the offset variables after offset_mag and offset_tod
-    weekday_offset_1 = [weekday_offset_mag, weekday_offset_schedule_1].transpose.map {|x| x.reduce(:*)}
-    weekend_offset_1 = [weekend_offset_mag, weekend_offset_schedule_1].transpose.map {|x| x.reduce(:*)}
+    weekday_offset_1 = [weekday_offset_magnitude, weekday_offset_schedule].transpose.map {|x| x.reduce(:*)}
+    weekend_offset_1 = [weekend_offset_magnitude, weekend_offset_schedule].transpose.map {|x| x.reduce(:*)}
 
     # Update to one 24-value float array for setpoints schedule to count for the offset_tods 
     weekday_setpoints = [ weekday_setpoints, weekday_offset_1].transpose.map {|x| x.reduce(:+)}     

@@ -29,7 +29,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
 
   def test_offset_weekday_schedule1_argument_error_not_24_values
     args_hash = {}
-    args_hash["weekday_offset_schedule_1"] = "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
+    args_hash["weekday_offset_schedule"] = "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
     result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
   end 
@@ -57,7 +57,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
 
   def test_offset_weekend_schedule1_argument_error_not_24_values
     args_hash = {}
-    args_hash["weekend_offset_schedule_1"] = "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
+    args_hash["weekend_offset_schedule"] = "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
     result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend offset time of day schedule.")    
   end
@@ -182,7 +182,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     args_hash = {}
     args_hash["weekday_setpoint"] = "75"
     args_hash["weekday_offset_magnitude"] = 3.0
-    args_hash["weekday_offset_schedule_1"] = "0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
+    args_hash["weekday_offset_schedule"] = "0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>48, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>[-18000]*24, "heating_setpoint_sch_overlap_season"=>[-18000]*24,
@@ -292,7 +292,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
             new_object.daySchedule.times.each_with_index do |t, i|
               h = t.to_s.split(":")[0].to_i
               (step...h).to_a.each do |j|
-                actual_values << UnitConversions.convert(new_object.daySchedule.values[i],"C","F")
+                actual_values << UnitConversions.convert(new_object.daySchedule.values[i],"C","F") # method to create `actual_value` array from the day schedule
               end
               step = h
             end
