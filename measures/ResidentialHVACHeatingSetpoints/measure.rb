@@ -58,7 +58,7 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
 
     #Make a string argument for 24 weekend heating set point offset magnitude
     weekend_offset_magnitude = OpenStudio::Measure::OSArgument::makeDoubleArgument("weekend_offset_magnitude", true)
-    weekend_offset_magnitude.setDisplayName("Wcalceekend Offset Magnitude")
+    weekend_offset_magnitude.setDisplayName("Weekend Offset Magnitude")
     weekend_offset_magnitude.setDescription("Specify the magnitude of the heating setpoint offset for the weekdays, which will be applied during hours specified by the offset schedule. A positive offset increases the setpoint while a negative offset decreases the setpoint.")
     weekend_offset_magnitude.setUnits("degrees F")
     weekend_offset_magnitude.setDefaultValue(0)
