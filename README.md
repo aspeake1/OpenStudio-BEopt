@@ -70,11 +70,12 @@ The order in which these measures are called is important. For example, the Wind
 <!--- MEASURE_WORKFLOW_START -->
 |Group|Measure|Dependencies*|
 |:---|:---|:---|
-|1. Location|1. Location||
-|2. Geometry|1. Geometry - Create Single-Family Detached (or Single-Family Attached or Multifamily)||
+|1. Simulation Controls|1. Simulation Controls||
+|2. Location|1. Location||
+|3. Geometry|1. Geometry - Create Single-Family Detached (or Single-Family Attached or Multifamily)||
 ||2. Door Area||
 ||3. Window/Skylight Area||
-|3. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
+|4. Envelope Constructions|1. Unfinished Attic (or Finished Roof)||
 ||2. Wood Stud Walls (or Double Stud, CMU, SIP, etc.)||
 ||3. Slab (or Finished Basement, Unfinished Basement, Crawlspace, Pier & Beam)||
 ||4. Floors||
@@ -85,23 +86,23 @@ The order in which these measures are called is important. For example, the Wind
 ||2. Hot Water Fixtures|Water Heater|
 ||3. Hot Water Distribution|Hot Water Fixtures, Location|
 ||4. Solar Hot Water|Water Heater, Location|
-|5. HVAC|1. Central Air Source Heat Pump (or AC/Furnace, Boiler, MSHP, etc.)||
+|6. HVAC|1. Central Air Source Heat Pump (or AC/Furnace, Boiler, MSHP, etc.)||
 ||2. Heating Setpoint|HVAC Equipment, Location|
 ||3. Cooling Setpoint|HVAC Equipment, Location|
 ||4. Ceiling Fan|Cooling Setpoint|
 ||5. Dehumidifier|HVAC Equipment|
-|6. Major Appliances|1. Refrigerator||
+|7. Major Appliances|1. Refrigerator||
 ||2. Clothes Washer|Water Heater, Location|
 ||3. Clothes Dryer|Clothes Washer|
 ||4. Dishwasher|Water Heater, Location|
 ||5. Cooking Range||
-|7. Lighting|1. Lighting|Location|
-|8. Misc Loads|1. Plug Loads||
+|8. Lighting|1. Lighting|Location|
+|9. Misc Loads|1. Plug Loads||
 ||2. Large, Uncommon Loads||
-|9. Airflow|1. Airflow|Location, HVAC Equipment, Clothes Dryer|
-|10. Sizing|1. HVAC Sizing|(lots of measures...)|
-|11. Photovoltaics|1. Photovoltaics||
-|12. Zone Multipliers|1. Zone Multipliers||
+|10. Airflow|1. Airflow|Location, HVAC Equipment, Clothes Dryer|
+|11. Sizing|1. HVAC Sizing|(lots of measures...)|
+|12. Photovoltaics|1. Photovoltaics||
+|13. Zone Multipliers|1. Zone Multipliers||
 <!--- MEASURE_WORKFLOW_END -->
 
 <!---

@@ -376,7 +376,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     
     model.getBuildingUnits.each do |unit|
       next if unit.spaces.size == 0
-      is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
+      is_ducted = unit.additionalProperties.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
       if is_ducted.is_initialized
         is_ducted = is_ducted.get
       end
