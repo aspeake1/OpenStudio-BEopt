@@ -49,8 +49,8 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     args_hash["num_units"] = 3
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>3, "Surface"=>26, "ThermalZone"=>1+3, "Space"=>1+3, "SpaceType"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>11}
-    expected_values = {"FinishedFloorArea"=>900*3, "BuildingHeight"=>8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>10.17, "EavesDepth"=>2}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+    expected_values = {"FinishedFloorArea"=>900*3, "BuildingHeight"=>8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>10.17, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>6}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 12)
   end
 
   def test_warning_balc_but_no_inset
@@ -194,28 +194,6 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
     expected_num_new_objects = {"BuildingUnit"=>num_finished_spaces, "Surface"=>60, "ThermalZone"=>num_finished_spaces, "Space"=>num_finished_spaces, "SpaceType"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>6, "ShadingSurface"=>16}
     expected_values = {"FinishedFloorArea"=>900*num_finished_spaces, "BuildingHeight"=>2*8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>33.9, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>0}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 26)
-  end
-
-  def test_corr_width_zero_but_corr_not_none
-    num_finished_spaces = 2
-    args_hash = {}
-    args_hash["corridor_width"] = 0
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>2, "Surface"=>12  , "ThermalZone"=>2, "Space"=>2, "SpaceType"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>2, "ShadingSurface"=>8}
-    expected_values = {"FinishedFloorArea"=>900*2, "BuildingHeight"=>8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>6.78, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
-  end
-
-  def test_odd_units_per_floor_double_exterior
-    num_finished_spaces = 10
-    args_hash = {}
-    args_hash["num_floors"] = 2
-    args_hash["num_units_per_floor"] = 5
-    args_hash["corridor_position"] = "Double Exterior"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>num_finished_spaces, "Surface"=>60, "ThermalZone"=>num_finished_spaces, "Space"=>num_finished_spaces, "SpaceType"=>1, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2, "ShadingSurfaceGroup"=>6, "ShadingSurface"=>16}
-    expected_values = {"FinishedFloorArea"=>900*num_finished_spaces, "BuildingHeight"=>2*8, "Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>33.9, "EavesDepth"=>2, "NumAdiabaticSurfaces"=>0}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_argument_error_beds_not_equal_to_baths
