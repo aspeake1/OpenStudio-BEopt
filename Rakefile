@@ -172,8 +172,10 @@ def get_osms_listed_in_test(testrb)
 end
 
 def update_and_format_osw(osw)
-  # Insert new step(s) into test osw files, if they don't already exist: {{step1=>index, step2=>index}}
+  # Insert new step(s) into test osw files, if they don't already exist: {step1=>index1, step2=>index2, ...}
+  # e.g., new_steps = {{"measure_dir_name"=>"ResidentialSimulationControls"}=>0}
   new_steps = {}
+  new_steps = {{"measure_dir_name"=>"ResidentialSimulationControls"}=>0}
   json = JSON.parse(File.read(osw), :symbolize_names=>true)
   steps = json[:steps]
   new_steps.each do |new_step, ix|
