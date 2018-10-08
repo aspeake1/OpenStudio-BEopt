@@ -158,15 +158,13 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
       weekend_setpoints = weekend_setpoint.split(",").map(&:to_f)
     end
 
-    #  Convert the string of weekday/end-offset magnitude value into a 24 valued float array
+    #  Convert the weekday/end-offset magnitude value into a 24 valued float array
     weekday_offset_magnitude = Array.new(24, weekday_offset_magnitude)
     weekend_offset_magnitude = Array.new(24, weekend_offset_magnitude)
 
 
-	# Convert the string of weekday-offset_tod values into float arrays
+	  # Convert the string of weekday/end-offset_schedule values into float arrays
     weekday_offset_schedule = weekday_offset_schedule.split(",").map(&:to_f)
-
-    # Convert the string of weekend-offset_tod values into float arrays
     weekend_offset_schedule = weekend_offset_schedule.split(",").map(&:to_f)
 
     # Error-checking

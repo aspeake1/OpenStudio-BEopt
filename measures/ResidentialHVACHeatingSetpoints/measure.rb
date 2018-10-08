@@ -58,7 +58,7 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
 
     #Make a string argument for 24 weekend heating set point offset magnitude
     weekend_offset_magnitude = OpenStudio::Measure::OSArgument::makeDoubleArgument("weekend_offset_magnitude", true)
-    weekend_offset_magnitude.setDisplayName("Weekend Offset Magnitude")
+    weekend_offset_magnitude.setDisplayName("Wcalceekend Offset Magnitude")
     weekend_offset_magnitude.setDescription("Specify the magnitude of the heating setpoint offset for the weekdays, which will be applied during hours specified by the offset schedule. A positive offset increases the setpoint while a negative offset decreases the setpoint.")
     weekend_offset_magnitude.setUnits("degrees F")
     weekend_offset_magnitude.setDefaultValue(0)
@@ -192,12 +192,12 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     end
 
     # set the offset variables after offset_mag and offset_tod
-    weekday_offset_1 = [weekday_offset_magnitude, weekday_offset_schedule].transpose.map {|x| x.reduce(:*)}
-    weekend_offset_1 = [weekend_offset_magnitude, weekend_offset_schedule].transpose.map {|x| x.reduce(:*)}
+    weekday_offset = [weekday_offset_magnitude, weekday_offset_schedule].transpose.map {|x| x.reduce(:*)}
+    weekend_offset = [weekend_offset_magnitude, weekend_offset_schedule].transpose.map {|x| x.reduce(:*)}
 
     # Update to one 24-value float array for setpoints schedule to count for the offset_tods 
-    weekday_setpoints = [ weekday_setpoints, weekday_offset_1].transpose.map {|x| x.reduce(:+)}     
-    weekend_setpoints = [ weekend_setpoints, weekend_offset_1].transpose.map {|x| x.reduce(:+)}
+    weekday_setpoints = [ weekday_setpoints, weekday_offset].transpose.map {|x| x.reduce(:+)}     
+    weekend_setpoints = [ weekend_setpoints, weekend_offset].transpose.map {|x| x.reduce(:+)}
     
     # Convert to month int or nil
     month_map = {"Jan"=>1, "Feb"=>2, "Mar"=>3, "Apr"=>4, "May"=>5, "Jun"=>6, "Jul"=>7, "Aug"=>8, "Sep"=>9, "Oct"=>10, "Nov"=>11, "Dec"=>12}
