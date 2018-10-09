@@ -12,13 +12,13 @@ class ProcessConstructionsPierBeamTest < MiniTest::Test
     args_hash["cavity_r"] = 0
     args_hash["joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>2}
     ceiling_ins_r = 0.23495/2.598173704068639
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
     ceiling_carpet_r = 0.0127/0.0433443509615385
     ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
-    expected_values = {"CeilingRValue"=>ceiling_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
+    expected_values = {"CeilingRValue"=>ceiling_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor+BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA+BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB+BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC+BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD+BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness+BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor+BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -29,13 +29,13 @@ class ProcessConstructionsPierBeamTest < MiniTest::Test
     args_hash["framing_factor"] = 0.13
     args_hash["joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>2}
     ceiling_ins_r = 0.23495/0.1168615354327202
     ceiling_plywood_r = 0.01905/0.1154577
     ceiling_mass_r = 0.015875/0.1154577
     ceiling_carpet_r = 0.0127/0.0433443509615385
     ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
-    expected_values = {"CeilingRValue"=>ceiling_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
+    expected_values = {"CeilingRValue"=>ceiling_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor+BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA+BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB+BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC+BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD+BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness+BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor+BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_PB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   

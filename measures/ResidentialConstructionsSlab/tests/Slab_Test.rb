@@ -10,8 +10,8 @@ class ProcessConstructionsSlabTest < MiniTest::Test
   def test_uninsulated
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>3, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SumRValues"=>0.077+0.293, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>134.165}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"SumRValues"=>0.077+0.293, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>134.165, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -21,8 +21,8 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     args_hash["perimeter_width"] = 2
     args_hash["gap_r"] = 5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SumRValues"=>0.077+0.88+0.88+0.293, "SumWidths"=>0.609, "SumDepths"=>0.1016, "ExposedPerimeter"=>134.167}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"SumRValues"=>0.077+0.88+0.88+0.293, "SumWidths"=>0.609, "SumDepths"=>0.1016, "ExposedPerimeter"=>134.167, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -31,8 +31,8 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     args_hash["exterior_depth"] = 4
     args_hash["exterior_r"] = 15
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SumRValues"=>0.077+2.64+0.293, "SumWidths"=>0, "SumDepths"=>1.2192, "ExposedPerimeter"=>134.167}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"SumRValues"=>0.077+2.64+0.293, "SumWidths"=>0, "SumDepths"=>1.2192, "ExposedPerimeter"=>134.167, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -41,24 +41,24 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     args_hash["whole_r"] = 20
     args_hash["gap_r"] = 10
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    expected_values = {"SumRValues"=>0.077+1.76+3.52+0.293, "SumWidths"=>0, "SumDepths"=>0.1016, "ExposedPerimeter"=>134.167}
+    expected_num_new_objects = {"Material"=>5, "Construction"=>2, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"SumRValues"=>0.077+1.76+3.52+0.293, "SumWidths"=>0, "SumDepths"=>0.1016, "ExposedPerimeter"=>134.167, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_exposed_perimeter_with_garage
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>4, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
-    expected_values = {"ExposedPerimeter"=>104}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>4, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"ExposedPerimeter"=>104, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_exposed_perimeter_with_door
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>4, "Construction"=>4, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2}
-    expected_values = {"ExposedPerimeter"=>104.167}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>4, "FoundationKiva"=>2, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>2, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"ExposedPerimeter"=>104.167, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFD_2000sqft_2story_SL_GRG_UA_Windows_Doors.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -66,8 +66,8 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>8, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"ExposedPerimeter"=>254.558}
+    expected_num_new_objects = {"Material"=>6, "Construction"=>8, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"ExposedPerimeter"=>254.558, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -75,8 +75,8 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     num_units = 8+1
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>11, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units}
-    expected_values = {"ExposedPerimeter"=>339.411}
+    expected_num_new_objects = {"Material"=>11, "Construction"=>18, "FoundationKiva"=>num_units, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>num_units, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_values = {"ExposedPerimeter"=>339.411, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Carpet.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Carpet.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Carpet.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Carpet.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Carpet.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Carpet.coatingLayerWaterVaporDiffusionResistanceFactor}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -212,7 +212,7 @@ class ProcessConstructionsSlabTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"SumRValues"=>0, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>0}
+    actual_values = {"SumRValues"=>0, "SumWidths"=>0, "SumDepths"=>0, "ExposedPerimeter"=>0, "WaterVaporDiffusionResistanceFactor"=>0, "MoistureEquationCoefficientA"=>0, "MoistureEquationCoefficientB"=>0, "MoistureEquationCoefficientC"=>0, "MoistureEquationCoefficientD"=>0, "CoatingLayerThickness"=>0, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -252,21 +252,20 @@ class ProcessConstructionsSlabTest < MiniTest::Test
                         actual_values["ExposedPerimeter"] += UnitConversions.convert(surface.surfacePropertyExposedFoundationPerimeter.get.totalExposedPerimeter.get,"m","ft")
                     end
                 end
+            elsif obj_type == "MaterialPropertyMoisturePenetrationDepthSettings"
+              actual_values["WaterVaporDiffusionResistanceFactor"] += new_object.waterVaporDiffusionResistanceFactor
+              actual_values["MoistureEquationCoefficientA"] += new_object.moistureEquationCoefficientA
+              actual_values["MoistureEquationCoefficientB"] += new_object.moistureEquationCoefficientB
+              actual_values["MoistureEquationCoefficientC"] += new_object.moistureEquationCoefficientC
+              actual_values["MoistureEquationCoefficientD"] += new_object.moistureEquationCoefficientD
+              actual_values["CoatingLayerThickness"] += new_object.coatingLayerThickness
+              actual_values["CoatingLayerWaterVaporDiffusionResistanceFactor"] += new_object.coatingLayerWaterVaporDiffusionResistanceFactor
             end
         end
     end
-    
-    if not expected_values["SumRValues"].nil?
-      assert_in_epsilon(expected_values["SumRValues"], actual_values["SumRValues"], 0.01)
-    end
-    if not expected_values["SumWidths"].nil?
-      assert_in_epsilon(expected_values["SumWidths"], actual_values["SumWidths"], 0.01)
-    end
-    if not expected_values["SumDepths"].nil?
-      assert_in_epsilon(expected_values["SumDepths"], actual_values["SumDepths"], 0.01)
-    end
-    if not expected_values["ExposedPerimeter"].nil?
-      assert_in_epsilon(expected_values["ExposedPerimeter"], actual_values["ExposedPerimeter"], 0.01)
+    actual_values.each do |prop, val|
+      next if expected_values[prop].nil?
+      assert_in_epsilon(expected_values[prop], actual_values[prop], 0.01)  
     end
     
     return model
