@@ -54,12 +54,6 @@ class Material
             @coatingLayerWaterVaporDiffusionResistanceFactor = moist_base.coatingLayerWaterVaporDiffusionResistanceFactor
         end
 
-        if not moist_base.nil?
-
-        else
-
-        end
-        
         # Override the base material if both are included
         if not k_in.nil?
             @k_in = k_in # Btu-in/h-ft^2-F
@@ -196,7 +190,7 @@ class Material
     def self.CoveringBare(floorFraction=0.8, rvalue=2.08)
         # Combined layer of, e.g., carpet and bare floor
         thickness = 0.5 # in
-        return self.new(name="Floor Covering", thick_in=thickness, mat_base=nil, k_in=thickness / (rvalue * floorFraction), rho=3.4, cp=0.32, tAbs=0.9, sAbs=0.9)
+        return self.new(name="Floor Covering", thick_in=thickness, mat_base=nil, k_in=thickness / (rvalue * floorFraction), rho=3.4, cp=0.32, tAbs=0.9, sAbs=0.9, vAbs=nil, rvalue=nil, moist_base=BaseMaterial.Carpet)
     end
 
     def self.Concrete(thick_in)
@@ -387,6 +381,10 @@ class BaseMaterial
 
     def self.Furniture
         return self.new(rho=nil, cp=nil, k_in=nil, waterVaporDiffusionResistanceFactor=6, moistureEquationCoefficientA=0.02, moistureEquationCoefficientB=1.0, moistureEquationCoefficientC=0.0, moistureEquationCoefficientD=1.0, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
+    end
+
+    def self.Carpet
+        return self.new(rho=nil, cp=nil, k_in=nil, waterVaporDiffusionResistanceFactor=6.6, moistureEquationCoefficientA=0.019, moistureEquationCoefficientB=1.0, moistureEquationCoefficientC=0.0, moistureEquationCoefficientD=1.0, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
     end
 
     def self.InsulationRigid
