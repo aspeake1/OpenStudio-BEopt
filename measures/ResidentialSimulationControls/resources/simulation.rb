@@ -19,7 +19,7 @@ class Simulation
         insurf.setAlgorithm('TARP')
         
         zonecap = model.getZoneCapacitanceMultiplierResearchSpecial
-        zonecap.setHumidityCapacityMultiplier(15)
+        zonecap.setHumidityCapacityMultiplier(1) # set to 1, not 15, because we're using EMPD
 
         if not min_system_timestep_mins.nil?
           convlim = model.getConvergenceLimits
