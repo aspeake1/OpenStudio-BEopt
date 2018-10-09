@@ -521,6 +521,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       runner.registerError("Ducts: Return Surface Area Multiplier must be greater than or equal to 0.")
       return false
     end
+    sum_fracs = duct_supply_leakage_frac_of_total + duct_ah_supply_leakage_frac_of_total + duct_return_leakage_frac_of_total + duct_ah_return_leakage_frac_of_total
+    if (sum_fracs-1.0).abs > 0.001
+      runner.registerError("Ducts: Sum of supply and return leakage fractions don't sum to 1.")
+      return false
+    end
     
     # Building unit ffa & nstories
     units = Geometry.get_building_units(model, runner)
@@ -540,16 +545,6 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     num_returns = get_duct_num_returns(duct_num_returns, unit_nstory)
     duct_supply_area = get_duct_supply_surface_area(duct_supply_area_mult, unit_ffa, unit_nstory)
     duct_return_area = get_duct_return_surface_area(duct_return_area_mult, unit_ffa, unit_nstory, num_returns)
-    
-    # FIXME: Move to airflow.rb
-    # Normalize duct leakage frac of total values in case they don't add up to 1
-    sum_fracs = duct_supply_leakage_frac_of_total + duct_ah_supply_leakage_frac_of_total + duct_return_leakage_frac_of_total + duct_ah_return_leakage_frac_of_total
-    if sum_fracs > 0
-      duct_supply_leakage_frac_of_total = duct_supply_leakage_frac_of_total / sum_fracs
-      duct_ah_supply_leakage_frac_of_total = duct_ah_supply_leakage_frac_of_total / sum_fracs
-      duct_return_leakage_frac_of_total = duct_return_leakage_frac_of_total / sum_fracs
-      duct_ah_return_leakage_frac_of_total = duct_ah_return_leakage_frac_of_total / sum_fracs
-    end
     
     # Calculate total supply/return fractions of airflow
     duct_supply_leakage_frac = duct_total_leakage * (duct_supply_leakage_frac_of_total + duct_ah_supply_leakage_frac_of_total)
