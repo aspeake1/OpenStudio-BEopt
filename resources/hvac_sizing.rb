@@ -2794,7 +2794,7 @@ class HVACSizing
         return_leakage_fracs = return_leakage_fracs.split(",").map(&:to_f)
         supply_leakage_cfm25s = supply_leakage_cfm25s.split(",").map(&:to_f)
         return_leakage_cfm25s = return_leakage_cfm25s.split(",").map(&:to_f)
-        if supply_leakage_fracs.inject{ |sum, n| sum + n } == 0.0 and return_leakage_fracs.inject{ |sum, n| sum + n }
+        if supply_leakage_fracs.inject{ |sum, n| sum + n } == 0.0 and return_leakage_fracs.inject{ |sum, n| sum + n } == 0.0
           supply_leakage_fracs = [nil]*supply_leakage_fracs.size
           return_leakage_fracs = [nil]*return_leakage_fracs.size
         else
