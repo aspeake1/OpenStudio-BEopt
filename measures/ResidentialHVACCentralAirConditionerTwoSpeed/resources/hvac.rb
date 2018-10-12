@@ -1336,11 +1336,10 @@ class HVAC
         
         # _processSystemFan
         
-        # fan_power_curve = create_curve_exponent(model, [0, 1, 3], obj_name + " fan power curve", -100, 100)        
-        # fan_eff_curve = create_curve_cubic(model, [0, 1, 0, 0], obj_name + " fan eff curve", 0, 1, 0.01, 1)
+        fan_power_curve = create_curve_exponent(model, [0, 1, 3], obj_name + " fan power curve", -100, 100)        
+        fan_eff_curve = create_curve_cubic(model, [0, 1, 0, 0], obj_name + " fan eff curve", 0, 1, 0.01, 1)
         
-        # fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule, fan_power_curve, fan_eff_curve)
-        fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule)
+        fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule, fan_power_curve, fan_eff_curve)
         fan_eff = UnitConversions.convert(UnitConversions.convert(0.1, "inH2O", "Pa") / fan_power, "cfm", "m^3/s") # Overall Efficiency of the Fan, Motor and Drive
         fan.setName(obj_name + " htg supply fan")
         fan.setEndUseSubcategory(Constants.EndUseHVACHeatingFan)
@@ -1349,12 +1348,12 @@ class HVAC
         fan.setMotorEfficiency(1.0)
         fan.setMotorInAirstreamFraction(1.0)    
         
-        # perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)
-        # perf.setSingleModeOperation(false)
-        # for speed in 1..num_speeds
-        #   f = OpenStudio::Model::SupplyAirflowRatioField.new(fan_speed_ratios_heating[speed-1], Constants.small)
-        #   perf.addSupplyAirflowRatioField(f)
-        # end
+        perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)
+        perf.setSingleModeOperation(false)
+        for speed in 1..num_speeds
+          f = OpenStudio::Model::SupplyAirflowRatioField.new(1, Constants.small) # TODO: fan_speed_ratios_heating?
+          perf.addSupplyAirflowRatioField(f)
+        end
 
         # _processSystemAir
                  
@@ -1369,7 +1368,7 @@ class HVAC
         htg_air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(200.0,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.
         htg_air_loop_unitary.setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(UnitConversions.convert(40.0,"F","C"))
         htg_air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
-        # htg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
+        htg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
         air_loop.setName(obj_name + " central htg air system")
@@ -1438,11 +1437,10 @@ class HVAC
         
         # _processSystemFan
         
-        # fan_power_curve = create_curve_exponent(model, [0, 1, 3], obj_name + " fan power curve", -100, 100)        
-        # fan_eff_curve = create_curve_cubic(model, [0, 1, 0, 0], obj_name + " fan eff curve", 0, 1, 0.01, 1)
+        fan_power_curve = create_curve_exponent(model, [0, 1, 3], obj_name + " fan power curve", -100, 100)        
+        fan_eff_curve = create_curve_cubic(model, [0, 1, 0, 0], obj_name + " fan eff curve", 0, 1, 0.01, 1)
         
-        # fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule, fan_power_curve, fan_eff_curve)
-        fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule)
+        fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule, fan_power_curve, fan_eff_curve)
         fan_eff = UnitConversions.convert(UnitConversions.convert(0.1, "inH2O", "Pa") / fan_power, "cfm", "m^3/s") # Overall Efficiency of the Fan, Motor and Drive
         fan.setName(obj_name + " clg supply fan")
         fan.setEndUseSubcategory(Constants.EndUseHVACCoolingFan)
@@ -1451,12 +1449,12 @@ class HVAC
         fan.setMotorEfficiency(1.0)
         fan.setMotorInAirstreamFraction(1.0)    
         
-        # perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)
-        # perf.setSingleModeOperation(false)
-        # for speed in 1..num_speeds
-        #   f = OpenStudio::Model::SupplyAirflowRatioField.new(Constants.small, fan_speed_ratios_cooling[speed-1])
-        #   perf.addSupplyAirflowRatioField(f)
-        # end
+        perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)
+        perf.setSingleModeOperation(false)
+        for speed in 1..num_speeds
+          f = OpenStudio::Model::SupplyAirflowRatioField.new(Constants.small, 1) # TODO: fan_speed_ratios_cooling?
+          perf.addSupplyAirflowRatioField(f)
+        end
 
         # _processSystemAir
                  
@@ -1470,7 +1468,7 @@ class HVAC
         clg_air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(170.0,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.
         clg_air_loop_unitary.setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(UnitConversions.convert(40.0,"F","C"))
         clg_air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
-        # clg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
+        clg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
         air_loop.setName(obj_name + " central clg air system")
@@ -1522,9 +1520,9 @@ class HVAC
 
         htg_air_loop_unitary.additionalProperties.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
         clg_air_loop_unitary.additionalProperties.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
-        # clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios.join(","))
-        # clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
-        # htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP, cop_capacity_derates.join(","))
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios_cooling.join(","))
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, "1,1,1,1,1") # TODO: eer_capacity_derates?
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP, "1,1,1,1,1") # TODO: cop_capacity_derates?
         htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHPSizedForMaxLoad, (heat_pump_capacity == Constants.SizingAutoMaxLoad))
         htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating, cfms_heating.join(","))
         clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cfms_cooling.join(","))
@@ -4442,6 +4440,7 @@ class HVAC
           cfms_cooling[i] = cfm_ton_min + i*(cfm_ton_max - cfm_ton_min)/(num_speeds-1)
           # Calculate the SHR for each speed. Use minimum value of 0.98 to prevent E+ bypass factor calculation errors
           shrs_rated[i] = [Psychrometrics.CalculateSHR(dB_rated, wB_rated, Constants.Patm, UnitConversions.convert(capacity_ratios_cooling[i],"ton","kBtu/hr"), cfms_cooling[i], ao), 0.98].min
+
       end
     
       return cfms_cooling, capacity_ratios_cooling, shrs_rated
