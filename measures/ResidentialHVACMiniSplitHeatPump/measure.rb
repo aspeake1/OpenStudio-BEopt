@@ -33,7 +33,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     seer.setUnits("Btu/W-h")
     seer.setDescription("Seasonal Energy Efficiency Ratio (SEER) is a measure of equipment energy efficiency over the cooling season.")
     seer.setDefaultValue(14.5)
-    args << seer 
+    args << seer
     
     #make a double argument for minisplit rated hspf
     hspf = OpenStudio::Measure::OSArgument::makeDoubleArgument("hspf", true)
@@ -48,15 +48,15 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     shr.setDisplayName("Rated SHR")
     shr.setDescription("The sensible heat ratio (ratio of the sensible portion of the load to the total load) at the nominal rated capacity.")
     shr.setDefaultValue(0.73)
-    args << shr        
-    
+    args << shr
+
     #make a double argument for minisplit cooling min capacity
     min_cooling_capacity = OpenStudio::Measure::OSArgument::makeDoubleArgument("min_cooling_capacity", true)
     min_cooling_capacity.setDisplayName("Minimum Cooling Capacity")
     min_cooling_capacity.setUnits("frac")
     min_cooling_capacity.setDescription("Minimum cooling capacity as a fraction of the nominal cooling capacity at rated conditions.")
     min_cooling_capacity.setDefaultValue(0.4)
-    args << min_cooling_capacity     
+    args << min_cooling_capacity
     
     #make a double argument for minisplit cooling max capacity
     max_cooling_capacity = OpenStudio::Measure::OSArgument::makeDoubleArgument("max_cooling_capacity", true)
@@ -64,7 +64,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     max_cooling_capacity.setUnits("frac")
     max_cooling_capacity.setDescription("Maximum cooling capacity as a fraction of the nominal cooling capacity at rated conditions.")
     max_cooling_capacity.setDefaultValue(1.2)
-    args << max_cooling_capacity    
+    args << max_cooling_capacity
     
     #make a double argument for minisplit cooling min airflow
     min_cooling_airflow_rate = OpenStudio::Measure::OSArgument::makeDoubleArgument("min_cooling_airflow_rate", true)
@@ -72,7 +72,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     min_cooling_airflow_rate.setUnits("cfm/ton")
     min_cooling_airflow_rate.setDescription("Minimum cooling cfm divided by the nominal rated cooling capacity.")
     min_cooling_airflow_rate.setDefaultValue(200.0)
-    args << min_cooling_airflow_rate      
+    args << min_cooling_airflow_rate
     
     #make a double argument for minisplit cooling max airflow
     max_cooling_airflow_rate = OpenStudio::Measure::OSArgument::makeDoubleArgument("max_cooling_airflow_rate", true)
@@ -80,7 +80,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     max_cooling_airflow_rate.setUnits("cfm/ton")
     max_cooling_airflow_rate.setDescription("Maximum cooling cfm divided by the nominal rated cooling capacity.")
     max_cooling_airflow_rate.setDefaultValue(425.0)
-    args << max_cooling_airflow_rate     
+    args << max_cooling_airflow_rate
     
     #make a double argument for minisplit heating min capacity
     min_heating_capacity = OpenStudio::Measure::OSArgument::makeDoubleArgument("min_heating_capacity", true)
@@ -88,7 +88,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     min_heating_capacity.setUnits("frac")
     min_heating_capacity.setDescription("Minimum heating capacity as a fraction of nominal heating capacity at rated conditions.")
     min_heating_capacity.setDefaultValue(0.3)
-    args << min_heating_capacity     
+    args << min_heating_capacity
     
     #make a double argument for minisplit heating max capacity
     max_heating_capacity = OpenStudio::Measure::OSArgument::makeDoubleArgument("max_heating_capacity", true)
@@ -96,7 +96,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     max_heating_capacity.setUnits("frac")
     max_heating_capacity.setDescription("Maximum heating capacity as a fraction of nominal heating capacity at rated conditions.")
     max_heating_capacity.setDefaultValue(1.2)
-    args << max_heating_capacity        
+    args << max_heating_capacity
     
     #make a double argument for minisplit heating min airflow
     min_heating_airflow_rate = OpenStudio::Measure::OSArgument::makeDoubleArgument("min_heating_airflow_rate", true)
@@ -104,7 +104,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     min_heating_airflow_rate.setUnits("cfm/ton")
     min_heating_airflow_rate.setDescription("Minimum heating cfm divided by the nominal rated heating capacity.")
     min_heating_airflow_rate.setDefaultValue(200.0)
-    args << min_heating_airflow_rate     
+    args << min_heating_airflow_rate
     
     #make a double argument for minisplit heating min airflow
     max_heating_airflow_rate = OpenStudio::Measure::OSArgument::makeDoubleArgument("max_heating_airflow_rate", true)
@@ -112,7 +112,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     max_heating_airflow_rate.setUnits("cfm/ton")
     max_heating_airflow_rate.setDescription("Maximum heating cfm divided by the nominal rated heating capacity.")
     max_heating_airflow_rate.setDefaultValue(400.0)
-    args << max_heating_airflow_rate         
+    args << max_heating_airflow_rate
     
     #make a double argument for minisplit heating capacity offset
     heating_capacity_offset = OpenStudio::Measure::OSArgument::makeDoubleArgument("heating_capacity_offset", true)
@@ -120,32 +120,8 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     heating_capacity_offset.setUnits("Btu/hr")
     heating_capacity_offset.setDescription("The difference between the nominal rated heating capacity and the nominal rated cooling capacity.")
     heating_capacity_offset.setDefaultValue(2300.0)
-    args << heating_capacity_offset    
-    
-    #make a double argument for minisplit capacity retention fraction
-    cap_retention_frac = OpenStudio::Measure::OSArgument::makeDoubleArgument("cap_retention_frac", true)
-    cap_retention_frac.setDisplayName("Heating Capacity Retention Fraction")
-    cap_retention_frac.setUnits("frac")
-    cap_retention_frac.setDescription("The maximum heating capacity at X degrees divided by the maximum heating capacity at 47 degrees F.")
-    cap_retention_frac.setDefaultValue(0.25)
-    args << cap_retention_frac
-    
-    #make a double argument for minisplit capacity retention temperature
-    cap_retention_temp = OpenStudio::Measure::OSArgument::makeDoubleArgument("cap_retention_temp", true)
-    cap_retention_temp.setDisplayName("Heating Capacity Retention Temperature")
-    cap_retention_temp.setUnits("degrees F")
-    cap_retention_temp.setDescription("The outdoor drybulb temperature at which the heating capacity retention fraction is defined.")
-    cap_retention_temp.setDefaultValue(-5.0)
-    args << cap_retention_temp    
-    
-    #make a double argument for minisplit pan heater power
-    pan_heater_power = OpenStudio::Measure::OSArgument::makeDoubleArgument("pan_heater_power", true)
-    pan_heater_power.setDisplayName("Pan Heater")
-    pan_heater_power.setUnits("W/unit")
-    pan_heater_power.setDescription("Prevents ice build up from damaging the coil.")
-    pan_heater_power.setDefaultValue(0.0)
-    args << pan_heater_power    
-    
+    args << heating_capacity_offset
+
     #make a double argument for minisplit supply fan power
     fan_power = OpenStudio::Measure::OSArgument::makeDoubleArgument("fan_power", true)
     fan_power.setDisplayName("Supply Fan Power")
@@ -154,13 +130,14 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     fan_power.setDefaultValue(0.07)
     args << fan_power
 
-    #make a bool argument for whether the minisplit is ducted or ductless
-    is_ducted = OpenStudio::Measure::OSArgument::makeBoolArgument("is_ducted", true)
-    is_ducted.setDisplayName("Is Ducted")
-    is_ducted.setDescription("Specified whether the mini-split heat pump is ducted or ductless.")
-    is_ducted.setDefaultValue(false)
-    args << is_ducted
-    
+    #make a double argument for minisplit min temp
+    min_temp = OpenStudio::Ruleset::OSArgument::makeDoubleArgument("min_temp", true)
+    min_temp.setDisplayName("Min Temp")
+    min_temp.setUnits("degrees F")
+    min_temp.setDescription("Outdoor dry-bulb temperature below which compressor turns off.")
+    min_temp.setDefaultValue(5.0)
+    args << min_temp
+
     #make a string argument for minisplit cooling output capacity
     heat_pump_capacity = OpenStudio::Measure::OSArgument::makeStringArgument("heat_pump_capacity", true)
     heat_pump_capacity.setDisplayName("Heat Pump Capacity")
@@ -183,7 +160,14 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     supplemental_capacity.setDescription("The output heating capacity of the supplemental electric baseboard. If using '#{Constants.SizingAuto}', the autosizing algorithm will use ACCA Manual S to set the supplemental heating capacity.")
     supplemental_capacity.setUnits("kBtu/hr")
     supplemental_capacity.setDefaultValue(Constants.SizingAuto)
-    args << supplemental_capacity  
+    args << supplemental_capacity
+
+    #make a bool argument for whether the minisplit is ducted or ductless
+    is_ducted = OpenStudio::Measure::OSArgument::makeBoolArgument("is_ducted", true)
+    is_ducted.setDisplayName("Is Ducted")
+    is_ducted.setDescription("Specified whether the mini-split heat pump is ducted or ductless.")
+    is_ducted.setDefaultValue(false)
+    args << is_ducted
     
     #make a string argument for distribution system efficiency
     dse = OpenStudio::Measure::OSArgument::makeStringArgument("dse", true)
@@ -226,17 +210,14 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     min_cooling_capacity = runner.getDoubleArgumentValue("min_cooling_capacity",user_arguments) 
     max_cooling_capacity = runner.getDoubleArgumentValue("max_cooling_capacity",user_arguments) 
     min_cooling_airflow_rate = runner.getDoubleArgumentValue("min_cooling_airflow_rate",user_arguments) 
-    max_cooling_airflow_rate = runner.getDoubleArgumentValue("max_cooling_airflow_rate",user_arguments) 
+    max_cooling_airflow_rate = runner.getDoubleArgumentValue("max_cooling_airflow_rate",user_arguments)
     min_heating_capacity = runner.getDoubleArgumentValue("min_heating_capacity",user_arguments) 
     max_heating_capacity = runner.getDoubleArgumentValue("max_heating_capacity",user_arguments) 
     min_heating_airflow_rate = runner.getDoubleArgumentValue("min_heating_airflow_rate",user_arguments) 
     max_heating_airflow_rate = runner.getDoubleArgumentValue("max_heating_airflow_rate",user_arguments)
     heating_capacity_offset = runner.getDoubleArgumentValue("heating_capacity_offset",user_arguments) 
-    cap_retention_frac = runner.getDoubleArgumentValue("cap_retention_frac",user_arguments)
-    cap_retention_temp = runner.getDoubleArgumentValue("cap_retention_temp",user_arguments)
-    pan_heater_power = runner.getDoubleArgumentValue("pan_heater_power",user_arguments)    
     fan_power = runner.getDoubleArgumentValue("fan_power",user_arguments)
-    is_ducted = runner.getBoolArgumentValue("is_ducted",user_arguments)
+    min_temp = runner.getDoubleArgumentValue("min_temp", user_arguments)
     heat_pump_capacity = runner.getStringArgumentValue("heat_pump_capacity",user_arguments)
     unless heat_pump_capacity == Constants.SizingAuto or heat_pump_capacity == Constants.SizingAutoMaxLoad
       heat_pump_capacity = UnitConversions.convert(heat_pump_capacity.to_f,"ton","Btu/hr")
@@ -245,7 +226,8 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     supplemental_capacity = runner.getStringArgumentValue("supplemental_capacity",user_arguments)
     unless supplemental_capacity == Constants.SizingAuto
       supplemental_capacity = UnitConversions.convert(supplemental_capacity.to_f,"kBtu/hr","Btu/hr")
-    end    
+    end
+    is_ducted = runner.getBoolArgumentValue("is_ducted",user_arguments)
     dse = runner.getStringArgumentValue("dse",user_arguments)
     if dse.to_f > 0
       dse = dse.to_f
@@ -276,10 +258,9 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
                                 min_cooling_airflow_rate, max_cooling_airflow_rate,
                                 min_heating_capacity, max_heating_capacity,
                                 min_heating_airflow_rate, max_heating_airflow_rate, 
-                                heating_capacity_offset, cap_retention_frac,
-                                cap_retention_temp, pan_heater_power, fan_power,
-                                is_ducted, heat_pump_capacity,
-                                supplemental_efficiency, supplemental_capacity,
+                                heating_capacity_offset,
+                                fan_power, min_temp, is_ducted, 
+                                heat_pump_capacity, supplemental_efficiency, supplemental_capacity,
                                 dse, frac_heat_load_served, frac_cool_load_served)
       return false if not success
       

@@ -6,6 +6,14 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class ProcessMiniSplitHeatPumpTest < MiniTest::Test 
+
+  def test_new
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {"CoolingCOP"=>2.34, "CoolingNominalCapacity"=>8440.45, "FBsmtZoneCoolingNominalCapacity"=>4220.22, "HeatingCOP"=>2.84, "HeatingNominalCapacity"=>8979.70, "FBsmtZoneHeatingNominalCapacity"=>4489.85, "SuppNominalCapacity"=>5861.42, "is_ducted"=>false}
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
   
   def test_new_construction_fbsmt_seer_14_5_8_2_hspf
     args_hash = {}
@@ -17,7 +25,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirConditionerVariableRefrigerantFlow"=>2, "FanOnOff"=>4, "ZoneHVACTerminalUnitVariableRefrigerantFlow"=>4, "CoilHeatingDXVariableRefrigerantFlow"=>2, "CoilCoolingDXVariableRefrigerantFlow"=>2, "ZoneHVACBaseboardConvectiveElectric"=>2, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "EnergyManagementSystemSensor"=>3, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_values = {"CoolingCOP"=>2.34, "CoolingNominalCapacity"=>8440.45, "FBsmtZoneCoolingNominalCapacity"=>4220.22, "HeatingCOP"=>2.84, "HeatingNominalCapacity"=>8979.70, "FBsmtZoneHeatingNominalCapacity"=>4489.85, "SuppNominalCapacity"=>5861.42, "is_ducted"=>false}
-    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 9)
   end  
   
   def test_new_construction_fbsmt_seer_14_5_8_2_hspf_no_supp_heating_80_dse
@@ -312,7 +320,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    # show_output(result)
+    show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
