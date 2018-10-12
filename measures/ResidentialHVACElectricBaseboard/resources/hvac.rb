@@ -1270,6 +1270,7 @@ class HVAC
                         dse, frac_heat_load_served=1.0, frac_cool_load_served=1.0)
     
       num_speeds = 4
+      supp_htg_max_supply_temp = 200.0
 
       # NOTE: These coefficients are in SI UNITS, which differs from the coefficients for 1, 2, and 4 speed units, which are in IP UNITS
       cOOL_CAP_FT_SPEC = [[1.008993521905866, 0.006512749025457, 0.0, 0.003917565735935, -0.000222646705889, 0.0]] * num_speeds
@@ -1365,7 +1366,7 @@ class HVAC
         htg_air_loop_unitary.setSupplementalHeatingCoil(supp_htg_coil)
         htg_air_loop_unitary.setFanPlacement("BlowThrough")
         htg_air_loop_unitary.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
-        htg_air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(200.0,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.
+        htg_air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(supp_htg_max_supply_temp,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.
         htg_air_loop_unitary.setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(UnitConversions.convert(40.0,"F","C"))
         htg_air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
         htg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
@@ -1465,7 +1466,7 @@ class HVAC
         clg_air_loop_unitary.setCoolingCoil(clg_coil)
         clg_air_loop_unitary.setFanPlacement("BlowThrough")
         clg_air_loop_unitary.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
-        clg_air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(170.0,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.
+        clg_air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(supp_htg_max_supply_temp,"F","C")) # higher temp for supplemental heat as to not severely limit its use, resulting in unmet hours.
         clg_air_loop_unitary.setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(UnitConversions.convert(40.0,"F","C"))
         clg_air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
         clg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
@@ -4221,7 +4222,7 @@ class HVAC
     
     def self.remove_mshp(model, runner, thermal_zone, unit)
       # Returns true if the object was removed
-      return false if not self.has_ashp(model, runner, thermal_zone)
+      return false if not self.has_mshp(model, runner, thermal_zone)
       unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
       unitary_system_air_loops.each do |unitary_system_air_loop|
         system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
