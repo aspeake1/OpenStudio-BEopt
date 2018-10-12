@@ -1519,6 +1519,9 @@ class HVAC
         end # slave_zone
       
         # Store info for HVAC Sizing measure
+
+        htg_air_loop_unitary.additionalProperties.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
+        clg_air_loop_unitary.additionalProperties.setFeature(Constants.DuctedInfoMiniSplitHeatPump, is_ducted)
         # clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_ratios.join(","))
         # clg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorEER, eer_capacity_derates.join(","))
         # htg_air_loop_unitary.additionalProperties.setFeature(Constants.SizingInfoHVACCapacityDerateFactorCOP, cop_capacity_derates.join(","))
@@ -3726,14 +3729,6 @@ class HVAC
         cooling_equipment << ptac
       end
 
-      vrfs = self.get_vrfs(model, runner, thermal_zone)
-      vrfs.each do |vrf|
-        vrf.terminals.each do |terminal|
-          next if not terminal.coolingCoil.is_initialized
-          cooling_equipment << terminal
-        end
-      end
-
       if self.has_ideal_air(model, runner, thermal_zone)
         runner.registerInfo("Found ideal air system in #{thermal_zone.name}.")
         ideal_air = self.get_ideal_air(model, runner, thermal_zone)
@@ -3784,14 +3779,6 @@ class HVAC
       baseboards = self.get_baseboard_electrics(model, runner, thermal_zone)
       baseboards.each do |baseboard|
         heating_equipment << baseboard
-      end
-
-      vrfs = self.get_vrfs(model, runner, thermal_zone)
-      vrfs.each do |vrf|
-        vrf.terminals.each do |terminal|
-          next if not terminal.heatingCoil.is_initialized
-          heating_equipment << terminal
-        end
       end
 
       unitary_system_zone_hvacs = self.get_unitary_system_zone_hvacs(model, runner, thermal_zone)
@@ -3910,20 +3897,6 @@ class HVAC
       return unitary_system_zone_hvacs
     end
     
-    def self.get_vrfs(model, runner, thermal_zone)
-      # Returns the VRF(s) if available
-      vrfs = []
-      model.getAirConditionerVariableRefrigerantFlows.each do |vrf|
-        vrf.terminals.each do |terminal|
-          next unless thermal_zone.handle.to_s == terminal.thermalZone.get.handle.to_s
-          unless vrfs.include? vrf
-            vrfs << vrf
-          end
-        end
-      end
-      return vrfs
-    end
-    
     def self.get_ptacs(model, runner, thermal_zone)
       # Returns the PTAC(s) if available
       ptacs = []
@@ -4020,7 +3993,14 @@ class HVAC
     end
     
     def self.num_mshp(model, runner, thermal_zone)
-      return self.get_vrfs(model, runner, thermal_zone).length
+      num = 0
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next unless system.name.to_s.start_with? Constants.ObjectNameMiniSplitHeatPump
+        num += 1
+      end
+      return num
     end
     
     def self.num_room_ac(model, runner, thermal_zone)
@@ -4109,15 +4089,12 @@ class HVAC
       if not self.has_mshp(model, runner, thermal_zone)
         return false
       end
-      model.getBuildingUnits.each do |unit|
-        next if not Geometry.get_thermal_zones_from_spaces(unit.spaces).include?(thermal_zone)
-        model.getAirConditionerVariableRefrigerantFlows.each do |vrf|
-          vrf.terminals.each do |terminal|
-            next unless thermal_zone.handle.to_s == terminal.thermalZone.get.handle.to_s
-            is_ducted = vrf.additionalProperties.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump).get
-            return is_ducted
-          end
-        end
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next unless system.name.to_s.start_with? Constants.ObjectNameMiniSplitHeatPump
+        is_ducted = system.additionalProperties.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump).get
+        return is_ducted
       end
       return false
     end
@@ -4256,48 +4233,24 @@ class HVAC
     
     def self.remove_mshp(model, runner, thermal_zone, unit)
       # Returns true if the object was removed
-      return false if not self.has_mshp(model, runner, thermal_zone)
-      vrfs = self.get_vrfs(model, runner, thermal_zone)
-      vrfs.each do |vrf|
-        runner.registerInfo("Removed '#{vrf.name}' from #{thermal_zone.name}.")
-        vrf.terminals.each do |terminal|
-          terminal.remove
+      return false if not self.has_ashp(model, runner, thermal_zone)
+      unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+      unitary_system_air_loops.each do |unitary_system_air_loop|
+        system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+        next unless system.name.to_s.start_with? Constants.ObjectNameMiniSplitHeatPump
+        unless htg_coil.nil?
+          runner.registerInfo("Removed '#{htg_coil.name}' from '#{air_loop.name}'.")
+          system.resetHeatingCoil
+          htg_coil.remove          
         end
-        vrf.remove
-      end
-
-      obj_name = Constants.ObjectNameMiniSplitHeatPump(unit.name.to_s)
-      
-      model.getEnergyManagementSystemSensors.each do |sensor|
-        next unless sensor.name.to_s == "#{obj_name} vrf energy sensor".gsub(" ","_").gsub("|","_")
-        sensor.remove
-      end
-      model.getEnergyManagementSystemSensors.each do |sensor|
-        next unless sensor.name.to_s == "#{obj_name} vrf fbsmt energy sensor".gsub(" ","_").gsub("|","_")
-        sensor.remove
-      end
-      model.getEnergyManagementSystemSensors.each do |sensor|
-        next unless sensor.name.to_s == "#{obj_name} tout sensor".gsub(" ","_").gsub("|","_")
-        sensor.remove
-      end
-      model.getEnergyManagementSystemActuators.each do |actuator|
-        next unless actuator.name.to_s == "#{obj_name} pan heater actuator".gsub(" ","_").gsub("|","_")
-        actuator.remove
-      end
-      model.getEnergyManagementSystemPrograms.each do |program|
-        next unless program.name.to_s == "#{obj_name} pan heater program".gsub(" ","_")
-        program.remove
-      end          
-      model.getEnergyManagementSystemProgramCallingManagers.each do |program_calling_manager|
-        next unless program_calling_manager.name.to_s == obj_name + " pan heater program calling manager"
-        program_calling_manager.remove
-      end
-      
-      thermal_zone.spaces.each do |space|
-        space.electricEquipment.each do |equip|
-          next unless equip.name.to_s == obj_name + " pan heater equip"
-          equip.electricEquipmentDefinition.remove
+        unless clg_coil.nil?
+          runner.registerInfo("Removed '#{clg_coil.name}' from '#{air_loop.name}'.")
+          system.resetCoolingCoil
+          clg_coil.remove          
         end
+        system.supplyFan.get.remove
+        runner.registerInfo("Removed '#{air_loop.name}' from #{thermal_zone.name}.")
+        air_loop.remove        
       end
       return true
     end
