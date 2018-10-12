@@ -547,7 +547,7 @@ class HVAC
         htg_air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
           
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central htg air system")
+        air_loop.setName(obj_name + " htg asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -639,7 +639,7 @@ class HVAC
         clg_air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
           
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central clg air system")
+        air_loop.setName(obj_name + " clg asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -817,7 +817,7 @@ class HVAC
         htg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central htg air system")
+        air_loop.setName(obj_name + " htg asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -916,7 +916,7 @@ class HVAC
         clg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central clg air system")
+        air_loop.setName(obj_name + " clg asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -1087,7 +1087,7 @@ class HVAC
         # _processSystemAir
                  
         htg_air_loop_unitary = OpenStudio::Model::AirLoopHVACUnitarySystem.new(model)
-        htg_air_loop_unitary.setName(obj_name + " htg unitary system")
+        htg_air_loop_unitary.setName(obj_name + " htg asys")
         htg_air_loop_unitary.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
         htg_air_loop_unitary.setSupplyFan(fan)
         htg_air_loop_unitary.setHeatingCoil(htg_coil)
@@ -1371,7 +1371,7 @@ class HVAC
         htg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central htg air system")
+        air_loop.setName(obj_name + " htg asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -1471,7 +1471,7 @@ class HVAC
         clg_air_loop_unitary.setDesignSpecificationMultispeedObject(perf)
         
         air_loop = OpenStudio::Model::AirLoopHVAC.new(model)
-        air_loop.setName(obj_name + " central clg air system")
+        air_loop.setName(obj_name + " clg asys")
         air_supply_inlet_node = air_loop.supplyInletNode
         air_supply_outlet_node = air_loop.supplyOutletNode
         air_demand_inlet_node = air_loop.demandInletNode
@@ -2433,8 +2433,7 @@ class HVAC
         heating_equipment.each do |htg_equip|
           htg_obj = nil
           supp_htg_obj = nil
-          if (htg_equip.is_a? OpenStudio::Model::AirLoopHVACUnitarySystem or
-              htg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow)
+          if htg_equip.is_a? OpenStudio::Model::AirLoopHVACUnitarySystem
             clg_obj, htg_obj, supp_htg_obj = get_coils_from_hvac_equip(htg_equip)
           elsif htg_equip.to_ZoneHVACComponent.is_initialized
             htg_obj = htg_equip
@@ -3804,9 +3803,6 @@ class HVAC
         htg_coil = get_coil_from_hvac_component(hvac_equip.heatingCoil)
         clg_coil = get_coil_from_hvac_component(hvac_equip.coolingCoil)
         supp_htg_coil = get_coil_from_hvac_component(hvac_equip.supplementalHeatingCoil)
-      elsif hvac_equip.to_ZoneHVACTerminalUnitVariableRefrigerantFlow.is_initialized
-        htg_coil = get_coil_from_hvac_component(hvac_equip.heatingCoil)
-        clg_coil = get_coil_from_hvac_component(hvac_equip.coolingCoil)
       elsif hvac_equip.is_a? OpenStudio::Model::ZoneHVACBaseboardConvectiveWater
         htg_coil = get_coil_from_hvac_component(hvac_equip.heatingCoil)
       elsif hvac_equip.is_a? OpenStudio::Model::ZoneHVACPackagedTerminalAirConditioner
@@ -3818,9 +3814,7 @@ class HVAC
 
     def self.get_coil_from_hvac_component(hvac_component)
       # Check for optional objects
-      if (hvac_component.is_a? OpenStudio::Model::OptionalHVACComponent or
-          hvac_component.is_a? OpenStudio::Model::OptionalCoilHeatingDXVariableRefrigerantFlow or
-          hvac_component.is_a? OpenStudio::Model::OptionalCoilCoolingDXVariableRefrigerantFlow)
+      if hvac_component.is_a? OpenStudio::Model::OptionalHVACComponent
         return nil if not hvac_component.is_initialized
         hvac_component = hvac_component.get
       end
@@ -3830,8 +3824,6 @@ class HVAC
         return hvac_component.to_CoilCoolingDXSingleSpeed.get
       elsif hvac_component.to_CoilCoolingDXMultiSpeed.is_initialized
         return hvac_component.to_CoilCoolingDXMultiSpeed.get
-      elsif hvac_component.to_CoilCoolingDXVariableRefrigerantFlow.is_initialized
-        return hvac_component.to_CoilCoolingDXVariableRefrigerantFlow.get
       elsif hvac_component.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
         return hvac_component.to_CoilCoolingWaterToAirHeatPumpEquationFit.get
       end
@@ -3841,8 +3833,6 @@ class HVAC
         return hvac_component.to_CoilHeatingDXSingleSpeed.get
       elsif hvac_component.to_CoilHeatingDXMultiSpeed.is_initialized
         return hvac_component.to_CoilHeatingDXMultiSpeed.get
-      elsif hvac_component.to_CoilHeatingDXVariableRefrigerantFlow.is_initialized
-        return hvac_component.to_CoilHeatingDXVariableRefrigerantFlow.get
       elsif hvac_component.to_CoilHeatingGas.is_initialized
         return hvac_component.to_CoilHeatingGas.get
       elsif hvac_component.to_CoilHeatingElectric.is_initialized

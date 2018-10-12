@@ -380,13 +380,13 @@ class ResidentialAirflowTest < MiniTest::Test
   end
 
   def test_ducted_mini_split_heat_pump_has_ducts # miniSplitHPIsDucted=true, duct_location=auto
-    num_terminals = 2
+    num_airloops = 2
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>4, "EnergyManagementSystemSubroutine"=>num_terminals, "EnergyManagementSystemProgramCallingManager"=>1+num_terminals, "EnergyManagementSystemProgram"=>2+num_terminals, "EnergyManagementSystemSensor"=>10+9*num_terminals, "EnergyManagementSystemActuator"=>5+12*num_terminals, "EnergyManagementSystemGlobalVariable"=>23*num_terminals, "OtherEquipmentDefinition"=>10*num_terminals, "OtherEquipment"=>10*num_terminals, "ThermalZone"=>num_terminals, "ZoneMixing"=>2*num_terminals, "SpaceInfiltrationDesignFlowRate"=>2, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Space"=>num_terminals, "Material"=>1, "ElectricEquipmentDefinition"=>3, "ElectricEquipment"=>3, "SurfacePropertyConvectionCoefficients"=>6*num_terminals, "Surface"=>6*num_terminals}
-    expected_values = {"res_infil_1_program"=>{"c"=>0.069658, "Cs"=>0.086238, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds res ms living h vrf ret air zone"=>{"RADuctVol"=>90}, "res ds res ms living c vrf ret air zone"=>{"RADuctVol"=>90}, "res_ds_res_ms_living_h_vrf_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, "res_ds_res_ms_living_c_vrf_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
-    model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHPDucted.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_terminals, 1)
+    expected_num_new_objects = {"ScheduleRuleset"=>4, "EnergyManagementSystemSubroutine"=>num_airloops, "EnergyManagementSystemProgramCallingManager"=>1+num_airloops, "EnergyManagementSystemProgram"=>2+num_airloops, "EnergyManagementSystemSensor"=>10+10*num_airloops, "EnergyManagementSystemActuator"=>5+12*num_airloops, "EnergyManagementSystemGlobalVariable"=>23*num_airloops, "AirLoopHVACReturnPlenum"=>num_airloops, "OtherEquipmentDefinition"=>10*num_airloops, "OtherEquipment"=>10*num_airloops, "ThermalZone"=>num_airloops, "ZoneMixing"=>2*num_airloops, "SpaceInfiltrationDesignFlowRate"=>2, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Space"=>num_airloops, "Material"=>1, "ElectricEquipmentDefinition"=>3, "ElectricEquipment"=>3, "SurfacePropertyConvectionCoefficients"=>6*num_airloops, "Surface"=>6*num_airloops}
+    expected_values = {"res_infil_1_program"=>{"c"=>0.069658, "Cs"=>0.086238, "Cw"=>0.128435, "faneff_wh"=>0.943894, "faneff_sp"=>0.471947}, "res_nv_1_program"=>{"Cs"=>0.000179, "Cw"=>0.000282}, "res ds res ms htg asys ret air zone"=>{"RADuctVol"=>90}, "res ds res ms clg asys ret air zone"=>{"RADuctVol"=>90}, "res_ds_res_ms_htg_asys_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, "res_ds_res_ms_clg_asys_lk_subrout"=>{"f_sup"=>0.136963, "f_ret"=>0.100099, "f_OA"=>0.036863}, "TerrainType"=>"Suburbs", "DuctLocation"=>"unfinished attic zone"}
+    model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHPDucted.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, num_airloops, 1)
   end
 
   def test_duct_location_frac
@@ -694,6 +694,7 @@ class ResidentialAirflowTest < MiniTest::Test
           next if new_object.outputVariableOrMeterName != "Zone Air Temperature"
           actual_values["DuctLocation"] = new_object.keyName
         elsif obj_type == "ThermalZone"
+          puts new_object.name
           actual_values[new_object.name.to_s]["RADuctVol"] = UnitConversions.convert(new_object.volume.get, "m^3", "ft^3")
         elsif obj_type == "ZoneHVACEnergyRecoveryVentilator"
           actual_values[new_object.name.to_s]["SupAirRate"] = new_object.supplyAirFlowRate

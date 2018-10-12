@@ -1,11 +1,11 @@
 <measure>
   <schema_version>3.0</schema_version>
-  <name>process_vrf_minisplit</name>
+  <name>process_mini_split_heat_pump</name>
   <uid>402b168f-ed99-46bb-b367-103937011e91</uid>
-  <version_id>904c0302-a4c4-4df3-b893-db6e8b8bbcd7</version_id>
-  <version_modified>20181003T162410Z</version_modified>
+  <version_id>5486999e-a1a7-4c3d-b032-d1c1bafe2f7e</version_id>
+  <version_modified>20181012T205210Z</version_modified>
   <xml_checksum>470FC630</xml_checksum>
-  <class_name>ProcessVRFMinisplit</class_name>
+  <class_name>ProcessMiniSplitHeatPump</class_name>
   <display_name>Set Residential Mini-Split Heat Pump</display_name>
   <description>This measure removes any existing HVAC components from the building and adds a mini-split heat pump. For multifamily buildings, the mini-split heat pump can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Any supply components or baseboard convective electrics/waters are removed from any existing air/plant loops or zones. Any existing air/plant loops are also removed. A heating DX coil, cooling DX coil, and an on/off supply fan are added to a variable refrigerant flow terminal unit.</modeler_description>
@@ -130,36 +130,6 @@
       <default_value>2300</default_value>
     </argument>
     <argument>
-      <name>cap_retention_frac</name>
-      <display_name>Heating Capacity Retention Fraction</display_name>
-      <description>The maximum heating capacity at X degrees divided by the maximum heating capacity at 47 degrees F.</description>
-      <type>Double</type>
-      <units>frac</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>0.25</default_value>
-    </argument>
-    <argument>
-      <name>cap_retention_temp</name>
-      <display_name>Heating Capacity Retention Temperature</display_name>
-      <description>The outdoor drybulb temperature at which the heating capacity retention fraction is defined.</description>
-      <type>Double</type>
-      <units>degrees F</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>-5</default_value>
-    </argument>
-    <argument>
-      <name>pan_heater_power</name>
-      <display_name>Pan Heater</display_name>
-      <description>Prevents ice build up from damaging the coil.</description>
-      <type>Double</type>
-      <units>W/unit</units>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>0</default_value>
-    </argument>
-    <argument>
       <name>fan_power</name>
       <display_name>Supply Fan Power</display_name>
       <description>Fan power (in W) per delivered airflow rate (in cfm) of the fan.</description>
@@ -170,23 +140,14 @@
       <default_value>0.07</default_value>
     </argument>
     <argument>
-      <name>is_ducted</name>
-      <display_name>Is Ducted</display_name>
-      <description>Specified whether the mini-split heat pump is ducted or ductless.</description>
-      <type>Boolean</type>
+      <name>min_temp</name>
+      <display_name>Min Temp</display_name>
+      <description>Outdoor dry-bulb temperature below which compressor turns off.</description>
+      <type>Double</type>
+      <units>degrees F</units>
       <required>true</required>
       <model_dependent>false</model_dependent>
-      <default_value>false</default_value>
-      <choices>
-        <choice>
-          <value>true</value>
-          <display_name>true</display_name>
-        </choice>
-        <choice>
-          <value>false</value>
-          <display_name>false</display_name>
-        </choice>
-      </choices>
+      <default_value>5</default_value>
     </argument>
     <argument>
       <name>heat_pump_capacity</name>
@@ -217,6 +178,25 @@
       <required>true</required>
       <model_dependent>false</model_dependent>
       <default_value>autosize</default_value>
+    </argument>
+    <argument>
+      <name>is_ducted</name>
+      <display_name>Is Ducted</display_name>
+      <description>Specified whether the mini-split heat pump is ducted or ductless.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>false</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
     </argument>
     <argument>
       <name>dse</name>
@@ -313,27 +293,10 @@
       <checksum>81550F14</checksum>
     </file>
     <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.12.4</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>BD482F69</checksum>
-    </file>
-    <file>
       <filename>schedules.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>4C000237</checksum>
-    </file>
-    <file>
-      <filename>process_mini_split_heat_pump_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>529B8F8A</checksum>
     </file>
     <file>
       <filename>geometry.rb</filename>
@@ -342,154 +305,171 @@
       <checksum>AB584683</checksum>
     </file>
     <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>BEC64FB8</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.12.4</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>4347D6AE</checksum>
+    </file>
+    <file>
+      <filename>process_mini_split_heat_pump_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>2E5091F5</checksum>
+    </file>
+    <file>
       <filename>hvac.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>6202CBE5</checksum>
+      <checksum>08D88295</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_RoomAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>CB1C5488</checksum>
+      <checksum>9EE286C2</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_MSHP.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>C4900189</checksum>
+      <checksum>6CE6DD66</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_UnitHeater.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>29F33462</checksum>
+      <checksum>F479656D</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_UnitHeater_CentralAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>29347764</checksum>
+      <checksum>3FED5890</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_UnitHeater_RoomAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>E7015ECE</checksum>
+      <checksum>8B54E704</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_ElectricBaseboard_RoomAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>F4742346</checksum>
+      <checksum>C44A88CD</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>BBAFC398</checksum>
+      <checksum>A83071DD</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Furnace_RoomAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>9A93ABD2</checksum>
+      <checksum>3187F464</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_GSHPVertBore.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>9A1D5ECD</checksum>
+      <checksum>7AC4138B</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC2.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>AA1FCDF2</checksum>
+      <checksum>D4DF1069</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Furnace.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>6714C7DA</checksum>
+      <checksum>23BC30D0</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_CentralAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>E7BC0CAD</checksum>
+      <checksum>C6C4A3AA</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_ElectricBaseboard.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>4EA7F181</checksum>
+      <checksum>B59AC55B</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_ElectricBaseboard_CentralAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>B3AE84A6</checksum>
+      <checksum>A8B574E8</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_CentralAC2.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>2431B06E</checksum>
+      <checksum>B233EF34</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Boiler_CentralAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>1572E70B</checksum>
+      <checksum>A7262D36</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Boiler_RoomAC.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>CACC309B</checksum>
+      <checksum>D8A1A41D</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_ASHP.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>7E6EE4E4</checksum>
+      <checksum>912601E5</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Boiler.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>30BBF3E3</checksum>
+      <checksum>D64519DD</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>447C6591</checksum>
+      <checksum>19AB4E0D</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_ASHP2.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>9233B28D</checksum>
+      <checksum>CDDC1B51</checksum>
     </file>
     <file>
       <filename>SFA_4units_1story_FB_UA_Denver.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>ECDFFEF1</checksum>
+      <checksum>76156931</checksum>
     </file>
     <file>
       <filename>MF_8units_1story_SL_Denver.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>D303A45A</checksum>
-    </file>
-    <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>BEC64FB8</checksum>
+      <checksum>0B8399E6</checksum>
     </file>
   </files>
 </measure>

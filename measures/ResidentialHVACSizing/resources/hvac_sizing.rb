@@ -2912,14 +2912,12 @@ class HVACSizing
     hvac.HXHWDesign = nil
     hvac.NumCoilCoolingDXSingleSpeed = 0
     hvac.NumCoilCoolingDXMultiSpeed = 0
-    hvac.NumCoilCoolingDXVariableRefrigerantFlow = 0
     hvac.NumCoilCoolingWaterToAirHeatPumpEquationFit = 0
     hvac.NumCoilHeatingElectric = 0
     hvac.NumCoilHeatingGas = 0
     hvac.NumCoilHeatingWaterBaseboard = 0
     hvac.NumCoilHeatingDXSingleSpeed = 0
     hvac.NumCoilHeatingDXMultiSpeed = 0
-    hvac.NumCoilHeatingDXVariableRefrigerantFlow = 0
     hvac.NumCoilHeatingWaterToAirHeatPumpEquationFit = 0
     hvac.NumZoneHVACBaseboardConvectiveElectric = 0
     hvac.NumDehumidifier = 0
@@ -2977,10 +2975,6 @@ class HVACSizing
             
             if clg_equip.is_a? OpenStudio::Model::AirLoopHVACUnitarySystem
                 if clg_equip.airLoopHVAC.is_initialized
-                    hvac.HasDuctedCooling = true
-                end
-            elsif clg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow
-                if has_ducted_mshp
                     hvac.HasDuctedCooling = true
                 end
             end
@@ -3130,12 +3124,6 @@ class HVACSizing
                     hvac.HPSizedForMaxLoad = get_feature(runner, htg_equip, Constants.SizingInfoHPSizedForMaxLoad, 'boolean', true)
                     return nil if hvac.HPSizedForMaxLoad.nil?
                 end
-            elsif htg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow
-                if has_ducted_mshp
-                    hvac.HasDuctedHeating = true
-                end
-                hvac.HPSizedForMaxLoad = get_feature(runner, htg_equip, Constants.SizingInfoHPSizedForMaxLoad, 'boolean', true)
-                return nil if hvac.HPSizedForMaxLoad.nil?
             end
             
             ratedCFMperTonHeating = get_feature(runner, htg_equip, Constants.SizingInfoHVACRatedCFMperTonHeating, 'string', false)
@@ -4354,10 +4342,6 @@ class HVACSizing
         clg_coil.setRatedWaterFlowRate(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s"))
         clg_coil.setRatedTotalCoolingCapacity(UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","W"))
         clg_coil.setRatedSensibleCoolingCapacity(UnitConversions.convert(unit_final.Cool_Capacity_Sens,"Btu/hr","W"))
-        
-    elsif clg_coil.is_a? OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow
-        clg_coil.setRatedTotalCoolingCapacity(zone_ratio * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","W") * hvac.CapacityRatioCooling[mshp_index])
-        clg_coil.setRatedAirFlowRate(zone_ratio * UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") * UnitConversions.convert(hvac.CoolingCFMs[mshp_index],"cfm","m^3/s"))
     
     end
     
@@ -4400,11 +4384,7 @@ class HVACSizing
         htg_coil.setRatedAirFlowRate(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.Heat_Airflow,"cfm","m^3/s")))
         htg_coil.setRatedWaterFlowRate(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.GSHP_Loop_flow,"gal/min","m^3/s")))
         htg_coil.setRatedHeatingCapacity(OpenStudio::OptionalDouble.new(UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W")))
-        
-    elsif htg_coil.is_a? OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow
-        htg_coil.setRatedTotalHeatingCapacity(zone_ratio * UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") * hvac.CapacityRatioHeating[mshp_index])
-        htg_coil.setRatedAirFlowRate(zone_ratio * UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","ton") * UnitConversions.convert(hvac.HeatingCFMs[mshp_index],"cfm","m^3/s"))
-    
+
     end
     
     # Supplemental heating coil
@@ -4562,11 +4542,11 @@ class HVACInfo
                 :BoilerDesignTemp, :Dehumidifier_Water_Remove_Cap_Ft_DB_RH, :CoilBF,
                 :GroundHXVertical, :HeatingEIR, :CoolingEIR, 
                 :HXDTDesign, :HXCHWDesign, :HXHWDesign,
-                :NumCoilCoolingDXSingleSpeed, :NumCoilCoolingDXMultiSpeed,
-                :NumCoilCoolingDXVariableRefrigerantFlow, :NumCoilCoolingWaterToAirHeatPumpEquationFit,
+                :NumCoilCoolingDXSingleSpeed, :NumCoilCoolingDXMultiSpeed, 
+                :NumCoilCoolingWaterToAirHeatPumpEquationFit,
                 :NumCoilHeatingElectric, :NumCoilHeatingGas, 
                 :NumCoilHeatingWaterBaseboard, :NumCoilHeatingDXSingleSpeed,
-                :NumCoilHeatingDXMultiSpeed, :NumCoilHeatingDXVariableRefrigerantFlow, 
+                :NumCoilHeatingDXMultiSpeed,
                 :NumCoilHeatingWaterToAirHeatPumpEquationFit,
                 :NumZoneHVACBaseboardConvectiveElectric, :NumDehumidifier,
                 :RatedCFMperTonCooling, :RatedCFMperTonHeating,

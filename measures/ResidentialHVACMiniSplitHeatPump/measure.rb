@@ -6,7 +6,7 @@ require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/hvac"
 
 # start the measure
-class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
+class ProcessMiniSplitHeatPump < OpenStudio::Measure::ModelMeasure
 
   # human readable name
   def name
@@ -274,4 +274,4 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
 end
 
 # register the measure to be used by the application
-ProcessVRFMinisplit.new.registerWithApplication
+ProcessMiniSplitHeatPump.new.registerWithApplication

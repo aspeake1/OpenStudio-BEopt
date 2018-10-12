@@ -1318,16 +1318,10 @@ class Airflow
       return duct_programs, cfis_programs, cfis_outputs
     end
 
-    unit_vrfs = []
-    model.getZoneHVACTerminalUnitVariableRefrigerantFlows.each do |vrf|
-      next if unit_living.zone != vrf.thermalZone.get
-      unit_vrfs << vrf
-    end
-
     # Create one duct system per airloop or ducted mshp
     air_loops.each do |air_loop|
       
-      next unless unit_living.zone.airLoopHVACs.include? air_loop or unit_vrfs.include? air_loop # next if airloop or ducted mshp doesn't serve this unit
+      next unless unit_living.zone.airLoopHVACs.include? air_loop # next if airloop doesn't serve this unit
 
       obj_name_ducts = Constants.ObjectNameDucts(air_loop.name).gsub("|","_")
 
@@ -1350,9 +1344,6 @@ class Airflow
           air_loop_unitary = supply_component.to_AirLoopHVACUnitarySystem.get
           supply_fan = air_loop_unitary.supplyFan.get
         end
-      elsif air_loop.to_ZoneHVACTerminalUnitVariableRefrigerantFlow.is_initialized # ducted mshp
-        air_demand_inlet_node = air_loop.outletNode.get
-        supply_fan = air_loop.supplyAirFan
       end
 
       # Set the return plenums

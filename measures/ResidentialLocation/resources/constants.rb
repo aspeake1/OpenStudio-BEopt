@@ -251,7 +251,6 @@ class Constants
   def self.LoadVarsSpaceHeating
     return {'OpenStudio::Model::CoilHeatingDXSingleSpeed' => ['Heating Coil Heating Energy'],
             'OpenStudio::Model::CoilHeatingDXMultiSpeed' => ['Heating Coil Heating Energy'],
-            'OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow' => ['Heating Coil Heating Energy'],
             'OpenStudio::Model::CoilHeatingElectric' => ['Heating Coil Heating Energy'],
             'OpenStudio::Model::CoilHeatingGas' => ['Heating Coil Heating Energy'],
             'OpenStudio::Model::ZoneHVACBaseboardConvectiveElectric' => ['Baseboard Total Heating Energy'],
@@ -261,7 +260,6 @@ class Constants
   def self.LoadVarsSpaceCooling
     return {'OpenStudio::Model::CoilCoolingDXSingleSpeed' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
             'OpenStudio::Model::CoilCoolingDXMultiSpeed' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
-            'OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
             'OpenStudio::Model::CoilCoolingWaterToAirHeatPumpEquationFit' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy']}
   end
   def self.LoadVarsWaterHeating
@@ -1085,8 +1083,7 @@ class Constants
             self.SpaceTypeUnfinishedBasement]
   end
   def self.ZoneHVACPriorityList
-     return ["ZoneHVACEnergyRecoveryVentilator", 
-             "ZoneHVACTerminalUnitVariableRefrigerantFlow", 
+     return ["ZoneHVACEnergyRecoveryVentilator",
              "AirLoopHVACUnitarySystem",
              "ZoneHVACBaseboardConvectiveElectric", 
              "ZoneHVACBaseboardConvectiveWater", 

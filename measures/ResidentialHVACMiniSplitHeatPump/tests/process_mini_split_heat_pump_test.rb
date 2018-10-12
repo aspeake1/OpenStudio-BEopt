@@ -288,7 +288,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
   
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
-    measure = ProcessVRFMinisplit.new
+    measure = ProcessMiniSplitHeatPump.new
 
     # check for standard methods
     assert(!measure.name.empty?)
@@ -320,7 +320,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -374,15 +374,12 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
       next if unit.spaces.size == 0
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
       thermal_zones.each do |thermal_zone|
-        model.getAirConditionerVariableRefrigerantFlows.each do |vrf|
-          vrf.terminals.each do |terminal|
-            next unless thermal_zone == terminal.thermalZone.get
-            is_ducted = vrf.additionalProperties.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
-            if is_ducted.is_initialized
-              is_ducted = is_ducted.get
-            end
-            assert_equal(expected_values["is_ducted"], is_ducted)
-          end
+        unitary_system_air_loops = self.get_unitary_system_air_loops(model, runner, thermal_zone)
+        unitary_system_air_loops.each do |unitary_system_air_loop|
+          system, clg_coil, htg_coil, air_loop = unitary_system_air_loop
+          next unless system.name.to_s.start_with? Constants.ObjectNameMiniSplitHeatPump
+          is_ducted = system.additionalProperties.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump).get
+          assert_equal(expected_values["is_ducted"], is_ducted)
         end
       end
     end
