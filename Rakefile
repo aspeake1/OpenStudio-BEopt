@@ -1,6 +1,3 @@
-require 'bundler'
-Bundler.setup
-
 require 'rake'
 require 'rake/testtask'
 require 'ci/reporter/rake/minitest'
