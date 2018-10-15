@@ -252,8 +252,6 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
       argument_map[arg.name] = temp_arg_var
     end
 
-    puts argument_map
-
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
