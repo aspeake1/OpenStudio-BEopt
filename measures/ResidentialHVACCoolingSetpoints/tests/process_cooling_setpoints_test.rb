@@ -34,27 +34,6 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
   end 
 
-  # def test_offset_weekday_schedule2_argument_error_not_24_values
-  #   args_hash = {}
-  #   args_hash["weekday_offset_schedule_2"] = "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
-  #   result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
-  #   assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
-  # end
-  
-  # def test_offset_weekday_schedule3_argument_error_not_24_values
-  #   args_hash = {}
-  #   args_hash["weekday_offset_schedule_3"] = "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
-  #   result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
-  #   assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
-  # end
-
-  # def test_offset_weekday_schedule4_argument_error_not_24_values
-  #   args_hash = {}
-  #   args_hash["weekday_offset_schedule_4"] = "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
-  #   result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash)
-  #   assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday offset time of day schedule.")    
-  # end
-
   def test_offset_weekend_schedule1_argument_error_not_24_values
     args_hash = {}
     args_hash["weekend_offset_schedule"] = "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
@@ -284,7 +263,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
-			next unless obj_type == "ScheduleRule"
+            next unless obj_type == "ScheduleRule"
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
             actual_values = []
