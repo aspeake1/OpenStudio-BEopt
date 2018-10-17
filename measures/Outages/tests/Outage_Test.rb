@@ -56,14 +56,14 @@ class OutageTest < MiniTest::Test
     args_hash = {}
     args_hash["otg_hr"] = -1
     result = _test_error("example_single_family_detached.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Start hour must be between 0 and 24")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Start hour must be between 0 and 23")
   end
   
   def test_outage_start_hour_over_24
     args_hash = {}
     args_hash["otg_hr"] = 25
     result = _test_error("example_single_family_detached.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Start hour must be between 0 and 24")
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Start hour must be between 0 and 23")
   end
     
   def test_outage_less_than_one_day_dst
