@@ -1065,12 +1065,18 @@ class Airflow
       runner.registerWarning("Ducted HVAC equipment was found but no ducts were specified. Proceeding without ducts.")
     end
 
+    num_ducts_in_location = {}
     ducts.each do |duct|
       duct.supply_r = Airflow.get_duct_insulation_rvalue(duct.supply_r, true)
       duct.return_r = Airflow.get_duct_insulation_rvalue(duct.return_r, false)
+      duct.location_zone = get_duct_location_zone(duct.location, unit, unit_index, unit_living.zone)
       duct.supply_ua = duct.supply_area / duct.supply_r
       duct.return_ua = duct.return_area / duct.return_r
-      duct.location_zone = get_duct_location_zone(duct.location, unit, unit_index, unit_living.zone)
+      if num_ducts_in_location[duct.location_zone].nil?
+        num_ducts_in_location[duct.location_zone] = 1
+      else
+        num_ducts_in_location[duct.location_zone] += 1
+      end
       if not unit_finished_basement.nil? and unit_finished_basement.zone == duct.location_zone
         duct.f_oa = 0.0
       elsif not building.unfinished_basement.nil? and building.unfinished_basement.zone == duct.location_zone
@@ -1084,6 +1090,54 @@ class Airflow
       else
         duct.f_oa = 1.0
       end
+    end
+    
+    # If multiple duct objects specified for the same location, combine into a single duct object
+    num_ducts_in_location.each do |location_zone, num_ducts|
+      next if num_ducts <= 1
+      
+      ducts_to_combine = []
+      ducts.each do |duct|
+        next if duct.location_zone != location_zone
+        ducts_to_combine << duct
+      end
+      
+      # Combined property values
+      cmb_location = ducts_to_combine[0].location
+      if ducts_to_combine[0].supply_leakage_frac.nil?
+        cmb_supply_leakage_frac = nil
+        cmb_supply_leakage_cfm25 = ducts_to_combine.map(&:supply_leakage_cfm25).inject(0, &:+) # sum
+      else
+        cmb_supply_leakage_frac = ducts_to_combine.map(&:supply_leakage_frac).inject(0, &:+) # sum
+        cmb_supply_leakage_cfm25 = nil
+      end
+      cmb_supply_area = ducts_to_combine.map(&:supply_area).inject(0, &:+) # sum
+      cmb_supply_ua = ducts_to_combine.map(&:supply_ua).inject(0, &:+) # sum
+      cmb_supply_r = cmb_supply_area / cmb_supply_ua
+      if ducts_to_combine[0].return_leakage_frac.nil?
+        cmb_return_leakage_frac = nil
+        cmb_return_leakage_cfm25 = ducts_to_combine.map(&:return_leakage_cfm25).inject(0, &:+) # sum
+      else
+        cmb_return_leakage_frac = ducts_to_combine.map(&:return_leakage_frac).inject(0, &:+) # sum
+        cmb_return_leakage_cfm25 = nil
+      end
+      cmb_return_area = ducts_to_combine.map(&:return_area).inject(0, &:+) # sum
+      cmb_return_ua = ducts_to_combine.map(&:return_ua).inject(0, &:+) # sum
+      cmb_return_r = cmb_return_area / cmb_return_ua
+      
+      # Create combined duct object
+      cmb_duct = Duct.new(cmb_location, cmb_supply_leakage_frac, cmb_supply_leakage_cfm25, cmb_supply_area, cmb_supply_r, cmb_return_leakage_frac, cmb_return_leakage_cfm25, cmb_return_area, cmb_return_r)
+      cmb_duct.location_zone = ducts_to_combine[0].location_zone
+      cmb_duct.supply_ua = cmb_supply_ua
+      cmb_duct.return_ua = cmb_return_ua
+      cmb_duct.f_oa = ducts_to_combine[0].f_oa
+      
+      # Add combined duct to ducts; remove individual duct objects
+      ducts << cmb_duct
+      ducts_to_combine.each do |d|
+        ducts.delete(d)
+      end
+
     end
     
     # Store info for HVAC Sizing measure
@@ -2208,8 +2262,6 @@ class Airflow
   end
 
 end
-
-# FIXME: Update this to move leakage values into Duct class?
 
 class Duct
   def initialize(location, supply_leakage_frac, supply_leakage_cfm25, supply_area, supply_r, return_leakage_frac, return_leakage_cfm25, return_area, return_r)
