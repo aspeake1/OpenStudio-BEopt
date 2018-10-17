@@ -694,7 +694,6 @@ class ResidentialAirflowTest < MiniTest::Test
           next if new_object.outputVariableOrMeterName != "Zone Air Temperature"
           actual_values["DuctLocation"] = new_object.keyName
         elsif obj_type == "ThermalZone"
-          puts new_object.name
           actual_values[new_object.name.to_s]["RADuctVol"] = UnitConversions.convert(new_object.volume.get, "m^3", "ft^3")
         elsif obj_type == "ZoneHVACEnergyRecoveryVentilator"
           actual_values[new_object.name.to_s]["SupAirRate"] = new_object.supplyAirFlowRate

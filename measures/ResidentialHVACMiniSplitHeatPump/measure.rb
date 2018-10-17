@@ -122,6 +122,14 @@ class ProcessMiniSplitHeatPump < OpenStudio::Measure::ModelMeasure
     heating_capacity_offset.setDefaultValue(2300.0)
     args << heating_capacity_offset
 
+    #make a double argument for minisplit pan heater power
+    pan_heater_power = OpenStudio::Measure::OSArgument::makeDoubleArgument("pan_heater_power", true)
+    pan_heater_power.setDisplayName("Pan Heater")
+    pan_heater_power.setUnits("W/unit")
+    pan_heater_power.setDescription("Prevents ice build up from damaging the coil.")
+    pan_heater_power.setDefaultValue(0.0)
+    args << pan_heater_power
+    
     #make a double argument for minisplit supply fan power
     fan_power = OpenStudio::Measure::OSArgument::makeDoubleArgument("fan_power", true)
     fan_power.setDisplayName("Supply Fan Power")
@@ -216,6 +224,7 @@ class ProcessMiniSplitHeatPump < OpenStudio::Measure::ModelMeasure
     min_heating_airflow_rate = runner.getDoubleArgumentValue("min_heating_airflow_rate",user_arguments) 
     max_heating_airflow_rate = runner.getDoubleArgumentValue("max_heating_airflow_rate",user_arguments)
     heating_capacity_offset = runner.getDoubleArgumentValue("heating_capacity_offset",user_arguments) 
+    pan_heater_power = runner.getDoubleArgumentValue("pan_heater_power",user_arguments)
     fan_power = runner.getDoubleArgumentValue("fan_power",user_arguments)
     min_temp = runner.getDoubleArgumentValue("min_temp", user_arguments)
     heat_pump_capacity = runner.getStringArgumentValue("heat_pump_capacity",user_arguments)
@@ -259,7 +268,7 @@ class ProcessMiniSplitHeatPump < OpenStudio::Measure::ModelMeasure
                                 min_heating_capacity, max_heating_capacity,
                                 min_heating_airflow_rate, max_heating_airflow_rate, 
                                 heating_capacity_offset,
-                                fan_power, min_temp, is_ducted, 
+                                pan_heater_power, fan_power, min_temp, is_ducted, 
                                 heat_pump_capacity, supplemental_efficiency, supplemental_capacity,
                                 dse, frac_heat_load_served, frac_cool_load_served)
       return false if not success

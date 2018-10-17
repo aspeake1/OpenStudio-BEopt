@@ -1265,7 +1265,7 @@ class HVAC
                         min_heating_capacity, max_heating_capacity,
                         min_heating_airflow_rate, max_heating_airflow_rate, 
                         heating_capacity_offset,
-                        fan_power, min_temp, is_ducted, 
+                        pan_heater_power, fan_power, min_temp, is_ducted, 
                         heat_pump_capacity, supplemental_efficiency, supplemental_capacity,
                         dse, frac_heat_load_served=1.0, frac_cool_load_served=1.0)
     
@@ -1417,6 +1417,59 @@ class HVAC
           prioritize_zone_hvac(model, runner, slave_zone)
           
         end # slave_zone
+
+        if pan_heater_power > 0
+
+          vrf_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "VRF Heat Pump Heating Electric Energy")
+          vrf_sensor.setName("#{obj_name} vrf energy sensor".gsub("|","_"))
+          vrf_sensor.setKeyName(obj_name + " #{control_zone.name} ac vrf")
+     
+          equip_def = OpenStudio::Model::ElectricEquipmentDefinition.new(model)
+          equip_def.setName(obj_name + " pan heater equip")
+          equip = OpenStudio::Model::ElectricEquipment.new(equip_def)
+          equip.setName(equip_def.name.to_s)
+          equip.setSpace(control_zone.spaces[0])
+          equip_def.setFractionRadiant(0)
+          equip_def.setFractionLatent(0)
+          equip_def.setFractionLost(1)
+          equip.setSchedule(model.alwaysOnDiscreteSchedule)
+
+          pan_heater_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(equip, "ElectricEquipment", "Electric Power Level")
+          pan_heater_actuator.setName("#{obj_name} pan heater actuator".gsub("|","_"))
+
+          tout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Zone Outdoor Air Drybulb Temperature")
+          tout_sensor.setName("#{obj_name} tout sensor".gsub("|","_"))
+          thermal_zones.each do |thermal_zone|
+            if Geometry.is_living(thermal_zone)
+              tout_sensor.setKeyName(thermal_zone.name.to_s)
+              break
+            end
+          end
+
+          program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
+          program.setName(obj_name + " pan heater program")
+          if heat_pump_capacity != Constants.SizingAuto and heat_pump_capacity != Constants.SizingAutoMaxLoad
+            num_outdoor_units = (UnitConversions.convert(heat_pump_capacity,"Btu/hr","ton") / 1.5).ceil # Assume 1.5 tons max per outdoor unit
+          else
+            num_outdoor_units = 2
+          end
+          unless slave_zones.empty?
+            num_outdoor_units = [num_outdoor_units, 2].max
+          end
+          pan_heater_power = pan_heater_power * num_outdoor_units # W
+          program.addLine("Set #{pan_heater_actuator.name} = 0")
+          program.addLine("If #{vrf_sensor.name} > 0")
+          program.addLine("If #{tout_sensor.name} <= #{UnitConversions.convert(32.0,"F","C").round(3)}")
+          program.addLine("Set #{pan_heater_actuator.name} = #{pan_heater_power}")
+          program.addLine("EndIf")
+          program.addLine("EndIf")
+         
+          program_calling_manager = OpenStudio::Model::EnergyManagementSystemProgramCallingManager.new(model)
+          program_calling_manager.setName(obj_name + " pan heater program calling manager")
+          program_calling_manager.setCallingPoint("BeginTimestepBeforePredictor")
+          program_calling_manager.addProgram(program)
+
+        end
         
         # _processCurvesDXCooling
 
@@ -4240,6 +4293,33 @@ class HVAC
         system.supplyFan.get.remove
         runner.registerInfo("Removed '#{air_loop.name}' from #{thermal_zone.name}.")
         air_loop.remove        
+      end
+      obj_name = Constants.ObjectNameMiniSplitHeatPump(unit.name.to_s)      
+      model.getEnergyManagementSystemSensors.each do |sensor|
+        next unless sensor.name.to_s == "#{obj_name} vrf energy sensor".gsub(" ","_").gsub("|","_")
+        sensor.remove
+      end
+      model.getEnergyManagementSystemSensors.each do |sensor|
+        next unless sensor.name.to_s == "#{obj_name} tout sensor".gsub(" ","_").gsub("|","_")
+        sensor.remove
+      end
+      model.getEnergyManagementSystemActuators.each do |actuator|
+        next unless actuator.name.to_s == "#{obj_name} pan heater actuator".gsub(" ","_").gsub("|","_")
+        actuator.remove
+      end
+      model.getEnergyManagementSystemPrograms.each do |program|
+        next unless program.name.to_s == "#{obj_name} pan heater program".gsub(" ","_")
+        program.remove
+      end          
+      model.getEnergyManagementSystemProgramCallingManagers.each do |program_calling_manager|
+        next unless program_calling_manager.name.to_s == obj_name + " pan heater program calling manager"
+        program_calling_manager.remove
+      end      
+      thermal_zone.spaces.each do |space|
+        space.electricEquipment.each do |equip|
+          next unless equip.name.to_s == obj_name + " pan heater equip"
+          equip.electricEquipmentDefinition.remove
+        end
       end
       return true
     end
