@@ -20,6 +20,11 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     return 'Reports resilience metric(s) of interest.'
   end
 
+  # human readable description of modeling approach
+  def modeler_description
+    return "Reports resilience metric(s) of interest."
+  end
+
   # define the arguments that the user will input
   def arguments
     args = OpenStudio::Measure::OSArgumentVector.new
@@ -288,8 +293,8 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     year_description = model.getYearDescription
     additional_properties = year_description.additionalProperties
     power_outage_start_date = additional_properties.getFeatureAsString("PowerOutageStartDate")
-    power_outage_start_hour = additional_properties.getFeatureAsDouble("PowerOutageStartHour")
-    power_outage_duration = additional_properties.getFeatureAsDouble("PowerOutageDuration")
+    power_outage_start_hour = additional_properties.getFeatureAsInteger("PowerOutageStartHour")
+    power_outage_duration = additional_properties.getFeatureAsInteger("PowerOutageDuration")
 
     unless power_outage_start_date.is_initialized
       runner.registerWarning("Could not find power outage start date on additional properties object. Need to apply the 'Outages' measure first.")
