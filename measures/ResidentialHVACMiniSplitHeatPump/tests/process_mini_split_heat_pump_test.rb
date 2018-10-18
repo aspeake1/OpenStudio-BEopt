@@ -16,7 +16,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>300.0}}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>300.0}}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 9)
   end  
   
@@ -30,7 +30,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
-    expected_values = {"CoolingCOP"=>[4.56*0.8, 4.46*0.8, 4.19*0.8, 3.86*0.8], "HeatingCOP"=>[3.81*0.8, 3.18*0.8, 2.77*0.8, 2.55*0.8], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>0, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>300.0}}
+    expected_values = {"CoolingCOP"=>[4.36*0.8, 3.77*0.8, 3.17*0.8, 2.34*0.8], "HeatingCOP"=>[4.27*0.8, 3.42*0.8, 3.13*0.8, 2.84*0.8], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>0, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>300.0}}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 9)
   end  
   
@@ -40,7 +40,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 11)
   end
   
@@ -50,7 +50,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilHeatingElectric"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingDXSingleSpeed"=>1, "CoilCoolingDXSingleSpeed"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_ASHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end  
   
@@ -60,7 +60,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilHeatingElectric"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingDXMultiSpeed"=>1, "CoilHeatingDXMultiSpeedStageData"=>2, "CoilCoolingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>2, "UnitarySystemPerformanceMultispeed"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_ASHP2.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end  
   
@@ -70,7 +70,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilCoolingDXSingleSpeed"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 11)
   end  
   
@@ -80,7 +80,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilCoolingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>2, "UnitarySystemPerformanceMultispeed"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_CentralAC2.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 11)
   end  
   
@@ -90,7 +90,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "CoilHeatingElectric"=>1, "FanOnOff"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 10)
   end  
   
@@ -100,7 +100,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"ZoneHVACBaseboardConvectiveElectric"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_ElectricBaseboard.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 11)
   end
   
@@ -110,7 +110,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"BoilerHotWater"=>1, "PumpVariableSpeed"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "SetpointManagerScheduled"=>1, "CoilHeatingWaterBaseboard"=>2, "PlantLoop"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 12)
   end  
 
@@ -120,7 +120,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"CoilHeatingGas"=>2, "AirLoopHVACUnitarySystem"=>2, "FanOnOff"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 11)
   end  
 
@@ -131,7 +131,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["is_ducted"] = "true"
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>true}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>true}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end
   
@@ -141,7 +141,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilHeatingGas"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilCoolingDXSingleSpeed"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end  
   
@@ -151,7 +151,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilHeatingGas"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilCoolingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>2, "UnitarySystemPerformanceMultispeed"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_CentralAC2.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end  
   
@@ -161,7 +161,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "CoilHeatingElectric"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Furnace_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 12)
   end  
   
@@ -171,7 +171,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilCoolingDXSingleSpeed"=>1, "ZoneHVACBaseboardConvectiveElectric"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_ElectricBaseboard_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end  
   
@@ -181,7 +181,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilCoolingDXSingleSpeed"=>1, "BoilerHotWater"=>1, "PumpVariableSpeed"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "SetpointManagerScheduled"=>1, "CoilHeatingWaterBaseboard"=>2, "PlantLoop"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 14)
   end  
 
@@ -191,7 +191,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>3, "AirLoopHVAC"=>1, "FanOnOff"=>3, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilCoolingDXSingleSpeed"=>1, "CoilHeatingGas"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end  
 
@@ -201,7 +201,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "FanOnOff"=>1, "CoilHeatingElectric"=>1, "ZoneHVACBaseboardConvectiveElectric"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_ElectricBaseboard_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 12)
   end   
   
@@ -211,7 +211,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "FanOnOff"=>1, "CoilHeatingElectric"=>1, "BoilerHotWater"=>1, "PumpVariableSpeed"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "SetpointManagerScheduled"=>1, "CoilHeatingWaterBaseboard"=>2, "PlantLoop"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end
 
@@ -221,7 +221,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"CoilCoolingDXSingleSpeed"=>1, "ZoneHVACPackagedTerminalAirConditioner"=>1, "FanOnOff"=>3, "CoilHeatingElectric"=>1, "CoilHeatingGas"=>2, "AirLoopHVACUnitarySystem"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 12)
   end
 
@@ -231,7 +231,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"SetpointManagerFollowGroundTemperature"=>1, "GroundHeatExchangerVertical"=>1, "FanOnOff"=>2, "CoilHeatingWaterToAirHeatPumpEquationFit"=>1, "CoilCoolingWaterToAirHeatPumpEquationFit"=>1, "PumpVariableSpeed"=>1, "CoilHeatingElectric"=>1, "PlantLoop"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_GSHPVertBore.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 14)
   end  
   
@@ -242,7 +242,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>num_units*2, "AirLoopHVAC"=>num_units*2, "CoilCoolingDXMultiSpeed"=>num_units, "FanOnOff"=>num_units*2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units*4, "CoilHeatingElectric"=>num_units, "CoilHeatingDXMultiSpeed"=>num_units, "CoilCoolingDXMultiSpeedStageData"=>num_units*4, "CoilHeatingDXMultiSpeedStageData"=>num_units*4, "UnitarySystemPerformanceMultispeed"=>num_units*2}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false}
     _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*9)
   end
 
@@ -254,7 +254,7 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>num_units*2, "AirLoopHVAC"=>num_units*2, "CoilCoolingDXMultiSpeed"=>num_units, "FanOnOff"=>num_units*2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units*2, "CoilHeatingElectric"=>num_units, "CoilHeatingDXMultiSpeed"=>num_units, "CoilCoolingDXMultiSpeedStageData"=>num_units*4, "CoilHeatingDXMultiSpeedStageData"=>num_units*4, "UnitarySystemPerformanceMultispeed"=>num_units*2, "EnergyManagementSystemSensor"=>num_units*2, "EnergyManagementSystemActuator"=>num_units*1, "EnergyManagementSystemProgram"=>num_units*1, "EnergyManagementSystemProgramCallingManager"=>num_units*1, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>300.0}, "res_ms|unit_2_pan_heater_program"=>{"res_ms_unit_2_pan_heater_actuator"=>300.0}, "res_ms|unit_3_pan_heater_program"=>{"res_ms_unit_3_pan_heater_actuator"=>300.0}, "res_ms|unit_4_pan_heater_program"=>{"res_ms_unit_4_pan_heater_actuator"=>300.0}, "res_ms|unit_5_pan_heater_program"=>{"res_ms_unit_5_pan_heater_actuator"=>300.0}, "res_ms|unit_6_pan_heater_program"=>{"res_ms_unit_6_pan_heater_actuator"=>300.0}, "res_ms|unit_7_pan_heater_program"=>{"res_ms_unit_7_pan_heater_actuator"=>300.0}, "res_ms|unit_8_pan_heater_program"=>{"res_ms_unit_8_pan_heater_actuator"=>300.0}}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>300.0}, "res_ms|unit_2_pan_heater_program"=>{"res_ms_unit_2_pan_heater_actuator"=>300.0}, "res_ms|unit_3_pan_heater_program"=>{"res_ms_unit_3_pan_heater_actuator"=>300.0}, "res_ms|unit_4_pan_heater_program"=>{"res_ms_unit_4_pan_heater_actuator"=>300.0}, "res_ms|unit_5_pan_heater_program"=>{"res_ms_unit_5_pan_heater_actuator"=>300.0}, "res_ms|unit_6_pan_heater_program"=>{"res_ms_unit_6_pan_heater_actuator"=>300.0}, "res_ms|unit_7_pan_heater_program"=>{"res_ms_unit_7_pan_heater_actuator"=>300.0}, "res_ms|unit_8_pan_heater_program"=>{"res_ms_unit_8_pan_heater_actuator"=>300.0}}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*7)
   end
 
@@ -265,14 +265,14 @@ class ProcessMiniSplitHeatPumpTest < MiniTest::Test
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>40.0}}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>40.0}}
     model = _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 9)
     args_hash["pan_heater_power"] = 30.0
     args_hash["max_cooling_capacity"] = 1.5
     args_hash["max_heating_capacity"] = 1.5
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>2, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>2, "AirTerminalSingleDuctConstantVolumeNoReheat"=>4, "CoilHeatingElectric"=>1, "CoilHeatingDXMultiSpeed"=>1, "CoilCoolingDXMultiSpeedStageData"=>4, "CoilHeatingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>2, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
-    expected_values = {"CoolingCOP"=>[4.56, 4.46, 4.19, 3.86], "HeatingCOP"=>[3.81, 3.18, 2.77, 2.55], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>60.0}}
+    expected_values = {"CoolingCOP"=>[4.36, 3.77, 3.17, 2.34], "HeatingCOP"=>[4.27, 3.42, 3.13, 2.84], "CoolingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "HeatingNominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>93.33, "is_ducted"=>false, "res_ms_pan_heater_program"=>{"res_ms_pan_heater_actuator"=>60.0}}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 13)
   end
   
