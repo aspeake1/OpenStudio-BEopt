@@ -122,6 +122,22 @@ class ProcessMiniSplitHeatPump < OpenStudio::Measure::ModelMeasure
     heating_capacity_offset.setDefaultValue(2300.0)
     args << heating_capacity_offset
 
+    #make a double argument for minisplit capacity retention fraction
+    cap_retention_frac = OpenStudio::Measure::OSArgument::makeDoubleArgument("cap_retention_frac", true)
+    cap_retention_frac.setDisplayName("Heating Capacity Retention Fraction")
+    cap_retention_frac.setUnits("frac")
+    cap_retention_frac.setDescription("The maximum heating capacity at X degrees divided by the maximum heating capacity at 47 degrees F.")
+    cap_retention_frac.setDefaultValue(0.25)
+    args << cap_retention_frac
+    
+    #make a double argument for minisplit capacity retention temperature
+    cap_retention_temp = OpenStudio::Measure::OSArgument::makeDoubleArgument("cap_retention_temp", true)
+    cap_retention_temp.setDisplayName("Heating Capacity Retention Temperature")
+    cap_retention_temp.setUnits("degrees F")
+    cap_retention_temp.setDescription("The outdoor drybulb temperature at which the heating capacity retention fraction is defined.")
+    cap_retention_temp.setDefaultValue(-5.0)
+    args << cap_retention_temp   
+
     #make a double argument for minisplit pan heater power
     pan_heater_power = OpenStudio::Measure::OSArgument::makeDoubleArgument("pan_heater_power", true)
     pan_heater_power.setDisplayName("Pan Heater")
@@ -137,14 +153,6 @@ class ProcessMiniSplitHeatPump < OpenStudio::Measure::ModelMeasure
     fan_power.setDescription("Fan power (in W) per delivered airflow rate (in cfm) of the fan.")
     fan_power.setDefaultValue(0.07)
     args << fan_power
-
-    #make a double argument for minisplit min temp
-    min_temp = OpenStudio::Ruleset::OSArgument::makeDoubleArgument("min_temp", true)
-    min_temp.setDisplayName("Min Temp")
-    min_temp.setUnits("degrees F")
-    min_temp.setDescription("Outdoor dry-bulb temperature below which compressor turns off.")
-    min_temp.setDefaultValue(5.0)
-    args << min_temp
 
     #make a string argument for minisplit cooling output capacity
     heat_pump_capacity = OpenStudio::Measure::OSArgument::makeStringArgument("heat_pump_capacity", true)
@@ -224,9 +232,10 @@ class ProcessMiniSplitHeatPump < OpenStudio::Measure::ModelMeasure
     min_heating_airflow_rate = runner.getDoubleArgumentValue("min_heating_airflow_rate",user_arguments) 
     max_heating_airflow_rate = runner.getDoubleArgumentValue("max_heating_airflow_rate",user_arguments)
     heating_capacity_offset = runner.getDoubleArgumentValue("heating_capacity_offset",user_arguments) 
+    cap_retention_frac = runner.getDoubleArgumentValue("cap_retention_frac",user_arguments)
+    cap_retention_temp = runner.getDoubleArgumentValue("cap_retention_temp",user_arguments)
     pan_heater_power = runner.getDoubleArgumentValue("pan_heater_power",user_arguments)
     fan_power = runner.getDoubleArgumentValue("fan_power",user_arguments)
-    min_temp = runner.getDoubleArgumentValue("min_temp", user_arguments)
     heat_pump_capacity = runner.getStringArgumentValue("heat_pump_capacity",user_arguments)
     unless heat_pump_capacity == Constants.SizingAuto or heat_pump_capacity == Constants.SizingAutoMaxLoad
       heat_pump_capacity = UnitConversions.convert(heat_pump_capacity.to_f,"ton","Btu/hr")
@@ -267,8 +276,8 @@ class ProcessMiniSplitHeatPump < OpenStudio::Measure::ModelMeasure
                                 min_cooling_airflow_rate, max_cooling_airflow_rate,
                                 min_heating_capacity, max_heating_capacity,
                                 min_heating_airflow_rate, max_heating_airflow_rate, 
-                                heating_capacity_offset,
-                                pan_heater_power, fan_power, min_temp, is_ducted, 
+                                heating_capacity_offset, cap_retention_frac, cap_retention_temp,
+                                pan_heater_power, fan_power, is_ducted, 
                                 heat_pump_capacity, supplemental_efficiency, supplemental_capacity,
                                 dse, frac_heat_load_served, frac_cool_load_served)
       return false if not success
