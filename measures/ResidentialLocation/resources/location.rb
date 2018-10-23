@@ -24,9 +24,6 @@ class Location
         success = apply_dst(model, runner, dst_start_date, dst_end_date)
         return false if not success
 
-        success = apply_ground_temp(model, runner, weather)
-        return false if not success
-
         return true, weather
     end
     
@@ -142,17 +139,6 @@ class Location
         return true
     end
     
-    def self.apply_ground_temp(model, runner, weather)
-    
-        annual_temps = Array.new(12, weather.data.AnnualAvgDrybulb)
-        annual_temps = annual_temps.map {|i| UnitConversions.convert(i,"F","C")}
-        s_gt_d = model.getSiteGroundTemperatureDeep
-        s_gt_d.resetAllMonths
-        s_gt_d.setAllMonthlyTemperatures(annual_temps)
-        
-        return true
-    end
-   
     def self.get_climate_zone_ba(wmo)
         ba_zone = nil
 
