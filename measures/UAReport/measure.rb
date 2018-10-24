@@ -149,6 +149,7 @@ class UAReport < OpenStudio::Measure::ReportingMeasure
       material = layer.to_StandardOpaqueMaterial.get
       val += material.thickness / ( material.conductivity * area )
     end
+    return val if val == 0
     return 1.0 / val
   end
 
