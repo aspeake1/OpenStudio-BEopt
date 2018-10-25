@@ -178,12 +178,14 @@ class ThermalCapacitanceReport < OpenStudio::Measure::ReportingMeasure
 
     if building_type == "Residential"
       thermal_capacitances.each do |name, val|
+        next unless val > 0
         report_output(runner, name, [OpenStudio::OptionalDouble.new(val)], desired_units, desired_units)
       end
     elsif building_type == "Commercial"
       csv_path = File.expand_path("../thermal_capacitances.csv")
       CSV.open(csv_path, "wb") do |csv|
         thermal_capacitances.each do |name, val|
+          next unless val > 0
           csv << [name, val]
         end
       end
@@ -250,8 +252,12 @@ class ThermalCapacitanceReport < OpenStudio::Measure::ReportingMeasure
     model.getInternalMassDefinitions.each do |internal_mass_def|
       next if internal_mass_def.construction.get.to_LayeredConstruction.get != construction
       surface_area = internal_mass_def.surfaceArea
-      next unless surface_area.is_initialized
-      area += surface_area.get
+      surface_area_per_space_floor_area = internal_mass_def.surfaceAreaperSpaceFloorArea
+      if surface_area.is_initialized
+        area += surface_area.get
+      elsif surface_area_per_space_floor_area.is_initialized
+        area += surface_area_per_space_floor_area.get * internal_mass_def.floorArea
+      end
     end
     return area, construction.name.to_s
   end
