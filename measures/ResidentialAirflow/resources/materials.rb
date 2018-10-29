@@ -363,11 +363,11 @@ class BaseMaterial
     end
 
     def self.Gypsum
-        return self.new(rho=50.0, cp=0.2, k_in=1.1112, waterVaporDiffusionResistanceFactor=8.9, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
+        return self.new(rho=50.0, cp=0.2, k_in=1.1112, waterVaporDiffusionResistanceFactor=9.14, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
     end
 
     def self.Wood
-        return self.new(rho=32.0, cp=0.29, k_in=0.8004, waterVaporDiffusionResistanceFactor=97, moistureEquationCoefficientA=0.15, moistureEquationCoefficientB=8.51, moistureEquationCoefficientC=0.167, moistureEquationCoefficientD=0.965, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
+        return self.new(rho=32.0, cp=0.29, k_in=0.8004, waterVaporDiffusionResistanceFactor=320.0, moistureEquationCoefficientA=0.15, moistureEquationCoefficientB=8.51, moistureEquationCoefficientC=0.167, moistureEquationCoefficientD=0.965, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
     end
     
     def self.Concrete
@@ -384,7 +384,7 @@ class BaseMaterial
     end
 
     def self.Carpet
-        return self.new(rho=nil, cp=nil, k_in=nil, waterVaporDiffusionResistanceFactor=6.6, moistureEquationCoefficientA=0.019, moistureEquationCoefficientB=1.0, moistureEquationCoefficientC=0.0, moistureEquationCoefficientD=1.0, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
+        return self.new(rho=nil, cp=nil, k_in=nil, waterVaporDiffusionResistanceFactor=0.5, moistureEquationCoefficientA=0.019, moistureEquationCoefficientB=1.0, moistureEquationCoefficientC=0.0, moistureEquationCoefficientD=1.0, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0, coatingLayerWaterVaporDiffusionResistanceFactor=0)
     end
 
     def self.InsulationRigid
