@@ -242,7 +242,7 @@ class ProcessEvaporativeCoolerTest < MiniTest::Test
   
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects,  num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
-    measure = ResidentialHvacEvaporativeCooler.new
+    measure = ResidentialHVACEvaporativeCooler.new
 
     # check for standard methods
     assert(!measure.name.empty?)
