@@ -7,7 +7,7 @@ require "#{File.dirname(__FILE__)}/schedules"
 
 class HVAC
 
-    def self.apply_evap_cooler(model, unit, runner, dse )
+    def self.apply_evap_cooler(model, unit, runner, dse)
 
       cooler_effectiveness = 0.75
 
@@ -2169,8 +2169,37 @@ class HVAC
     def self.apply_ideal_air_loads(model, unit, runner)
       thermal_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
 
-      unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonHeating, airflow_rate.to_s)
+      control_slave_zones_hash = get_control_and_slave_zones(thermal_zones)
+      control_slave_zones_hash.each do |control_zone, slave_zones|
 
+        ideal_air = OpenStudio::Model::ZoneHVACIdealLoadsAirSystem.new(model)
+        ideal_air.setMaximumHeatingSupplyAirTemperature(50)
+        ideal_air.setMinimumCoolingSupplyAirTemperature(10)
+        ideal_air.setMaximumHeatingSupplyAirHumidityRatio(0.015)
+        ideal_air.setMinimumCoolingSupplyAirHumidityRatio(0.01)
+        ideal_air.setHeatingLimit('NoLimit')
+        ideal_air.setCoolingLimit('NoLimit')
+        ideal_air.setDehumidificationControlType('None')
+        ideal_air.setHumidificationControlType('None')
+        ideal_air.addToThermalZone(control_zone)
+        
+        slave_zones.each do |slave_zone|
+        
+          ideal_air = OpenStudio::Model::ZoneHVACIdealLoadsAirSystem.new(model)
+          ideal_air.setMaximumHeatingSupplyAirTemperature(50)
+          ideal_air.setMinimumCoolingSupplyAirTemperature(10)
+          ideal_air.setMaximumHeatingSupplyAirHumidityRatio(0.015)
+          ideal_air.setMinimumCoolingSupplyAirHumidityRatio(0.01)
+          ideal_air.setHeatingLimit('NoLimit')
+          ideal_air.setCoolingLimit('NoLimit')
+          ideal_air.setDehumidificationControlType('None')
+          ideal_air.setHumidificationControlType('None')
+          ideal_air.addToThermalZone(slave_zone)
+          
+        end
+        
+      end
+    
       return true
     end
 
@@ -2215,8 +2244,7 @@ class HVAC
         removed_heater = self.remove_unit_heater(model, runner, thermal_zone)
         removed_elec_baseboard = self.remove_electric_baseboard(model, runner, thermal_zone)
         removed_gshp = self.remove_gshp(model, runner, thermal_zone)
-        removed_evap_cooler = self.remove_evap_cooler(model, runner, thermal_zone)
-        if counterpart_equip or removed_furnace or removed_ashp or removed_gshp or removed_evap_cooler
+        if counterpart_equip or removed_furnace or removed_ashp or removed_gshp
           if removed_ashp or removed_gshp
             self.remove_air_loop(model, runner, thermal_zone)
           else
@@ -2231,8 +2259,7 @@ class HVAC
         removed_ashp = self.remove_ashp(model, runner, thermal_zone)
         removed_mshp = self.remove_mshp(model, runner, thermal_zone, unit)
         removed_gshp = self.remove_gshp(model, runner, thermal_zone)
-        counterpart_equip = self.reset_evap_cooler(model, runner, thermal_zone)
-        if removed_furnace or removed_ashp or removed_mshp or removed_gshp or counterpart_equip
+        if removed_furnace or removed_ashp or removed_mshp or removed_gshp
           self.remove_air_loop(model, runner, thermal_zone)
         end
       when Constants.ObjectNameElectricBaseboard
@@ -2243,8 +2270,7 @@ class HVAC
         removed_ashp = self.remove_ashp(model, runner, thermal_zone)
         removed_mshp = self.remove_mshp(model, runner, thermal_zone, unit)
         removed_gshp = self.remove_gshp(model, runner, thermal_zone)
-        counterpart_equip = self.reset_evap_cooler(model, runner, thermal_zone)
-        if removed_furnace or removed_ashp or removed_gshp or counterpart_equip
+        if removed_furnace or removed_ashp or removed_gshp
           self.remove_air_loop(model, runner, thermal_zone)
         end
       when Constants.ObjectNameAirSourceHeatPump
@@ -2297,15 +2323,12 @@ class HVAC
         removed_ashp = self.remove_ashp(model, runner, thermal_zone)
         removed_mshp = self.remove_mshp(model, runner, thermal_zone, unit)
         removed_gshp = self.remove_gshp(model, runner, thermal_zone)
-        counterpart_equip = self.reset_evap_cooler(model, runner, thermal_zone)
-        if removed_furnace or removed_ashp or removed_gshp or counterpart_equip
+        if removed_furnace or removed_ashp or removed_gshp
           self.remove_air_loop(model, runner, thermal_zone)
         end
       when Constants.ObjectNameEvaporativeCooler
-
         removed_ashp = self.remove_ashp(model, runner, thermal_zone)
         removed_mshp = self.remove_mshp(model, runner, thermal_zone, unit)
-        counterpart_equip = self.reset_furnace(model, runner, thermal_zone)
         removed_evap_cooler = self.remove_evap_cooler(model, runner, thermal_zone)
         removed_ac = self.remove_central_ac(model, runner, thermal_zone)
         removed_room_ac = self.remove_room_ac(model, runner, thermal_zone)
@@ -2315,7 +2338,6 @@ class HVAC
         end
 
       end
-
 
       return counterpart_equip, perf
     end
@@ -3731,7 +3753,7 @@ class HVAC
       elsif hvac_equip.is_a? OpenStudio::Model::ZoneHVACPackagedTerminalAirConditioner
         htg_coil = get_coil_from_hvac_component(hvac_equip.heatingCoil)
         clg_coil = get_coil_from_hvac_component(hvac_equip.coolingCoil)
-
+      end
       return clg_coil, htg_coil, supp_htg_coil
     end
 
@@ -3877,6 +3899,15 @@ class HVAC
       return nil
     end
 
+    def self.get_ideal_air(model, runner, thermal_zone)
+      # Returns the ideal air loads system if available
+      model.getZoneHVACIdealLoadsAirSystems.each do |ideal_air|
+        next unless thermal_zone.handle.to_s == ideal_air.thermalZone.get.handle.to_s
+        return ideal_air
+      end
+      return nil
+    end
+
     # Has Equipment methods
 
     def self.has_central_ac(model, runner, thermal_zone)
@@ -4007,6 +4038,14 @@ class HVAC
         return false
       end
       return true
+    end
+
+    def self.has_ideal_air(model, runner, thermal_zone)
+      ideal_air = self.get_ideal_air(model, runner, thermal_zone)
+      if not ideal_air.nil?
+        return true
+      end
+      return false
     end
 
     def self.has_ducted_equipment(model, runner, thermal_zone)
@@ -4750,5 +4789,5 @@ class HVAC
       hspf = bLtot / UnitConversions.convert(etot,"Btu/hr","W")
       return hspf
     end
-  end
+
 end
