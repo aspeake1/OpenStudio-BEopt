@@ -73,7 +73,7 @@ class ProcessCentralSystemHotWaterBoilerBaseboardsTest < MiniTest::Test
   def test_retrofit_replace_furnace
     num_units = 4
     args_hash = {}
-    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilHeatingGas"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units}
+    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilHeatingGas"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units}
     expected_values = {}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 13)
@@ -100,7 +100,7 @@ class ProcessCentralSystemHotWaterBoilerBaseboardsTest < MiniTest::Test
   def test_retrofit_replace_ashp
     num_units = 4
     args_hash = {}
-    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilHeatingElectric"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "CoilHeatingDXSingleSpeed"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units}
+    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilHeatingElectric"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units, "CoilHeatingDXSingleSpeed"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units}
     expected_values = {}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_ASHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 13)
@@ -145,7 +145,7 @@ class ProcessCentralSystemHotWaterBoilerBaseboardsTest < MiniTest::Test
   def test_retrofit_replace_gshp_vert_bore
     num_units = 4
     args_hash = {}
-    expected_num_del_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
+    expected_num_del_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
     expected_num_new_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units}
     expected_values = {}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_GSHPVertBore.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 17)
