@@ -4405,8 +4405,8 @@ class HVACSizing
 
     # Evaporative Cooler
     thermal_zones.each do |thermal_zone|
-        evap_cooler = HVAC.get_evap_cooler_air_loop(model, runner, thermal_zone)
-        next if evap_cooler.nil?
+        system, air_loop = HVAC.get_evap_cooler_air_loop(model, runner, thermal_zone)
+        next if system.nil?
         
         # Unitary System
         evap_cooler.setSupplyAirFlowRateMethodDuringCoolingOperation("SupplyAirFlowRate")
