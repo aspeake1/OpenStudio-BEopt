@@ -234,7 +234,7 @@ class ResidentialCookingRangeTest < MiniTest::Test
     args_hash = {}
     args_hash["cooktop_ef"] = 0.74
     args_hash["oven_ef"] = 0.11
-	args_hash["fuel_type"] = Constants.FuelTypeElectric
+    args_hash["fuel_type"] = Constants.FuelTypeElectric
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>500, "Annual_therm"=>0, "Annual_gal"=>0, "Location"=>args_hash["location"]}

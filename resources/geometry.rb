@@ -156,8 +156,8 @@ class Geometry
 
   def self.get_unit_beds_baths(model, unit, runner=nil)
     # Returns a list with #beds, #baths, a list of spaces, and the unit name
-    nbeds = unit.getFeatureAsInteger(Constants.BuildingUnitFeatureNumBedrooms)
-    nbaths = unit.getFeatureAsDouble(Constants.BuildingUnitFeatureNumBathrooms)
+    nbeds = unit.additionalProperties.getFeatureAsInteger(Constants.BuildingUnitFeatureNumBedrooms)
+    nbaths = unit.additionalProperties.getFeatureAsDouble(Constants.BuildingUnitFeatureNumBathrooms)
     if not (nbeds.is_initialized or nbaths.is_initialized)
       if !runner.nil?
         runner.registerError("Could not determine number of bedrooms or bathrooms.")
@@ -757,11 +757,32 @@ class Geometry
       return edges
   end
 
-  def self.vertices_straddle_base_vertex?(b, v1, v2, facade)
-      # Checks if v1 and v2 are on opposite sides of b
-      if [Constants.FacadeFront, Constants.FacadeBack].include?(facade)
-          if (v1[0] < b[0] and v2[0] > b[0]) or (v2[0] < b[0] and v1[0] > b[0])
-              return true
+  def self.equal_vertices(v1, v2)
+      tol = 0.001
+      return false if (v1[0] - v2[0]).abs > tol
+      return false if (v1[1] - v2[1]).abs > tol
+      return false if (v1[2] - v2[2]).abs > tol
+      return true
+  end
+  
+  def self.get_walls_connected_to_floor(wall_surfaces, floor_surface)
+      adjacent_wall_surfaces = []
+      
+      wall_surfaces.each do |wall_surface|
+          next if wall_surface.space.get != floor_surface.space.get
+          wall_vertices = wall_surface.vertices
+          wall_vertices.each_with_index do |wv1, widx|
+              wv2 = wall_vertices[widx-1]
+              floor_vertices = floor_surface.vertices
+              floor_vertices.each_with_index do |fv1, fidx|
+                  fv2 = floor_vertices[fidx-1]
+                  # Wall within floor edge?
+                  if self.is_point_between([wv1.x, wv1.y, wv1.z], [fv1.x, fv1.y, fv1.z], [fv2.x, fv2.y, fv2.z]) and self.is_point_between([wv2.x, wv2.y, wv2.z], [fv1.x, fv1.y, fv1.z], [fv2.x, fv2.y, fv2.z])
+                      if not adjacent_wall_surfaces.include? wall_surface
+                          adjacent_wall_surfaces << wall_surface
+                      end
+                  end
+              end
           end
       elsif [Constants.FacadeLeft, Constants.FacadeRight].include?(facade)
           if (v1[1] < b[1] and v2[1] > b[1]) or (v2[1] < b[1] and v1[1] > b[1])
@@ -770,7 +791,8 @@ class Geometry
       else
           abort("Unhandled situation.")
       end
-      return false
+      
+      return adjacent_wall_surfaces
   end
 
   def self.is_living(space_or_zone)
@@ -1313,8 +1335,8 @@ class Geometry
       num_br[unit_index] = num_br[unit_index].to_i
       num_ba[unit_index] = num_ba[unit_index].to_f
 
-      unit.setFeature(Constants.BuildingUnitFeatureNumBedrooms, num_br[unit_index])
-      unit.setFeature(Constants.BuildingUnitFeatureNumBathrooms, num_ba[unit_index])
+      unit.additionalProperties.setFeature(Constants.BuildingUnitFeatureNumBedrooms, num_br[unit_index])
+      unit.additionalProperties.setFeature(Constants.BuildingUnitFeatureNumBathrooms, num_ba[unit_index])
 
       if units.size > 1
         runner.registerInfo("Unit '#{unit_index}' has been assigned #{num_br[unit_index].to_s} bedroom(s) and #{num_ba[unit_index].round(2).to_s} bathroom(s).")
