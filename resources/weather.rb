@@ -259,20 +259,8 @@ class WeatherProcess
         
         return true
       end
-<<<<<<< HEAD
-  
-      def process_epw(epw_path)
-        if not File.exist?(epw_path)
-          @runner.registerError("Cannot find weather file at #{epw_path}.")
-          @error = true
-          return
-        end
-
-        epw_file = OpenStudio::EpwFile.new(epw_path, true)
-=======
 
       def process_epw
->>>>>>> master
 
         # Header info:
         @header.City = @epw_file.city
@@ -285,19 +273,6 @@ class WeatherProcess
         @header.Timezone = @epw_file.timeZone
         @header.Altitude = UnitConversions.convert(@epw_file.elevation,"m","ft")
         @header.LocalPressure = Math::exp(-0.0000368 * @header.Altitude) # atm
-<<<<<<< HEAD
-        
-        ddy_path = epw_path.gsub(".epw",".ddy")
-        epwHasDesignData = false
-        if File.exist?(ddy_path)
-          epwHasDesignData = true
-          @design = get_design_info_from_ddy(@design, ddy_path, @header.Altitude)
-        end
-        
-        # Timeseries data:
-        epw_file_data = epw_file.data
-        hourdata = []
-=======
         @header.RecordsPerHour = @epw_file.recordsPerHour
 
         epw_file_data = @epw_file.data
@@ -306,7 +281,6 @@ class WeatherProcess
 
         # Timeseries data:        
         rowdata = []
->>>>>>> master
         dailydbs = []
         dailyhighdbs = []
         dailylowdbs = []
@@ -401,13 +375,8 @@ class WeatherProcess
         @data.WSF = get_ashrae_622_wsf
         
         if not epwHasDesignData
-<<<<<<< HEAD
-          @runner.registerWarning("No DDY file found; calculating design conditions from EPW weather data.")
-          @design = calc_design_info(@design, hourdata, @header.Altitude)
-=======
           @runner.registerWarning("No design condition info found; calculating design conditions from EPW weather data.")
           calc_design_info(rowdata)
->>>>>>> master
           @design.DailyTemperatureRange = @data.MonthlyAvgDailyHighDrybulbs[7] - @data.MonthlyAvgDailyLowDrybulbs[7]
         end
         
@@ -581,33 +550,6 @@ class WeatherProcess
         return wsf_avg
             
       end
-<<<<<<< HEAD
-      
-      def get_design_info_from_ddy(design, ddy_path, altitude)
-        ddy_model = OpenStudio::EnergyPlus.loadAndTranslateIdf(ddy_path).get
-        dehum02per_dp = nil
-        ddy_model.getObjectsByType("OS:SizingPeriod:DesignDay".to_IddObjectType).each do |d|
-          designDay = d.to_DesignDay.get
-          if d.name.get.include?("Ann Htg 99% Condns DB")
-            design.HeatingDrybulb = UnitConversions.convert(designDay.maximumDryBulbTemperature,"C","F")
-          elsif d.name.get.include?("Ann Htg Wind 99% Condns WS=>MCDB")
-            # FIXME: Is this correct? Or should be wind speed coincident with heating drybulb?
-            design.HeatingWindspeed = designDay.windSpeed
-          elsif d.name.get.include?("Ann Clg 1% Condns DB=>MWB")
-            design.CoolingDrybulb = UnitConversions.convert(designDay.maximumDryBulbTemperature,"C","F")
-            design.CoolingWetbulb = UnitConversions.convert(designDay.humidityIndicatingConditionsAtMaximumDryBulb,"C","F")
-            design.CoolingWindspeed = designDay.windSpeed
-            design.DailyTemperatureRange = UnitConversions.convert(designDay.dailyDryBulbTemperatureRange,"K","R")
-          elsif d.name.get.include?("Ann Clg 2% Condns DP=>MDB")
-            design.DehumidDrybulb = UnitConversions.convert(designDay.maximumDryBulbTemperature,"C","F")
-            dehum02per_dp = UnitConversions.convert(designDay.humidityIndicatingConditionsAtMaximumDryBulb,"C","F")
-          end
-        end
-        std_press = Psychrometrics.Pstd_fZ(altitude)
-        design.CoolingHumidityRatio = Psychrometrics.w_fT_Twb_P(design.CoolingDrybulb, design.CoolingWetbulb, std_press)
-        design.DehumidHumidityRatio = Psychrometrics.w_fT_Twb_P(dehum02per_dp, dehum02per_dp, std_press)
-        return design
-=======
 
       def get_design_info_from_epw
         epw_design_conditions = @epw_file.designConditions
@@ -628,7 +570,6 @@ class WeatherProcess
           @design.DehumidHumidityRatio = Psychrometrics.w_fT_Twb_P(dehum02per_dp, dehum02per_dp, std_press)
         end
         return epwHasDesignData
->>>>>>> master
       end
       
       def calc_design_info(rowdata)

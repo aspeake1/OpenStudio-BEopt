@@ -256,7 +256,7 @@ class WeatherProcess
           return false if !@design.send(k).is_initialized
           @design.send(k+"=", @design.send(k).get)
         end
-
+        
         return true
       end
 
@@ -308,6 +308,18 @@ class WeatherProcess
             @runner.registerError("Cannot retrieve relativeHumidity from the EPW for hour #{rownum+1}.")
             @error = true
           end
+          #if epwdata.extraterrestrialHorizontalRadiation.is_initialized
+          #  hourdict['ethoriz'] = epwdata.extraterrestrialHorizontalRadiation.get
+          #else
+          #  @runner.registerError("Cannot retrieve extraterrestrialHorizontalRadiation from the EPW for hour #{hournum+1}.")
+          #  @error = true
+          #end
+          #if epwdata.globalHorizontalRadiation.is_initialized
+          #  hourdict['ghoriz'] = epwdata.globalHorizontalRadiation.get
+          #else
+          #  @runner.registerError("Cannot retrieve globalHorizontalRadiation from the EPW for hour #{hournum+1}.")
+          #  @error = true
+          #end
           if epwdata.directNormalRadiation.is_initialized
             rowdict['dirnormal'] = epwdata.directNormalRadiation.get # W/m^2
           else

@@ -439,6 +439,15 @@ class Constants
     end
     return "residential baseboard#{s_unit}"
   end    
+  
+  def self.ObjectNameEvaporativeCooler(unit_name=self.ObjectNameBuildingUnit)
+    s_unit = ""
+    if unit_name != self.ObjectNameBuildingUnit
+      s_unit = "|#{unit_name}"
+    end
+    return "residentia evaporative cooler#{s_unit}"
+  end  
+  
   def self.ObjectNameExtraRefrigerator(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""
     if unit_name != self.ObjectNameBuildingUnit
