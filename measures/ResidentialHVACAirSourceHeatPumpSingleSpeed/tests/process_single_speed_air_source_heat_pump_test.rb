@@ -190,7 +190,7 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units, "SetpointManagerScheduled"=>1}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units*2, "CoilHeatingElectric"=>num_units, "CoilHeatingDXSingleSpeed"=>num_units}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "FanOnOff"=>num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units, "CoilHeatingElectric"=>num_units, "CoilHeatingDXSingleSpeed"=>num_units}
     expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Boiler_Baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*6+1)
   end

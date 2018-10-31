@@ -327,7 +327,7 @@ class ProcessGroundSourceHeatPumpVerticalBoreTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "CoilHeatingWaterBaseboard"=>num_units, "ZoneHVACBaseboardConvectiveWater"=>num_units, "SetpointManagerScheduled"=>1}
-    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
+    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
     expected_values = {"HeatingCOP"=>3.65, "CoolingCOP"=>5.36, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "GlycolFrac"=>0.3}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Boiler_Baseboards.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4+1)
   end
@@ -336,7 +336,7 @@ class ProcessGroundSourceHeatPumpVerticalBoreTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {"PlantLoop"=>2, "PumpVariableSpeed"=>2, "BoilerHotWater"=>1, "ChillerElectricEIR"=>1, "ControllerWaterCoil"=>2*num_units, "CoilCoolingWater"=>num_units, "CoilHeatingWater"=>num_units, "FanOnOff"=>num_units, "ZoneHVACFourPipeFanCoil"=>num_units, "SetpointManagerScheduled"=>2}
-    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
+    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
     expected_values = {"HeatingCOP"=>3.65, "CoolingCOP"=>5.36, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "GlycolFrac"=>0.3}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_Fan_Coil.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4+2)
   end
@@ -345,7 +345,7 @@ class ProcessGroundSourceHeatPumpVerticalBoreTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {"PlantLoop"=>1, "PumpVariableSpeed"=>1, "BoilerHotWater"=>1, "ControllerWaterCoil"=>num_units, "CoilHeatingWater"=>num_units, "FanConstantVolume"=>num_units, "CoilCoolingDXSingleSpeed"=>num_units, "ZoneHVACPackagedTerminalAirConditioner"=>num_units, "SetpointManagerScheduled"=>1}
-    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctUncontrolled"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
+    expected_num_new_objects = {"SetpointManagerFollowGroundTemperature"=>num_units, "GroundHeatExchangerVertical"=>num_units, "FanOnOff"=>num_units, "CoilHeatingWaterToAirHeatPumpEquationFit"=>num_units, "CoilCoolingWaterToAirHeatPumpEquationFit"=>num_units, "PumpVariableSpeed"=>num_units, "CoilHeatingElectric"=>num_units, "PlantLoop"=>num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>num_units, "AirLoopHVACUnitarySystem"=>num_units, "AirLoopHVAC"=>num_units}
     expected_values = {"HeatingCOP"=>3.65, "CoolingCOP"=>5.36, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "GlycolFrac"=>0.3}
     _test_measure("SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Central_System_PTAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*4+1)
   end
