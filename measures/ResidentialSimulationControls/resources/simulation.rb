@@ -1,12 +1,12 @@
 class Simulation
 
     def self.apply(model, runner, timesteps_per_hr=1, min_system_timestep_mins=nil, begin_month=1, begin_day_of_month=1, end_month=12, end_day_of_month=31)
-
+      
         sim = model.getSimulationControl
         sim.setRunSimulationforSizingPeriods(false)
         
         tstep = model.getTimestep
-        tstep.setNumberOfTimestepsPerHour(timesteps)
+        tstep.setNumberOfTimestepsPerHour(timesteps_per_hr) # Timesteps/hour
         
         shad = model.getShadowCalculation
         shad.setCalculationFrequency(20)
@@ -21,9 +21,9 @@ class Simulation
         zonecap = model.getZoneCapacitanceMultiplierResearchSpecial
         zonecap.setHumidityCapacityMultiplier(15)
 
-        if not convlim_min.nil?
+        if not min_system_timestep_mins.nil?
           convlim = model.getConvergenceLimits
-          convlim.setMinimumSystemTimestep(convlim_min)
+          convlim.setMinimumSystemTimestep(min_system_timestep_mins) # Minutes
         end
 
         run_period = model.getRunPeriod
@@ -31,8 +31,8 @@ class Simulation
         run_period.setBeginDayOfMonth(begin_day_of_month)
         run_period.setEndMonth(end_month)
         run_period.setEndDayOfMonth(end_day_of_month)
-        
-        return true
+      
+      return true
     end
        
 end
