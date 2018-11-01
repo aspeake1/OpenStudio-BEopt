@@ -1842,6 +1842,75 @@ class SubsurfaceConstructions
 
 end
 
+class MoistureConstructions
+
+  # Container class for decoupled internal mass with moisture properties
+
+  def self.apply(runner, model, drywall_mult=2.92, wood_trim_mult=0.31, carpet_mult=0.64, furniture_mult=0.75)
+    
+    spaces = Geometry.get_finished_spaces(model.getSpaces)
+    ffa = Geometry.get_finished_floor_area_from_spaces(spaces, false, runner)
+
+    if not apply_partition_walls(runner, model, ffa * drywall_mult)
+      return false
+    end
+
+    if not apply_wood_trim(runner, model, ffa * wood_trim_mult)
+      return false
+    end
+
+    if not apply_carpet(runner, model, ffa * carpet_mult)
+      return false
+    end
+
+    if not apply_living_furniture(runner, model, ffa * furniture_mult)
+      return false
+    end
+
+  end
+
+  private
+
+  def self.apply_partition_walls(runner, model, surface_area)
+
+    gypsum = BaseMaterial.new(rho=50.0, cp=0.2, k_in=1.1112, waterVaporDiffusionResistanceFactor=9.14, moistureEquationCoefficientA=0.0069, moistureEquationCoefficientB=0.9066, moistureEquationCoefficientC=0.0404, moistureEquationCoefficientD=22.1121, surfaceLayerPenetrationDepth=nil, deepLayerPenetrationDepth=nil, coatingLayerThickness=0.005, coatingLayerWaterVaporDiffusionResistanceFactor=140)
+    gypsum = Construction.create_os_material(model, runner, gypsum)
+
+    # Set paths
+    path_fracs = [1]
+
+    # Define construction
+    constr = Construction.new("test", path_fracs)
+    constr.add_layer(constr)
+
+    imdef = OpenStudio::Model::InternalMassDefinition.new(model)
+    imdef.setName(mass_obj_name_space)
+    imdef.setSurfaceArea(surface_area)
+    
+    im = OpenStudio::Model::InternalMass.new(imdef)
+    im.setName("test")
+    im.setSpace(space)
+    
+    # Create and assign construction to surfaces
+    if not constr.create_and_assign_constructions([imdef], runner, model)
+        return false
+    end
+  end
+
+  def self.apply_wood_trim(runner, model, surface_area)
+
+  end
+
+  def self.apply_carpet(runner, model, surface_area)
+
+  end
+
+  def self.apply_living_furniture(runner, model, surface_area)
+
+  end
+
+end
+
 class ThermalMassConstructions
 
     # Container class for additional thermal mass (partition/furniture) constructions
@@ -1975,7 +2044,7 @@ class ThermalMassConstructions
             furnThickness = UnitConversions.convert(furnMass / (furnDensity * furnAreaFraction),'ft','in')
             
             # Define materials
-            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil, moist_base=BaseMaterial.Furniture)
+            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil)
             
             # Set paths
             path_fracs = [1]
