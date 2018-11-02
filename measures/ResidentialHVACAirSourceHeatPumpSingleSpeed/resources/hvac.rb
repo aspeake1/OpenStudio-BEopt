@@ -1384,7 +1384,7 @@ class HVAC
         perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)
         perf.setSingleModeOperation(false)
         mshp_indices.each do |mshp_index|
-          ratio = cfms_heating[mshp_index] / cfms_heating[mshp_indices[-1]] # FIXME: Need to verify
+          ratio = cfms_heating[mshp_index] / cfms_heating[mshp_indices[-1]]
           f = OpenStudio::Model::SupplyAirflowRatioField.new(ratio, Constants.small)
           perf.addSupplyAirflowRatioField(f)
         end
@@ -1539,7 +1539,7 @@ class HVAC
         perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)
         perf.setSingleModeOperation(false)
         mshp_indices.each do |mshp_index|
-          ratio = cfms_cooling[mshp_index] / cfms_cooling[mshp_indices[-1]] # FIXME: Need to verify
+          ratio = cfms_cooling[mshp_index] / cfms_cooling[mshp_indices[-1]]
           f = OpenStudio::Model::SupplyAirflowRatioField.new(Constants.small, ratio)
           perf.addSupplyAirflowRatioField(f)
         end
