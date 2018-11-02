@@ -80,7 +80,7 @@ class Airflow
     
     # Adiabatic construction for ducts
 
-    mat = Material.Adiabatic
+    mat = SimpleMaterial.Adiabatic
     adiabatic_mat = Construction.create_os_material(model, runner, mat)
     adiabatic_const = OpenStudio::Model::Construction.new(model)
     adiabatic_const.setName("AdiabaticConst")
@@ -1312,6 +1312,8 @@ class Airflow
       surface_property_convection_coefficients.setConvectionCoefficient1Type("Value")
       surface_property_convection_coefficients.setConvectionCoefficient1(999)
     end
+
+    MoistureConstructions.apply_dummy(runner, model, 1.0, [ra_space], ra_space.floorArea)
 
     if has_forced_air_equipment
 

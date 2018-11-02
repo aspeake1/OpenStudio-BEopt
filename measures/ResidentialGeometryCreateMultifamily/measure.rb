@@ -5,6 +5,7 @@ require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 require "#{File.dirname(__FILE__)}/resources/schedules"
+require "#{File.dirname(__FILE__)}/resources/constructions"
 
 # start the measure
 class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
@@ -590,6 +591,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
           corridor_space = corridor_space.get
           corridor_space_name = "corridor space"
           corridor_space.setName(corridor_space_name)
+          MoistureConstructions.apply_dummy(runner, model, 1.0, [corridor_space], corridor_space.floorArea)
           if space_types_hash.keys.include? Constants.SpaceTypeCorridor
             corridor_space_type = space_types_hash[Constants.SpaceTypeCorridor]
           else
@@ -852,6 +854,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
           foundation_space.setThermalZone(foundation_zone)
           foundation_space_type_name = Constants.SpaceTypeUnfinishedBasement
         end
+        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space], foundation_space.floorArea)
         if space_types_hash.keys.include? foundation_space_type_name
           foundation_space_type = space_types_hash[foundation_space_type_name]
         else

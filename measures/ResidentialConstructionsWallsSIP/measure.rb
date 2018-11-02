@@ -171,6 +171,10 @@ class ProcessConstructionsWallsSIP < OpenStudio::Measure::ModelMeasure
                                           drywall_thick_in)
         return false
     end
+
+    if not MoistureConstructions.apply(runner, model)
+        return false
+    end
     
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)

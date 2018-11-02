@@ -1842,6 +1842,210 @@ class SubsurfaceConstructions
 
 end
 
+class MoistureConstructions
+
+  # Container class for decoupled internal mass with moisture properties
+
+  def self.apply(runner, model, drywall_mult=2.92, wood_trim_mult=0.31, carpet_mult=0.64, furniture_mult=0.75)
+
+    spaces = Geometry.get_finished_spaces(model.getSpaces)
+    ffa = UnitConversions.convert(Geometry.get_finished_floor_area_from_spaces(spaces, false), "ft^2", "m^2")
+
+    if not apply_partition_walls(runner, model, drywall_mult, spaces, ffa)
+      return false
+    end
+
+    if not apply_wood_trim(runner, model, wood_trim_mult, spaces, ffa)
+      return false
+    end
+
+    if not apply_carpet(runner, model, carpet_mult, spaces, ffa)
+      return false
+    end
+
+    if not apply_furniture(runner, model, furniture_mult, spaces, ffa)
+      return false
+    end
+
+  end
+
+  private
+
+  def self.remove(model, name)
+
+    # Remove any existing empd internal mass.
+    model.getInternalMasss.each do |im|
+      next if not im.name.get.start_with? name
+      md = im.internalMassDefinition
+      im.remove
+      md.remove
+    end
+
+  end
+
+  def self.apply_partition_walls(runner, model, mult, spaces, ffa)
+
+    name = "#{Constants.ObjectNameEMPD} #{Constants.ObjectNamePartitionWall} drywall"
+
+    thick_in = 0.001
+    k_in = 0.1
+    rho = 800.0
+    cp = 100.0
+    wDiff = 9.14
+    coefA = 0.0069
+    coefB = 0.9066
+    coefC = 0.0404
+    coefD = 22.1121
+    sDepth = 0.01886
+    dDepth = 0.08642
+    cThick = 0.005
+    cDiff = 140.0
+
+    surface_area = ffa * mult
+
+    create_internal_mass(runner, model, name, surface_area, thick_in, k_in, rho, cp, wDiff, coefA, coefB, coefC, coefD, sDepth, dDepth, cThick, cDiff, spaces)
+    return true
+
+  end
+
+  def self.apply_wood_trim(runner, model, mult, spaces, ffa)
+
+    name = "#{Constants.ObjectNameEMPD} #{Constants.ObjectNameWoodTrim}"
+
+    thick_in = 0.001
+    k_in = 0.1
+    rho = 512.0
+    cp = 100.0
+    wDiff = 320.0
+    coefA = 0.15
+    coefB = 8.51
+    coefC = 0.167
+    coefD = 0.965
+    sDepth = 0.00079
+    dDepth = 0.0036
+    cThick = 0.005
+    cDiff = 140.0
+
+    surface_area = ffa * mult
+
+    create_internal_mass(runner, model, name, surface_area, thick_in, k_in, rho, cp, wDiff, coefA, coefB, coefC, coefD, sDepth, dDepth, cThick, cDiff, spaces)
+    return true
+
+  end
+
+  def self.apply_carpet(runner, model, mult, spaces, ffa)
+
+    name = "#{Constants.ObjectNameEMPD} #{Constants.ObjectNameCarpet}"
+
+    thick_in = 0.001
+    k_in = 0.1
+    rho = 220.0
+    cp = 100.0
+    wDiff = 0.5
+    coefA = 0.019
+    coefB = 1.0
+    coefC = 0.0
+    coefD = 1.0
+    sDepth = 0.0341
+    dDepth = 0.156
+    cThick = 0.0
+    cDiff = 0.0
+
+    surface_area = ffa * mult
+
+    create_internal_mass(runner, model, name, surface_area, thick_in, k_in, rho, cp, wDiff, coefA, coefB, coefC, coefD, sDepth, dDepth, cThick, cDiff, spaces)
+    return true
+
+  end
+
+  def self.apply_furniture(runner, model, mult, spaces, ffa)
+
+    name = "#{Constants.ObjectNameEMPD} #{Constants.ObjectNameFurniture}"
+
+    thick_in = 0.001
+    k_in = 0.1
+    rho = 500.0
+    cp = 100.0
+    wDiff = 6.0
+    coefA = 0.02
+    coefB = 1.0
+    coefC = 0.0
+    coefD = 1.0
+    sDepth = nil
+    dDepth = nil
+    cThick = 0.0
+    cDiff = 0.0
+
+    surface_area = ffa * mult
+
+    create_internal_mass(runner, model, name, surface_area, thick_in, k_in, rho, cp, wDiff, coefA, coefB, coefC, coefD, sDepth, dDepth, cThick, cDiff, spaces)
+    return true
+
+  end
+
+  def self.apply_dummy(runner, model, mult, spaces, ffa)
+
+    name = "#{Constants.ObjectNameEMPD} dummy"
+
+    thick_in = 0.001
+    k_in = 0.1
+    rho = 100.0
+    cp = 100.0
+    wDiff = 500.0
+    coefA = 0.0069
+    coefB = 0.9066
+    coefC = 0.0404
+    coefD = 22.1121
+    sDepth = 0.1
+    dDepth = 0.0
+    cThick = 0.0
+    cDiff = 0.0
+
+    surface_area = ffa * mult
+
+    create_internal_mass(runner, model, name, surface_area, thick_in, k_in, rho, cp, wDiff, coefA, coefB, coefC, coefD, sDepth, dDepth, cThick, cDiff, spaces)
+    return true
+
+  end
+
+  def self.create_internal_mass(runner, model, name, surface_area, thick_in, k_in, rho, cp, wDiff, coefA, coefB, coefC, coefD, sDepth, dDepth, cThick, cDiff, spaces)
+
+    thick_in = UnitConversions.convert(thick_in, "m", "in")
+    k_in = UnitConversions.convert(k_in,"w/(m*k)", "btu*in/(hr*ft^2*r)")
+    rho = UnitConversions.convert(rho, "kg/m^3", "lbm/ft^3")
+    cp = UnitConversions.convert(cp, "j/(kg*k)", "btu/(lbm*r)")
+ 
+    mat = Material.new(name=name, thick_in=thick_in, mat_base=nil, k_in=k_in, rho=rho, cp=cp, tAbs=0.9, sAbs=0.5, vAbs=0.1, rvalue=nil, wDiff=wDiff, coefA=coefA, coefB=coefB, coefC=coefC, coefD=coefD, sDepth=sDepth, dDepth=dDepth, cThick=cThick, cDiff=cDiff)
+
+    # Define construction
+    constr = Construction.new(name, [1])
+    constr.add_layer(mat)
+
+    imdefs = []
+    spaces.each do |space|
+
+      remove(model, "#{name} #{space.name}")
+
+      imdef = OpenStudio::Model::InternalMassDefinition.new(model)
+      imdef.setName("#{name} #{space.name}")
+      imdef.setSurfaceArea(surface_area)
+      imdefs << imdef
+      
+      im = OpenStudio::Model::InternalMass.new(imdef)
+      im.setName("#{name} #{space.name}")
+      im.setSpace(space)
+
+    end
+
+    # Create and assign construction to surfaces
+    if not constr.create_and_assign_constructions(imdefs, runner, model)
+      return false
+    end
+
+  end
+
+end
+
 class ThermalMassConstructions
 
     # Container class for additional thermal mass (partition/furniture) constructions
@@ -1890,26 +2094,30 @@ class ThermalMassConstructions
         
             # Determine additional partition wall mass required
             addtl_surface_area = frac_of_ffa * space.floorArea - existing_surface_area * 2 / spaces.size.to_f
-            
+
             # Remove any existing internal mass
+            partition_wall_removed = false
             space.internalMass.each do |im|
-                runner.registerInfo("Removing internal mass object '#{im.name.to_s}' from space '#{space.name.to_s}'")
+                next if not im.name.get.include?(Constants.ObjectNamePartitionWall)
                 imdef = im.internalMassDefinition
                 im.remove
                 imdef.resetConstruction
                 imdef.remove
+                partition_wall_removed = true
             end
-            
+
+            mass_obj_name_space = "#{Constants.ObjectNamePartitionWall} mass #{space.name.to_s}"
+
             if addtl_surface_area > 0
                 # Add remaining partition walls within spaces (those without geometric representation)
                 # as internal mass object.
                 imdef = OpenStudio::Model::InternalMassDefinition.new(model)
-                imdef.setName("#{space.name.to_s} Partition")
+                imdef.setName(mass_obj_name_space)
                 imdef.setSurfaceArea(addtl_surface_area)
                 imdefs << imdef
                 
                 im = OpenStudio::Model::InternalMass.new(imdef)
-                im.setName("#{space.name.to_s} Partition")
+                im.setName(mass_obj_name_space)
                 im.setSpace(space)
                 runner.registerInfo("Added internal mass object '#{im.name.to_s}' to space '#{space.name.to_s}'")
             end
@@ -1931,7 +2139,7 @@ class ThermalMassConstructions
                              density_lb_per_cuft=40.0, mat=BaseMaterial.Wood)
     
         # Remove any existing furniture mass.
-        furniture_removed = false    
+        furniture_removed = false
         model.getInternalMasss.each do |im|
             next if not im.name.get.include?(Constants.ObjectNameFurniture)
             md = im.internalMassDefinition
@@ -1975,7 +2183,7 @@ class ThermalMassConstructions
             furnThickness = UnitConversions.convert(furnMass / (furnDensity * furnAreaFraction),'ft','in')
             
             # Define materials
-            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil, moist_base=BaseMaterial.Furniture)
+            mat_fm = Material.new(name=mat_obj_name_space, thick_in=furnThickness, mat_base=nil, k_in=furnConductivity, rho=furnDensity, cp=furnSpecHeat, tAbs=0.9, sAbs=furnSolarAbsorptance, vAbs=0.1, rvalue=nil)
             
             # Set paths
             path_fracs = [1]
@@ -2334,13 +2542,13 @@ class Construction
             if not material.vAbs.nil?
                 mat.setVisibleAbsorptance(material.vAbs)
             end
-            if not material.waterVaporDiffusionResistanceFactor.nil? and not material.moistureEquationCoefficientA.nil? and not material.moistureEquationCoefficientB.nil? and not material.moistureEquationCoefficientC.nil? and not material.moistureEquationCoefficientD.nil? and not material.coatingLayerThickness.nil? and not material.coatingLayerWaterVaporDiffusionResistanceFactor.nil?
-              mat.createMaterialPropertyMoisturePenetrationDepthSettings(material.waterVaporDiffusionResistanceFactor, material.moistureEquationCoefficientA, material.moistureEquationCoefficientB, material.moistureEquationCoefficientC, material.moistureEquationCoefficientD, material.coatingLayerThickness, material.coatingLayerWaterVaporDiffusionResistanceFactor)
-              unless material.surfaceLayerPenetrationDepth.nil?
-                mat.setSurfaceLayerPenetrationDepth(material.surfaceLayerPenetrationDepth)
+            if not material.wDiff.nil? and not material.coefA.nil? and not material.coefB.nil? and not material.coefC.nil? and not material.coefD.nil? and not material.cThick.nil? and not material.cDiff.nil?
+              mat_props = mat.createMaterialPropertyMoisturePenetrationDepthSettings(material.wDiff, material.coefA, material.coefB, material.coefC, material.coefD, material.cThick, material.cDiff)
+              unless material.sDepth.nil?
+                mat_props.get.setSurfaceLayerPenetrationDepth(material.sDepth)
               end
-              unless material.deepLayerPenetrationDepth.nil?
-                mat.setDeepLayerPenetrationDepth(material.deepLayerPenetrationDepth)
+              unless material.dDepth.nil?
+                mat_props.get.setDeepLayerPenetrationDepth(material.dDepth)
               end
               msg = " along with moisture penetration depth settings."
             end

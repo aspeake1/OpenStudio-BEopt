@@ -5,6 +5,7 @@ require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 require "#{File.dirname(__FILE__)}/resources/schedules"
+require "#{File.dirname(__FILE__)}/resources/constructions"
 
 # start the measure
 class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::ModelMeasure
@@ -789,6 +790,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedBasement)
           foundation_space.setSpaceType(foundation_space_type)
         end
+        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space], foundation_space.floorArea)
       end
 
       # set foundation walls to ground
@@ -835,6 +837,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       attic_space_type = OpenStudio::Model::SpaceType.new(model)
       attic_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedAttic)
       attic_space.setSpaceType(attic_space_type)
+      MoistureConstructions.apply_dummy(runner, model, 1.0, [attic_space], attic_space.floorArea)
     end
 
     unit_hash = {}
