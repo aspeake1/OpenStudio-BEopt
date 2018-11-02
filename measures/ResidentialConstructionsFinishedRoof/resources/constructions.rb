@@ -1875,7 +1875,7 @@ class MoistureConstructions
 
     # Remove any existing empd internal mass.
     model.getInternalMasss.each do |im|
-      next if not im.name.get.start_with? name
+      next if not im.name.get.to_s == name
       md = im.internalMassDefinition
       im.remove
       md.remove
