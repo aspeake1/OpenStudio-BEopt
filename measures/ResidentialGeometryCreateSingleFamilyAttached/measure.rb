@@ -790,7 +790,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedBasement)
           foundation_space.setSpaceType(foundation_space_type)
         end
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space], foundation_space.floorArea)
+        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space])
       end
 
       # set foundation walls to ground
@@ -837,7 +837,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       attic_space_type = OpenStudio::Model::SpaceType.new(model)
       attic_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedAttic)
       attic_space.setSpaceType(attic_space_type)
-      MoistureConstructions.apply_dummy(runner, model, 1.0, [attic_space], attic_space.floorArea)
+      MoistureConstructions.apply_dummy(runner, model, 1.0, [attic_space])
     end
 
     unit_hash = {}

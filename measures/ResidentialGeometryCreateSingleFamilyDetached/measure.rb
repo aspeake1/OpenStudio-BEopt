@@ -481,7 +481,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         end
         foundation_polygon_with_wrong_zs = living_polygon
 
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [garage_space], garage_space.floorArea)
+        MoistureConstructions.apply_dummy(runner, model, 1.0, [garage_space])
 
       else # first floor without garage or above first floor
 
@@ -656,7 +656,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       end
       attic_space.setName(attic_space_name)
       if attic_type == "unfinished attic"
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [attic_space], attic_space.floorArea)
+        MoistureConstructions.apply_dummy(runner, model, 1.0, [attic_space])
       end
       if space_types_hash.keys.include? attic_space_type_name
         attic_space_type = space_types_hash[attic_space_type_name]
@@ -719,7 +719,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       end
       foundation_space.setName(foundation_space_name)
       if ["crawlspace", "unfinished basement", "pier and beam"].include? foundation_type
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space], foundation_space.floorArea)
+        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space])
       end
       if space_types_hash.keys.include? foundation_space_type_name
         foundation_space_type = space_types_hash[foundation_space_type_name]
