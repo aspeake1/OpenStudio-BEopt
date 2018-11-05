@@ -247,7 +247,7 @@ class ProcessConstructionsWallsWoodStudTest < MiniTest::Test
                     material = layer.to_StandardOpaqueMaterial.get
                     actual_values["AssemblyR"] += material.thickness/material.conductivity
                 end
-            end
+              end
         end
     end
     actual_values.each do |prop, val|
