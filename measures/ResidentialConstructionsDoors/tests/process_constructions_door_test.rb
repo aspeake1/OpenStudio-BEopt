@@ -10,16 +10,16 @@ class ProcessConstructionsDoorsTest < MiniTest::Test
   def test_retrofit_replace
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     door_r = 0.04445/0.0612266553480475
-    expected_values = {"DoorR"=>door_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
+    expected_values = {"DoorR"=>door_r}
     model = _test_measure("SFD_2000sqft_2story_SL_GRG_UA_Windows_Doors.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["ufactor"] = 0.48
-    expected_num_del_objects = {"Material"=>1, "Construction"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1, "MaterialPropertyMoisturePenetrationDepthSettings"=>1}
+    expected_num_del_objects = {"Material"=>1, "Construction"=>1}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     door_r = 0.04445/0.2092601547388782
-    expected_values = {"DoorR"=>door_r, "WaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.waterVaporDiffusionResistanceFactor, "MoistureEquationCoefficientA"=>BaseMaterial.Wood.moistureEquationCoefficientA, "MoistureEquationCoefficientB"=>BaseMaterial.Wood.moistureEquationCoefficientB, "MoistureEquationCoefficientC"=>BaseMaterial.Wood.moistureEquationCoefficientC, "MoistureEquationCoefficientD"=>BaseMaterial.Wood.moistureEquationCoefficientD, "CoatingLayerThickness"=>BaseMaterial.Wood.coatingLayerThickness, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>BaseMaterial.Wood.coatingLayerWaterVaporDiffusionResistanceFactor}
+    expected_values = {"DoorR"=>door_r}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
@@ -116,7 +116,7 @@ class ProcessConstructionsDoorsTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"DoorR"=>0, "WaterVaporDiffusionResistanceFactor"=>0, "MoistureEquationCoefficientA"=>0, "MoistureEquationCoefficientB"=>0, "MoistureEquationCoefficientC"=>0, "MoistureEquationCoefficientD"=>0, "CoatingLayerThickness"=>0, "CoatingLayerWaterVaporDiffusionResistanceFactor"=>0}
+    actual_values = {"DoorR"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -124,25 +124,10 @@ class ProcessConstructionsDoorsTest < MiniTest::Test
             if obj_type == "Material"
                 new_object = new_object.to_StandardOpaqueMaterial.get
                 actual_values["DoorR"] += new_object.thickness / new_object.conductivity
-            elsif obj_type == "MaterialPropertyMoisturePenetrationDepthSettings"
-              actual_values["WaterVaporDiffusionResistanceFactor"] += new_object.waterVaporDiffusionResistanceFactor
-              actual_values["MoistureEquationCoefficientA"] += new_object.moistureEquationCoefficientA
-              actual_values["MoistureEquationCoefficientB"] += new_object.moistureEquationCoefficientB
-              actual_values["MoistureEquationCoefficientC"] += new_object.moistureEquationCoefficientC
-              actual_values["MoistureEquationCoefficientD"] += new_object.moistureEquationCoefficientD
-              actual_values["CoatingLayerThickness"] += new_object.coatingLayerThickness
-              actual_values["CoatingLayerWaterVaporDiffusionResistanceFactor"] += new_object.coatingLayerWaterVaporDiffusionResistanceFactor
             end
         end
     end
     assert_in_epsilon(expected_values["DoorR"], actual_values["DoorR"], 0.01)
-    assert_in_epsilon(expected_values["WaterVaporDiffusionResistanceFactor"], actual_values["WaterVaporDiffusionResistanceFactor"], 0.01)
-    assert_in_epsilon(expected_values["MoistureEquationCoefficientA"], actual_values["MoistureEquationCoefficientA"], 0.01)
-    assert_in_epsilon(expected_values["MoistureEquationCoefficientB"], actual_values["MoistureEquationCoefficientB"], 0.01)
-    assert_in_epsilon(expected_values["MoistureEquationCoefficientC"], actual_values["MoistureEquationCoefficientC"], 0.01)
-    assert_in_epsilon(expected_values["MoistureEquationCoefficientD"], actual_values["MoistureEquationCoefficientD"], 0.01)
-    assert_in_epsilon(expected_values["CoatingLayerThickness"], actual_values["CoatingLayerThickness"], 0.01)
-    assert_in_epsilon(expected_values["CoatingLayerWaterVaporDiffusionResistanceFactor"], actual_values["CoatingLayerWaterVaporDiffusionResistanceFactor"], 0.01)
 
     return model
   end  
