@@ -969,7 +969,41 @@ class Waterheater
         end
         return input_power
       end
-end
+    end
+
+    def self.calc_ef_from_uef(uef, type, fuel_type)
+        # Interpretation on Water Heater UEF
+        if fuel_type == Constants.FuelTypeElectric
+          if type == Constants.WaterHeaterTypeTank
+            return [2.4029*uef - 1.2844, 0.96].min
+          elsif type == Constants.WaterHeaterTypeTankless
+            return uef
+          elsif type == Constants.WaterHeaterTypeHeatPump
+            return 1.2101*uef - 0.6052
+          end
+        else # Fuel
+          if type == Constants.WaterHeaterTypeTank
+            return 0.9066*uef + 0.0711
+          elsif type == Constants.WaterHeaterTypeTankless
+            return uef
+          end
+        end
+        return nil
+    end
+    
+    def self.get_default_hot_water_temperature(eri_version)
+      if eri_version.include? "A"
+        return 125.0
+      end
+      return 120.0
+    end
+    
+    def self.get_ef_multiplier(type)
+      if type == Constants.WaterHeaterTypeTankless
+        return 0.92
+      end
+      return 1.0
+    end
 
     private
 
