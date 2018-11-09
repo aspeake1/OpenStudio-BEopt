@@ -11,9 +11,7 @@ class Airflow
 
   def self.apply(model, runner, infil, mech_vent, nat_vent, ducts, measure_dir)
   
-    @measure_dir = measure_dir
-  
-    weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
+    weather = WeatherProcess.new(model, runner, measure_dir)
     if weather.error?
       return false
     end
@@ -55,7 +53,7 @@ class Airflow
       elsif Geometry.is_pier_beam(thermal_zone)
         building.pierbeam = ZoneInfo.new(thermal_zone, Geometry.get_height_of_spaces(thermal_zone.spaces), UnitConversions.convert(thermal_zone.floorArea,"m^2","ft^2"), Geometry.get_zone_volume(thermal_zone, false, runner), Geometry.get_z_origin_for_zone(thermal_zone), infil.pier_beam_ach, nil)
       elsif Geometry.is_unfinished_attic(thermal_zone)
-        building.unfinished_attic = ZoneInfo.new(thermal_zone, Geometry.get_height_of_spaces(thermal_zone.spaces), UnitConversions.convert(thermal_zone.floorArea,"m^2","ft^2"), Geometry.get_zone_volume(thermal_zone, false, runner), Geometry.get_z_origin_for_zone(thermal_zone), nil, infil.unfinished_attic_sla)
+        building.unfinished_attic = ZoneInfo.new(thermal_zone, Geometry.get_height_of_spaces(thermal_zone.spaces), UnitConversions.convert(thermal_zone.floorArea,"m^2","ft^2"), Geometry.get_zone_volume(thermal_zone, false, runner), Geometry.get_z_origin_for_zone(thermal_zone), infil.unfinished_attic_const_ach, infil.unfinished_attic_sla)
       end
     end
     building.ffa = Geometry.get_finished_floor_area_from_spaces(model_spaces, true, runner)
@@ -161,39 +159,37 @@ class Airflow
       
       duct_program, cfis_program, cfis_output = create_ducts_objects(model, runner, obj_name_ducts, unit_living, unit_finished_basement, ducts, mech_vent, ducts_output, tin_sensor, pbar_sensor, duct_lk_supply_fan_equiv_var, duct_lk_return_fan_equiv_var, has_forced_air_equipment, unit_has_mshp, adiabatic_const)
       
-      infil_program = create_infil_mech_vent_objects(model, runner, obj_name_infil, obj_name_mech_vent, unit_living, infil, mech_vent, wind_speed, mv_output, infil_output, tin_sensor, tout_sensor, vwind_sensor, duct_lk_supply_fan_equiv_var, duct_lk_return_fan_equiv_var, cfis_output, nbeds)
+      infil_program = create_infil_mech_vent_objects(model, runner, obj_name_infil, obj_name_mech_vent, unit_living, infil, mech_vent, wind_speed, mv_output, infil_output, tin_sensor, tout_sensor, vwind_sensor, duct_lk_supply_fan_equiv_var, duct_lk_return_fan_equiv_var, cfis_output, nbeds, measure_dir)
       
       create_ems_program_managers(model, infil_program, nv_program, cfis_program, 
                                   duct_program, obj_name_airflow, obj_name_ducts)
                                   
       # Store info for HVAC Sizing measure
       if not unit_living.ELA.nil?
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationELA(unit_living.zone), unit_living.ELA.to_f)
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(unit_living.zone), unit_living.inf_flow.to_f)
+        unit_living.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationELA, unit_living.ELA.to_f)
+        unit_living.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationCFM, unit_living.inf_flow.to_f)
       else
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationELA(unit_living.zone), 0.0)
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(unit_living.zone), 0.0)
+        unit_living.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationELA, 0.0)
+        unit_living.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationCFM, 0.0)
       end
       unless unit_finished_basement.nil?
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(unit_finished_basement.zone), unit_finished_basement.inf_flow)
+        unit_finished_basement.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationCFM, unit_finished_basement.inf_flow)
       end
 
     end # end unit loop
 
     # Store info for HVAC Sizing measure
-    units.each do |unit|
-      unless building.crawlspace.nil?
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(building.crawlspace.zone), building.crawlspace.inf_flow.to_f)
-      end
-      unless building.pierbeam.nil?
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(building.pierbeam.zone), building.pierbeam.inf_flow.to_f)
-      end
-      unless building.unfinished_basement.nil?
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(building.unfinished_basement.zone), building.unfinished_basement.inf_flow.to_f)
-      end
-      unless building.unfinished_attic.nil?
-        unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(building.unfinished_attic.zone), building.unfinished_attic.inf_flow)
-      end
+    unless building.crawlspace.nil?
+      building.crawlspace.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationCFM, building.crawlspace.inf_flow.to_f)
+    end
+    unless building.pierbeam.nil?
+      building.pierbeam.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationCFM, building.pierbeam.inf_flow.to_f)
+    end
+    unless building.unfinished_basement.nil?
+      building.unfinished_basement.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationCFM, building.unfinished_basement.inf_flow.to_f)
+    end
+    unless building.unfinished_attic.nil?
+      building.unfinished_attic.zone.additionalProperties.setFeature(Constants.SizingInfoZoneInfiltrationCFM, building.unfinished_attic.inf_flow)
     end
 
     terrain = {Constants.TerrainOcean=>"Ocean",      # Ocean, Bayou flat country
@@ -364,6 +360,10 @@ class Airflow
   
   end
 
+  def self.get_default_shelter_coefficient()
+    return 0.5 # Table 4.2.2(1)(g)
+  end
+  
   private
   
   def self.process_wind_speed_correction(terrain, shelter_coef, neighbors_min_nonzero_offset, building_height)
@@ -400,8 +400,8 @@ class Airflow
     elsif terrain == Constants.TerrainCity
       wind_speed.site_terrain_multiplier = 0.47 # Used for DOE-2's correlation
       wind_speed.site_terrain_exponent = 0.35 # Used for DOE-2's correlation
-      wind_speed.ashrae_site_terrain_thickness = 460 # Towns, city outskirs, center of large cities
-      wind_speed.ashrae_site_terrain_exponent = 0.33 # Towns, city outskirs, center of large cities
+      wind_speed.ashrae_site_terrain_thickness = 460 # Towns, city outskirts, center of large cities
+      wind_speed.ashrae_site_terrain_exponent = 0.33 # Towns, city outskirts, center of large cities
     end
 
     # Local Shielding
@@ -419,7 +419,7 @@ class Airflow
         wind_speed.S_wo = 0.50
       end
     else
-      wind_speed.S_wo = shelter_coef.to_f
+      wind_speed.S_wo = Float(shelter_coef)
     end
 
     # S-G Shielding Coefficients are roughly 1/3 of AIM2 Shelter Coefficients
@@ -463,10 +463,14 @@ class Airflow
     end
 
     unless building.unfinished_attic.nil?
-      building.unfinished_attic.inf_method = @infMethodSG
-      building.unfinished_attic.hor_lk_frac = 0.75 # Same as Energy Gauge USA Attic Model
-      building.unfinished_attic.neutral_level = 0.5 # DOE-2 Default
-      building.unfinished_attic.ACH = Airflow.get_infiltration_ACH_from_SLA(building.unfinished_attic.SLA, 1.0, weather)
+      if not building.unfinished_attic.SLA.nil?
+        building.unfinished_attic.inf_method = @infMethodSG
+        building.unfinished_attic.hor_lk_frac = 0.75 # Same as Energy Gauge USA Attic Model
+        building.unfinished_attic.neutral_level = 0.5 # DOE-2 Default
+        building.unfinished_attic.ACH = Airflow.get_infiltration_ACH_from_SLA(building.unfinished_attic.SLA, 1.0, weather)
+      elsif not building.unfinished_attic.ACH.nil?
+        building.unfinished_attic.inf_method = @infMethodRes
+      end
       building.unfinished_attic.inf_flow = building.unfinished_attic.ACH / UnitConversions.convert(1.0,"hr","min") * building.unfinished_attic.volume
     end
     
@@ -486,8 +490,8 @@ class Airflow
     inf_conv_factor = 776.25 # [ft/min]/[inH2O^(1/2)*ft^(3/2)/lbm^(1/2)]
     delta_pref = 0.016 # inH2O
 
-    if infil.living_ach50 > 0
-      # Living Space Infiltration
+    # Living Space Infiltration
+    if not infil.living_ach50.nil?
       unit_living.inf_method = @infMethodASHRAE
 
       # Based on "Field Validation of Algebraic Equations for Stack and
@@ -606,6 +610,13 @@ class Airflow
       # Convert living space ACH to cfm:
       unit_living.inf_flow = unit_living.ACH / UnitConversions.convert(1.0,"hr","min") * unit_living.volume # cfm
 
+    elsif not infil.living_constant_ach.nil?
+    
+      unit_living.inf_method = @infMethodRes
+      
+      unit_living.ACH = infil.living_constant_ach
+      unit_living.inf_flow = unit_living.ACH / UnitConversions.convert(1.0,"hr","min") * unit_living.volume # cfm
+      
     end
 
     unless unit_finished_basement.nil?
@@ -623,7 +634,7 @@ class Airflow
   def self.process_infiltration_for_spaces(model, spaces, wind_speed)
   
     spaces.each do |space|
-
+    
       space.f_t_SG = wind_speed.site_terrain_multiplier * ((space.height + space.coord_z) / 32.8) ** wind_speed.site_terrain_exponent / (wind_speed.terrain_multiplier * (wind_speed.height / 32.8) ** wind_speed.terrain_exponent)
 
       if space.inf_method == @infMethodSG
@@ -637,6 +648,7 @@ class Airflow
       end
       
       space.zone.spaces.each do |s|
+        next if Geometry.is_living(s)
         obj_name = "#{Constants.ObjectNameInfiltration}|#{s.name}"
         if space.inf_method == @infMethodRes and space.ACH.to_f > 0
           flow_rate = OpenStudio::Model::SpaceInfiltrationDesignFlowRate.new(model)
@@ -644,6 +656,10 @@ class Airflow
           flow_rate.setSchedule(model.alwaysOnDiscreteSchedule)
           flow_rate.setAirChangesperHour(space.ACH)
           flow_rate.setSpace(s)
+          flow_rate.setConstantTermCoefficient(1)
+          flow_rate.setTemperatureTermCoefficient(0)
+          flow_rate.setVelocityTermCoefficient(0)
+          flow_rate.setVelocitySquaredTermCoefficient(0)
         elsif space.inf_method == @infMethodSG and space.ELA.to_f > 0
           leakage_area = OpenStudio::Model::SpaceInfiltrationEffectiveLeakageArea.new(model)
           leakage_area.setName(obj_name)
@@ -724,7 +740,7 @@ class Airflow
       cw_day_shift = 0.0
       model.getElectricEquipments.each do |ee|
         next if ee.name.to_s != Constants.ObjectNameClothesWasher(unit.name.to_s)
-        cw_day_shift = unit.getFeatureAsDouble(Constants.ClothesWasherDayShift(ee)).get
+        cw_day_shift = ee.additionalProperties.getFeatureAsDouble(Constants.ClothesWasherDayShift).get
         break
       end
       dryer_exhaust_day_shift = cw_day_shift + 1.0 / 24.0
@@ -817,11 +833,11 @@ class Airflow
     end
     
     # Store info for HVAC Sizing measure
-    unit.setFeature(Constants.SizingInfoMechVentType, mech_vent.type)
-    unit.setFeature(Constants.SizingInfoMechVentTotalEfficiency, mech_vent.total_efficiency.to_f)
-    unit.setFeature(Constants.SizingInfoMechVentLatentEffectiveness, latent_effectiveness.to_f)
-    unit.setFeature(Constants.SizingInfoMechVentApparentSensibleEffectiveness, apparent_sensible_effectiveness.to_f)
-    unit.setFeature(Constants.SizingInfoMechVentWholeHouseRate, whole_house_vent_rate.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoMechVentType, mech_vent.type)
+    unit.additionalProperties.setFeature(Constants.SizingInfoMechVentTotalEfficiency, mech_vent.total_efficiency.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoMechVentLatentEffectiveness, latent_effectiveness.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoMechVentApparentSensibleEffectiveness, apparent_sensible_effectiveness.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoMechVentWholeHouseRate, whole_house_vent_rate.to_f)
     
     mv_output = MechanicalVentilationOutput.new(frac_fan_heat, whole_house_vent_rate, bathroom_hour_avg_exhaust, range_hood_hour_avg_exhaust, spot_fan_power, latent_effectiveness, sensible_effectiveness, dryer_exhaust_day_shift, has_dryer)
     return true, mv_output
@@ -1096,12 +1112,9 @@ class Airflow
       return_volume = 0
     end
 
-    # This can't be zero. A value of zero causes weird sizing issues in DOE-2.
-    direct_oa_supply_loss = 0.000001
-
     # Only if using the Fractional Leakage Option Type:
     if ducts.norm_leakage_25pa.nil?
-      supply_loss = (location_frac_leakage * (supply_leakage - direct_oa_supply_loss) + (ah_supply_leakage + direct_oa_supply_loss))
+      supply_loss = location_frac_leakage * supply_leakage + ah_supply_leakage
       return_loss = return_leakage + ah_return_leakage
     end
 
@@ -1112,42 +1125,39 @@ class Airflow
 
     total_unbalance = (supply_loss - return_loss).abs
 
-    if not location_name == unit_living.zone.name.to_s and not location_name == "none" and supply_loss > 0
+    if not location_name == unit_living.zone.name.to_s and not location_name == "none"
       # Calculate d.frac_oa = fraction of unbalanced make-up air that is outside air
       if total_unbalance <=  0
         # Handle the exception for if there is no leakage unbalance.
         frac_oa = 0
       elsif not unit_finished_basement.nil? and unit_finished_basement.zone == location_zone
-        frac_oa = direct_oa_supply_loss / total_unbalance
+        frac_oa = 0
       elsif not building.unfinished_basement.nil? and building.unfinished_basement.zone == location_zone
-        frac_oa = direct_oa_supply_loss / total_unbalance
+        frac_oa = 0
       elsif not building.crawlspace.nil? and building.crawlspace.zone == location_zone and building.crawlspace.ACH == 0
-        frac_oa = direct_oa_supply_loss / total_unbalance
+        frac_oa = 0
       elsif not building.pierbeam.nil? and building.pierbeam.zone == location_zone and building.pierbeam.ACH == 0
-        frac_oa = direct_oa_supply_loss / total_unbalance
+        frac_oa = 0
       elsif not building.unfinished_attic.nil? and building.unfinished_attic.zone == location_zone and building.unfinished_attic.ACH == 0
-        frac_oa = direct_oa_supply_loss / total_unbalance
+        frac_oa = 0
       else
         # Assume that all of the unbalanced make-up air is driven infiltration from outdoors.
         # This assumes that the holes for attic ventilation are much larger than any attic bypasses.
         frac_oa = 1
       end
-      # d.oa_duct_makeup =  fraction of the supply duct air loss that is made up by outside air (via return leakage)
-      oa_duct_makeup = [frac_oa * total_unbalance / [supply_loss, return_loss].max, 1].min
     else
       frac_oa = 0
-      oa_duct_makeup = 0
     end
     
     # Store info for HVAC Sizing measure
-    unit.setFeature(Constants.SizingInfoDuctsSupplyRvalue, supply_r.to_f)
-    unit.setFeature(Constants.SizingInfoDuctsReturnRvalue, return_r.to_f)
-    unit.setFeature(Constants.SizingInfoDuctsSupplyLoss, supply_loss.to_f)
-    unit.setFeature(Constants.SizingInfoDuctsReturnLoss, return_loss.to_f)
-    unit.setFeature(Constants.SizingInfoDuctsSupplySurfaceArea, supply_surface_area.to_f)
-    unit.setFeature(Constants.SizingInfoDuctsReturnSurfaceArea, return_surface_area.to_f)
-    unit.setFeature(Constants.SizingInfoDuctsLocationZone, location_name)
-    unit.setFeature(Constants.SizingInfoDuctsLocationFrac, location_frac_leakage.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsSupplyRvalue, supply_r.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsReturnRvalue, return_r.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsSupplyLoss, supply_loss.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsReturnLoss, return_loss.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsSupplySurfaceArea, supply_surface_area.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsReturnSurfaceArea, return_surface_area.to_f)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsLocationZone, location_name)
+    unit.additionalProperties.setFeature(Constants.SizingInfoDuctsLocationFrac, location_frac_leakage.to_f)
 
     ducts_output = DuctsOutput.new(location_name, location_zone, return_volume, supply_loss, return_loss, frac_oa, total_unbalance, unconditioned_ua, return_ua)
     return true, ducts_output
@@ -1463,8 +1473,8 @@ class Airflow
       zone_mixing_ah_to_living = OpenStudio::Model::ZoneMixing.new(unit_living.zone)
       zone_mixing_ah_to_living.setName("#{obj_name_ducts} ah to liv mix")
       zone_mixing_ah_to_living.setSourceZone(ducts_output.location_zone)
-      liv_to_ah_flow_rate_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(zone_mixing_ah_to_living, "ZoneMixing", "Air Exchange Flow Rate")
-      liv_to_ah_flow_rate_actuator.setName("#{zone_mixing_ah_to_living.name} act")
+      ah_to_liv_flow_rate_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(zone_mixing_ah_to_living, "ZoneMixing", "Air Exchange Flow Rate")
+      ah_to_liv_flow_rate_actuator.setName("#{zone_mixing_ah_to_living.name} act")
 
       zone_mixing_living_to_ah = OpenStudio::Model::ZoneMixing.new(ducts_output.location_zone)
       zone_mixing_living_to_ah.setName("#{obj_name_ducts} liv to ah mix")
@@ -1593,23 +1603,15 @@ class Airflow
         duct_subroutine.addLine("  Set #{supply_sens_lkage_to_liv_var.name} = SALeakageQtot-#{supply_lat_lkage_to_liv_var.name}")
         duct_subroutine.addLine("  Set eTm = (#{fan_rtf_var.name}/(#{ah_mfr_var.name}*1006.0))*#{UnitConversions.convert(ducts_output.unconditioned_ua,"Btu/(hr*F)","W/K").round(3)}")
         duct_subroutine.addLine("  Set eTm = 0-eTm")
-        duct_subroutine.addLine("  If eTm <= -20")
-        duct_subroutine.addLine("    Set tsup = #{ah_t_var.name}")
-        duct_subroutine.addLine("  Else")
-        duct_subroutine.addLine("    Set temp4 = #{ah_t_var.name}")
-        duct_subroutine.addLine("    Set tsup = temp4+((#{ah_tout_var.name}-#{ah_t_var.name})*(@Exp eTm))")
-        duct_subroutine.addLine("  EndIf")
+        duct_subroutine.addLine("  Set temp4 = #{ah_t_var.name}")
+        duct_subroutine.addLine("  Set tsup = temp4+((#{ah_tout_var.name}-#{ah_t_var.name})*(@Exp eTm))")
         duct_subroutine.addLine("  Set temp5 = tsup-#{ah_tout_var.name}")
         duct_subroutine.addLine("  Set #{supply_duct_cond_to_liv_var.name} = #{ah_mfr_var.name}*1006.0*temp5")
         duct_subroutine.addLine("  Set #{supply_duct_cond_to_ah_var.name} = 0-#{supply_duct_cond_to_liv_var.name}")
         duct_subroutine.addLine("  Set eTm = (#{fan_rtf_var.name}/(#{ah_mfr_var.name}*1006.0))*#{UnitConversions.convert(ducts_output.return_ua,"Btu/(hr*F)","W/K").round(3)}")
         duct_subroutine.addLine("  Set eTm = 0-eTm")
-        duct_subroutine.addLine("  If eTm <= -20")
-        duct_subroutine.addLine("    Set tret = #{ah_t_var.name}")
-        duct_subroutine.addLine("  Else")
-        duct_subroutine.addLine("    Set temp6 = #{ah_t_var.name}")
-        duct_subroutine.addLine("    Set tret = temp6+((#{ra_t_var.name}-#{ah_t_var.name})*(@Exp eTm))")
-        duct_subroutine.addLine("  EndIf")
+        duct_subroutine.addLine("  Set temp6 = #{ah_t_var.name}")
+        duct_subroutine.addLine("  Set tret = temp6+((#{ra_t_var.name}-#{ah_t_var.name})*(@Exp eTm))")
         duct_subroutine.addLine("  Set temp7 = tret-#{ra_t_var.name}")
         duct_subroutine.addLine("  Set #{return_duct_cond_to_plenum_var.name} = #{ah_mfr_var.name}*1006.0*temp7")
         duct_subroutine.addLine("  Set #{return_duct_cond_to_ah_var.name} = 0-#{return_duct_cond_to_plenum_var.name}")
@@ -1671,7 +1673,7 @@ class Airflow
         duct_program.addLine("Set #{return_lat_lkage_actuator.name} = #{return_lat_lkage_var.name}")
         duct_program.addLine("Set #{return_duct_cond_to_plenum_actuator.name} = #{return_duct_cond_to_plenum_var.name}")
         duct_program.addLine("Set #{return_duct_cond_to_ah_actuator.name} = #{return_duct_cond_to_ah_var.name}")
-        duct_program.addLine("Set #{liv_to_ah_flow_rate_actuator.name} = #{ah_to_liv_flow_rate_var.name}")
+        duct_program.addLine("Set #{ah_to_liv_flow_rate_actuator.name} = #{ah_to_liv_flow_rate_var.name}")
         duct_program.addLine("Set #{liv_to_ah_flow_rate_actuator.name} = #{liv_to_ah_flow_rate_var.name}")
       else
 
@@ -1711,7 +1713,7 @@ class Airflow
         duct_program.addLine("   Set #{return_lat_lkage_actuator.name} = #{return_lat_lkage_var.name} + dl_8")
         duct_program.addLine("   Set #{return_duct_cond_to_plenum_actuator.name} = #{return_duct_cond_to_plenum_var.name} + dl_9")
         duct_program.addLine("   Set #{return_duct_cond_to_ah_actuator.name} = #{return_duct_cond_to_ah_var.name} + dl_10")
-        duct_program.addLine("   Set #{liv_to_ah_flow_rate_actuator.name} = #{ah_to_liv_flow_rate_var.name} + dl_11")
+        duct_program.addLine("   Set #{ah_to_liv_flow_rate_actuator.name} = #{ah_to_liv_flow_rate_var.name} + dl_11")
         duct_program.addLine("   Set #{liv_to_ah_flow_rate_actuator.name} = #{liv_to_ah_flow_rate_var.name} + dl_12")
 
         duct_program.addLine("Else")
@@ -1725,7 +1727,7 @@ class Airflow
         duct_program.addLine("   Set #{return_lat_lkage_actuator.name} = dl_8")
         duct_program.addLine("   Set #{return_duct_cond_to_plenum_actuator.name} = dl_9")
         duct_program.addLine("   Set #{return_duct_cond_to_ah_actuator.name} = dl_10")
-        duct_program.addLine("   Set #{liv_to_ah_flow_rate_actuator.name} = dl_11")
+        duct_program.addLine("   Set #{ah_to_liv_flow_rate_actuator.name} = dl_11")
         duct_program.addLine("   Set #{liv_to_ah_flow_rate_actuator.name} = dl_12")
         duct_program.addLine("EndIf")
       end
@@ -1758,7 +1760,7 @@ class Airflow
     
   end
   
-  def self.create_infil_mech_vent_objects(model, runner, obj_name_infil, obj_name_mech_vent, unit_living, infil, mech_vent, wind_speed, mv_output, infil_output, tin_sensor, tout_sensor, vwind_sensor, duct_lk_supply_fan_equiv_var, duct_lk_return_fan_equiv_var, cfis_output, nbeds)
+  def self.create_infil_mech_vent_objects(model, runner, obj_name_infil, obj_name_mech_vent, unit_living, infil, mech_vent, wind_speed, mv_output, infil_output, tin_sensor, tout_sensor, vwind_sensor, duct_lk_supply_fan_equiv_var, duct_lk_return_fan_equiv_var, cfis_output, nbeds, measure_dir)
 
     # Sensors
   
@@ -1777,7 +1779,7 @@ class Airflow
     bath_sch_sensor.setKeyName(bath_exhaust_sch.schedule.name.to_s)
 
     if mv_output.has_dryer and mech_vent.dryer_exhaust > 0
-      dryer_exhaust_sch = HotWaterSchedule.new(model, runner, obj_name_mech_vent + " dryer exhaust schedule", obj_name_mech_vent + " dryer exhaust temperature schedule", nbeds, mv_output.dryer_exhaust_day_shift, "ClothesDryerExhaust", 0, @measure_dir)
+      dryer_exhaust_sch = HotWaterSchedule.new(model, runner, obj_name_mech_vent + " dryer exhaust schedule", obj_name_mech_vent + " dryer exhaust temperature schedule", nbeds, mv_output.dryer_exhaust_day_shift, "ClothesDryerExhaust", 0, measure_dir)
       dryer_sch_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, "Schedule Value")
       dryer_sch_sensor.setName("#{obj_name_infil} dryer sch s")
       dryer_sch_sensor.setKeyName(dryer_exhaust_sch.schedule.name.to_s)
@@ -1895,7 +1897,6 @@ class Airflow
     
     infil_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
     infil_program.setName(obj_name_infil + " program")
-
     if unit_living.inf_method == @infMethodASHRAE
       if unit_living.SLA > 0
         infil_program.addLine("Set p_m = #{wind_speed.ashrae_terrain_exponent}")
@@ -2291,12 +2292,14 @@ class DuctsOutput
 end
 
 class Infiltration
-  def initialize(living_ach50, shelter_coef, garage_ach50, crawl_ach, unfinished_attic_sla, unfinished_basement_ach, finished_basement_ach, pier_beam_ach, has_flue_chimney, is_existing_home, terrain)
+  def initialize(living_ach50, living_constant_ach, shelter_coef, garage_ach50, crawl_ach, unfinished_attic_sla, unfinished_attic_const_ach, unfinished_basement_ach, finished_basement_ach, pier_beam_ach, has_flue_chimney, is_existing_home, terrain)
     @living_ach50 = living_ach50
+    @living_constant_ach = living_constant_ach
     @shelter_coef = shelter_coef
     @garage_ach50 = garage_ach50
     @crawl_ach = crawl_ach
     @unfinished_attic_sla = unfinished_attic_sla
+    @unfinished_attic_const_ach = unfinished_attic_const_ach
     @unfinished_basement_ach = unfinished_basement_ach
     @finished_basement_ach = finished_basement_ach
     @pier_beam_ach = pier_beam_ach
@@ -2304,7 +2307,7 @@ class Infiltration
     @is_existing_home = is_existing_home
     @terrain = terrain
   end
-  attr_accessor(:living_ach50, :shelter_coef, :garage_ach50, :crawl_ach, :unfinished_attic_sla, :unfinished_basement_ach, :finished_basement_ach, :pier_beam_ach, :has_flue_chimney, :is_existing_home, :terrain)
+  attr_accessor(:living_ach50, :living_constant_ach, :shelter_coef, :garage_ach50, :crawl_ach, :unfinished_attic_sla, :unfinished_attic_const_ach, :unfinished_basement_ach, :finished_basement_ach, :pier_beam_ach, :has_flue_chimney, :is_existing_home, :terrain)
 end
 
 class InfiltrationOutput

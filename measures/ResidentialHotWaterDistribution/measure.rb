@@ -77,19 +77,19 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
         dist_ins.setDefaultValue(0.0)
         args << dist_ins
 
-		return args
-	end #end the arguments method
+    return args
+  end #end the arguments method
 
-	#define what happens when the measure is run
-	def run(model, runner, user_arguments)
-		super(model, runner, user_arguments)
+  #define what happens when the measure is run
+  def run(model, runner, user_arguments)
+    super(model, runner, user_arguments)
 
-		#use the built-in error checking 
-		if not runner.validateUserArguments(arguments(model), user_arguments)
-			return false
-		end
+    #use the built-in error checking 
+    if not runner.validateUserArguments(arguments(model), user_arguments)
+      return false
+    end
 
-		#assign the user inputs to variables
+    #assign the user inputs to variables
         pipe_mat = runner.getStringArgumentValue("pipe_mat", user_arguments)
         dist_layout = runner.getStringArgumentValue("dist_layout", user_arguments)
         dist_ins = runner.getDoubleArgumentValue("dist_ins", user_arguments)
@@ -113,7 +113,11 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
             runner.registerError("Mains water temperature has not been set.")
             return false
         end
-        mainsMonthlyTemps = WeatherProcess.get_mains_temperature(site.siteWaterMainsTemperature.get, site.latitude)[1]
+        
+        waterMainsTemperature = site.siteWaterMainsTemperature.get
+        avgOAT = UnitConversions.convert(waterMainsTemperature.annualAverageOutdoorAirTemperature.get, "C", "F")
+        maxDiffMonthlyAvgOAT = UnitConversions.convert(waterMainsTemperature.maximumDifferenceInMonthlyAverageOutdoorAirTemperatures.get, "K", "R")
+        mainsMonthlyTemps = WeatherProcess.calc_mains_temperatures(avgOAT, maxDiffMonthlyAvgOAT, site.latitude)[1]
         
         tot_pump_e_ann = 0
         msgs = []

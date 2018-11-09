@@ -84,11 +84,8 @@ class WallConstructions
         
         # Store info for HVAC Sizing measure
         (surfaces).each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoWallType(surface), "WoodStud")
-                unit.setFeature(Constants.SizingInfoStudWallCavityRvalue(surface), cavity_r)
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoWallType, "WoodStud")
+            surface.additionalProperties.setFeature(Constants.SizingInfoStudWallCavityRvalue, cavity_r)
         end
         
         return true
@@ -189,10 +186,7 @@ class WallConstructions
         
         # Store info for HVAC Sizing measure
         (surfaces).each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoWallType(surface), "DoubleWoodStud")
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoWallType, "DoubleWoodStud")
         end
         
         return true
@@ -300,11 +294,8 @@ class WallConstructions
         
         # Store info for HVAC Sizing measure
         (surfaces).each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoWallType(surface), "CMU")
-                unit.setFeature(Constants.SizingInfoCMUWallFurringInsRvalue(surface), furring_r)
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoWallType, "CMU")
+            surface.additionalProperties.setFeature(Constants.SizingInfoCMUWallFurringInsRvalue, furring_r)
         end
 
         
@@ -383,10 +374,7 @@ class WallConstructions
         
         # Store info for HVAC Sizing measure
         (surfaces).each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoWallType(surface), "ICF")
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoWallType, "ICF")
         end
         
         return true
@@ -478,11 +466,8 @@ class WallConstructions
         
         # Store info for HVAC Sizing measure
         (surfaces).each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoWallType(surface), "SIP")
-                unit.setFeature(Constants.SizingInfoSIPWallInsThickness(surface), sip_thick_in)
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoWallType, "SIP")
+            surface.additionalProperties.setFeature(Constants.SizingInfoSIPWallInsThickness, sip_thick_in)
         end
         
         return true
@@ -570,11 +555,8 @@ class WallConstructions
         
         # Store info for HVAC Sizing measure
         (surfaces).each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoWallType(surface), "SteelStud")
-                unit.setFeature(Constants.SizingInfoStudWallCavityRvalue(surface), cavity_r)
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoWallType, "SteelStud")
+            surface.additionalProperties.setFeature(Constants.SizingInfoStudWallCavityRvalue, cavity_r)
         end
         
         return true
@@ -676,10 +658,7 @@ class WallConstructions
         
         # Store info for HVAC Sizing measure
         (surfaces).each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoWallType(surface), "Generic")
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoWallType, "Generic")
         end
         
         return true
@@ -724,6 +703,85 @@ class WallConstructions
         
         return true
     end
+    
+    def self.apply_rim_joist(runner, model, surfaces, constr_name,
+                             cavity_r, install_grade, framing_factor, 
+                             drywall_thick_in, osb_thick_in, 
+                             rigid_r, mat_ext_finish)
+    
+        return true if surfaces.empty?
+    
+        # Validate inputs
+        if cavity_r < 0.0
+            runner.registerError("Cavity Insulation Installed R-value must be greater than or equal to 0.")
+            return false
+        end
+        if framing_factor < 0.0 or framing_factor >= 1.0
+            runner.registerError("Framing Factor must be greater than or equal to 0 and less than 1.")
+            return false
+        end
+
+        # Define materials
+        rim_joist_thick_in = 1.5
+        sill_plate_thick_in = 3.5
+        framing_thick_in = sill_plate_thick_in - rim_joist_thick_in # Extra non-continuous wood beyond rim joist thickness
+        if cavity_r > 0
+            # Insulation
+            mat_cavity = Material.new(name=nil, thick_in=framing_thick_in, mat_base=BaseMaterial.InsulationGenericDensepack, k_in=framing_thick_in / cavity_r)
+        else
+            # Empty cavity
+            mat_cavity = Material.AirCavityOpen(framing_thick_in)
+        end
+        mat_framing = Material.new(name=nil, thick_in=framing_thick_in, mat_base=BaseMaterial.Wood)
+        mat_gap = Material.AirCavityClosed(framing_thick_in)
+        mat_osb = nil
+        if osb_thick_in > 0
+            mat_osb = Material.new(name="RimJoistSheathing", thick_in=osb_thick_in, mat_base=BaseMaterial.Wood)
+        end
+        mat_rigid = nil
+        if rigid_r > 0
+            rigid_thick_in = rigid_r * BaseMaterial.InsulationRigid.k_in
+            mat_rigid = Material.new(name="RimJoistRigidIns", thick_in=rigid_thick_in, mat_base=BaseMaterial.InsulationRigid, k_in=rigid_thick_in/rigid_r)
+        end
+
+        # Set paths
+        gapFactor = get_gap_factor(install_grade, framing_factor, cavity_r)
+        path_fracs = [framing_factor, 1 - framing_factor - gapFactor, gapFactor]
+        
+        # Define construction
+        constr = Construction.new(constr_name, path_fracs)
+        if not mat_ext_finish.nil?
+            constr.add_layer(Material.AirFilmOutside)
+            constr.add_layer(mat_ext_finish)
+        else # interior wall
+            constr.add_layer(Material.AirFilmVertical)
+        end
+        if not mat_rigid.nil?
+            constr.add_layer(mat_rigid)
+        end
+        if not mat_osb.nil?
+            constr.add_layer(mat_osb)
+        end
+        constr.add_layer([mat_framing, mat_cavity, mat_gap], "RimJoistStudAndCavity") 
+        if drywall_thick_in > 0
+            constr.add_layer(Material.GypsumWall(drywall_thick_in))
+        end
+        constr.add_layer(Material.AirFilmVertical)
+
+        # Create and assign construction to surfaces
+        if not constr.create_and_assign_constructions(surfaces, runner, model)
+            return false
+        end
+        
+        # Store info for HVAC Sizing measure
+        (surfaces).each do |surface|
+            surface.additionalProperties.setFeature(Constants.SizingInfoWallType, "WoodStud")
+            surface.additionalProperties.setFeature(Constants.SizingInfoStudWallCavityRvalue, cavity_r)
+        end
+        
+        return true
+    end
+                             
     
     def self.get_exterior_finish_materials
         mats = []
@@ -844,13 +902,10 @@ class RoofConstructions
         
         # Store info for HVAC Sizing measure
         surfaces.each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoRoofColor(surface), get_roofing_material_manual_j_color(mat_roofing.name))
-                unit.setFeature(Constants.SizingInfoRoofMaterial(surface), get_roofing_material_manual_j_material(mat_roofing.name))
-                unit.setFeature(Constants.SizingInfoRoofRigidInsRvalue(surface), rigid_r)
-                unit.setFeature(Constants.SizingInfoRoofHasRadiantBarrier(surface), !mat_rb.nil?)
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofColor, get_roofing_material_manual_j_color(mat_roofing.name))
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofMaterial, get_roofing_material_manual_j_material(mat_roofing.name))
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofRigidInsRvalue, rigid_r)
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofHasRadiantBarrier, !mat_rb.nil?)
         end
     
         return true
@@ -931,21 +986,11 @@ class RoofConstructions
 
         # Store info for HVAC Sizing measure
         surfaces.each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoRoofCavityRvalue(surface), cavity_r)
-            end
-        end
-        
-        # Store info for HVAC Sizing measure
-        surfaces.each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoRoofColor(surface), get_roofing_material_manual_j_color(mat_roofing.name))
-                unit.setFeature(Constants.SizingInfoRoofMaterial(surface), get_roofing_material_manual_j_material(mat_roofing.name))
-                unit.setFeature(Constants.SizingInfoRoofRigidInsRvalue(surface), rigid_r)
-                unit.setFeature(Constants.SizingInfoRoofHasRadiantBarrier(surface), false)
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofColor, get_roofing_material_manual_j_color(mat_roofing.name))
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofMaterial, get_roofing_material_manual_j_material(mat_roofing.name))
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofRigidInsRvalue, rigid_r)
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofHasRadiantBarrier, false)
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofCavityRvalue, cavity_r)
         end
         
         return true
@@ -985,13 +1030,11 @@ class RoofConstructions
         
         # Store info for HVAC Sizing measure
         surfaces.each do |surface|
-            model.getBuildingUnits.each do |unit|
-                next if unit.spaces.size == 0
-                unit.setFeature(Constants.SizingInfoRoofColor(surface), get_roofing_material_manual_j_color(mat_roofing.name))
-                unit.setFeature(Constants.SizingInfoRoofMaterial(surface), get_roofing_material_manual_j_material(mat_roofing.name))
-                unit.setFeature(Constants.SizingInfoRoofRigidInsRvalue(surface), 0.0)
-                unit.setFeature(Constants.SizingInfoRoofHasRadiantBarrier(surface), false)
-            end
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofColor, get_roofing_material_manual_j_color(mat_roofing.name))
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofMaterial, get_roofing_material_manual_j_material(mat_roofing.name))
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofRigidInsRvalue, 0.0)
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofHasRadiantBarrier, false)
+            surface.additionalProperties.setFeature(Constants.SizingInfoRoofCavityRvalue, 0.0)
         end
     
         return true
@@ -1444,25 +1487,6 @@ class FoundationConstructions
         return true
     end
     
-    def self.get_walls_connected_to_floor(wall_surfaces, floor_surface)
-        adjacent_wall_surfaces = []
-        
-        # Note: Algorithm assumes that walls span an entire edge of the floor.
-        tol = 0.001
-        wall_surfaces.each do |wall_surface|
-            next if wall_surface.space.get != floor_surface.space.get
-            wall_surface.vertices.each do |v1|
-                floor_surface.vertices.each do |v2|
-                    if (v1.x - v2.x).abs < tol and (v1.y - v2.y).abs < tol
-                        adjacent_wall_surfaces << wall_surface
-                    end
-                end
-            end
-        end
-        
-        return adjacent_wall_surfaces.uniq!
-    end
-    
     private
     
     def self.calc_interior_wall_r_value(runner, cavity_depth_in, cavity_r, filled_cavity,
@@ -1757,22 +1781,12 @@ class SubsurfaceConstructions
             sm.setRightSideOpeningMultiplier(0)
             sm.setAirflowPermeability(0)
 
-            if type == "Window"
-              # WindowShadingControl
-              sc = OpenStudio::Model::ShadingControl.new(sm)
-              sc.setName("#{type}ShadingControl")
-              sc.setShadingType("InteriorShade")
-              sc.setShadingControlType("OnIfScheduleAllows")
-              sc.setSchedule(sch.schedule)
-            elsif type == "Skylight"
-              # SkylightShadingControl
-              sc = OpenStudio::Model::ShadingControl.new(sm)
-              sc.setName("#{type}ShadingControl")
-              sc.setShadingType("InteriorShade")
-              sc.setShadingControlType("AlwaysOff")
-              # sc.setSchedule(model.alwaysOffDiscreteSchedule)
-            end
-            
+            # ShadingControl
+            sc = OpenStudio::Model::ShadingControl.new(sm)
+            sc.setName("#{type}ShadingControl")
+            sc.setShadingType("InteriorShade")
+            sc.setShadingControlType("OnIfScheduleAllows")
+            sc.setSchedule(sch.schedule)
         end
 
         # Define materials
@@ -1826,6 +1840,12 @@ class SubsurfaceConstructions
         return true
     end
 
+    def self.get_default_interior_shading_factors()
+      summer = 0.70
+      winter = 0.85
+      return summer, winter
+    end
+    
 end
 
 class ThermalMassConstructions
