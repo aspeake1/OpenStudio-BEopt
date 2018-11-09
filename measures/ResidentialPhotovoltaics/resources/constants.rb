@@ -197,6 +197,9 @@ class Constants
   def self.CondenserTypeWater
     return 'watercooled'
   end
+  def self.Constant
+    return 'Constant'
+  end
   def self.DuctedInfoMiniSplitHeatPump
     return __method__.to_s
   end
@@ -774,6 +777,9 @@ class Constants
   end
   def self.RoofTypeHip
     return 'hip'
+  end
+  def self.Scheduled
+    return 'Scheduled'
   end
   def self.SeasonHeating
     return 'Heating'

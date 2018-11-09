@@ -326,7 +326,7 @@ class ResidentialHotWaterHeaterTanklessTest < MiniTest::Test
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "WaterHeaterMixed" or obj_type == "WaterHeaterStratified"
+            if obj_type == "WaterHeaterMixed"
                 actual_values["TankVolume"] += UnitConversions.convert(new_object.tankVolume.get, "m^3", "gal")
                 actual_values["InputCapacity"] += UnitConversions.convert(new_object.heaterMaximumCapacity.get, "W", "kW")
                 actual_values["ThermalEfficiency"] += new_object.heaterThermalEfficiency.get
