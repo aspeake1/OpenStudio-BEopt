@@ -150,16 +150,16 @@ class Constants
     return 'Residential'
   end
   def self.CalcTypeERIRatedHome
-    return 'HERS Rated Home'
+    return 'ERI Rated Home'
   end
   def self.CalcTypeERIReferenceHome
-    return 'HERS Reference Home'
+    return 'ERI Reference Home'
   end
   def self.CalcTypeERIIndexAdjustmentDesign
-    return 'HERS Index Adjustment Design'
+    return 'ERI Index Adjustment Design'
   end
   def self.CalcTypeERIIndexAdjustmentReferenceHome
-    return 'HERS Index Adjustment Reference Home'
+    return 'ERI Index Adjustment Reference Home'
   end
   def self.CalcTypeStandard
     return 'Standard'
@@ -170,35 +170,38 @@ class Constants
   def self.CeilingFanControlSmart
     return 'smart'
   end
-  def self.ClothesDryerCEF(clothes_dryer)
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
+  def self.ClothesDryerCEF
+    return __method__.to_s
   end
-  def self.ClothesDryerMult(clothes_dryer)
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
+  def self.ClothesDryerMult
+    return __method__.to_s
   end
-  def self.ClothesDryerFuelType(clothes_dryer)
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
+  def self.ClothesDryerFuelType
+    return __method__.to_s
   end
-  def self.ClothesDryerFuelSplit(clothes_dryer)
-    return "#{__method__.to_s}|#{clothes_dryer.handle.to_s}"
+  def self.ClothesDryerFuelSplit
+    return __method__.to_s
   end
-  def self.ClothesWasherDrumVolume(clothes_washer)
-    return "#{__method__.to_s}|#{clothes_washer.handle.to_s}"
+  def self.ClothesWasherDrumVolume
+    return __method__.to_s
   end
-  def self.ClothesWasherIMEF(clothes_washer)
-    return "#{__method__.to_s}|#{clothes_washer.handle.to_s}"
+  def self.ClothesWasherIMEF
+    return __method__.to_s
   end
-  def self.ClothesWasherRatedAnnualEnergy(clothes_washer)
-    return "#{__method__.to_s}|#{clothes_washer.handle.to_s}"
+  def self.ClothesWasherRatedAnnualEnergy
+    return __method__.to_s
   end
-  def self.ClothesWasherDayShift(clothes_washer)
-    return "#{__method__.to_s}|#{clothes_washer.handle.to_s}"
+  def self.ClothesWasherDayShift
+    return __method__.to_s
   end
   def self.CondenserTypeWater
     return 'watercooled'
   end
   def self.DuctedInfoMiniSplitHeatPump
     return __method__.to_s
+  end
+  def self.EndUseCeilingFan
+    return 'residential ceiling fan'
   end
   def self.EndUseHVACFan
     return 'residential hvac fan'
@@ -246,20 +249,23 @@ class Constants
     return 'wood'
   end
   def self.LoadVarsSpaceHeating
-    return ['Heating Coil Total Heating Energy',
-            'Heating Coil Air Heating Energy',
-            'Boiler Heating Energy',
-            'Baseboard Total Heating Energy',
-            'Heating Coil Heating Energy',
-            'Zone Ideal Loads Zone Total Heating Energy']
+    return {'OpenStudio::Model::CoilHeatingDXSingleSpeed' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::CoilHeatingDXMultiSpeed' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::CoilHeatingElectric' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::CoilHeatingGas' => ['Heating Coil Heating Energy'],
+            'OpenStudio::Model::ZoneHVACBaseboardConvectiveElectric' => ['Baseboard Total Heating Energy'],
+            'OpenStudio::Model::ZoneHVACBaseboardConvectiveWater' => ['Baseboard Total Heating Energy'],
+            'OpenStudio::Model::CoilHeatingWaterToAirHeatPumpEquationFit' => ['Heating Coil Heating Energy']}
   end
   def self.LoadVarsSpaceCooling
-    return ['Cooling Coil Sensible Cooling Energy',
-            'Cooling Coil Latent Cooling Energy',
-            'Zone Ideal Loads Zone Total Cooling Energy']
+    return {'OpenStudio::Model::CoilCoolingDXSingleSpeed' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
+            'OpenStudio::Model::CoilCoolingDXMultiSpeed' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
+            'OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy'],
+            'OpenStudio::Model::CoilCoolingWaterToAirHeatPumpEquationFit' => ['Cooling Coil Sensible Cooling Energy','Cooling Coil Latent Cooling Energy']}
   end
   def self.LoadVarsWaterHeating
-    return ['Water Use Connections Plant Hot Water Energy']
+    return {nil => ['Water Use Connections Plant Hot Water Energy']}
   end
   def self.LocationInterior
     return 'interior'
@@ -281,6 +287,21 @@ class Constants
   end
   def self.MaterialPEX
     return 'pex'
+  end
+  def self.PVArrayTypeFixedOpenRack
+    return 'FixedOpenRack'
+  end
+  def self.PVArrayTypeFixedRoofMount
+    return 'FixedRoofMounted'
+  end
+  def self.PVArrayTypeFixed1Axis
+    return 'OneAxis'
+  end
+  def self.PVArrayTypeFixed1AxisBacktracked
+    return 'OneAxisBacktracking'
+  end
+  def self.PVArrayTypeFixed2Axis
+    return 'TwoAxis'
   end
   def self.PVModuleTypeStandard
     return 'Standard'
@@ -782,146 +803,143 @@ class Constants
     end
     return "#{property}#{s_obj}"
   end
-  def self.SizingInfoCMUWallFurringInsRvalue(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoCMUWallFurringInsRvalue
+    return __method__.to_s
   end
   def self.SizingInfoDuctsLocationFrac
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsLocationZone
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsReturnLoss
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsReturnRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsReturnSurfaceArea
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsSupplyLoss
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsSupplyRvalue
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoDuctsSupplySurfaceArea
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPBoreConfig
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPBoreDepth
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPBoreHoles
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPBoreSpacing
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPCoil_BF_FT_SPEC
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPCoilBF
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoGSHPUTubeSpacingType
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHPSizedForMaxLoad
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCapacityDerateFactorCOP
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCapacityDerateFactorEER
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCapacityRatioCooling
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCapacityRatioHeating
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACCoolingCFMs
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACHeatingCapacityOffset
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACHeatingCFMs
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACRatedCFMperTonHeating
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACRatedCFMperTonCooling
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoHVACSHR
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentType
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentApparentSensibleEffectiveness
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentLatentEffectiveness
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentTotalEfficiency
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMechVentWholeHouseRate
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
   def self.SizingInfoMSHPIndices
-    return self.SizingInfo(__method__.to_s)
+    return __method__.to_s
   end
-  def self.SizingInfoRoofCavityRvalue(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoRoofCavityRvalue
+    return __method__.to_s
   end
-  def self.SizingInfoRoofColor(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoRoofColor
+    return __method__.to_s
   end
-  def self.SizingInfoRoofHasRadiantBarrier(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoRoofHasRadiantBarrier
+    return __method__.to_s
   end
-  def self.SizingInfoRoofMaterial(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoRoofMaterial
+    return __method__.to_s
   end
-  def self.SizingInfoRoofRigidInsRvalue(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoRoofRigidInsRvalue
+    return __method__.to_s
   end
-  def self.SizingInfoSIPWallInsThickness(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoSIPWallInsThickness
+    return __method__.to_s
   end
-  def self.SizingInfoSlabThicknessIn(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoSlabRvalue
+    return __method__.to_s
   end
-  def self.SizingInfoSlabWholeRvalue(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoStudWallCavityRvalue
+    return __method__.to_s
   end
-  def self.SizingInfoStudWallCavityRvalue(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoWallType
+    return __method__.to_s
   end
-  def self.SizingInfoWallType(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoWallRigidInsRvalue
+    return __method__.to_s
   end
-  def self.SizingInfoWallRigidInsRvalue(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoWallRigidInsThickness
+    return __method__.to_s
   end
-  def self.SizingInfoWallRigidInsThickness(surface)
-    return self.SizingInfo(__method__.to_s, surface)
+  def self.SizingInfoZoneInfiltrationCFM
+    return __method__.to_s
   end
-  def self.SizingInfoZoneInfiltrationCFM(zone)
-    return self.SizingInfo(__method__.to_s, zone)
-  end
-  def self.SizingInfoZoneInfiltrationELA(zone)
-    return self.SizingInfo(__method__.to_s, zone)
+  def self.SizingInfoZoneInfiltrationELA
+    return __method__.to_s
   end
   def self.SpaceTypeBathroom
     return 'bathroom' # only used by multi-zone simulations
