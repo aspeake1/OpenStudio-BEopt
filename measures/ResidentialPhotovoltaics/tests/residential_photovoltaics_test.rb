@@ -25,7 +25,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 180.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -34,7 +34,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 180.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -43,7 +43,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 180.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -52,7 +52,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 180.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -62,7 +62,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 90.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -72,7 +72,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 90.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -82,7 +82,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 90.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
@@ -92,7 +92,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 90.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
@@ -102,7 +102,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 45.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -112,7 +112,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 45.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -122,7 +122,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 45.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -132,7 +132,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["azimuth"] = 45.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>225, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
@@ -141,7 +141,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.CoordAbsolute
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>0, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -150,7 +150,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.CoordAbsolute
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>0, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values) 
   end
   
@@ -159,7 +159,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.CoordAbsolute
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>0, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -168,7 +168,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt_type"] = Constants.CoordAbsolute
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>0, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -179,7 +179,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = 30.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>30, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>30, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -189,7 +189,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = 30.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>30, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>30, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -199,7 +199,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = 30.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>30, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>30, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -209,7 +209,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = 30.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>30, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>30, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
@@ -219,7 +219,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = -15.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7-15, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>39.7-15, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -229,7 +229,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = -15.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7-15, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>39.7-15, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -239,7 +239,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = -15.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7-15, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>39.7-15, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -249,7 +249,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = -15.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7-15, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>39.7-15, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -259,7 +259,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = 15.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7+15, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>39.7+15, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -269,7 +269,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = 15.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7+15, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>39.7+15, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -279,7 +279,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = 15.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7+15, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>39.7+15, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
@@ -289,7 +289,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash["tilt"] = 15.0
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>39.7+15, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>39.7+15, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -297,7 +297,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>180, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_North.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -305,7 +305,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>90, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_West.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -313,7 +313,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>270, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
   
@@ -321,7 +321,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -330,7 +330,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -339,7 +339,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>0, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>0, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
 
@@ -347,12 +347,12 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>2500, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>2500, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     model = _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["size"] = 5.0
     expected_num_del_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
     expected_num_new_objects = {"GeneratorPVWatts"=>1, "ElectricLoadCenterInverterPVWatts"=>1, "ElectricLoadCenterDistribution"=>1}
-    expected_values = {"SystemCapacity"=>5000, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96}
+    expected_values = {"SystemCapacity"=>5000, "ModuleType"=>Constants.PVModuleTypeStandard, "TiltAngle"=>26.57, "AzimuthAngle"=>0, "InverterEfficiency"=>0.96, "ArrayType"=>Constants.PVArrayTypeFixedRoofMount}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -450,8 +450,10 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
         new_object = new_object.public_send("to_#{obj_type}").get
         if obj_type == "GeneratorPVWatts"
           assert_in_epsilon(expected_values["SystemCapacity"], new_object.dcSystemCapacity, 0.01)
+          assert_equal(expected_values["ModuleType"], new_object.moduleType)
           assert_in_epsilon(expected_values["TiltAngle"], new_object.tiltAngle, 0.01)
           assert_in_epsilon(expected_values["AzimuthAngle"], new_object.azimuthAngle, 0.01)
+          assert_equal(expected_values["ArrayType"], new_object.arrayType)
         elsif obj_type == "ElectricLoadCenterInverterPVWatts"
           assert_in_epsilon(expected_values["InverterEfficiency"], new_object.inverterEfficiency, 0.01)
         end

@@ -1,6 +1,3 @@
-require 'bundler'
-Bundler.setup
-
 require 'rake'
 require 'rake/testtask'
 require 'ci/reporter/rake/minitest'
@@ -111,6 +108,7 @@ def regenerate_osms
         
         puts "[#{num_tot}/#{num_osws}] Regenerating osm from #{osw}..."
         osw = File.expand_path("../test/osw_files/#{osw}", __FILE__)
+        update_and_format_osw(osw)
         osm = File.expand_path("../test/osw_files/run/in.osm", __FILE__)
         command = "\"#{cli_path}\" --no-ssl run -w #{osw} -m >> log"
         for _retry in 1..3
@@ -170,6 +168,27 @@ def get_osms_listed_in_test(testrb)
     return osms.uniq
 end
 
+def update_and_format_osw(osw)
+  # Insert new step(s) into test osw files, if they don't already exist: {{step1=>index, step2=>index}}
+  new_steps = {}
+  json = JSON.parse(File.read(osw), :symbolize_names=>true)
+  steps = json[:steps]
+  new_steps.each do |new_step, ix|
+    insert_new_step = true
+    steps.each do |step|
+      step.each do |k, v|
+        next if k != :measure_dir_name
+        next if v != new_step.values[0] # already have this step
+        insert_new_step = false
+      end
+    end
+    next unless insert_new_step
+    json[:steps].insert(ix, new_step)
+  end
+  File.open(osw, "w") do |f|
+    f.write(JSON.pretty_generate(json)) # format nicely even if not updating the osw with new steps
+  end
+end
 
 desc 'update all measures (resources, xmls, workflows, README)'
 task :update_measures do
