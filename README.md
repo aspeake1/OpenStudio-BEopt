@@ -7,8 +7,6 @@ Unit Test Status: [![CircleCI](https://circleci.com/gh/NREL/OpenStudio-BEopt/tre
 
 Code Coverage: [![Coverage Status](https://coveralls.io/repos/github/NREL/OpenStudio-Beopt/badge.svg?branch=master)](https://coveralls.io/github/NREL/OpenStudio-Beopt?branch=master)
 
-<!--* [Outputs](#outputs)-->
-
 ## Running the Measures
 
 The measures can be run via the standard OpenStudio approaches: the user interfaces ([OpenStudio Application](http://nrel.github.io/OpenStudio-user-documentation/reference/openstudio_application_interface/) and [Parametric Analysis Tool](http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_analysis_tool_2/)), the [Command Line Interface](http://nrel.github.io/OpenStudio-user-documentation/reference/command_line_interface/), or via the [OpenStudio SDK](https://openstudio-sdk-documentation.s3.amazonaws.com/index.html).
@@ -20,45 +18,6 @@ An example OpenStudio Workflow [(example_single_family_detached.osw)](https://gi
 `openstudio.exe run -w example_single_family_detached.osw`
 
 This will apply the measures, run the EnergyPlus simulation, and produce output. 
-
-<!--
-
-## Workflows
-
-These measures can be used in different workflows:
-* [Create Model](#workflow-create-model) - Build up a model from scratch.
-* [Modify Model](#workflow-modify-model) - Apply a measure to an existing model.
-* [Create Model from Geometry](#workflow-create-model-from-geometry) - Build up a model on top of an existing geometry.
-
-### Workflow: Create Model
-
-Status: **Available**
-
-![Create Model Diagram](https://cloud.githubusercontent.com/assets/5861765/25581277/308515a2-2e44-11e7-88c2-7f9bca55bb5c.png)
-
-The Create Model workflow allows building up a complete residential building model from an [empty seed](https://github.com/NREL/OpenStudio-BEopt/blob/master/seeds/EmptySeedModel.osm) and calling a series of measures. The measures should be applied according to the specified [measure order](#measure-order).
-
-This workflow includes simple geometry measures to quickly develop 3D building geometry from text-based inputs (floor area, foundation type, number of stories, etc.). These measures are not meant to replace more sophisticated geometry approaches.
-
-### Workflow: Modify Model
-
-Status: **Available**
-
-![Modify Model Workflow Diagram](https://cloud.githubusercontent.com/assets/5861765/25581274/2c469998-2e44-11e7-9ed0-d08eec6f6178.png)
-
-Most of these measures were written to be reusable for existing building retrofits. For example, while the dishwasher measure adds a dishwasher to a model without a dishwasher, the same measure will replace a dishwasher that already exists in an existing building model (rather than adding an additional dishwasher to the model). This could be used to evaluate an EnergyStar dishwasher replacement, for example.
-
-While some of these measures may work on any user-created OpenStudio model, they have only been tested on, and are primarily intended to operate on, models created via one of the supported [Workflows](#workflows).
-
-### Workflow: Create Model From Geometry
-
-Status: **Not Yet Available**
-
-![Create Model From Geometry](https://cloud.githubusercontent.com/assets/5861765/25557648/f77be4e2-2cd2-11e7-9837-33840cadd369.png)
-
-In the future, we plan to support workflows where the geometry is defined not through our geometry measures, but through the OpenStudio Geometry Editor or SketchUp. There is currently no timeline for when this workflow will become available.
-
--->
 
 ### Measure Order
 
@@ -102,35 +61,6 @@ The order in which these measures are called is important. For example, the Wind
 |11. Sizing|1. HVAC Sizing|(lots of measures...)|
 |12. Photovoltaics|1. Photovoltaics||
 <!--- MEASURE_WORKFLOW_END -->
-
-<!---
-## Outputs
-
-These measures allow multiple outputs to be calculated:
-* [Simulation Results](#output-simulation-results) - Standard EnergyPlus annual and time series results by end use.
-* [Utility Bills](#output-utility-bills) - Simple of complex residential utility bills.
-* [Energy Rating Index (ERI)](#output-energy-rating-index-eri) - Calculation for the 301 Standard/HERS Index.
-
-### Output: Simulation Results
-
-Status: **Available**
-
-Description pending.
-
-### Output: Utility Bills
-
-Status: **Under Development**
-
-Description pending.
-
-### Output: Energy Rating Index (ERI)
-
-Status: **Under Development**
-
-Calculations are under development for ANSI/RESNET 301-2014 "Standard for the Calculation and Labeling of the Energy Performance of Low-Rise Residential Buildings using the HERS Index". This metric is also a performance compliance path in the 2015 IECC. 
-
-Note that because the calculation involves performing multiple simulations (e.g., the Reference Home and Rated Home), a custom workflow will be developed to support this.
--->
 
 ## Development
 
