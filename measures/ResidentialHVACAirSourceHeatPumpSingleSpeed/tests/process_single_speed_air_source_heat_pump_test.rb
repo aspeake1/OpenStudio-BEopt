@@ -222,7 +222,7 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
     args_hash = {}
     args_hash["actual_cfm_per_ton"] = "650"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>1, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>1, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "res_installation_quality_fault_1_prog"=>{"F_AF"=>0.625}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5, 1)
   end
@@ -231,7 +231,7 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
     args_hash = {}
     args_hash["frac_manufacturer_charge"] = "1.27"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>1, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>1, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "res_installation_quality_fault_1_prog"=>{"F_CH"=>0.27}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5, 1)
   end  
@@ -239,7 +239,7 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
   def test_apply_non_fault_to_single_speed_ashp
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>1, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>1, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1}
     expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
@@ -247,8 +247,8 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
   def test_apply_airflow_fault_to_faulted_single_speed_ashp
     args_hash = {}
     args_hash["actual_cfm_per_ton"] = "280"
-    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "AirLoopHVACReturnPlenum"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "AirLoopHVACReturnPlenum"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "res_installation_quality_fault_1_prog"=>{"F_AF"=>-0.3}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_HVACSizing_Equip_Faulted_ASHP1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 8)
   end
@@ -256,8 +256,8 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
   def test_apply_airflow_fault_to_faulted_single_speed_ashp
     args_hash = {}
     args_hash["frac_manufacturer_charge"] = "0.90"
-    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "AirLoopHVACReturnPlenum"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "AirLoopHVACReturnPlenum"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "res_installation_quality_fault_1_prog"=>{"F_CH"=>-0.1}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_HVACSizing_Equip_Faulted_ASHP1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 8)
   end  
@@ -266,8 +266,8 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
     args_hash = {}
     args_hash["actual_cfm_per_ton"] = "280"
     args_hash["frac_manufacturer_charge"] = "0.90"
-    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "AirLoopHVACReturnPlenum"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "AirLoopHVACReturnPlenum"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctConstantVolumeNoReheat"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1, "EnergyManagementSystemSensor"=>2, "EnergyManagementSystemActuator"=>4, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
     expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, "res_installation_quality_fault_1_prog"=>{"F_AF"=>-0.3, "F_CH"=>-0.1}, "SensorLocation"=>"living zone"}
     _test_measure("SFD_HVACSizing_Equip_Faulted_ASHP1_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 8)
   end  
@@ -277,8 +277,8 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
     args_hash = {}
     args_hash["actual_cfm_per_ton"] = "280"
     args_hash["frac_manufacturer_charge"] = "0.90"
-    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1*num_units, "AirLoopHVAC"=>1*num_units, "CoilCoolingDXSingleSpeed"=>1*num_units, "FanOnOff"=>1*num_units, "AirTerminalSingleDuctUncontrolled"=>1*num_units, "CoilHeatingElectric"=>1*num_units, "CoilHeatingDXSingleSpeed"=>1*num_units}
-    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1*num_units, "AirLoopHVAC"=>1*num_units, "CoilCoolingDXSingleSpeed"=>1*num_units, "FanOnOff"=>1*num_units, "AirTerminalSingleDuctUncontrolled"=>1*num_units, "CoilHeatingElectric"=>1*num_units, "CoilHeatingDXSingleSpeed"=>1*num_units, "EnergyManagementSystemSensor"=>2*num_units, "EnergyManagementSystemActuator"=>4*num_units, "EnergyManagementSystemProgram"=>1*num_units, "EnergyManagementSystemProgramCallingManager"=>1*num_units}
+    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1*num_units, "AirLoopHVAC"=>1*num_units, "CoilCoolingDXSingleSpeed"=>1*num_units, "FanOnOff"=>1*num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>1*num_units, "CoilHeatingElectric"=>1*num_units, "CoilHeatingDXSingleSpeed"=>1*num_units}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1*num_units, "AirLoopHVAC"=>1*num_units, "CoilCoolingDXSingleSpeed"=>1*num_units, "FanOnOff"=>1*num_units, "AirTerminalSingleDuctConstantVolumeNoReheat"=>1*num_units, "CoilHeatingElectric"=>1*num_units, "CoilHeatingDXSingleSpeed"=>1*num_units, "EnergyManagementSystemSensor"=>2*num_units, "EnergyManagementSystemActuator"=>4*num_units, "EnergyManagementSystemProgram"=>1*num_units, "EnergyManagementSystemProgramCallingManager"=>1*num_units}
     expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1, \
                        "res_installation_quality_fault_1_prog"=>{"F_AF"=>-0.3, "F_CH"=>-0.1}, \
                        "res_installation_quality_fault_2_prog"=>{"F_AF"=>-0.3, "F_CH"=>-0.1}, \
@@ -401,7 +401,7 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
           if new_object.nominalCapacity.is_initialized
             assert_in_epsilon(expected_values["SuppNominalCapacity"], new_object.nominalCapacity.get, 0.01)
           end
-        elsif obj_type == "AirTerminalSingleDuctUncontrolled"
+        elsif obj_type == "AirTerminalSingleDuctConstantVolumeNoReheat"
           model.getThermalZones.each do |thermal_zone|
             cooling_seq = thermal_zone.equipmentInCoolingOrder.index new_object
             heating_seq = thermal_zone.equipmentInHeatingOrder.index new_object

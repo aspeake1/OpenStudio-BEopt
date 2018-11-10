@@ -302,7 +302,7 @@ class ProcessTwoSpeedCentralAirConditionerTest < MiniTest::Test
                         assert_in_epsilon(expected_values["NominalCapacity"][i], stage.grossRatedTotalCoolingCapacity.get, 0.01)
                     end
                 end
-            elsif obj_type == "AirTerminalSingleDuctUncontrolled"
+            elsif obj_type == "AirTerminalSingleDuctConstantVolumeNoReheat"
                 model.getThermalZones.each do |thermal_zone|
                   cooling_seq = thermal_zone.equipmentInCoolingOrder.index new_object
                   heating_seq = thermal_zone.equipmentInHeatingOrder.index new_object

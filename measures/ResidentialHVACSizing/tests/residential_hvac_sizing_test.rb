@@ -1071,13 +1071,13 @@ class ProcessHVACSizingTest < MiniTest::Test
             end
 
         elsif beopt_key == 'AirTerminal:SingleDuct:Uncontrolled_Living_Maximum Flow Rate {m3/s}'
-            model.getAirTerminalSingleDuctUncontrolleds.each do |term|
+            model.getAirTerminalSingleDuctConstantVolumeNoReheats.each do |term|
                 next if term.name.to_s.downcase.include?('basement')
                 os_val += term.maximumAirFlowRate.get
             end
 
         elsif beopt_key == 'AirTerminal:SingleDuct:Uncontrolled_Basement_Maximum Flow Rate {m3/s}'
-            model.getAirTerminalSingleDuctUncontrolleds.each do |term|
+            model.getAirTerminalSingleDuctConstantVolumeNoReheats.each do |term|
                 next if !term.name.to_s.downcase.include?('basement')
                 os_val += term.maximumAirFlowRate.get
             end

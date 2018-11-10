@@ -314,7 +314,7 @@ class ProcessVariableSpeedAirSourceHeatPumpTest < MiniTest::Test
                 if new_object.nominalCapacity.is_initialized
                   assert_in_epsilon(expected_values["SuppNominalCapacity"], new_object.nominalCapacity.get, 0.01)
                 end
-            elsif obj_type == "AirTerminalSingleDuctUncontrolled"
+            elsif obj_type == "AirTerminalSingleDuctConstantVolumeNoReheat"
                 model.getThermalZones.each do |thermal_zone|
                   cooling_seq = thermal_zone.equipmentInCoolingOrder.index new_object
                   heating_seq = thermal_zone.equipmentInHeatingOrder.index new_object
