@@ -1485,11 +1485,8 @@ class FoundationConstructions
         surface.createSurfacePropertyExposedFoundationPerimeter("TotalExposedPerimeter", UnitConversions.convert(exposed_perimeter,"ft","m"))
         
         # Store info for HVAC Sizing measure
-        model.getBuildingUnits.each do |unit|
-            next if unit.spaces.size == 0
-            unit.setFeature(Constants.SizingInfoSlabWholeRvalue(surface), whole_r)
-            unit.setFeature(Constants.SizingInfoSlabThicknessIn(surface), concrete_thick_in)
-        end
+        surface.additionalProperties.setFeature(Constants.SizingInfoSlabWholeRvalue, whole_r)
+        surface.additionalProperties.setFeature(Constants.SizingInfoSlabThicknessIn, concrete_thick_in)
         
         return true
     end

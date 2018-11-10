@@ -920,7 +920,10 @@ class Constants
   def self.SizingInfoSIPWallInsThickness
     return __method__.to_s
   end
-  def self.SizingInfoSlabRvalue
+  def self.SizingInfoSlabThicknessIn
+    return __method__.to_s
+  end
+  def self.SizingInfoSlabWholeRvalue
     return __method__.to_s
   end
   def self.SizingInfoStudWallCavityRvalue
