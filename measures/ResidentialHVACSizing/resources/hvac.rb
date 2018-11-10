@@ -2393,8 +2393,8 @@ class HVAC
         end
       end
 
-      weekday_setpoints = weekday_setpoints.map {|i| UnitConversions.convert(i,"F","C")}
-      weekend_setpoints = weekend_setpoints.map {|i| UnitConversions.convert(i,"F","C")}
+      weekday_setpoints = weekday_setpoints.map {|i| i.map {|j| UnitConversions.convert(j,"F","C")}}
+      weekend_setpoints = weekend_setpoints.map {|i| i.map {|j| UnitConversions.convert(j,"F","C")}} 
 
       finished_zones = []
       model.getThermalZones.each do |thermal_zone|
@@ -2586,8 +2586,8 @@ class HVAC
         end
       end
 
-      weekday_setpoints = weekday_setpoints.map {|i| UnitConversions.convert(i,"F","C")}
-      weekend_setpoints = weekend_setpoints.map {|i| UnitConversions.convert(i,"F","C")}
+      weekday_setpoints = weekday_setpoints.map {|i| i.map {|j| UnitConversions.convert(j,"F","C")}}
+      weekend_setpoints = weekend_setpoints.map {|i| i.map {|j| UnitConversions.convert(j,"F","C")}}
 
       finished_zones = []
       model.getThermalZones.each do |thermal_zone|
@@ -3770,6 +3770,11 @@ class HVAC
         runner.registerInfo("Found ground source heat pump in #{thermal_zone.name}.")
         cooling_equipment << system
       end
+      if self.has_ideal_air(model, runner, thermal_zone)
+        runner.registerInfo("Found ideal air system in #{thermal_zone.name}.")
+        ideal_air = self.get_ideal_air(model, runner, thermal_zone)
+        cooling_equipment << ideal_air
+      end
       return cooling_equipment
     end
 
@@ -3812,6 +3817,11 @@ class HVAC
         runner.registerInfo("Found unit heater in #{thermal_zone.name}.")
         system, clg_coil, htg_coil = self.get_unitary_system_zone_hvac(model, runner, thermal_zone)
         heating_equipment << system
+      end
+      if self.has_ideal_air(model, runner, thermal_zone)
+        runner.registerInfo("Found ideal air system in #{thermal_zone.name}.")
+        ideal_air = self.get_ideal_air(model, runner, thermal_zone)
+        heating_equipment << ideal_air
       end
       return heating_equipment
     end
