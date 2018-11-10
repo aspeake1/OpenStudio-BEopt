@@ -39,7 +39,7 @@ class SetResidentialEPWFileTest < MiniTest::Test
   def test_change_daylight_saving
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"RunPeriodControlDaylightSavingTime"=>1, "SiteWaterMainsTemperature"=>1, "WeatherFile"=>1, "ClimateZones"=>1, "Site"=>1, "ZoneCapacitanceMultiplierResearchSpecial"=>1, "ShadowCalculation"=>1, "Timestep"=>1, "SimulationControl"=>1}
+    expected_num_new_objects = {"RunPeriodControlDaylightSavingTime"=>1, "SiteWaterMainsTemperature"=>1, "WeatherFile"=>1, "ClimateZones"=>1, "Site"=>1}
     expected_values = {"StartDate"=>"Apr-07", "EndDate"=>"Oct-26", "Year"=>"", "HotWaterAnnualTemp"=>10.88, "HotWaterMaxDiffTemp"=>23.15}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
     args_hash = {}
