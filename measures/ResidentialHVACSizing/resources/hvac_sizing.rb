@@ -4331,7 +4331,7 @@ class HVACSizing
     elsif clg_coil.is_a? OpenStudio::Model::CoilCoolingDXMultiSpeed
         clg_coil.stages.each_with_index do |stage, speed|
             stage.setGrossRatedTotalCoolingCapacity(UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","W") * hvac.CapacityRatioCooling[speed])
-            if clg_coil.name.to_s.start_with? Constants.ObjectNameAirSourceHeatPump
+            if clg_coil.name.to_s.start_with? Constants.ObjectNameAirSourceHeatPump or clg_coil.name.to_s.start_with? Constants.ObjectNameCentralAirConditioner
                 stage.setRatedAirFlowRate(UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") * UnitConversions.convert(hvac.RatedCFMperTonCooling[speed],"cfm","m^3/s") * hvac.CapacityRatioCooling[speed])
             elsif clg_coil.name.to_s.start_with? Constants.ObjectNameMiniSplitHeatPump
                 stage.setRatedAirFlowRate(UnitConversions.convert(unit_final.Cool_Capacity,"Btu/hr","ton") * UnitConversions.convert(hvac.CoolingCFMs[speed],"cfm","m^3/s"))
