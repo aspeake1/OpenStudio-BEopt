@@ -158,7 +158,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
   private
 
   def model_in_path_default(osm_file_or_model)
-    return "#{File.dirname(__FILE__)}/#{osm_file_or_model}"
+    return File.absolute_path(File.join(File.dirname(__FILE__),"..","..","..","test","osm_files",osm_file_or_model))
   end
 
   def epw_path_default(epw_name)
