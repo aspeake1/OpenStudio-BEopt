@@ -17,17 +17,8 @@ end
 
 def exclude_file(f)
   exclude = false
-  if f.include?('tests')
+  if f.include? 'HPXMLtoOpenStudio' or f.include? 'Rakefile'
     exclude = true
-  elsif f.include?('resources')
-    allowances = {
-                  '301EnergyRatingIndexRuleset'=>['301.rb','hpxml.rb']
-                 }
-    exclude = true
-    allowances.keys.each do |m|
-      next if not (f.include?(m) and allowances[m].include?(File.basename(f)))
-      exclude = false
-    end
   end
   return exclude
 end
@@ -50,7 +41,8 @@ def get_model(measure_dir, osm_file_or_model)
     else
         # load the test model
         translator = OpenStudio::OSVersion::VersionTranslator.new
-        path = OpenStudio::Path.new(File.join(measure_dir, osm_file_or_model))
+        osm_path = File.join(measure_dir, "..", "..", "..", "test", "osm_files", osm_file_or_model)
+        path = OpenStudio::Path.new(osm_path)
         model = translator.loadModel(path)
         assert((not model.empty?))
         model = model.get
