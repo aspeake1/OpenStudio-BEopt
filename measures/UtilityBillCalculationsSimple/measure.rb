@@ -2,9 +2,9 @@
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
 require 'csv'
-require "#{File.dirname(__FILE__)}/resources/constants"
-require "#{File.dirname(__FILE__)}/resources/unit_conversions"
-require "#{File.dirname(__FILE__)}/resources/util"
+require_relative "../HPXMLtoOpenStudio/resources/constants"
+require_relative "../HPXMLtoOpenStudio/resources/unit_conversions"
+require_relative "../HPXMLtoOpenStudio/resources/util"
 
 #start the measure
 class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
