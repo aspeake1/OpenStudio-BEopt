@@ -115,14 +115,6 @@ class ResidentialLightingTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
-  def test_new_construction_high_latitude
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"LightsDefinition"=>4, "Lights"=>4, "ExteriorLightsDefinition"=>1, "ExteriorLights"=>1, "ScheduleRuleset"=>1}
-    expected_values = {"Annual_kwh"=>1733}
-    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_Anchorage.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
-  end
-  
   def test_retrofit_replace
     args_hash = {}
     expected_num_del_objects = {}
