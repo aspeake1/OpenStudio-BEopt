@@ -1,19 +1,38 @@
 <measure>
   <schema_version>3.0</schema_version>
-  <name>utility_bill_calculations_detailed</name>
+  <name>utility_bill_calculations</name>
   <uid>872cd20c-55df-459e-9ac9-f42c93ab665c</uid>
-  <version_id>bbfc5993-adb1-4c8d-9a65-d4432ab061cd</version_id>
-  <version_modified>20181113T060906Z</version_modified>
+  <version_id>55ac3e2b-544b-4b54-bf29-851c3ba63fa4</version_id>
+  <version_modified>20181113T172837Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
-  <class_name>UtilityBillCalculationsDetailed</class_name>
-  <display_name>Calculate Detailed Utility Bills</display_name>
-  <description>Calculate utility bills for detailed electricity tariffs.</description>
-  <modeler_description>Calculate electric utility bills based on tariffs from the OpenEI Utility Rate Database (URDB). Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. User can specify PV compensation types of 'Net Metering' or 'Feed-In Tariff', along with corresponding rates.</modeler_description>
+  <class_name>UtilityBillCalculations</class_name>
+  <display_name>Calculate Utility Bills</display_name>
+  <description>Calculate utility bills for simple and detailed electricity tariffs.</description>
+  <modeler_description>Calculate electric utility bills based on either: (a) monthly fixed charge and marginal rate, or (b) tariff from the OpenEI Utility Rate Database (URDB). Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. User can specify PV compensation types of 'Net Metering' or 'Feed-In Tariff', along with corresponding rates.</modeler_description>
   <arguments>
+    <argument>
+      <name>electric_bill_type</name>
+      <display_name>Electricity: Simple or Detailed</display_name>
+      <description>Choose either 'Simple' or 'Detailed'. If 'Simple' is selected, electric utility bills are calculated based on user-defined fixed charge and marginal rate. If 'Detailed' is selected, electric utility bills are calculated based on either: a tariff from the OpenEI Utility Rate Database (URDB), or a real-time pricing rate.</description>
+      <type>Choice</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Simple</default_value>
+      <choices>
+        <choice>
+          <value>Simple</value>
+          <display_name>Simple</display_name>
+        </choice>
+        <choice>
+          <value>Detailed</value>
+          <display_name>Detailed</display_name>
+        </choice>
+      </choices>
+    </argument>
     <argument>
       <name>tariff_label</name>
       <display_name>Electricity: Tariff</display_name>
-      <description>Choose either 'Autoselect Tariff(s)', 'Custom Tariff', or a prepackaged tariff. If 'Autoselect Tariff(s)' is selected, tariff(s) from nearby utilities will be selected.</description>
+      <description>Choose either 'Autoselect Tariff(s)', 'Custom Tariff', 'Custom Real-Time Pricing Rate', 'Sample Real-Time Pricing Rate', or a prepackaged tariff. If 'Autoselect Tariff(s)' is selected, tariff(s) from nearby utilities will be selected.</description>
       <type>Choice</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -26,6 +45,14 @@
         <choice>
           <value>Custom Tariff</value>
           <display_name>Custom Tariff</display_name>
+        </choice>
+        <choice>
+          <value>Custom Real-Time Pricing Rate</value>
+          <display_name>Custom Real-Time Pricing Rate</display_name>
+        </choice>
+        <choice>
+          <value>Sample Real-Time Pricing Rate</value>
+          <display_name>Sample Real-Time Pricing Rate</display_name>
         </choice>
         <choice>
           <value>Blue Ridge Mountain E M C (North Carolina) - Residential</value>
@@ -18487,11 +18514,31 @@
     </argument>
     <argument>
       <name>custom_tariff</name>
-      <display_name>Electricity: Custom Tariff File Location</display_name>
-      <description>Absolute path to custom tariff file. See resources/tariffs.zip for example tariff files. Only applies if Tariff is 'Custom Tariff'.</description>
+      <display_name>Electricity: Custom Tariff or Real-Time Pricing Rate File Location</display_name>
+      <description>Absolute path to custom tariff or real-time pricing rate file. See resources/tariffs.zip for example tariff files. See resources/Sample Real-Time Pricing Rate.json for example real-time pricing rate file. Only applies if Tariff is 'Custom Tariff' or 'Custom Real-Time Pricing Rate'.</description>
       <type>String</type>
       <required>false</required>
       <model_dependent>false</model_dependent>
+    </argument>
+    <argument>
+      <name>elec_fixed</name>
+      <display_name>Electricity: Fixed Charge</display_name>
+      <description>Monthly fixed charge for electricity.</description>
+      <type>String</type>
+      <units>$/month</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>12.0</default_value>
+    </argument>
+    <argument>
+      <name>elec_rate</name>
+      <display_name>Electricity: Marginal Rate</display_name>
+      <description>Price per kilowatt-hour for electricity. Use 'auto for state-average value from EIA.</description>
+      <type>String</type>
+      <units>$/kWh</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
     </argument>
     <argument>
       <name>gas_fixed</name>
@@ -18553,9 +18600,28 @@
       </choices>
     </argument>
     <argument>
+      <name>pv_annual_excess_sellback_rate_type</name>
+      <display_name>PV: Net Metering Annual Excess Sellback Rate Type</display_name>
+      <description>The type of annual excess sellback rate for PV. Only applies if the PV compensation type is 'Net Metering'.</description>
+      <type>Choice</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>user-specified</default_value>
+      <choices>
+        <choice>
+          <value>retail electricity cost</value>
+          <display_name>retail electricity cost</display_name>
+        </choice>
+        <choice>
+          <value>user-specified</value>
+          <display_name>user-specified</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
       <name>pv_sellback_rate</name>
       <display_name>PV: Net Metering Annual Excess Sellback Rate</display_name>
-      <description>The annual excess/net sellback rate for PV. Only applies if the PV compensation type is 'Net Metering'.</description>
+      <description>The annual excess sellback rate for PV. Only applies if the PV compensation type is 'Net Metering' and the PV annual excess sellback rate type is 'user-specified'.</description>
       <type>String</type>
       <units>$/kWh</units>
       <required>true</required>
@@ -18744,7 +18810,7 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>1206209A</checksum>
+      <checksum>1595178F</checksum>
     </file>
   </files>
 </measure>
