@@ -49,8 +49,7 @@ def regenerate_osms
     num_osws = osw_files.size
 
     osw_files.each do |osw|
-        next if osw_map[osw].nil?
-        
+    
         # Generate osm from osw
         num_tot += 1
         
