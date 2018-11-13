@@ -4,8 +4,8 @@
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
 require 'erb'
-require "#{File.dirname(__FILE__)}/resources/geometry"
-require "#{File.dirname(__FILE__)}/resources/unit_conversions"
+require_relative "../HPXMLtoOpenStudio/resources/geometry"
+require_relative "../HPXMLtoOpenStudio/resources/unit_conversions"
 
 # start the measure
 class ConstructionPropertiesReport < OpenStudio::Measure::ReportingMeasure
