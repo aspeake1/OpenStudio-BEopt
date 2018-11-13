@@ -4,8 +4,6 @@ require 'openstudio/ruleset/ShowRunnerOutput'
 require 'minitest/autorun'
 require_relative '../measure.rb'
 require 'fileutils'
-require_relative '../resources/geometry'
-require_relative '../resources/constants'
 
 class WindowSkylightAreaTest < MiniTest::Test
 
