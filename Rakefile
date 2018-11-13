@@ -12,7 +12,7 @@ namespace :test do
   desc 'Run unit tests for all measures'
   Rake::TestTask.new('all') do |t|
     t.libs << 'test'
-    t.test_files = Dir['measures/*/tests/*.rb'] + Dir['workflows/tests/*.rb']
+    t.test_files = Dir['measures/*/tests/*.rb'] + Dir['workflows/tests/*.rb'] - Dir['measures/HPXMLtoOpenStudio/tests/*.rb'] # HPXMLtoOpenStudio is tested upstream
     t.warning = false
     t.verbose = true
   end
@@ -36,74 +36,21 @@ def regenerate_osms
     num_success = 0
     
     osw_path = File.expand_path("../test/osw_files/", __FILE__)
-  
-    # Generate hash that maps osw's to measures
-    osw_map = {}
-    measures = Dir.entries(File.expand_path("../measures/", __FILE__)).select {|entry| File.directory? File.join(File.expand_path("../measures/", __FILE__), entry) and !(entry == '.' || entry == '..') }
-    measures.each do |m|
-        testrbs = Dir[File.expand_path("../measures/#{m}/tests/*.rb", __FILE__)]
-        if testrbs.size == 1
-            # Get osm's specified in the test rb
-            testrb = testrbs[0]
-            osms = get_osms_listed_in_test(testrb)
-            osms.each do |osm|
-                osw = File.basename(osm).gsub('.osm','.osw')
-                if not osw_map.keys.include?(osw)
-                    osw_map[osw] = []
-                end
-                osw_map[osw] << m
-            end
-        elsif testrbs.size > 1
-            fail "ERROR: Multiple .rb files found in #{m} tests dir."
-      end
-    end
+    osm_path = File.expand_path("../test/osm_files/", __FILE__)
     
-    osw_files = Dir.entries(osw_path).select {|entry| entry.end_with?(".osw")}
+    osw_files = Dir.entries(osw_path).select {|entry| entry.end_with?(".osw") and entry != "out.osw"}
+    
     if File.exists?(File.expand_path("../log", __FILE__))
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
 
-    # Print warnings about unused OSWs
-    osw_files.each do |osw|
-        next if not osw_map[osw].nil?
-        puts "Warning: Unused OSW '#{osw}'."
-    end
-
-    # Print more warnings
-    osw_map.each do |osw, _measures|
-        next if osw_files.include? osw
-        puts "Warning: OSW not found '#{osw}'."
-    end
-    
-    # Remove any extra osm's in the measures test dirs
-    measures.each do |m|
-        osms = Dir[File.expand_path("../measures/#{m}/tests/*.osm", __FILE__)]
-        osms.each do |osm|
-            osw = File.basename(osm).gsub('.osm','.osw')
-            if osw_map[osw].nil? or !osw_map[osw].include?(m)
-                puts "Extra file #{osw} found in #{m}/tests. Do you want to delete it? (y/n)"
-                input = STDIN.gets.strip.downcase
-                next if input != "y"
-                FileUtils.rm(osm)
-                puts "File deleted."
-            end
-        end
-    end
-    
     cli_path = OpenStudio.getOpenStudioCLI
 
-    num_osws = 0
-    osw_files.each do |osw|
-        next if osw_map[osw].nil?
-        num_osws += 1
-    end
+    num_osws = osw_files.size
 
     osw_files.each do |osw|
     
-        next if osw_map[osw].nil?
-
         # Generate osm from osw
-        osw_filename = osw
         num_tot += 1
         
         puts "[#{num_tot}/#{num_osws}] Regenerating osm from #{osw}..."
@@ -127,21 +74,21 @@ def regenerate_osms
             file_text.each do |file_line|
                 if file_line.strip.start_with?("file:///")
                     file_data = file_line.split('/')
-                    file_line = file_data[0] + "../tests/" + file_data[-1]
+                    epw_name = file_data[-1].split(',')[0]
+                    if File.exists? File.join(File.dirname(__FILE__), "measures/HPXMLtoOpenStudio/weather/#{epw_name}")
+                      file_line = file_data[0] + "../weather/" + file_data[-1]
+                    else
+                      # File not found in weather dir, assume it's in measure's tests dir instead
+                      file_line = file_data[0] + "../tests/" + file_data[-1]
+                    end
                 end
                 f.write(file_line)
             end
         end
-
-        # Copy to appropriate measure test dirs
-        osm_filename = osw_filename.gsub(".osw", ".osm")
-        num_copied = 0
-        osw_map[osw_filename].each do |measure|
-            measure_test_dir = File.expand_path("../measures/#{measure}/tests/", __FILE__)
-            FileUtils.cp(osm, File.expand_path("#{measure_test_dir}/#{osm_filename}", __FILE__))
-            num_copied += 1
-        end
-        puts "  Copied to #{num_copied} measure(s)."
+        
+        # Copy to osm dir
+        osm_new = File.join(osm_path, File.basename(osw).gsub(".osw",".osm"))
+        FileUtils.cp(osm, osm_new)
         num_success += 1
 
         # Clean up
@@ -156,16 +103,6 @@ def regenerate_osms
     
     puts "Completed. #{num_success} of #{num_tot} osm files were regenerated successfully (#{Time.now - start_time} seconds)."
 
-end
-
-def get_osms_listed_in_test(testrb)
-    osms = []
-    if not File.exists?(testrb)
-      return osms
-    end
-    str = File.readlines(testrb).join("\n")
-    osms = str.scan(/\w+\.osm/)
-    return osms.uniq
 end
 
 def update_and_format_osw(osw)
@@ -194,86 +131,7 @@ desc 'update all measures (resources, xmls, workflows, README)'
 task :update_measures do
 
   require 'openstudio'
-
-  puts "Updating measure resources..."
   measures_dir = File.expand_path("../measures/", __FILE__)
-  
-  measures = Dir.entries(measures_dir).select {|entry| File.directory? File.join(File.expand_path("../measures/", __FILE__), entry) and !(entry == '.' || entry == '..') }
-  measures.each do |m|
-    measurerb = File.expand_path("../measures/#{m}/measure.rb", __FILE__)
-    
-    # Get recursive list of resources required based on looking for 'require FOO' in rb files
-    resources = get_requires_from_file(measurerb)
-
-    # Add any additional resources specified in resource_to_measure_mapping.csv
-    subdir_resources = {} # Handle resources in subdirs
-    File.open(File.expand_path("../resources/resource_to_measure_mapping.csv", __FILE__)) do |file|
-      file.each do |line|
-        line = line.chomp.split(',').reject { |l| l.empty? }
-        measure = line.delete_at(0)
-        next if measure != m
-        line.each do |resource|
-          fullresource = File.expand_path("../resources/#{resource}", __FILE__)
-          next if resources.include?(fullresource)
-          resources << fullresource
-          if resource != File.basename(resource)
-            subdir_resources[File.basename(resource)] = resource
-          end
-        end
-      end
-    end
-    
-    # Add/update resource files as needed
-    resources.each do |resource|
-      if not File.exist?(resource)
-        puts "Cannot find resource: #{resource}."
-        next
-      end
-      r = File.basename(resource)
-      dest_resource = File.expand_path("../measures/#{m}/resources/#{r}", __FILE__)
-      measure_resource_dir = File.dirname(dest_resource)
-      if not File.directory?(measure_resource_dir)
-        FileUtils.mkdir_p(measure_resource_dir)
-      end
-      if not File.file?(dest_resource)
-        FileUtils.cp(resource, measure_resource_dir)
-        puts "Added #{r} to #{m}/resources."
-      elsif not FileUtils.compare_file(resource, dest_resource)
-        FileUtils.cp(resource, measure_resource_dir)
-        puts "Updated #{r} in #{m}/resources."
-      end
-    end
-    
-    # Any extra resource files?
-    if File.directory?(File.expand_path("../measures/#{m}/resources", __FILE__))
-      Dir.foreach(File.expand_path("../measures/#{m}/resources", __FILE__)) do |item|
-        next if item == '.' or item == '..'
-        if subdir_resources.include?(item)
-          item = subdir_resources[item]
-        end
-        resource = File.expand_path("../resources/#{item}", __FILE__)
-        next if resources.include?(resource)
-        item_path = File.expand_path("../measures/#{m}/resources/#{item}", __FILE__)
-        if File.directory?(item_path)
-            puts "Extra dir #{item} found in #{m}/resources. Do you want to delete it? (y/n)"
-            input = STDIN.gets.strip.downcase
-            next if input != "y"
-            puts "deleting #{item_path}"
-            FileUtils.rm_rf(item_path)
-            puts "Dir deleted."
-        else
-            next if item == 'measure-info.json'
-            puts "Extra file #{item} found in #{m}/resources. Do you want to delete it? (y/n)"
-            input = STDIN.gets.strip.downcase
-            next if input != "y"
-            FileUtils.rm(item_path)
-            puts "File deleted."
-        end
-      end
-    end
-    
-  end
-  
   # Update measure xmls
   cli_path = OpenStudio.getOpenStudioCLI
   command = "del log && \"#{cli_path}\" --no-ssl measure --update_all #{measures_dir} >> log"
@@ -330,7 +188,7 @@ def generate_example_osws(data_hash, include_measures, exclude_measures,
   # with all the measures in it, in the order specified in /resources/measure-info.json
 
   require 'openstudio'
-  require_relative 'resources/meta_measure'
+  require_relative 'measures/HPXMLtoOpenStudio/resources/meta_measure'
 
   puts "Updating #{osw_filename}..."
   
@@ -506,33 +364,6 @@ def get_and_proof_measure_order_json()
   
   return data_hash
 end
-
-def get_requires_from_file(filerb)
-  requires = []
-  if not File.exists?(filerb)
-    return requires
-  end
-  File.open(filerb) do |file|
-    file.each do |line|
-      line.strip!
-      next if line.nil?
-      next if not (line.start_with?("require \"\#{File.dirname(__FILE__)}/") or line.start_with?("require\"\#{File.dirname(__FILE__)}/"))
-      line.chomp!("\"")
-      d = line.split("/")
-      requirerb = File.expand_path("../resources/#{d[-1].to_s}.rb", __FILE__)
-      requires << requirerb
-    end   
-  end
-  # Recursively look for additional requirements
-  requires.each do |requirerb|
-    get_requires_from_file(requirerb).each do |rb|
-      next if requires.include?(rb)
-      requires << rb
-    end
-  end
-  return requires
-end
-
 
 desc 'update urdb tariffs'
 task :update_tariffs do

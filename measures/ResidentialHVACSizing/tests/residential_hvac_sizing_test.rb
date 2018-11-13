@@ -5,8 +5,6 @@ require 'minitest/autorun'
 require_relative '../measure.rb'
 require 'fileutils'
 
-# TODO: Update expected_values due to windspeed and foundation (and internal gains?) changes.
-
 class ProcessHVACSizingTest < MiniTest::Test
 
   def test_loads_2story_finished_basement_garage_finished_attic
@@ -162,22 +160,13 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Load_1story_S_UA_Unvented_NoOverhangs_NoIntShading_HRV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_loads_1story_slab_unfinished_attic_vented_atlanta_darkextfin
+  def test_loads_1story_slab_unfinished_attic_vented_darkextfin
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_HVACSizing_Load_1story_S_UA_Vented_Atlanta_ExtFinDark.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end
-
-  def test_loads_1story_slab_unfinished_attic_vented_losangeles
-    args_hash = {}
-    args_hash["show_debug_info"] = true
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_HVACSizing_Load_1story_S_UA_Vented_LosAngeles.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_HVACSizing_Load_1story_S_UA_Vented_ExtFinDark.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_loads_1story_pierbeam_unfinished_attic_vented
@@ -558,22 +547,22 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_MSHP_BB_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_equip_dehumidifier_autosize_atlanta
+  def test_equip_dehumidifier_autosize
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_HVACSizing_Equip_Dehumidifier_Auto_Atlanta.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_HVACSizing_Equip_Dehumidifier_Auto_Miami.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
-  def test_equip_dehumidifier_fixedsize_atlanta
+  def test_equip_dehumidifier_fixedsize
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_HVACSizing_Equip_Dehumidifier_Fixed_Atlanta.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_HVACSizing_Equip_Dehumidifier_Fixed_Miami.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_error_missing_geometry
@@ -638,8 +627,6 @@ class ProcessHVACSizingTest < MiniTest::Test
 
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, apply_volume_adj=false)
 
-    print_debug_info = false # set to true for more detailed output
-
     # create an instance of the measure
     measure = ProcessHVACSizing.new
 
@@ -673,9 +660,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    if print_debug_info
-        show_output(result)
-    end
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
