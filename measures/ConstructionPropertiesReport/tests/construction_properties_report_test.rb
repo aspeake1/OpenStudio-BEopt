@@ -92,12 +92,7 @@ class ConstructionPropertiesReportTest < MiniTest::Test
   private
 
   def _test_thermal_capacitances(osm_file, thermal_capacitances)
-    # load the test model
-    translator = OpenStudio::OSVersion::VersionTranslator.new
-    path = OpenStudio::Path.new(File.join(File.dirname(__FILE__), osm_file))
-    model = translator.loadModel(path)
-    assert((not model.empty?))
-    model = model.get
+    model = get_model(File.dirname(__FILE__), osm_file)
 
     # create an instance of the measure
     measure = ConstructionPropertiesReport.new
@@ -136,12 +131,7 @@ class ConstructionPropertiesReportTest < MiniTest::Test
   end
 
   def _test_uas(osm_file, uas)
-    # load the test model
-    translator = OpenStudio::OSVersion::VersionTranslator.new
-    path = OpenStudio::Path.new(File.join(File.dirname(__FILE__), osm_file))
-    model = translator.loadModel(path)
-    assert((not model.empty?))
-    model = model.get
+    model = get_model(File.dirname(__FILE__), osm_file)
 
     # create an instance of the measure
     measure = ConstructionPropertiesReport.new
