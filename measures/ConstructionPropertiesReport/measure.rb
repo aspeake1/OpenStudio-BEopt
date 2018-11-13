@@ -4,8 +4,18 @@
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
 require 'erb'
-require_relative "../HPXMLtoOpenStudio/resources/geometry"
-require_relative "../HPXMLtoOpenStudio/resources/unit_conversions"
+resstock_aws_path = "../../lib/resources/measures/HPXMLtoOpenStudio/resources"
+resstock_local_path = "../../resources/measures/HPXMLtoOpenStudio/resources"
+if File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_aws_path)) # Hack to run ResStock on AWS
+  require_relative File.join(resstock_aws_path, "geometry")
+  require_relative File.join(resstock_aws_path, "unit_conversions")
+elsif File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_local_path)) # Hack to run ResStock unit tests locally
+  require_relative File.join(resstock_local_path, "geometry")
+  require_relative File.join(resstock_local_path, "unit_conversions")
+else
+  require_relative "../HPXMLtoOpenStudio/resources/geometry"
+  require_relative "../HPXMLtoOpenStudio/resources/unit_conversions"
+end
 
 # start the measure
 class ConstructionPropertiesReport < OpenStudio::Measure::ReportingMeasure
