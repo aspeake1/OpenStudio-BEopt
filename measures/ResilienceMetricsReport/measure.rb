@@ -3,9 +3,9 @@
 # see the URL below for information on how to write OpenStudio measures
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
-require "#{File.dirname(__FILE__)}/resources/util"
-require "#{File.dirname(__FILE__)}/resources/unit_conversions"
-require "#{File.dirname(__FILE__)}/resources/psychrometrics"
+require_relative "../HPXMLtoOpenStudio/resources/util"
+require_relative "../HPXMLtoOpenStudio/resources/unit_conversions"
+require_relative "../HPXMLtoOpenStudio/resources/psychrometrics"
 
 # start the measure
 class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
