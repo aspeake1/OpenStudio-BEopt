@@ -3,9 +3,9 @@
 
 require 'csv'
 require 'matrix'
-require "#{File.dirname(__FILE__)}/resources/constants"
-require "#{File.dirname(__FILE__)}/resources/unit_conversions"
-require "#{File.dirname(__FILE__)}/resources/util"
+require_relative "../HPXMLtoOpenStudio/resources/constants"
+require_relative "../HPXMLtoOpenStudio/resources/unit_conversions"
+require_relative "../HPXMLtoOpenStudio/resources/util"
 
 #start the measure
 class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
