@@ -6,15 +6,14 @@
 resstock_aws_path = "../../lib/resources/measures/HPXMLtoOpenStudio/resources"
 resstock_local_path = "../../resources/measures/HPXMLtoOpenStudio/resources"
 if File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_aws_path)) # Hack to run ResStock on AWS
-  require_relative File.join(resstock_aws_path, "constants")
-  require_relative File.join(resstock_aws_path, "simulation")
+  resources_path = resstock_aws_path
 elsif File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_local_path)) # Hack to run ResStock unit tests locally
-  require_relative File.join(resstock_local_path, "constants")
-  require_relative File.join(resstock_local_path, "simulation")
+  resources_path = resstock_local_path
 else
-  require_relative "../HPXMLtoOpenStudio/resources/constants"
-  require_relative "../HPXMLtoOpenStudio/resources/simulation"
+  resources_path = "../HPXMLtoOpenStudio/resources"
 end
+require_relative File.join(resources_path, "constants")
+require_relative File.join(resources_path, "simulation")
 
 # start the measure
 class ResidentialSimulationControls < OpenStudio::Measure::ModelMeasure
