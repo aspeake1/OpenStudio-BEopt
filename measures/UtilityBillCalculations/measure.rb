@@ -21,7 +21,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calculate electric utility bills based on either: (a) monthly fixed charge and marginal rate, or (b) tariff from the OpenEI Utility Rate Database (URDB). Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. User can specify PV compensation types of '#{Constants.PVNetMetering}' or '#{Constants.PVFeedInTariff}', along with corresponding rates."
+    return "Calculate electric utility bills based on either: (a) monthly fixed charge and marginal rate, or (b) tariff from the OpenEI Utility Rate Database (URDB). Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. User can specify PV compensation types of '#{Constants.PVTypeNetMetering}' or '#{Constants.PVTypeFeedInTariff}', along with corresponding rates."
   end
 
   def fuel_types
@@ -123,34 +123,34 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     args << arg
 
     pv_compensation_types = OpenStudio::StringVector.new
-    pv_compensation_types << Constants.PVNetMetering
-    pv_compensation_types << Constants.PVFeedInTariff
+    pv_compensation_types << Constants.PVTypeNetMetering
+    pv_compensation_types << Constants.PVTypeFeedInTariff
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("pv_compensation_type", pv_compensation_types, true)
     arg.setDisplayName("PV: Compensation Type")
     arg.setDescription("The type of compensation for PV.")
-    arg.setDefaultValue(Constants.PVNetMetering)
+    arg.setDefaultValue(Constants.PVTypeNetMetering)
     args << arg
 
     pv_annual_excess_sellback_rate_types = OpenStudio::StringVector.new
-    pv_annual_excess_sellback_rate_types << Constants.RetailElectricityCost
-    pv_annual_excess_sellback_rate_types << Constants.UserSpecified
+    pv_annual_excess_sellback_rate_types << Constants.PVNetMeteringExcessRetailElectricityCost
+    pv_annual_excess_sellback_rate_types << Constants.PVNetMeteringExcessUserSpecified
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("pv_annual_excess_sellback_rate_type", pv_annual_excess_sellback_rate_types, true)
     arg.setDisplayName("PV: Net Metering Annual Excess Sellback Rate Type")
-    arg.setDescription("The type of annual excess sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVNetMetering}'.")
-    arg.setDefaultValue(Constants.UserSpecified)
+    arg.setDescription("The type of annual excess sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVTypeNetMetering}'.")
+    arg.setDefaultValue(Constants.PVNetMeteringExcessUserSpecified)
     args << arg
 
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("pv_sellback_rate", true)
     arg.setDisplayName("PV: Net Metering Annual Excess Sellback Rate")
     arg.setUnits("$/kWh")
-    arg.setDescription("The annual excess sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVNetMetering}' and the PV annual excess sellback rate type is '#{Constants.UserSpecified}'.")
+    arg.setDescription("The annual excess sellback rate for PV. Only applies if the PV compensation type is '#{Constants.PVTypeNetMetering}' and the PV annual excess sellback rate type is '#{Constants.PVNetMeteringExcessUserSpecified}'.")
     arg.setDefaultValue("0.03")
     args << arg
 
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("pv_tariff_rate", true)
     arg.setDisplayName("PV: Feed-In Tariff Rate")
     arg.setUnits("$/kWh")
-    arg.setDescription("The annual full/gross tariff rate for PV. Only applies if the PV compensation type is '#{Constants.PVFeedInTariff}'.")
+    arg.setDescription("The annual full/gross tariff rate for PV. Only applies if the PV compensation type is '#{Constants.PVTypeFeedInTariff}'.")
     arg.setDefaultValue("0.12")
     args << arg
 
