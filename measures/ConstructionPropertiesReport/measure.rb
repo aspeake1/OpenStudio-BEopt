@@ -165,8 +165,8 @@ class ConstructionPropertiesReport < OpenStudio::Measure::ReportingMeasure
       name = thermal_zone.name.to_s
       vol = Geometry.get_zone_volume(thermal_zone, false)
       next unless vol > 0
-      val = get_thermal_capacitance(nil, nil, 1.004 * 1.225, UnitConversions.convert(vol, "ft^3", "m^3"))
-      calculations["thermal_mass"][name] = val
+      val = 1.004 * 1.225 # air specific heat and density
+      calculations["thermal_mass"][name] = get_thermal_capacitance(nil, nil, val, UnitConversions.convert(vol, "ft^3", "m^3"))
     end
 
     if register_values
