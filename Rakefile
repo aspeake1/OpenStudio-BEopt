@@ -124,7 +124,7 @@ def update_and_format_osw(osw)
   end
 end
 
-desc 'update all measures (xmls, workflows, README)'
+desc 'update all measures'
 task :update_measures do
   require 'openstudio'
   measures_dir = File.expand_path("../measures/", __FILE__)
