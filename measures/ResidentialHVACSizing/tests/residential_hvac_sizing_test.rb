@@ -6,7 +6,6 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class ProcessHVACSizingTest < MiniTest::Test
-
   def test_loads_2story_finished_basement_garage_finished_attic
     args_hash = {}
     args_hash["show_debug_info"] = true
@@ -51,7 +50,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_values = {}
     _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
+
   def test_loads_2story_crawlspace_garage_finished_attic_skylights
     args_hash = {}
     args_hash["show_debug_info"] = true
@@ -568,25 +567,24 @@ class ProcessHVACSizingTest < MiniTest::Test
   def test_error_missing_geometry
     args_hash = {}
     result = _test_error(nil, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "No building geometry has been defined.")
+    assert_equal(result.errors.map { |x| x.logMessage }[0], "No building geometry has been defined.")
   end
 
   def test_error_missing_weather
     args_hash = {}
     result = _test_error("SFD_2000sqft_2story_FB_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Model has not been assigned a weather file.")
+    assert_equal(result.errors.map { |x| x.logMessage }[0], "Model has not been assigned a weather file.")
   end
 
   def test_error_missing_construction
     args_hash = {}
     result = _test_error("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Construction not assigned to 'Surface 13'.")
+    assert_equal(result.errors.map { |x| x.logMessage }[0], "Construction not assigned to 'Surface 13'.")
   end
-  
+
   private
 
   def _test_error(osm_file_or_model, args_hash)
-
     print_debug_info = false # set to true for more detailed output
 
     # create an instance of the measure
@@ -625,8 +623,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     return result
   end
 
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, apply_volume_adj=false)
-
+  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, apply_volume_adj = false)
     # create an instance of the measure
     measure = ProcessHVACSizing.new
 
@@ -659,7 +656,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
-    
+
     # show_output(result)
 
     # assert that it ran correctly
@@ -678,13 +675,13 @@ class ProcessHVACSizingTest < MiniTest::Test
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 
     all_new_objects.each do |obj_type, new_objects|
-        new_objects.each do |new_object|
-            next if not new_object.respond_to?("to_#{obj_type}")
-            new_object = new_object.public_send("to_#{obj_type}").get
-        end
+      new_objects.each do |new_object|
+        next if not new_object.respond_to?("to_#{obj_type}")
+
+        new_object = new_object.public_send("to_#{obj_type}").get
+      end
     end
 
     return model
   end
-
 end
