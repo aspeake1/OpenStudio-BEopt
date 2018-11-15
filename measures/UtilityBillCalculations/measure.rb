@@ -2,9 +2,18 @@
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
 require 'csv'
-require_relative "../HPXMLtoOpenStudio/resources/constants"
-require_relative "../HPXMLtoOpenStudio/resources/unit_conversions"
-require_relative "../HPXMLtoOpenStudio/resources/util"
+resstock_aws_path = "../../lib/resources/measures/HPXMLtoOpenStudio/resources"
+resstock_local_path = "../../resources/measures/HPXMLtoOpenStudio/resources"
+if File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_aws_path)) # Hack to run ResStock on AWS
+  resources_path = resstock_aws_path
+elsif File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_local_path)) # Hack to run ResStock unit tests locally
+  resources_path = resstock_local_path
+else
+  resources_path = "../HPXMLtoOpenStudio/resources"
+end
+require_relative File.join(resources_path, "constants")
+require_relative File.join(resources_path, "unit_conversions")
+require_relative File.join(resources_path, "util")
 
 #start the measure
 class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
