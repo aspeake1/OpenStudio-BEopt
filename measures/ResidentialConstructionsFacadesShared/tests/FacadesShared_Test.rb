@@ -6,36 +6,35 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class ProcessConstructionsFacadesSharedTest < MiniTest::Test
-  
   def test_single_family_detached
     args_hash = {}
     args_hash["shared_building_facades"] = Constants.FacadeNone
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {"SharedWalls"=>0}
+    expected_values = { "SharedWalls" => 0 }
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
+
   def test_single_family_attached
     args_hash = {}
     args_hash["shared_building_facades"] = "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"SharedWalls"=>38}
+    expected_num_new_objects = { "Material" => 1, "Construction" => 1 }
+    expected_values = { "SharedWalls" => 38 }
     _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
+
   def test_multifamily
     args_hash = {}
     args_hash["shared_building_facades"] = "#{Constants.FacadeLeft}, #{Constants.FacadeRight}, #{Constants.FacadeBack}"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"SharedWalls"=>55}
+    expected_num_new_objects = { "Material" => 1, "Construction" => 1 }
+    expected_values = { "SharedWalls" => 55 }
     _test_measure("MF_40units_4story_CS_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   private
-  
+
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # create an instance of the measure
     measure = ProcessConstructionsFacadesShared.new
@@ -47,7 +46,7 @@ class ProcessConstructionsFacadesSharedTest < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     model = get_model(File.dirname(__FILE__), osm_file_or_model)
 
     # get the initial objects in the model
@@ -69,13 +68,13 @@ class ProcessConstructionsFacadesSharedTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
-    
+
     # show the output
     # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    
+
     # get the final objects in the model
     final_objects = get_objects(model)
 
@@ -83,7 +82,7 @@ class ProcessConstructionsFacadesSharedTest < MiniTest::Test
     obj_type_exclusions = []
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
-    
+
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
@@ -92,5 +91,4 @@ class ProcessConstructionsFacadesSharedTest < MiniTest::Test
 
     return model
   end
-  
 end

@@ -6,80 +6,79 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class ZoneMultipliersTest < MiniTest::Test
-
   def test_sfd_zone_mult
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>0, "ThermalZone"=>0}
+    expected_num_del_objects = { "BuildingUnit" => 0, "ThermalZone" => 0 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>2, "NumZonesRepresented"=>2}
+    expected_values = { "NumActualZones" => 2, "NumZonesRepresented" => 2 }
     _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_sfa_zone_mult_front_units_only
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>7, "ThermalZone"=>7}
+    expected_num_del_objects = { "BuildingUnit" => 7, "ThermalZone" => 7 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>3, "NumZonesRepresented"=>10}
+    expected_values = { "NumActualZones" => 3, "NumZonesRepresented" => 10 }
     _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_sfa_zone_mult_has_rear_units
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>4, "ThermalZone"=>4}
+    expected_num_del_objects = { "BuildingUnit" => 4, "ThermalZone" => 4 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>6, "NumZonesRepresented"=>10}
+    expected_values = { "NumActualZones" => 6, "NumZonesRepresented" => 10 }
     _test_measure("SFA_10units_2story_SL_UA_3Beds_2Baths_Denver_HasRearUnits.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_sfa_finished_basement_zone_mult_front_units_only
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>7, "ThermalZone"=>2*7}
+    expected_num_del_objects = { "BuildingUnit" => 7, "ThermalZone" => 2 * 7 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>2*3, "NumZonesRepresented"=>2*10}
+    expected_values = { "NumActualZones" => 2 * 3, "NumZonesRepresented" => 2 * 10 }
     _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_sfa_finished_basement_zone_mult_has_rear_units
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>4, "ThermalZone"=>2*4}
+    expected_num_del_objects = { "BuildingUnit" => 4, "ThermalZone" => 2 * 4 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>2*6, "NumZonesRepresented"=>2*10}
+    expected_values = { "NumActualZones" => 2 * 6, "NumZonesRepresented" => 2 * 10 }
     _test_measure("SFA_10units_2story_FB_UA_3Beds_2Baths_Denver_HasRearUnits.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_mf_zone_mult_double_loaded_corridor
     num_finished_spaces = 3
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>22, "ThermalZone"=>22}
+    expected_num_del_objects = { "BuildingUnit" => 22, "ThermalZone" => 22 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>18, "NumZonesRepresented"=>40}
+    expected_values = { "NumActualZones" => 18, "NumZonesRepresented" => 40 }
     _test_measure("MF_40units_4story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-  
+
   def test_mf_zone_mult_exterior_corridor
     num_finished_spaces = 3
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>5, "ThermalZone"=>5}
+    expected_num_del_objects = { "BuildingUnit" => 5, "ThermalZone" => 5 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>3, "NumZonesRepresented"=>8}
+    expected_values = { "NumActualZones" => 3, "NumZonesRepresented" => 8 }
     _test_measure("MF_8units_1story_SL_Denver_ExteriorCorridor.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-  
+
   def test_sfa_zone_mult_furnace_central_air_conditioner
     num_finished_spaces = 3
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>7, "ThermalZone"=>7+7, "AirLoopHVAC"=>7, "EnergyManagementSystemActuator"=>91, "PlantLoop"=>7, "WaterHeaterMixed"=>7, "EnergyManagementSystemSensor"=>105, "EnergyManagementSystemProgram"=>21, "EnergyManagementSystemProgramCallingManager"=>14, "SurfacePropertyConvectionCoefficients"=>7*6, "ThermostatSetpointDualSetpoint"=>7}
+    expected_num_del_objects = { "BuildingUnit" => 7, "ThermalZone" => 7 + 7, "AirLoopHVAC" => 7, "EnergyManagementSystemActuator" => 91, "PlantLoop" => 7, "WaterHeaterMixed" => 7, "EnergyManagementSystemSensor" => 105, "EnergyManagementSystemProgram" => 21, "EnergyManagementSystemProgramCallingManager" => 14, "SurfacePropertyConvectionCoefficients" => 7 * 6, "ThermostatSetpointDualSetpoint" => 7 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>3, "NumZonesRepresented"=>10}
+    expected_values = { "NumActualZones" => 3, "NumZonesRepresented" => 10 }
     _test_measure("SFA_10units_2story_SL_3Beds_1pt5Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
-  
+
   def test_mf_zone_mult_furnace_central_air_conditioner
     num_finished_spaces = 3
     args_hash = {}
-    expected_num_del_objects = {"BuildingUnit"=>12, "ThermalZone"=>12*2, "AirLoopHVAC"=>12, "EnergyManagementSystemActuator"=>108, "PlantLoop"=>6, "WaterHeaterMixed"=>6, "EnergyManagementSystemSensor"=>138, "EnergyManagementSystemProgram"=>36, "EnergyManagementSystemProgramCallingManager"=>24, "SurfacePropertyConvectionCoefficients"=>72, "ThermostatSetpointDualSetpoint"=>12}
+    expected_num_del_objects = { "BuildingUnit" => 12, "ThermalZone" => 12 * 2, "AirLoopHVAC" => 12, "EnergyManagementSystemActuator" => 108, "PlantLoop" => 6, "WaterHeaterMixed" => 6, "EnergyManagementSystemSensor" => 138, "EnergyManagementSystemProgram" => 36, "EnergyManagementSystemProgramCallingManager" => 24, "SurfacePropertyConvectionCoefficients" => 72, "ThermostatSetpointDualSetpoint" => 12 }
     expected_num_new_objects = {}
-    expected_values = {"NumActualZones"=>12, "NumZonesRepresented"=>24}
+    expected_values = { "NumActualZones" => 12, "NumZonesRepresented" => 24 }
     _test_measure("MF_24units_2story_UB_3Beds_1pt5Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -157,7 +156,7 @@ class ZoneMultipliersTest < MiniTest::Test
     # save the model to test output directory
     # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{test_name}.osm")
     # model.save(output_file_path, true)
-    
+
     # show the output
     # show_output(result)
 
@@ -176,7 +175,7 @@ class ZoneMultipliersTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 
-    actual_values = {"NumActualZones"=>0, "NumZonesRepresented"=>0}
+    actual_values = { "NumActualZones" => 0, "NumZonesRepresented" => 0 }
     zones = []
     units = Geometry.get_building_units(model)
     units.each do |unit|
@@ -197,5 +196,4 @@ class ZoneMultipliersTest < MiniTest::Test
 
     return model
   end
-
 end

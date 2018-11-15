@@ -6,14 +6,13 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
-
   def test_error_empty_floorplan_path
     args_hash = {}
     args_hash["floorplan_path"] = ""
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Empty floorplan path was entered.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Empty floorplan path was entered.")
   end
 
   def test_error_invalid_floorplan_path
@@ -22,7 +21,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot find floorplan path '#{args_hash["floorplan_path"]}'.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Cannot find floorplan path '#{args_hash["floorplan_path"]}'.")
   end
 
   def test_error_unexpected_space_type_name
@@ -31,7 +30,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Unexpected space type 'grrage'. Supported space types are: '#{Constants.ExpectedSpaceTypes.join("', '")}'.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Unexpected space type 'grrage'. Supported space types are: '#{Constants.ExpectedSpaceTypes.join("', '")}'.")
   end
 
   def test_error_mix_of_finished_and_unfinished_spaces_in_a_zone
@@ -40,7 +39,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "'Thermal Zone 1' has a mix of finished and unfinished spaces.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "'Thermal Zone 1' has a mix of finished and unfinished spaces.")
   end
 
   def test_error_empty_floorplan
@@ -49,7 +48,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot load floorplan from '#{args_hash["floorplan_path"]}'.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Cannot load floorplan from '#{args_hash["floorplan_path"]}'.")
   end
 
   def test_error_no_space_types
@@ -58,7 +57,7 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "No space types were created.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "No space types were created.")
   end
 
   def test_no_zones_assigned_to_spaces
@@ -66,8 +65,8 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_spaces_assigned_to_zones.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>4, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 40, "Space" => 4, "SpaceType" => 3, "ThermalZone" => 4, "BuildingUnit" => 1, "BuildingStory" => 3, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 2.64 }
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -76,8 +75,8 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_UA.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 40, "Space" => 4, "SpaceType" => 3, "ThermalZone" => 3, "BuildingUnit" => 1, "BuildingStory" => 3, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 2.64 }
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -86,8 +85,8 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_FA.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 40, "Space" => 4, "SpaceType" => 2, "ThermalZone" => 2, "BuildingUnit" => 1, "BuildingStory" => 3, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 2.64 }
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -96,8 +95,8 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFA_2unit.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>71, "Space"=>8, "SpaceType"=>3, "ThermalZone"=>6, "BuildingUnit"=>2, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>6.78}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 71, "Space" => 8, "SpaceType" => 3, "ThermalZone" => 6, "BuildingUnit" => 2, "BuildingStory" => 3, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 6.78 }
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -106,8 +105,8 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_4unit.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>24, "Space"=>4, "SpaceType"=>1, "ThermalZone"=>4, "BuildingUnit"=>4, "BuildingStory"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>13.56}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 24, "Space" => 4, "SpaceType" => 1, "ThermalZone" => 4, "BuildingUnit" => 4, "BuildingStory" => 2, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 13.56 }
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -116,8 +115,8 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_corr_12unit.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>92, "Space"=>14, "SpaceType"=>2, "ThermalZone"=>14, "BuildingUnit"=>12, "BuildingStory"=>2, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>40.68}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 92, "Space" => 14, "SpaceType" => 2, "ThermalZone" => 14, "BuildingUnit" => 12, "BuildingStory" => 2, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 40.68 }
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -126,18 +125,18 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_Multizone.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 80, "Space" => 12, "SpaceType" => 7, "ThermalZone" => 12, "BuildingUnit" => 1, "BuildingStory" => 3, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 2.64 }
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
   def test_mf_multi_zone_floorplan
-    num_finished_spaces = 3*8
+    num_finished_spaces = 3 * 8
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_Multizone.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>181, "Space"=>26, "SpaceType"=>6, "ThermalZone"=>22, "BuildingUnit"=>2, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>6.78}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 181, "Space" => 26, "SpaceType" => 6, "ThermalZone" => 22, "BuildingUnit" => 2, "BuildingStory" => 3, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 6.78 }
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -146,120 +145,120 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash["num_bedrooms"] = "3.0, 3.0, 3.0"
     args_hash["num_bathrooms"] = "2.0, 2.0"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bedroom elements specified inconsistent with number of bathroom elements specified.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of bedroom elements specified inconsistent with number of bathroom elements specified.")
   end
 
   def test_argument_error_beds_not_equal_to_units
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bedroom elements specified inconsistent with number of multifamily units defined in the model.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of bedroom elements specified inconsistent with number of multifamily units defined in the model.")
   end
 
   def test_argument_error_baths_not_equal_to_units
     args_hash = {}
     args_hash["num_bathrooms"] = "2.0, 2.0"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bathroom elements specified inconsistent with number of multifamily units defined in the model.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of bathroom elements specified inconsistent with number of multifamily units defined in the model.")
   end
 
   def test_argument_error_beds_not_numerical
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0, typo"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bedrooms must be a numerical value.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of bedrooms must be a numerical value.")
   end
 
   def test_argument_error_baths_not_numerical
     args_hash = {}
     args_hash["num_bathrooms"] = "2.0, 2.0, typo"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bathrooms must be a numerical value.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of bathrooms must be a numerical value.")
   end
 
   def test_argument_error_beds_not_positive_integer
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0, 3.5"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bedrooms must be a positive integer.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of bedrooms must be a positive integer.")
   end
 
   def test_argument_error_baths_not_positive_multiple_of_0pt25
     args_hash = {}
     args_hash["num_bathrooms"] = "2.0, 2.0, 2.8"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bathrooms must be a positive multiple of 0.25.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of bathrooms must be a positive multiple of 0.25.")
   end
 
   def test_argument_error_num_occ_bad_string
     args_hash = {}
     args_hash["num_occupants"] = "hello"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
   end
 
   def test_argument_error_num_occ_negative
     args_hash = {}
     args_hash["num_occupants"] = "-1"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
   end
 
   def test_argument_error_num_occ_incorrect_num_elements
     args_hash = {}
     args_hash["num_occupants"] = "2, 3, 4"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of occupant elements specified inconsistent with number of multifamily units defined in the model.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Number of occupant elements specified inconsistent with number of multifamily units defined in the model.")
   end
 
   def test_argument_error_weekday_sch_wrong_number_of_values
     args_hash = {}
     args_hash["occupants_weekday_sch"] = "1,1"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
   end
 
   def test_argument_error_weekday_sch_not_number
     args_hash = {}
     args_hash["occupants_weekday_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")
   end
 
   def test_argument_error_weekend_sch_wrong_number_of_values
     args_hash = {}
     args_hash["occupants_weekend_sch"] = "1,1"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
   end
 
   def test_argument_error_weekend_sch_not_number
     args_hash = {}
     args_hash["occupants_weekend_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekend schedule.")
   end
 
   def test_argument_error_monthly_sch_wrong_number_of_values
     args_hash = {}
     args_hash["occupants_monthly_sch"] = "1,1"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
 
   def test_argument_error_monthly_sch_not_number
     args_hash = {}
     args_hash["occupants_monthly_sch"] = "str,1,1,1,1,1,1,1,1,1,1,1"
     result = _test_error(nil, args_hash)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "A comma-separated string of 12 numbers must be entered for the monthly schedule.")
   end
 
   def test_new_construction_none
     args_hash = {}
     args_hash["num_occupants"] = "0"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>0}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 80, "Space" => 12, "SpaceType" => 7, "ThermalZone" => 12, "BuildingUnit" => 1, "BuildingStory" => 3 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 0 }
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -268,8 +267,8 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["num_occupants"] = Constants.Auto
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>2.64}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 80, "Space" => 12, "SpaceType" => 7, "ThermalZone" => 12, "BuildingUnit" => 1, "BuildingStory" => 3, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 2.64 }
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -278,8 +277,8 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     args_hash = {}
     args_hash["num_occupants"] = "3"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3, "PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "NumOccupants"=>3}
+    expected_num_new_objects = { "Building" => 1, "Surface" => 80, "Space" => 12, "SpaceType" => 7, "ThermalZone" => 12, "BuildingUnit" => 1, "BuildingStory" => 3, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2 }
+    expected_values = { "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 3 }
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
@@ -312,7 +311,6 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
     result = runner.result
 
     return result
-
   end
 
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name)
@@ -377,10 +375,11 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
       assert_equal(expected_values["Baths"], nbaths)
     end
 
-    actual_values = {"NumOccupants"=>0}
+    actual_values = { "NumOccupants" => 0 }
     all_new_objects.each do |obj_type, new_objects|
       new_objects.each do |new_object|
         next if not new_object.respond_to?("to_#{obj_type}")
+
         new_object = new_object.public_send("to_#{obj_type}").get
         if obj_type == "People"
           actual_values["NumOccupants"] += new_object.peopleDefinition.numberofPeople.get
@@ -391,5 +390,4 @@ class ResidentialGeometryFromFloorspaceJS_Test < MiniTest::Test
 
     return model
   end
-
 end
