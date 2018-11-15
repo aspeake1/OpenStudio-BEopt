@@ -7,15 +7,14 @@ require 'csv'
 resstock_aws_path = "../../lib/resources/measures/HPXMLtoOpenStudio/resources"
 resstock_local_path = "../../resources/measures/HPXMLtoOpenStudio/resources"
 if File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_aws_path)) # Hack to run ResStock on AWS
-  require_relative File.join(resstock_aws_path, "weather")
-  require_relative File.join(resstock_aws_path, "unit_conversions")
+  resources_path = resstock_aws_path
 elsif File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_local_path)) # Hack to run ResStock unit tests locally
-  require_relative File.join(resstock_local_path, "weather")
-  require_relative File.join(resstock_local_path, "unit_conversions")
+  resources_path = resstock_local_path
 else
-  require_relative "../HPXMLtoOpenStudio/resources/weather"
-  require_relative "../HPXMLtoOpenStudio/resources/unit_conversions"
+  resources_path = "../HPXMLtoOpenStudio/resources"
 end
+require_relative File.join(resources_path, "weather")
+require_relative File.join(resources_path, "unit_conversions")
 
 # start the measure
 class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure

@@ -77,7 +77,7 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
     args << dist_ins
 
     return args
-end # end the arguments method
+  end # end the arguments method
 
   # define what happens when the measure is run
   def run(model, runner, user_arguments)
@@ -571,7 +571,7 @@ end # end the arguments method
     end
 
     return true
-    end
+  end
 end # end the measure
 
 # this allows the measure to be use by the application

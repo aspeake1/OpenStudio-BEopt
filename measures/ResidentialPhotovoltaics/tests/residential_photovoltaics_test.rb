@@ -123,7 +123,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     expected_num_new_objects = { "GeneratorPVWatts" => 1, "ElectricLoadCenterInverterPVWatts" => 1, "ElectricLoadCenterDistribution" => 1 }
     expected_values = { "SystemCapacity" => 2500, "ModuleType" => Constants.PVModuleTypeStandard, "TiltAngle" => 26.57, "AzimuthAngle" => 225, "InverterEfficiency" => 0.96, "ArrayType" => Constants.PVArrayTypeFixedRoofMount }
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver_East.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-end
+  end
 
   def test_faces_south_azimuth_absolute_southwest
     args_hash = {}

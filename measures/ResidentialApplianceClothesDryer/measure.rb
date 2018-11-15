@@ -169,7 +169,7 @@ class ResidentialClothesDryer < OpenStudio::Measure::ModelMeasure
     end
 
     return true
-    end
+  end
 end # end the measure
 
 # this allows the measure to be use by the application

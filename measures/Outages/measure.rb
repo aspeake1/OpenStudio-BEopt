@@ -7,9 +7,18 @@
 # see the URL below for access to C++ documentation on model objects (click on "model" in the main window to view model objects)
 # http://openstudio.nrel.gov/sites/openstudio.nrel.gov/files/nv_data/cpp_documentation_it/model/html/namespaces.html
 
-require_relative "../HPXMLtoOpenStudio/resources/weather"
-require_relative "../HPXMLtoOpenStudio/resources/constants"
-require_relative "../HPXMLtoOpenStudio/resources/geometry"
+resstock_aws_path = "../../lib/resources/measures/HPXMLtoOpenStudio/resources"
+resstock_local_path = "../../resources/measures/HPXMLtoOpenStudio/resources"
+if File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_aws_path)) # Hack to run ResStock on AWS
+  resources_path = resstock_aws_path
+elsif File.exists? File.absolute_path(File.join(File.dirname(__FILE__), resstock_local_path)) # Hack to run ResStock unit tests locally
+  resources_path = resstock_local_path
+else
+  resources_path = "../HPXMLtoOpenStudio/resources"
+end
+require_relative File.join(resources_path, "weather")
+require_relative File.join(resources_path, "constants")
+require_relative File.join(resources_path, "geometry")
 
 # start the measure
 class ProcessPowerOutage < OpenStudio::Measure::ModelMeasure
