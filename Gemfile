@@ -13,8 +13,8 @@ end
 
 group :test do
   gem 'minitest', '~> 5.9'
-  gem 'rubocop', '~> 0.49.0'
-  gem 'rubocop-checkstyle_formatter', '~> 0.1.1'
+  gem 'rubocop', '~> 0.60.0'
+  gem 'rubocop-checkstyle_formatter', '~> 0.4.0'
   gem 'ci_reporter_minitest', '~> 1.0.0'
   gem 'coveralls'
   gem 'minitest-reporters'
