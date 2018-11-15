@@ -6,7 +6,6 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class ProcessConstructionsWallsGenericTest < MiniTest::Test
-
   def test_tmass_wall_metal_ties
     args_hash = {}
     args_hash["thick_in_1"] = 2.5
@@ -22,15 +21,15 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     args_hash["specific_heat_2"] = 0.28
     args_hash["specific_heat_3"] = 0.28
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>8, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
-    ext_finish_r = 0.009525/0.089435
-    osb_r = 0.0127/0.1154577
-    drywall_r = 0.0127/0.1602906
-    layer1_r = 0.0635/1.3286867500000001
-    layer2_r = 0.0762/0.06130625
-    layer3_r = 0.0635/1.07769175
+    expected_num_new_objects = { "Material" => 8, "Construction" => 5, "InternalMass" => 4, "InternalMassDefinition" => 4 }
+    ext_finish_r = 0.009525 / 0.089435
+    osb_r = 0.0127 / 0.1154577
+    drywall_r = 0.0127 / 0.1602906
+    layer1_r = 0.0635 / 1.3286867500000001
+    layer2_r = 0.0762 / 0.06130625
+    layer3_r = 0.0635 / 1.07769175
     assembly_r = ext_finish_r + osb_r + drywall_r + layer1_r + layer2_r + layer3_r
-    expected_values = {"AssemblyR"=>assembly_r}
+    expected_values = { "AssemblyR" => assembly_r }
     _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -49,19 +48,19 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     args_hash["specific_heat_2"] = 0.21
     args_hash["specific_heat_3"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>8, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
-    ext_finish_r = 0.009525/0.089435
-    osb_r = 0.0127/0.1154577
-    drywall_r = 0.0127/0.1602906
-    layer1_r = 0.06985/0.063888325
-    layer2_r = 0.094615/0.49867225
-    layer3_r = 0.0889/0.13371975
+    expected_num_new_objects = { "Material" => 8, "Construction" => 5, "InternalMass" => 4, "InternalMassDefinition" => 4 }
+    ext_finish_r = 0.009525 / 0.089435
+    osb_r = 0.0127 / 0.1154577
+    drywall_r = 0.0127 / 0.1602906
+    layer1_r = 0.06985 / 0.063888325
+    layer2_r = 0.094615 / 0.49867225
+    layer3_r = 0.0889 / 0.13371975
     assembly_r = ext_finish_r + osb_r + drywall_r + layer1_r + layer2_r + layer3_r
-    expected_values = {"AssemblyR"=>assembly_r}
+    expected_values = { "AssemblyR" => assembly_r }
     model = _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # Replace
-    expected_num_del_objects = {"Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
-    expected_num_new_objects = {"Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
+    expected_num_del_objects = { "Construction" => 5, "InternalMass" => 4, "InternalMassDefinition" => 4 }
+    expected_num_new_objects = { "Construction" => 5, "InternalMass" => 4, "InternalMassDefinition" => 4 }
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -84,104 +83,104 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     args_hash["rigid_r"] = 10
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>9, "Construction"=>5, "InternalMass"=>4, "InternalMassDefinition"=>4}
-    ext_finish_r = 0.1016/0.793375
-    drywall_r = 0.0254/0.1602906
-    layer1_r = 0.06985/0.063888325
-    layer2_r = 0.094615/0.49867225
-    layer3_r = 0.0889/0.13371975
-    rigid_r = 0.0508/0.02885
+    expected_num_new_objects = { "Material" => 9, "Construction" => 5, "InternalMass" => 4, "InternalMassDefinition" => 4 }
+    ext_finish_r = 0.1016 / 0.793375
+    drywall_r = 0.0254 / 0.1602906
+    layer1_r = 0.06985 / 0.063888325
+    layer2_r = 0.094615 / 0.49867225
+    layer3_r = 0.0889 / 0.13371975
+    rigid_r = 0.0508 / 0.02885
     assembly_r = ext_finish_r + rigid_r + drywall_r + layer1_r + layer2_r + layer3_r
-    expected_values = {"AssemblyR"=>assembly_r}
+    expected_values = { "AssemblyR" => assembly_r }
     _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
   def test_argument_error_thick_in_zero
     (1..5).each do |layer_num|
-        args_hash = {}
-        args_hash["thick_in_#{layer_num}"] = 0
-        args_hash["conductivity_#{layer_num}"] = 0.5
-        args_hash["density_#{layer_num}"] = 0.5
-        args_hash["specific_heat_#{layer_num}"] = 0.5
-        result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
-        assert_equal(result.errors.map{ |x| x.logMessage }[0], "Thickness #{layer_num} must be greater than 0.")
+      args_hash = {}
+      args_hash["thick_in_#{layer_num}"] = 0
+      args_hash["conductivity_#{layer_num}"] = 0.5
+      args_hash["density_#{layer_num}"] = 0.5
+      args_hash["specific_heat_#{layer_num}"] = 0.5
+      result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
+      assert_equal(result.errors.map { |x| x.logMessage }[0], "Thickness #{layer_num} must be greater than 0.")
     end
   end
-    
+
   def test_argument_error_conductivity_zero
     (1..5).each do |layer_num|
-        args_hash = {}
-        args_hash["thick_in_#{layer_num}"] = 0.5
-        args_hash["conductivity_#{layer_num}"] = 0
-        args_hash["density_#{layer_num}"] = 0.5
-        args_hash["specific_heat_#{layer_num}"] = 0.5
-        result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
-        assert_equal(result.errors.map{ |x| x.logMessage }[0], "Conductivity #{layer_num} must be greater than 0.")
+      args_hash = {}
+      args_hash["thick_in_#{layer_num}"] = 0.5
+      args_hash["conductivity_#{layer_num}"] = 0
+      args_hash["density_#{layer_num}"] = 0.5
+      args_hash["specific_heat_#{layer_num}"] = 0.5
+      result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
+      assert_equal(result.errors.map { |x| x.logMessage }[0], "Conductivity #{layer_num} must be greater than 0.")
     end
   end
 
   def test_argument_error_density_zero
     (1..5).each do |layer_num|
-        args_hash = {}
-        args_hash["thick_in_#{layer_num}"] = 0.5
-        args_hash["conductivity_#{layer_num}"] = 0.5
-        args_hash["density_#{layer_num}"] = 0
-        args_hash["specific_heat_#{layer_num}"] = 0.5
-        result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
-        assert_equal(result.errors.map{ |x| x.logMessage }[0], "Density #{layer_num} must be greater than 0.")
+      args_hash = {}
+      args_hash["thick_in_#{layer_num}"] = 0.5
+      args_hash["conductivity_#{layer_num}"] = 0.5
+      args_hash["density_#{layer_num}"] = 0
+      args_hash["specific_heat_#{layer_num}"] = 0.5
+      result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
+      assert_equal(result.errors.map { |x| x.logMessage }[0], "Density #{layer_num} must be greater than 0.")
     end
   end
 
   def test_argument_error_specific_heat_zero
     (1..5).each do |layer_num|
-        args_hash = {}
-        args_hash["thick_in_#{layer_num}"] = 0.5
-        args_hash["conductivity_#{layer_num}"] = 0.5
-        args_hash["density_#{layer_num}"] = 0.5
-        args_hash["specific_heat_#{layer_num}"] = 0
-        result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
-        assert_equal(result.errors.map{ |x| x.logMessage }[0], "Specific Heat #{layer_num} must be greater than 0.")
+      args_hash = {}
+      args_hash["thick_in_#{layer_num}"] = 0.5
+      args_hash["conductivity_#{layer_num}"] = 0.5
+      args_hash["density_#{layer_num}"] = 0.5
+      args_hash["specific_heat_#{layer_num}"] = 0
+      result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
+      assert_equal(result.errors.map { |x| x.logMessage }[0], "Specific Heat #{layer_num} must be greater than 0.")
     end
   end
-  
+
   def test_argument_error_layer_missing_properties
     (2..5).each do |layer_num|
-        args_hash = {}
-        args_hash["thick_in_1"] = 0.5
-        if layer_num != 2
-            args_hash["thick_in_2"] = 0.5
-        end
-        args_hash["thick_in_3"] = 0.5
-        args_hash["thick_in_4"] = 0.5
-        args_hash["thick_in_5"] = 0.5
-        args_hash["conductivity_1"] = 0.5
-        args_hash["conductivity_2"] = 0.5
-        if layer_num != 3
-            args_hash["conductivity_3"] = 0.5
-        end
-        args_hash["conductivity_4"] = 0.5
-        args_hash["conductivity_5"] = 0.5
-        args_hash["density_1"] = 0.5
-        args_hash["density_2"] = 0.5
-        args_hash["density_3"] = 0.5
-        if layer_num != 4
-            args_hash["density_4"] = 0.5
-        end
-        args_hash["density_5"] = 0.5
-        args_hash["specific_heat_1"] = 0.5
-        args_hash["specific_heat_2"] = 0.5
-        args_hash["specific_heat_3"] = 0.5
-        args_hash["specific_heat_4"] = 0.5
-        if layer_num != 5
-            args_hash["specific_heat_5"] = 0.5
-        end
-        result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
-        assert_equal(result.errors.map{ |x| x.logMessage }[0], "Layer #{layer_num} does not have all four properties (thickness, conductivity, density, specific heat) entered.")
+      args_hash = {}
+      args_hash["thick_in_1"] = 0.5
+      if layer_num != 2
+        args_hash["thick_in_2"] = 0.5
+      end
+      args_hash["thick_in_3"] = 0.5
+      args_hash["thick_in_4"] = 0.5
+      args_hash["thick_in_5"] = 0.5
+      args_hash["conductivity_1"] = 0.5
+      args_hash["conductivity_2"] = 0.5
+      if layer_num != 3
+        args_hash["conductivity_3"] = 0.5
+      end
+      args_hash["conductivity_4"] = 0.5
+      args_hash["conductivity_5"] = 0.5
+      args_hash["density_1"] = 0.5
+      args_hash["density_2"] = 0.5
+      args_hash["density_3"] = 0.5
+      if layer_num != 4
+        args_hash["density_4"] = 0.5
+      end
+      args_hash["density_5"] = 0.5
+      args_hash["specific_heat_1"] = 0.5
+      args_hash["specific_heat_2"] = 0.5
+      args_hash["specific_heat_3"] = 0.5
+      args_hash["specific_heat_4"] = 0.5
+      if layer_num != 5
+        args_hash["specific_heat_5"] = 0.5
+      end
+      result = _test_error("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash)
+      assert_equal(result.errors.map { |x| x.logMessage }[0], "Layer #{layer_num} does not have all four properties (thickness, conductivity, density, specific heat) entered.")
     end
   end
 
   private
-  
+
   def _test_error(osm_file, args_hash)
     # create an instance of the measure
     measure = ProcessConstructionsWallsGeneric.new
@@ -209,15 +208,15 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it didn't run
     assert_equal("Fail", result.value.valueName)
     assert(result.errors.size == 1)
-    
+
     return result
   end
-  
+
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # create an instance of the measure
     measure = ProcessConstructionsWallsGeneric.new
@@ -229,7 +228,7 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     model = get_model(File.dirname(__FILE__), osm_file_or_model)
 
     # get the initial objects in the model
@@ -253,11 +252,11 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    
+
     # get the final objects in the model
     final_objects = get_objects(model)
 
@@ -265,28 +264,29 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     obj_type_exclusions = []
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
-    
+
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
-    
-    actual_values = {"AssemblyR"=>0}
+
+    actual_values = { "AssemblyR" => 0 }
     all_new_objects.each do |obj_type, new_objects|
-        new_objects.each do |new_object|
-            next if not new_object.respond_to?("to_#{obj_type}")
-            new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "Construction"
-                next if not new_object.name.to_s.start_with? Constants.SurfaceTypeWallExtInsFin
-                new_object.to_LayeredConstruction.get.layers.each do |layer|
-                    material = layer.to_StandardOpaqueMaterial.get
-                    actual_values["AssemblyR"] += material.thickness/material.conductivity
-                end
-            end
+      new_objects.each do |new_object|
+        next if not new_object.respond_to?("to_#{obj_type}")
+
+        new_object = new_object.public_send("to_#{obj_type}").get
+        if obj_type == "Construction"
+          next if not new_object.name.to_s.start_with? Constants.SurfaceTypeWallExtInsFin
+
+          new_object.to_LayeredConstruction.get.layers.each do |layer|
+            material = layer.to_StandardOpaqueMaterial.get
+            actual_values["AssemblyR"] += material.thickness / material.conductivity
+          end
         end
+      end
     end
     assert_in_epsilon(expected_values["AssemblyR"], actual_values["AssemblyR"], 0.01)
-    
+
     return model
   end
-  
 end

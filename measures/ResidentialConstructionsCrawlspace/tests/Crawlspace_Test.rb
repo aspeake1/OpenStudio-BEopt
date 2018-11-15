@@ -6,7 +6,6 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class ProcessConstructionsCrawlspaceTest < MiniTest::Test
-
   def test_uninsulated_and_insulate
     args_hash = {}
     args_hash["wall_rigid_r"] = 0
@@ -15,13 +14,13 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    ceiling_ins_r = 0.23495/2.598173704068639
-    ceiling_plywood_r = 0.01905/0.1154577
-    ceiling_mass_r = 0.015875/0.1154577
-    ceiling_carpet_r = 0.0127/0.0433443509615385
+    expected_num_new_objects = { "Material" => 6, "Construction" => 4, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1 }
+    ceiling_ins_r = 0.23495 / 2.598173704068639
+    ceiling_plywood_r = 0.01905 / 0.1154577
+    ceiling_mass_r = 0.015875 / 0.1154577
+    ceiling_carpet_r = 0.0127 / 0.0433443509615385
     ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
+    expected_values = { "WallRValue" => 0, "WallDepth" => 0, "CeilingRValue" => ceiling_r, "ExposedPerimeter" => 134.165 }
     _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -33,13 +32,13 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>7, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    ceiling_ins_r = 0.23495/2.598173704068639
-    ceiling_plywood_r = 0.01905/0.1154577
-    ceiling_mass_r = 0.015875/0.1154577
-    ceiling_carpet_r = 0.0127/0.0433443509615385
+    expected_num_new_objects = { "Material" => 7, "Construction" => 4, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1 }
+    ceiling_ins_r = 0.23495 / 2.598173704068639
+    ceiling_plywood_r = 0.01905 / 0.1154577
+    ceiling_mass_r = 0.015875 / 0.1154577
+    ceiling_carpet_r = 0.0127 / 0.0433443509615385
     ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
-    expected_values = {"WallRValue"=>1.76, "WallDepth"=>0.91, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
+    expected_values = { "WallRValue" => 1.76, "WallDepth" => 0.91, "CeilingRValue" => ceiling_r, "ExposedPerimeter" => 134.165 }
     _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -51,13 +50,13 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash["ceiling_framing_factor"] = 0.13
     args_hash["ceiling_joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>6, "Construction"=>4, "FoundationKiva"=>1, "FoundationKivaSettings"=>1, "SurfacePropertyExposedFoundationPerimeter"=>1}
-    ceiling_ins_r = 0.23495/0.1168615354327202
-    ceiling_plywood_r = 0.01905/0.1154577
-    ceiling_mass_r = 0.015875/0.1154577
-    ceiling_carpet_r = 0.0127/0.0433443509615385
+    expected_num_new_objects = { "Material" => 6, "Construction" => 4, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1 }
+    ceiling_ins_r = 0.23495 / 0.1168615354327202
+    ceiling_plywood_r = 0.01905 / 0.1154577
+    ceiling_mass_r = 0.015875 / 0.1154577
+    ceiling_carpet_r = 0.0127 / 0.0433443509615385
     ceiling_r = ceiling_ins_r + ceiling_plywood_r + ceiling_mass_r + ceiling_carpet_r
-    expected_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>ceiling_r, "ExposedPerimeter"=>134.165}
+    expected_values = { "WallRValue" => 0, "WallDepth" => 0, "CeilingRValue" => ceiling_r, "ExposedPerimeter" => 134.165 }
     _test_measure("SFD_2000sqft_2story_CS_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -65,39 +64,39 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     args_hash = {}
     args_hash["wall_rigid_r"] = -1
     result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Wall Continuous Insulation Nominal R-value must be greater than or equal to 0.")
+    assert_equal(result.errors.map { |x| x.logMessage }[0], "Wall Continuous Insulation Nominal R-value must be greater than or equal to 0.")
   end
-    
+
   def test_argument_error_ceiling_cavity_r_negative
     args_hash = {}
     args_hash["ceiling_cavity_r"] = -1
     result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Cavity Insulation Nominal R-value must be greater than or equal to 0.")
+    assert_equal(result.errors.map { |x| x.logMessage }[0], "Ceiling Cavity Insulation Nominal R-value must be greater than or equal to 0.")
   end
 
   def test_argument_error_ceiling_framing_factor_negative
     args_hash = {}
     args_hash["ceiling_framing_factor"] = -1
     result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
+    assert_equal(result.errors.map { |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_ceiling_framing_factor_eq_1
     args_hash = {}
     args_hash["ceiling_framing_factor"] = 1
     result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
+    assert_equal(result.errors.map { |x| x.logMessage }[0], "Ceiling Framing Factor must be greater than or equal to 0 and less than 1.")
   end
 
   def test_argument_error_ceiling_joist_height_in_zero
     args_hash = {}
-    args_hash["ceiling_joist_height_in"] =0
+    args_hash["ceiling_joist_height_in"] = 0
     result = _test_error("SFD_2000sqft_2story_CS_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Ceiling Joist Height must be greater than 0.")
+    assert_equal(result.errors.map { |x| x.logMessage }[0], "Ceiling Joist Height must be greater than 0.")
   end
-  
+
   private
-  
+
   def _test_error(osm_file, args_hash)
     # create an instance of the measure
     measure = ProcessConstructionsCrawlspace.new
@@ -125,15 +124,15 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it didn't run
     assert_equal("Fail", result.value.valueName)
     assert(result.errors.size == 1)
-    
+
     return result
   end
-  
+
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # create an instance of the measure
     measure = ProcessConstructionsCrawlspace.new
@@ -145,7 +144,7 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     model = get_model(File.dirname(__FILE__), osm_file_or_model)
 
     # get the initial objects in the model
@@ -169,11 +168,11 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    
+
     # get the final objects in the model
     final_objects = get_objects(model)
 
@@ -181,49 +180,51 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     obj_type_exclusions = []
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
-    
+
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
-    
-    actual_values = {"WallRValue"=>0, "WallDepth"=>0, "CeilingRValue"=>0, "ExposedPerimeter"=>0}
+
+    actual_values = { "WallRValue" => 0, "WallDepth" => 0, "CeilingRValue" => 0, "ExposedPerimeter" => 0 }
     all_new_objects.each do |obj_type, new_objects|
-        new_objects.each do |new_object|
-            next if not new_object.respond_to?("to_#{obj_type}")
-            new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "FoundationKiva"
-                if new_object.interiorVerticalInsulationMaterial.is_initialized
-                    mat = new_object.interiorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
-                    actual_values["WallRValue"] += mat.thickness/mat.conductivity
-                end
-                if new_object.interiorVerticalInsulationDepth.is_initialized
-                    actual_values["WallDepth"] += new_object.interiorVerticalInsulationDepth.get
-                end
-                if new_object.exteriorVerticalInsulationMaterial.is_initialized
-                    mat = new_object.exteriorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
-                    actual_values["WallRValue"] += mat.thickness/mat.conductivity
-                end
-                if new_object.exteriorVerticalInsulationDepth.is_initialized
-                    actual_values["WallDepth"] += new_object.exteriorVerticalInsulationDepth.get
-                end
-            elsif obj_type == "Construction"
-                if new_object.name.to_s.start_with? Constants.SurfaceTypeFloorCSInsFin and not new_object.name.to_s.include? "Reversed"
-                    new_object.to_LayeredConstruction.get.layers.each do |layer|
-                        mat = layer.to_StandardOpaqueMaterial.get
-                        actual_values["CeilingRValue"] +=  mat.thickness/mat.conductivity
-                    end
-                elsif new_object.name.to_s.start_with? Constants.SurfaceTypeFloorFndGrndCS
-                    model.getSurfaces.each do |surface|
-                        next if not surface.construction.is_initialized
-                        next if surface.construction.get.name.to_s != new_object.name.to_s
-                        next if not surface.surfacePropertyExposedFoundationPerimeter.is_initialized
-                        actual_values["ExposedPerimeter"] += UnitConversions.convert(surface.surfacePropertyExposedFoundationPerimeter.get.totalExposedPerimeter.get,"m","ft")
-                    end
-                end
+      new_objects.each do |new_object|
+        next if not new_object.respond_to?("to_#{obj_type}")
+
+        new_object = new_object.public_send("to_#{obj_type}").get
+        if obj_type == "FoundationKiva"
+          if new_object.interiorVerticalInsulationMaterial.is_initialized
+            mat = new_object.interiorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+            actual_values["WallRValue"] += mat.thickness / mat.conductivity
+          end
+          if new_object.interiorVerticalInsulationDepth.is_initialized
+            actual_values["WallDepth"] += new_object.interiorVerticalInsulationDepth.get
+          end
+          if new_object.exteriorVerticalInsulationMaterial.is_initialized
+            mat = new_object.exteriorVerticalInsulationMaterial.get.to_StandardOpaqueMaterial.get
+            actual_values["WallRValue"] += mat.thickness / mat.conductivity
+          end
+          if new_object.exteriorVerticalInsulationDepth.is_initialized
+            actual_values["WallDepth"] += new_object.exteriorVerticalInsulationDepth.get
+          end
+        elsif obj_type == "Construction"
+          if new_object.name.to_s.start_with? Constants.SurfaceTypeFloorCSInsFin and not new_object.name.to_s.include? "Reversed"
+            new_object.to_LayeredConstruction.get.layers.each do |layer|
+              mat = layer.to_StandardOpaqueMaterial.get
+              actual_values["CeilingRValue"] += mat.thickness / mat.conductivity
             end
+          elsif new_object.name.to_s.start_with? Constants.SurfaceTypeFloorFndGrndCS
+            model.getSurfaces.each do |surface|
+              next if not surface.construction.is_initialized
+              next if surface.construction.get.name.to_s != new_object.name.to_s
+              next if not surface.surfacePropertyExposedFoundationPerimeter.is_initialized
+
+              actual_values["ExposedPerimeter"] += UnitConversions.convert(surface.surfacePropertyExposedFoundationPerimeter.get.totalExposedPerimeter.get, "m", "ft")
+            end
+          end
         end
+      end
     end
-    
+
     if not expected_values["WallRValue"].nil?
       assert_in_epsilon(expected_values["WallRValue"], actual_values["WallRValue"], 0.01)
     end
@@ -236,8 +237,7 @@ class ProcessConstructionsCrawlspaceTest < MiniTest::Test
     if not expected_values["ExposedPerimeter"].nil?
       assert_in_epsilon(expected_values["ExposedPerimeter"], actual_values["ExposedPerimeter"], 0.01)
     end
-    
+
     return model
   end
-  
 end

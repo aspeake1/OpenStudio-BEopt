@@ -6,7 +6,6 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class UtilityBillCalculationsSimpleTest < MiniTest::Test
-  
   def test_functionality_net_metering
     args_hash = {}
     expected_num_del_objects = {}
@@ -14,7 +13,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     expected_values = {}
     _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 1, 1)
   end
-  
+
   def test_functionality_feed_in_tariff
     args_hash = {}
     args_hash["pv_compensation_type"] = Constants.PVFeedInTariff
@@ -38,9 +37,9 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     weather_file_state = "AB"
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     result = _test_error(timeseries, args_hash, weather_file_state)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Rates do not exist for '#{weather_file_state}'.")
+    assert_includes(result.errors.map { |x| x.logMessage }, "Rates do not exist for '#{weather_file_state}'.")
   end
-  
+
   def test_calculations_0kW_pv_net_metering
     args_hash = {}
     args_hash["elec_fixed"] = "8.0"
@@ -56,7 +55,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>724, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = { Constants.FuelTypeElectric => 724, Constants.FuelTypeGas => 414, Constants.FuelTypePropane => 62, Constants.FuelTypeOil => 344 }
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
 
@@ -75,10 +74,10 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>564, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = { Constants.FuelTypeElectric => 564, Constants.FuelTypeGas => 414, Constants.FuelTypePropane => 62, Constants.FuelTypeOil => 344 }
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
-  
+
   def test_calculations_10kW_pv_net_metering
     args_hash = {}
     args_hash["elec_fixed"] = "8.0"
@@ -94,7 +93,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>-176, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = { Constants.FuelTypeElectric => -176, Constants.FuelTypeGas => 414, Constants.FuelTypePropane => 62, Constants.FuelTypeOil => 344 }
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
 
@@ -113,7 +112,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>724, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = { Constants.FuelTypeElectric => 724, Constants.FuelTypeGas => 414, Constants.FuelTypePropane => 62, Constants.FuelTypeOil => 344 }
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
 
@@ -132,10 +131,10 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>724-178, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = { Constants.FuelTypeElectric => 724 - 178, Constants.FuelTypeGas => 414, Constants.FuelTypePropane => 62, Constants.FuelTypeOil => 344 }
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
-  
+
   def test_calculations_10kW_pv_feed_in_tariff
     args_hash = {}
     args_hash["elec_fixed"] = "8.0"
@@ -151,14 +150,14 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>724-1786, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    expected_values = { Constants.FuelTypeElectric => 724 - 1786, Constants.FuelTypeGas => 414, Constants.FuelTypePropane => 62, Constants.FuelTypeOil => 344 }
     _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, 1)
   end
-  
+
   private
 
   def model_in_path_default(osm_file_or_model)
-    return File.absolute_path(File.join(File.dirname(__FILE__),"..","..","..","test","osm_files",osm_file_or_model))
+    return File.absolute_path(File.join(File.dirname(__FILE__), "..", "..", "..", "test", "osm_files", osm_file_or_model))
   end
 
   def epw_path_default(epw_name)
@@ -167,12 +166,12 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     assert(File.exist?(epw.to_s))
     return epw.to_s
   end
-  
+
   def run_dir(test_name)
     # always generate test output in specially named 'output' directory so result files are not made part of the measure
     return "#{File.dirname(__FILE__)}/output/#{test_name}/run"
   end
-  
+
   def tests_dir(test_name)
     return "#{File.dirname(__FILE__)}/output/#{test_name}/tests"
   end
@@ -180,11 +179,11 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
   def model_out_path(osm_file_or_model, test_name)
     return "#{run_dir(test_name)}/#{osm_file_or_model}"
   end
-  
+
   def sql_path(test_name)
     return "#{run_dir(test_name)}/run/eplusout.sql"
   end
-  
+
   # create test files if they do not exist when the test first runs
   def setup_test(osm_file_or_model, test_name, idf_output_requests, epw_path, model_in_path)
     if !File.exist?(run_dir(test_name))
@@ -196,7 +195,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
       FileUtils.mkdir_p(tests_dir(test_name))
     end
     assert(File.exist?(tests_dir(test_name)))
-    
+
     assert(File.exist?(model_in_path))
 
     if File.exist?(model_out_path(osm_file_or_model, test_name))
@@ -218,7 +217,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     osw_path = File.join(run_dir(test_name), "in.osw")
     osw_path = File.absolute_path(osw_path)
-    
+
     workflow = OpenStudio::WorkflowJSON.new
     workflow.setSeedFile(File.absolute_path(model_out_path(osm_file_or_model, test_name)))
     workflow.setWeatherFile(epw_path)
@@ -227,18 +226,18 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     if !File.exist?("#{run_dir(test_name)}")
       FileUtils.mkdir_p("#{run_dir(test_name)}")
     end
-    
+
     cli_path = OpenStudio.getOpenStudioCLI
     cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
     puts cmd
     system(cmd)
-    
-    FileUtils.cp(epw_path, "#{tests_dir(test_name)}")    
 
-    return model    
+    FileUtils.cp(epw_path, "#{tests_dir(test_name)}")
+
+    return model
   end
-  
-  def _test_measure_functionality(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, debug=false)
+
+  def _test_measure_functionality(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos = 0, num_warnings = 0, debug = false)
     # create an instance of the measure
     measure = UtilityBillCalculationsSimple.new
 
@@ -249,12 +248,12 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     model = get_model(File.dirname(__FILE__), osm_file_or_model)
 
     # get the initial objects in the model
     initial_objects = get_objects(model)
-    
+
     # get arguments
     arguments = measure.arguments()
     argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
@@ -270,7 +269,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     # get the energyplus output requests, this will be done automatically by OS App and PAT
     idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
-    assert(idf_output_requests.size == measure.fuel_types.length*measure.end_uses.length)
+    assert(idf_output_requests.size == measure.fuel_types.length * measure.end_uses.length)
 
     # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
     model = setup_test(osm_file_or_model, test_name, idf_output_requests, File.expand_path(epw_path_default(epw_name)), model_in_path_default(osm_file_or_model))
@@ -299,11 +298,11 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     assert_equal("Success", result.value.valueName)
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
-    
+
     return model
   end
-  
-  def _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, num_infos=0, num_warnings=0, debug=false)  
+
+  def _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, num_infos = 0, num_warnings = 0, debug = false)
     # create an instance of the measure
     measure = UtilityBillCalculationsSimple.new
 
@@ -314,7 +313,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     # get arguments
     arguments = measure.arguments()
     argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
@@ -328,13 +327,13 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
       argument_map[arg.name] = temp_arg_var
     end
 
-    marginal_rates = {Constants.FuelTypeElectric=>args_hash["elec_rate"], Constants.FuelTypeGas=>args_hash["gas_rate"], Constants.FuelTypeOil=>args_hash["oil_rate"], Constants.FuelTypePropane=>args_hash["prop_rate"]}
-    fixed_rates = {Constants.FuelTypeElectric=>args_hash["elec_fixed"].to_f, Constants.FuelTypeGas=>args_hash["gas_fixed"].to_f}
+    marginal_rates = { Constants.FuelTypeElectric => args_hash["elec_rate"], Constants.FuelTypeGas => args_hash["gas_rate"], Constants.FuelTypeOil => args_hash["oil_rate"], Constants.FuelTypePropane => args_hash["prop_rate"] }
+    fixed_rates = { Constants.FuelTypeElectric => args_hash["elec_fixed"].to_f, Constants.FuelTypeGas => args_hash["gas_fixed"].to_f }
     measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
 
     result = runner.result
     # show_output(result)
-    
+
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     assert(result.info.size == num_infos)
@@ -342,10 +341,11 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     result.stepValues.each do |arg|
       next unless expected_values.keys.include? arg.name
+
       assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.005)
-    end 
+    end
   end
-  
+
   def _test_error(timeseries, args_hash, weather_file_state)
     # create an instance of the measure
     measure = UtilityBillCalculationsSimple.new
@@ -357,7 +357,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     # get arguments
     arguments = measure.arguments()
     argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
@@ -371,8 +371,8 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
       argument_map[arg.name] = temp_arg_var
     end
 
-    marginal_rates = {Constants.FuelTypeElectric=>args_hash["elec_rate"], Constants.FuelTypeGas=>args_hash["gas_rate"], Constants.FuelTypeOil=>args_hash["oil_rate"], Constants.FuelTypePropane=>args_hash["prop_rate"]}
-    fixed_rates = {Constants.FuelTypeElectric=>args_hash["elec_fixed"].to_f, Constants.FuelTypeGas=>args_hash["gas_fixed"].to_f}
+    marginal_rates = { Constants.FuelTypeElectric => args_hash["elec_rate"], Constants.FuelTypeGas => args_hash["gas_rate"], Constants.FuelTypeOil => args_hash["oil_rate"], Constants.FuelTypePropane => args_hash["prop_rate"] }
+    fixed_rates = { Constants.FuelTypeElectric => args_hash["elec_fixed"].to_f, Constants.FuelTypeGas => args_hash["gas_fixed"].to_f }
     measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], args_hash["pv_sellback_rate"], args_hash["pv_tariff_rate"])
 
     result = runner.result
@@ -381,26 +381,26 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     # assert that it didn't run
     assert_equal("Fail", result.value.valueName)
     assert(result.errors.size == 1)
-    
+
     return result
   end
-  
+
   def get_timeseries(enduse_timeseries)
     timeseries = {}
     cols = CSV.read(File.expand_path(enduse_timeseries)).transpose
     cols.each do |col|
       next unless col[0].include? "Facility"
+
       var_name = col[0].split("  ")[0]
       old_units = col[0].split("  ")[1].gsub("[", "").gsub("]", "")
       fuel_type = col[0].split(":")[0]
       new_units, unit_conv = UnitConversions.get_scalar_unit_conversion(var_name, old_units, HelperMethods.reverse_openstudio_fuel_map(fuel_type))
       vals = []
-      col[1..8760].each do |val|        
+      col[1..8760].each do |val|
         vals << unit_conv * val.to_f
       end
       timeseries[var_name] = vals
     end
     return timeseries
   end
-  
 end

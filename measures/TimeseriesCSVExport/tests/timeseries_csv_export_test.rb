@@ -6,7 +6,6 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class TimeseriesCSVExportTest < MiniTest::Test
-
   def test_leap_year_and_output_vars_subhourly
     measure = TimeseriesCSVExport.new
     args_hash = {}
@@ -32,7 +31,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
   private
 
   def model_in_path_default(osm_file_or_model)
-    return File.absolute_path(File.join(File.dirname(__FILE__),"..","..","..","test","osm_files",osm_file_or_model))
+    return File.absolute_path(File.join(File.dirname(__FILE__), "..", "..", "..", "test", "osm_files", osm_file_or_model))
   end
 
   def epw_path_default(epw_name)
@@ -41,13 +40,13 @@ class TimeseriesCSVExportTest < MiniTest::Test
     epw = OpenStudio::Path.new("#{File.dirname(__FILE__)}/#{epw_name}")
     assert(File.exist?(epw.to_s))
     return epw.to_s
-  end 
-  
+  end
+
   def run_dir(test_name)
     # always generate test output in specially named 'output' directory so result files are not made part of the measure
     return "#{File.dirname(__FILE__)}/output/#{test_name}/run"
   end
-  
+
   def tests_dir(test_name)
     return "#{File.dirname(__FILE__)}/output/#{test_name}/tests"
   end
@@ -55,18 +54,17 @@ class TimeseriesCSVExportTest < MiniTest::Test
   def model_out_path(osm_file_or_model, test_name)
     return "#{run_dir(test_name)}/#{osm_file_or_model}"
   end
-  
+
   def sql_path(test_name)
     return "#{run_dir(test_name)}/run/eplusout.sql"
   end
-  
+
   def timeseries_path(test_name)
     return "#{run_dir(test_name)}/../enduse_timeseries.csv"
   end
-  
+
   # create test files if they do not exist when the test first runs
   def setup_test(osm_file_or_model, test_name, idf_output_requests, epw_path, model_in_path)
-
     # convert output requests to OSM for testing, OS App and PAT will add these to the E+ Idf
     workspace = OpenStudio::Workspace.new("Draft".to_StrictnessLevel, "EnergyPlus".to_IddFileType)
     workspace.addObjects(idf_output_requests)
@@ -79,7 +77,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     model = model.get
     model.addObjects(request_model.objects)
     model.save(model_out_path(osm_file_or_model, test_name), true)
-    
+
     osw_path = File.join(run_dir(test_name), "in.osw")
     osw_path = File.absolute_path(osw_path)
 
@@ -96,14 +94,13 @@ class TimeseriesCSVExportTest < MiniTest::Test
     cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
     puts cmd
     system(cmd)
-    
+
     FileUtils.cp(epw_path, "#{tests_dir(test_name)}")
-    
+
     return model
-    
   end
-  
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, num_output_requests=0, debug=false)
+
+  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos = 0, num_warnings = 0, num_output_requests = 0, debug = false)
     # create an instance of the measure
     measure = TimeseriesCSVExport.new
 
@@ -114,12 +111,12 @@ class TimeseriesCSVExportTest < MiniTest::Test
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-    
+
     model = get_model(File.dirname(__FILE__), osm_file_or_model)
 
     # get the initial objects in the model
     initial_objects = get_objects(model)
-    
+
     # get arguments
     arguments = measure.arguments()
     argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
@@ -144,20 +141,20 @@ class TimeseriesCSVExportTest < MiniTest::Test
     assert(File.exist?(tests_dir(test_name)))
 
     assert(File.exist?(model_in_path_default(osm_file_or_model)))
-    
+
     # set up runner, this will happen automatically when measure is run in PAT or OpenStudio
     runner.setLastOpenStudioModelPath(OpenStudio::Path.new(model_in_path_default(osm_file_or_model)))
     runner.setLastEpwFilePath(File.expand_path(epw_path_default(epw_name)))
-    
+
     # get the energyplus output requests, this will be done automatically by OS App and PAT
     idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
     assert(idf_output_requests.size == num_output_requests)
-    
+
     # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
     model = setup_test(osm_file_or_model, test_name, idf_output_requests, File.expand_path(epw_path_default(epw_name)), model_in_path_default(osm_file_or_model))
     assert(File.exist?(model_out_path(osm_file_or_model, test_name)))
     runner.setLastEnergyPlusSqlFilePath(OpenStudio::Path.new(sql_path(test_name)))
-    
+
     # temporarily change directory to the run directory and run the measure
     start_dir = Dir.pwd
     begin
@@ -178,8 +175,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     assert_equal("Success", result.value.valueName)
     assert_equal(num_infos, result.info.size)
     assert_equal(num_warnings, result.warnings.size)
-    
+
     return model
-  end  
-  
+  end
 end
