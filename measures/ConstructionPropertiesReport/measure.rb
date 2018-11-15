@@ -83,11 +83,11 @@ class ConstructionPropertiesReport < OpenStudio::Measure::ReportingMeasure
       "garage_space_footing_construction", # garage space footing construction
       # "window_construction", # exterior window
       "door", # exterior door
-      "residential_furniture_construction_living_space", # furniture in living
-      "residential_furniture_construction_living_space_story_2", # furniture in living, second floor
-      "residential_furniture_construction_unfinished_basement_space", # furniture in unfinished basement
-      "residential_furniture_construction_finished_basement_space", # furniture in finished basement
-      "residential_furniture_construction_garage_space", # furniture in garage
+      "res_furniture_construction_living_space", # furniture in living
+      "res_furniture_construction_living_space_story_2", # furniture in living, second floor
+      "res_furniture_construction_unfinished_basement_space", # furniture in unfinished basement
+      "res_furniture_construction_finished_basement_space", # furniture in finished basement
+      "res_furniture_construction_garage_space", # furniture in garage
       "living_zone", # living space air
       "garage_zone", # garage space air
       "unfinished_basement_zone", # unfinished basement space air

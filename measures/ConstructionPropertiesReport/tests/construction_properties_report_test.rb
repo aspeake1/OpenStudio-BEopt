@@ -35,11 +35,11 @@ class ConstructionPropertiesReportTest < MiniTest::Test
       # "living_space_footing_construction"=>0, # living space footing construction
       # "garage_space_footing_construction"=>0, # garage space footing construction
       "door" => 51, # exterior door
-      "residential_furniture_construction_living_space" => 4407, # furniture in living
-      "residential_furniture_construction_living_space_story_2" => 4407, # furniture in living, second floor
-      # "residential_furniture_construction_unfinished_basement_space"=>0, # furniture in unfinished basement
-      # "residential_furniture_construction_finished_basement_space"=>0, # furniture in finished basement
-      # "residential_furniture_construction_garage_space"=>0, # furniture in garage
+      "res_furniture_construction_living_space" => 4407, # furniture in living
+      "res_furniture_construction_living_space_story_2" => 4407, # furniture in living, second floor
+      # "res_furniture_construction_unfinished_basement_space"=>0, # furniture in unfinished basement
+      # "res_furniture_construction_finished_basement_space"=>0, # furniture in finished basement
+      # "res_furniture_construction_garage_space"=>0, # furniture in garage
       "living_zone" => 557, # living space air
       # "garage_zone"=>0, # garage space air
       # "unfinished_basement_zone"=>0, # unfinished basement space air
@@ -79,11 +79,11 @@ class ConstructionPropertiesReportTest < MiniTest::Test
       # "living_space_footing_construction"=>0, # living space footing construction
       # "garage_space_footing_construction"=>0, # garage space footing construction
       "door" => 2.6, # exterior door
-      "residential_furniture_construction_living_space" => 28, # furniture in living
-      "residential_furniture_construction_living_space_story_2" => 28, # furniture in living, second floor
-      # "residential_furniture_construction_unfinished_basement_space"=>0, # furniture in unfinished basement
-      # "residential_furniture_construction_finished_basement_space"=>0, # furniture in finished basement
-      # "residential_furniture_construction_garage_space"=>0 # furniture in garage
+      "res_furniture_construction_living_space" => 28, # furniture in living
+      "res_furniture_construction_living_space_story_2" => 28, # furniture in living, second floor
+      # "res_furniture_construction_unfinished_basement_space"=>0, # furniture in unfinished basement
+      # "res_furniture_construction_finished_basement_space"=>0, # furniture in finished basement
+      # "res_furniture_construction_garage_space"=>0 # furniture in garage
     }
     _test_uas("example_single_family_detached.osm", uas)
   end
