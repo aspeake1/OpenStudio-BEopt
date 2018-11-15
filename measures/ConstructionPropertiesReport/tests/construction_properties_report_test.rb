@@ -122,7 +122,7 @@ class ConstructionPropertiesReportTest < MiniTest::Test
         internal_mass_area, name = measure.get_internal_mass_area(model, constr)
         area = surface_area + sub_surface_area + internal_mass_area
       else
-        vol = UnitConversions.convert(Geometry.get_zone_volume(zone, false, runner), "ft^3", "m^3")
+        vol = UnitConversions.convert(Geometry.get_zone_volume(zone, runner), "ft^3", "m^3")
         val = 1.004 * 1.225 # air specific heat and density
       end
       value = measure.get_thermal_capacitance(constr, area, val = val, vol = vol)
