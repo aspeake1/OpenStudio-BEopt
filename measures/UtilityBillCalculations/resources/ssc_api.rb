@@ -1,9 +1,7 @@
-
 require "#{File.dirname(__FILE__)}/ssc_ffi"
 require 'matrix'
 
 module SscApi
-
   SSC_INVALID = 0
   SSC_STRING = 1
   SSC_NUMBER = 2
@@ -23,7 +21,6 @@ module SscApi
   SSC_ERROR = 3
 
   class << self
-
     # Returns version and build information for the SSC API library.
     #
     # @return [Hash] containing version and build info
@@ -69,13 +66,13 @@ module SscApi
         info["description"] = SscFfi.ssc_entry_description(the_module)
         info["version"] = SscFfi.ssc_entry_version(the_module)
 
-        #params = {}
+        # params = {}
         #
-        #done = false
-        #i = 0
-        #while !done
+        # done = false
+        # i = 0
+        # while !done
         #
-        #end
+        # end
 
         vars = {}
 
@@ -189,13 +186,13 @@ module SscApi
 
       raw_values = SscFfi.ssc_data_get_matrix(data_obj, name, row_count, col_count)
       the_values = raw_values.read_array_of_float(row_count.read_int * col_count.read_int)
-      #rows = raw_values.read_array_of_pointer(row_count.read_int)
+      # rows = raw_values.read_array_of_pointer(row_count.read_int)
 
       m_rows = row_count.read_int
       m_cols = col_count.read_int
 
       rows = []
-      (0..m_rows-1).each do |n|
+      (0..m_rows - 1).each do |n|
         rows << the_values[n * m_cols, m_cols]
       end
 
@@ -222,7 +219,7 @@ module SscApi
     # @param [FFI::Pointer] data_obj the SSC API data object
     # @param [optional, String] name the name of the data field to clear
     # @return [nil]
-    def clear_data(data_obj, name=nil)
+    def clear_data(data_obj, name = nil)
       raise ArgumentError, "data_obj cannot be nil" if data_obj.nil? || data_obj == FFI::Pointer::NULL
 
       if name.nil?
@@ -384,7 +381,7 @@ module SscApi
     # Turn on/of the status update messages from ssc
     #
     # @param [boolean] true to turn it on, false to turn it off
-    def set_print(on_or_off=false)
+    def set_print(on_or_off = false)
       SscApi::SscFfi.ssc_module_exec_set_print(on_or_off ? 1 : 0)
     end
   end

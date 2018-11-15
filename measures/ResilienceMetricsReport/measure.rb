@@ -38,21 +38,21 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
   def arguments
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make an argument for optional output variables
+    # make an argument for optional output variables
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("output_vars", true)
     arg.setDisplayName("Output Variables")
     arg.setDescription("Output variables to request.")
     arg.setDefaultValue("Zone Mean Air Temperature, Wetbulb Globe Temperature")
     args << arg
 
-    #make a double argument for minimum comfortable temperature
+    # make a double argument for minimum comfortable temperature
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("min_vals", true)
     arg.setDisplayName("Minimum Value")
     arg.setDescription("Lower threshold. Use 'NA' if a lower threshold is not applicable.")
     arg.setDefaultValue("58, NA")
     args << arg
 
-    #make a double argument for maximum comfortable temperature
+    # make a double argument for maximum comfortable temperature
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("max_vals", true)
     arg.setDisplayName("Maximum Value")
     arg.setDescription("Upper threshold. Use 'NA' if an upper threshold is not applicable.")
@@ -67,7 +67,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     output_vars = ["Zone Mean Air Temperature", "Wetbulb Globe Temperature"] # possible list that the user can enter limits for; should get blank column for ones that aren't entered into output_vars arg
     buildstock_outputs = []
     thermal_zones.each do |zone|
-      output_vars.each do |output_var|      
+      output_vars.each do |output_var|
         buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_hours_below_lower_threshold" # hours below lower threshold
         buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_hours_above_upper_threshold" # hours above upper threshold
         buildstock_outputs << "#{OpenStudio::toUnderscoreCase(zone)}_#{OpenStudio::toUnderscoreCase(output_var)}_degree_hours_below_lower_threshold" # degree-hours below lower threshold
@@ -88,7 +88,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     end
     return result
   end
-  
+
   # return a vector of IdfObject's to request EnergyPlus objects needed by the run method
   # Warning: Do not change the name of this method to be snake_case. The method must be lowerCamelCase.
   def energyPlusOutputRequests(runner, user_arguments)
@@ -101,7 +101,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
       return result
     end
 
-    output_vars = runner.getStringArgumentValue("output_vars",user_arguments).split(",")
+    output_vars = runner.getStringArgumentValue("output_vars", user_arguments).split(",")
 
     output_vars.each do |output_var|
       output_var.strip!
@@ -128,7 +128,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     end
 
     # Assign the user inputs to variables
-    output_vars = runner.getStringArgumentValue("output_vars",user_arguments).split(",")
+    output_vars = runner.getStringArgumentValue("output_vars", user_arguments).split(",")
     min_vals = runner.getStringArgumentValue("min_vals", user_arguments).split(",")
     max_vals = runner.getStringArgumentValue("max_vals", user_arguments).split(",")
 
@@ -145,7 +145,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
       return false
     end
     model = model.get
-    
+
     # Get the last sql file
     sql = runner.lastEnergyPlusSqlFile
     if sql.empty?
@@ -179,7 +179,6 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     timeseries = {}
     key_values = []
     output_vars.each do |output_var|
-
       output_var.strip!
       if output_var == "Wetbulb Globe Temperature"
         requests = wbgt_vars
@@ -188,9 +187,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
       end
 
       requests.each do |request|
-
         sql.availableKeyValues(ann_env_pd, "Hourly", request).each do |key_value|
-
           if key_value != "Environment"
             next unless thermal_zones.any? { |zone| zone.casecmp(key_value) == 0 }
           end
@@ -203,21 +200,17 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
 
           timeseries["#{request},#{key_value}"] = timeserie
           next if key_value == "Environment"
+
           unless key_values.include? key_value
             key_values << key_value
           end
-
         end
-
       end
-
     end
 
     output_vars.each_with_index do |output_var, i|
-
       output_var.strip!
       key_values.each do |key_value|
-        
         if output_var == "Wetbulb Globe Temperature"
           tdb = timeseries["Zone Mean Air Temperature,#{key_value}"]
           w = timeseries["Zone Air Humidity Ratio,#{key_value}"]
@@ -262,14 +255,11 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
         unless coast_time_above.nil?
           report_output(runner, "#{key_value} #{output_var} hours until upper threshold", coast_time_above, "hours")
         end
-
       end
-
     end
 
     # Additional annual reporting variables
     key_values.each do |key_value|
-
       # End Of Outage Indoor Drybulb Temperature
       # values = timeseries["Zone Mean Air Temperature,#{key_value}"]
       # end_of_outage_indoor_drybulb_temperature = calc_end_of_outage_val("End Of Outage Indoor Drybulb Temperature", values, ix_outage_end)
@@ -279,7 +269,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
       values = timeseries["Wetbulb Globe Temperature,#{key_value}"]
       maximum_wetbulb_globe_temperature_during_outage = calc_maximum_during_outage_val("Maximum Wetbulb Globe Temperature During Outage", values, ix_outage_start, ix_outage_end)
       report_output(runner, "#{key_value} Maximum Wetbulb Globe Temperature During Outage", maximum_wetbulb_globe_temperature_during_outage, "F")
-      
+
       # Minimum Indoor Drybulb Temperature During Outage
       values = timeseries["Zone Mean Air Temperature,#{key_value}"]
       minimum_indoor_drybulb_temperature_during_outage = calc_minimum_during_outage_val("Minimum Indoor Drybulb Temperature During Outage", values, ix_outage_start, ix_outage_end)
@@ -289,7 +279,6 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
       values = timeseries["Zone Mean Air Temperature,#{key_value}"]
       maximum_indoor_drybulb_temperature_during_outage = calc_maximum_during_outage_val("Maximum Indoor Drybulb Temperature During Outage", values, ix_outage_start, ix_outage_end)
       report_output(runner, "#{key_value} Maximum Indoor Drybulb Temperature During Outage", maximum_indoor_drybulb_temperature_during_outage, "F")
-
     end
 
     sql.close()
@@ -298,7 +287,6 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
   end
 
   def get_outage_indexes(model, runner)
-
     year_description = model.getYearDescription
     additional_properties = year_description.additionalProperties
     power_outage_start_date = additional_properties.getFeatureAsString("PowerOutageStartDate")
@@ -333,14 +321,14 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     otg_start_date_month, otg_start_date_day = power_outage_start_date.split
     otg_start_date_month = OpenStudio::monthOfYear(otg_start_date_month)
     otg_start_date_day = otg_start_date_day.to_i
-    
+
     leap_offset = 0
     if year_description.isLeapYear
       leap_offset = 1
     end
 
     months = [OpenStudio::monthOfYear("January"), OpenStudio::monthOfYear("February"), OpenStudio::monthOfYear("March"), OpenStudio::monthOfYear("April"), OpenStudio::monthOfYear("May"), OpenStudio::monthOfYear("June"), OpenStudio::monthOfYear("July"), OpenStudio::monthOfYear("August"), OpenStudio::monthOfYear("September"), OpenStudio::monthOfYear("October"), OpenStudio::monthOfYear("November"), OpenStudio::monthOfYear("December")]
-    startday_m = [0, 31, 59+leap_offset, 90+leap_offset, 120+leap_offset, 151+leap_offset, 181+leap_offset, 212+leap_offset, 243+leap_offset, 273+leap_offset, 304+leap_offset, 334+leap_offset, 365+leap_offset]
+    startday_m = [0, 31, 59 + leap_offset, 90 + leap_offset, 120 + leap_offset, 151 + leap_offset, 181 + leap_offset, 212 + leap_offset, 243 + leap_offset, 273 + leap_offset, 304 + leap_offset, 334 + leap_offset, 365 + leap_offset]
     m_idx = 0
     for m in months
       if m == otg_start_date_month
@@ -356,7 +344,6 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     runner.registerInfo("Found the outage end index to be #{ix_outage_end}.")
 
     return ix_outage_start, ix_outage_end
-
   end
 
   def thermal_zones
@@ -381,14 +368,13 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
       if f_to_c_vars.include? output_var
         val = UnitConversions.convert(val, "F", "C")
       elsif c_to_f_vars.include? output_var
-        val = UnitConversions.convert(val, "C", "F")      
+        val = UnitConversions.convert(val, "C", "F")
       end
     end
     return val
   end
 
-  def calc_resilience_metric(output_var, values, min_val, max_val, ix_outage_start, ix_outage_end, degree_hours=false) # hours spend below, above specified thresholds
-
+  def calc_resilience_metric(output_var, values, min_val, max_val, ix_outage_start, ix_outage_end, degree_hours = false) # hours spend below, above specified thresholds
     min_val = convert_val(output_var, min_val)
     max_val = convert_val(output_var, max_val)
 
@@ -419,11 +405,9 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     end
 
     return resilience_metric_below, resilience_metric_above
-
   end
 
   def calc_coast_time(output_var, values, min_val, max_val, ix_outage_start, ix_outage_end) # hours until hitting below, above specified thresholds
-
     min_val = convert_val(output_var, min_val)
     max_val = convert_val(output_var, max_val)
 
@@ -460,7 +444,6 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     end
 
     return coast_time_below, coast_time_above
-
   end
 
   def calc_end_of_outage_val(output_var, values, ix_outage_end)
@@ -488,6 +471,7 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     else
       values = timeseries.get.values
     end
+
     timeseries = []
     (0...values.length).to_a.each do |i|
       timeseries << values[i]
@@ -499,7 +483,6 @@ class ResilienceMetricsReport < OpenStudio::Measure::ReportingMeasure
     runner.registerValue(name, val)
     runner.registerInfo("Registering #{val} #{units} for #{name}.")
   end
-
 end
 
 # register the measure to be used by the application
