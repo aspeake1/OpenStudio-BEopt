@@ -17,7 +17,6 @@ require_relative File.join(resources_path, "simulation")
 
 # start the measure
 class ResidentialSimulationControls < OpenStudio::Measure::ModelMeasure
-
   # human readable name
   def name
     # Measure name should be the title case of the class name.
@@ -38,31 +37,31 @@ class ResidentialSimulationControls < OpenStudio::Measure::ModelMeasure
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
 
-    #make an argument for the simulation timesteps per hour
+    # make an argument for the simulation timesteps per hour
     arg = OpenStudio::Measure::OSArgument::makeIntegerArgument("timesteps_per_hr", true)
     arg.setDisplayName("Simulation Timesteps Per Hour")
     arg.setDefaultValue(6)
     args << arg
 
-    #make an argument for the run period begin month
+    # make an argument for the run period begin month
     arg = OpenStudio::Measure::OSArgument::makeIntegerArgument("begin_month", true)
     arg.setDisplayName("Run Period Begin Month")
     arg.setDefaultValue(1)
     args << arg
 
-    #make an argument for the run period begin day of month
+    # make an argument for the run period begin day of month
     arg = OpenStudio::Measure::OSArgument::makeIntegerArgument("begin_day_of_month", true)
     arg.setDisplayName("Run Period Begin Day of Month")
     arg.setDefaultValue(1)
     args << arg
 
-    #make an argument for the run period end month
+    # make an argument for the run period end month
     arg = OpenStudio::Measure::OSArgument::makeIntegerArgument("end_month", true)
     arg.setDisplayName("Run Period End Month")
     arg.setDefaultValue(12)
     args << arg
 
-    #make an argument for the run period end day of month
+    # make an argument for the run period end day of month
     arg = OpenStudio::Measure::OSArgument::makeIntegerArgument("end_day_of_month", true)
     arg.setDisplayName("Run Period End Day of Month")
     arg.setDefaultValue(31)
@@ -80,11 +79,11 @@ class ResidentialSimulationControls < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    timesteps_per_hr = runner.getIntegerArgumentValue("timesteps_per_hr",user_arguments)
-    begin_month = runner.getIntegerArgumentValue("begin_month",user_arguments)
-    begin_day_of_month = runner.getIntegerArgumentValue("begin_day_of_month",user_arguments)
-    end_month = runner.getIntegerArgumentValue("end_month",user_arguments)
-    end_day_of_month = runner.getIntegerArgumentValue("end_day_of_month",user_arguments)
+    timesteps_per_hr = runner.getIntegerArgumentValue("timesteps_per_hr", user_arguments)
+    begin_month = runner.getIntegerArgumentValue("begin_month", user_arguments)
+    begin_day_of_month = runner.getIntegerArgumentValue("begin_day_of_month", user_arguments)
+    end_month = runner.getIntegerArgumentValue("end_month", user_arguments)
+    end_day_of_month = runner.getIntegerArgumentValue("end_day_of_month", user_arguments)
 
     # Error checking
     if timesteps_per_hr < 1 or timesteps_per_hr > 60
@@ -102,12 +101,12 @@ class ResidentialSimulationControls < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    {begin_month=>begin_day_of_month, end_month=>end_day_of_month}.each_with_index do |(month, day), i|
+    { begin_month => begin_day_of_month, end_month => end_day_of_month }.each_with_index do |(month, day), i|
       leap_day = 0
       if month == 2 # february
         leap_day = 1
       end
-      day_of_month_valid = (1..Constants.MonthNumDays[month-1]+leap_day).to_a.include? day # accommodate leap day
+      day_of_month_valid = (1..Constants.MonthNumDays[month - 1] + leap_day).to_a.include? day # accommodate leap day
       unless day_of_month_valid
         if i == 0
           runner.registerError("Invalid begin day of month (#{begin_day_of_month}) entered.")
@@ -118,7 +117,7 @@ class ResidentialSimulationControls < OpenStudio::Measure::ModelMeasure
       end
     end
 
-    success = Simulation.apply(model, runner, timesteps_per_hr, min_system_timestep_mins=nil, begin_month, begin_day_of_month, end_month, end_day_of_month)
+    success = Simulation.apply(model, runner, timesteps_per_hr, min_system_timestep_mins = nil, begin_month, begin_day_of_month, end_month, end_day_of_month)
     return false if not success
 
     runner.registerInfo("Set the simulation timesteps per hour to #{timesteps_per_hr}.")
