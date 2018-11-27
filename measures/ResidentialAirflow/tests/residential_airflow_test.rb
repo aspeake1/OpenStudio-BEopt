@@ -379,6 +379,25 @@ class ResidentialAirflowTest < MiniTest::Test
     model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHPDucted.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 0, 1)
   end
 
+  def test_ducted_mini_split_heat_pump_cfis
+    args_hash = {}
+    args_hash["has_hvac_flue"] = "true"
+    args_hash["mech_vent_type"] = Constants.VentTypeCFIS
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHPDucted.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map { |x| x.logMessage }, "A CFIS ventilation system has been selected but the building does not have central, forced air equipment.")
+  end
+
+  def test_ductless_mini_split_heat_pump_cfis
+    args_hash = {}
+    args_hash["has_hvac_flue"] = "true"
+    args_hash["mech_vent_type"] = Constants.VentTypeCFIS
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map { |x| x.logMessage }, "A CFIS ventilation system has been selected but the building does not have central, forced air equipment.")
+  end
   def test_duct_location_frac
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"
