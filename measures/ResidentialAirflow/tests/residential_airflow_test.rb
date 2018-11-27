@@ -107,7 +107,7 @@ class ResidentialAirflowTest < MiniTest::Test
     args_hash["duct_location"] = Constants.SpaceTypeLiving
     args_hash["mech_vent_type"] = Constants.VentTypeCFIS
     expected_num_del_objects = {}
-    expected_num_new_objects = { "ScheduleRuleset" => 4, "EnergyManagementSystemProgramCallingManager" => 3, "EnergyManagementSystemProgram" => 3, "EnergyManagementSystemSensor" => 12, "EnergyManagementSystemActuator" => 5, "EnergyManagementSystemGlobalVariable" => 7, "EnergyManagementSystemInternalVariable" => 2, "SpaceInfiltrationDesignFlowRate" => 2, "SpaceInfiltrationEffectiveLeakageArea" => 1, "ElectricEquipmentDefinition" => 3, "ElectricEquipment" => 3, "Material" => 1, "Construction" => 1 }
+    expected_num_new_objects = { "ScheduleRuleset" => 4, "EnergyManagementSystemProgramCallingManager" => 3, "EnergyManagementSystemProgram" => 3, "EnergyManagementSystemSensor" => 12, "EnergyManagementSystemActuator" => 5, "EnergyManagementSystemGlobalVariable" => 3, "EnergyManagementSystemInternalVariable" => 2, "SpaceInfiltrationDesignFlowRate" => 2, "SpaceInfiltrationEffectiveLeakageArea" => 1, "ElectricEquipmentDefinition" => 3, "ElectricEquipment" => 3, "Material" => 1, "Construction" => 1 }
     expected_values = { "res_infil_1_program" => { "c" => 0.069658, "Cs" => 0.086238, "Cw" => 0.128435, "faneff_wh" => 0.0, "faneff_sp" => 0.471947 }, "res_nv_1_program" => { "Cs" => 0.000179, "Cw" => 0.000282 }, "TerrainType" => "Suburbs" }
     model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 2, 1)
     # test objects are removed correctly
@@ -225,7 +225,7 @@ class ResidentialAirflowTest < MiniTest::Test
     args_hash["has_hvac_flue"] = "true"
     args_hash["duct_location"] = Constants.SpaceTypeLiving
     expected_num_del_objects = {}
-    expected_num_new_objects = { "ScheduleRuleset" => 4, "EnergyManagementSystemProgramCallingManager" => 1, "EnergyManagementSystemProgram" => 2, "EnergyManagementSystemSensor" => 12, "EnergyManagementSystemActuator" => 5, "EnergyManagementSystemGlobalVariable" => 4, "SpaceInfiltrationDesignFlowRate" => 2, "SpaceInfiltrationEffectiveLeakageArea" => 1, "ElectricEquipmentDefinition" => 3, "ElectricEquipment" => 3, "Material" => 1, "Construction" => 1 }
+    expected_num_new_objects = { "ScheduleRuleset" => 4, "EnergyManagementSystemProgramCallingManager" => 1, "EnergyManagementSystemProgram" => 2, "EnergyManagementSystemSensor" => 12, "EnergyManagementSystemActuator" => 5, "SpaceInfiltrationDesignFlowRate" => 2, "SpaceInfiltrationEffectiveLeakageArea" => 1, "ElectricEquipmentDefinition" => 3, "ElectricEquipment" => 3, "Material" => 1, "Construction" => 1 }
     expected_values = { "res_infil_1_program" => { "c" => 0.069658, "Cs" => 0.086238, "Cw" => 0.128435, "faneff_wh" => 0.943894, "faneff_sp" => 0.471947 }, "res_nv_1_program" => { "Cs" => 0.000179, "Cw" => 0.000282 }, "TerrainType" => "Suburbs" }
     model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1, 1)
   end
@@ -372,7 +372,7 @@ class ResidentialAirflowTest < MiniTest::Test
     args_hash["has_hvac_flue"] = "true"
     args_hash["duct_location"] = "none"
     expected_num_del_objects = {}
-    expected_num_new_objects = { "ScheduleRuleset" => 4, "EnergyManagementSystemProgramCallingManager" => 1, "EnergyManagementSystemProgram" => 2, "EnergyManagementSystemSensor" => 12, "EnergyManagementSystemActuator" => 5, "EnergyManagementSystemGlobalVariable" => 4, "SpaceInfiltrationDesignFlowRate" => 2, "SpaceInfiltrationEffectiveLeakageArea" => 1, "Construction" => 1, "Material" => 1, "ElectricEquipmentDefinition" => 3, "ElectricEquipment" => 3 }
+    expected_num_new_objects = { "ScheduleRuleset" => 4, "EnergyManagementSystemProgramCallingManager" => 1, "EnergyManagementSystemProgram" => 2, "EnergyManagementSystemSensor" => 12, "EnergyManagementSystemActuator" => 5, "SpaceInfiltrationDesignFlowRate" => 2, "SpaceInfiltrationEffectiveLeakageArea" => 1, "Construction" => 1, "Material" => 1, "ElectricEquipmentDefinition" => 3, "ElectricEquipment" => 3 }
     expected_values = { "res_infil_1_program" => { "c" => 0.069658, "Cs" => 0.086238, "Cw" => 0.128435, "faneff_wh" => 0.943894, "faneff_sp" => 0.471947 }, "res_nv_1_program" => { "Cs" => 0.000179, "Cw" => 0.000282 }, "TerrainType" => "Suburbs" }
     model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1, 1)
   end
@@ -381,7 +381,7 @@ class ResidentialAirflowTest < MiniTest::Test
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = { "ScheduleRuleset" => 4, "EnergyManagementSystemProgramCallingManager" => 1, "EnergyManagementSystemProgram" => 2, "EnergyManagementSystemSensor" => 12, "EnergyManagementSystemActuator" => 5, "EnergyManagementSystemGlobalVariable" => 4, "SpaceInfiltrationDesignFlowRate" => 2, "SpaceInfiltrationEffectiveLeakageArea" => 1, "Construction" => 1, "Material" => 1, "ElectricEquipmentDefinition" => 3, "ElectricEquipment" => 3 }
+    expected_num_new_objects = { "ScheduleRuleset" => 4, "EnergyManagementSystemProgramCallingManager" => 1, "EnergyManagementSystemProgram" => 2, "EnergyManagementSystemSensor" => 12, "EnergyManagementSystemActuator" => 5, "SpaceInfiltrationDesignFlowRate" => 2, "SpaceInfiltrationEffectiveLeakageArea" => 1, "Construction" => 1, "Material" => 1, "ElectricEquipmentDefinition" => 3, "ElectricEquipment" => 3 }
     expected_values = { "res_infil_1_program" => { "c" => 0.069658, "Cs" => 0.086238, "Cw" => 0.128435, "faneff_wh" => 0.943894, "faneff_sp" => 0.471947 }, "res_nv_1_program" => { "Cs" => 0.000179, "Cw" => 0.000282 }, "TerrainType" => "Suburbs" }
     model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 1, 2)
   end
@@ -584,7 +584,7 @@ class ResidentialAirflowTest < MiniTest::Test
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"
     expected_num_del_objects = {}
-    expected_num_new_objects = { "ScheduleRuleset" => num_units * 4, "EnergyManagementSystemProgramCallingManager" => num_units, "EnergyManagementSystemProgram" => num_units * 2, "EnergyManagementSystemSensor" => 3 + (num_units * 9), "EnergyManagementSystemActuator" => num_units * 5, "EnergyManagementSystemGlobalVariable" => 4 * num_units, "SpaceInfiltrationDesignFlowRate" => num_units * 2, "ElectricEquipmentDefinition" => num_units * 3, "ElectricEquipment" => num_units * 3, "Material" => 1, "Construction" => 1 }
+    expected_num_new_objects = { "ScheduleRuleset" => num_units * 4, "EnergyManagementSystemProgramCallingManager" => num_units, "EnergyManagementSystemProgram" => num_units * 2, "EnergyManagementSystemSensor" => 3 + (num_units * 9), "EnergyManagementSystemActuator" => num_units * 5, "SpaceInfiltrationDesignFlowRate" => num_units * 2, "ElectricEquipmentDefinition" => num_units * 3, "ElectricEquipment" => num_units * 3, "Material" => 1, "Construction" => 1 }
     expected_values = { "res_infil_1_program" => { "c" => 0.047360, "Cs" => 0.049758, "Cw" => 0.128435, "faneff_wh" => 0.943894, "faneff_sp" => 0.471947 }, "res_nv_1_program" => { "Cs" => 0.000089, "Cw" => 0.000199 }, \
                         "res_infil_2_program" => { "c" => 0.047360, "Cs" => 0.049758, "Cw" => 0.128435, "faneff_wh" => 0.943894, "faneff_sp" => 0.471947 }, "res_nv_2_program" => { "Cs" => 0.000089, "Cw" => 0.000199 }, \
                         "res_infil_3_program" => { "c" => 0.015540, "Cs" => 0.049758, "Cw" => 0.128435, "faneff_wh" => 0.943894, "faneff_sp" => 0.471947 }, "res_nv_3_program" => { "Cs" => 0.000089, "Cw" => 0.000199 }, \
