@@ -102,18 +102,19 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     return end_use_subcategories
   end
 
+  def reporting_frequency_map # idf => osm
+    return { "Detailed" => "HVAC System Timestep", "Timestep" => "Zone Timestep", "Hourly" => "Hourly", "Daily" => "Daily", "Monthly" => "Monthly", "Runperiod" => "Run Period" }
+  end
+
   # define the arguments that the user will input
   def arguments()
     args = OpenStudio::Measure::OSArgumentVector.new
 
     # make an argument for the frequency
     reporting_frequency_chs = OpenStudio::StringVector.new
-    reporting_frequency_chs << "Detailed"
-    reporting_frequency_chs << "Timestep"
-    reporting_frequency_chs << "Hourly"
-    reporting_frequency_chs << "Daily"
-    reporting_frequency_chs << "Monthly"
-    reporting_frequency_chs << "Runperiod"
+    reporting_frequency_map.keys.each do |reporting_frequency_ch|
+      reporting_frequency_chs << reporting_frequency_ch
+    end
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("reporting_frequency", reporting_frequency_chs, true)
     arg.setDisplayName("Reporting Frequency")
     arg.setDefaultValue("Hourly")
@@ -243,19 +244,19 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
                         else
                           "#{end_use}:#{fuel_type}"
                         end
-        variables_to_graph << [variable_name, reporting_frequency, ""]
+        variables_to_graph << [variable_name, reporting_frequency_map[reporting_frequency], ""]
         runner.registerInfo("Exporting #{variable_name}")
       end
     end
     if inc_end_use_subcategories
       end_use_subcategories(model).each do |variable_name|
-        variables_to_graph << [variable_name, reporting_frequency, ""]
+        variables_to_graph << [variable_name, reporting_frequency_map[reporting_frequency], ""]
         runner.registerInfo("Exporting #{variable_name}")
       end
     end
     if inc_output_variables
       output_vars.each do |output_var|
-        sql.availableKeyValues(ann_env_pd, reporting_frequency, output_var.strip).each do |key_value|
+        sql.availableKeyValues(ann_env_pd, reporting_frequency_map[reporting_frequency], output_var.strip).each do |key_value|
           variables_to_graph << [output_var.strip, reporting_frequency, key_value]
           runner.registerInfo("Exporting #{key_value} #{output_var.strip}")
         end
