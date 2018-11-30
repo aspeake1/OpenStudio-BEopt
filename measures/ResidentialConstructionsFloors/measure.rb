@@ -104,6 +104,9 @@ class ProcessConstructionsFloors < OpenStudio::Measure::ModelMeasure
     end
 
     finished_spaces = Geometry.get_finished_spaces(model.getSpaces)
+    if not MoistureConstructions.apply_drywall(runner, model, finished_spaces, "roofceiling")
+      return false
+    end
     if not MoistureConstructions.apply_carpet(runner, model, finished_spaces)
       return false
     end
