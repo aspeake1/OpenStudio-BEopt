@@ -25,12 +25,12 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
 
   # human readable description
   def description
-    return "Exports all available hourly timeseries enduses to csv."
+    return "Exports timeseries output data to csv."
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return "Exports all available hourly timeseries enduses to csv."
+    return "Exports all available timeseries enduses, subcategories, and output variables to csv file(s)."
   end
 
   def fuel_types
@@ -117,25 +117,22 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("reporting_frequency", reporting_frequency_chs, true)
     arg.setDisplayName("Reporting Frequency")
+    arg.setDescription("The frequency at which to report timeseries output data.")
     arg.setDefaultValue("Hourly")
     args << arg
 
     # make an argument for including optional end use subcategories
-    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("inc_end_use_subcategories", true)
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("include_enduse_subcategories", true)
     arg.setDisplayName("Include End Use Subcategories")
-    arg.setDefaultValue(false)
-    args << arg
-
-    # make an argument for including optional output variables
-    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("inc_output_variables", true)
-    arg.setDisplayName("Include Output Variables")
+    arg.setDescription("Whether to report appliance-level enduses: refrigerator, clothes dryer, plug loads, etc.")
     arg.setDefaultValue(false)
     args << arg
 
     # make an argument for optional output variables
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("output_variables", true)
     arg.setDisplayName("Output Variables")
-    arg.setDefaultValue("Zone Mean Air Temperature, Zone Mean Air Humidity Ratio, Fan Runtime Fraction")
+    arg.setDescription("Specify a comma-separated list of output variables to report. (See EnergyPlus's rdd file for available output variables.)")
+    arg.setDefaultValue("")
     args << arg
 
     return args
@@ -148,24 +145,24 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     result = OpenStudio::IdfObjectVector.new
 
     reporting_frequency = runner.getStringArgumentValue("reporting_frequency", user_arguments)
-    inc_end_use_subcategories = runner.getBoolArgumentValue("inc_end_use_subcategories", user_arguments)
-    inc_output_variables = runner.getBoolArgumentValue("inc_output_variables", user_arguments)
+    include_enduse_subcategories = runner.getBoolArgumentValue("include_enduse_subcategories", user_arguments)
     output_vars = runner.getStringArgumentValue("output_variables", user_arguments).split(",")
 
     # Request the output for each end use/fuel type combination
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
-        variable_name = if end_use == "Facility"
-                          "#{fuel_type}:#{end_use}"
-                        else
-                          "#{end_use}:#{fuel_type}"
-                        end
+        variable_name = nil
+        if end_use == "Facility"
+          variable_name = "#{fuel_type}:#{end_use}"
+        else
+          variable_name = "#{end_use}:#{fuel_type}"
+        end
         result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},#{reporting_frequency};").get
       end
     end
 
     # Request the output for each electric equipment object
-    if inc_end_use_subcategories
+    if include_enduse_subcategories
       # get the last model and sql file
       model = runner.lastOpenStudioModel
       if model.empty?
@@ -179,10 +176,8 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end
 
     # Request the output for each output variable
-    if inc_output_variables
-      output_vars.each do |output_var|
-        result << OpenStudio::IdfObject.load("Output:Variable,*,#{output_var.strip},#{reporting_frequency};").get
-      end
+    output_vars.each do |output_var|
+      result << OpenStudio::IdfObject.load("Output:Variable,*,#{output_var.strip},#{reporting_frequency};").get
     end
 
     return result
@@ -199,8 +194,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
 
     # Assign the user inputs to variables
     reporting_frequency = runner.getStringArgumentValue("reporting_frequency", user_arguments)
-    inc_end_use_subcategories = runner.getBoolArgumentValue("inc_end_use_subcategories", user_arguments)
-    inc_output_variables = runner.getBoolArgumentValue("inc_output_variables", user_arguments)
+    include_enduse_subcategories = runner.getBoolArgumentValue("include_enduse_subcategories", user_arguments)
     output_vars = runner.getStringArgumentValue("output_variables", user_arguments).split(",")
 
     # Get the last model
@@ -235,31 +229,28 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       return false
     end
 
+    puts sql.availableReportingFrequencies(ann_env_pd)
+
     # Create an array of arrays of variables
-    variables_to_graph = []
+    variables_to_report = []
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
-        variable_name = if end_use == "Facility"
-                          "#{fuel_type}:#{end_use}"
-                        else
-                          "#{end_use}:#{fuel_type}"
-                        end
-        variables_to_graph << [variable_name, reporting_frequency_map[reporting_frequency], ""]
-        runner.registerInfo("Exporting #{variable_name}")
-      end
-    end
-    if inc_end_use_subcategories
-      end_use_subcategories(model).each do |variable_name|
-        variables_to_graph << [variable_name, reporting_frequency_map[reporting_frequency], ""]
-        runner.registerInfo("Exporting #{variable_name}")
-      end
-    end
-    if inc_output_variables
-      output_vars.each do |output_var|
-        sql.availableKeyValues(ann_env_pd, reporting_frequency_map[reporting_frequency], output_var.strip).each do |key_value|
-          variables_to_graph << [output_var.strip, reporting_frequency, key_value]
-          runner.registerInfo("Exporting #{key_value} #{output_var.strip}")
+        if end_use == "Facility"
+          variable_name = "#{fuel_type}:#{end_use}"
+        else
+          variable_name = "#{end_use}:#{fuel_type}"
         end
+        variables_to_report << [variable_name, reporting_frequency_map[reporting_frequency], ""]
+      end
+    end
+    if include_enduse_subcategories
+      end_use_subcategories(model).each do |variable_name|
+        variables_to_report << [variable_name, reporting_frequency_map[reporting_frequency], ""]
+      end
+    end
+    output_vars.each do |output_var|
+      sql.availableKeyValues(ann_env_pd, reporting_frequency_map[reporting_frequency], output_var.strip).each do |key_value|
+        variables_to_report << [output_var.strip, reporting_frequency, key_value]
       end
     end
 
@@ -274,37 +265,37 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
 
     date_times = []
     cols = []
-    variables_to_graph.each_with_index do |var_to_graph, j|
-      var_name = var_to_graph[0]
-      freq = var_to_graph[1]
-      kv = var_to_graph[2]
+    variables_to_report.each_with_index do |var_to_report, j|
+      var_name = var_to_report[0]
+      freq = var_to_report[1]
+      kv = var_to_report[2]
 
       # Get the y axis values
       y_timeseries = sql.timeSeries(ann_env_pd, freq, var_name, kv)
       if y_timeseries.empty?
-        runner.registerWarning("No data found for #{freq} #{var_name} #{kv}.")
         next
       else
+        runner.registerInfo("Exporting #{freq} #{var_name} #{kv}.")
         y_timeseries = y_timeseries.get
         values = y_timeseries.values
       end
 
       old_units = y_timeseries.units
-      new_units = case old_units
-                  when "J"
-                    if var_name.include?("Electricity")
-                      "kWh"
-                    else
-                      "kBtu"
-                    end
-                  when "m3"
-                    old_units = "m^3"
-                    "gal"
-                  when "C"
-                    "F"
-                  else
-                    old_units
-                  end
+      new_units = nil
+      case old_units
+      when "J"
+        new_units = "kBtu"
+        if var_name.include? "Electricity"
+          new_units = "kWh"
+        end
+      when "m3"
+        old_units = "m^3"
+        new_units = "gal"
+      when "C"
+        new_units = "F"
+      else
+        new_units = old_units
+      end
       unit_conv = nil
       if ["J", "m^3"].include? old_units
         unit_conv = UnitConversions.convert(1.0, old_units, new_units)
