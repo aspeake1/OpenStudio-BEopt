@@ -15,7 +15,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     args_hash["framing_factor"] = 0.25
     args_hash["correction_factor"] = 0.5 # no insulation, shouldn't apply
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 6 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 6 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.009525 / 0.089435
     osb_r = 0.0127 / 0.1154577
     drywall_r = 0.0127 / 0.1602906
@@ -28,8 +28,8 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     args_hash["cavity_filled"] = true
     args_hash["install_grade"] = "2"
     args_hash["correction_factor"] = 0.46
-    expected_num_del_objects = { "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8 }
-    expected_num_new_objects = { "Material" => 1, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8 }
+    expected_num_del_objects = { "Material" => 1, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6 }
+    expected_num_new_objects = { "Material" => 1, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6 }
     cavity_r = 0.0889 / 0.0869815880123319
     assembly_r = ext_finish_r + osb_r + drywall_r + cavity_r
     expected_values = { "AssemblyR" => assembly_r }
@@ -45,7 +45,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     args_hash["framing_factor"] = 0.25
     args_hash["correction_factor"] = 0.46
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 6 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 6 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.009525 / 0.089435
     osb_r = 0.0127 / 0.1154577
     drywall_r = 0.0127 / 0.1602906
@@ -68,7 +68,7 @@ class ProcessConstructionsWallsSteelStudTest < MiniTest::Test
     args_hash["rigid_r"] = 10
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 7 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 7 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.1016 / 0.793375
     drywall_r = 0.0254 / 0.1602906
     cavity_r = 0.0889 / 0.0858877068354131

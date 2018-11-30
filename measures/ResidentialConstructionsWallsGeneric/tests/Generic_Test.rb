@@ -21,7 +21,7 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     args_hash["specific_heat_2"] = 0.28
     args_hash["specific_heat_3"] = 0.28
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 8 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 8 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.009525 / 0.089435
     osb_r = 0.0127 / 0.1154577
     drywall_r = 0.0127 / 0.1602906
@@ -48,7 +48,7 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     args_hash["specific_heat_2"] = 0.21
     args_hash["specific_heat_3"] = 0.25
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 8 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 8 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.009525 / 0.089435
     osb_r = 0.0127 / 0.1154577
     drywall_r = 0.0127 / 0.1602906
@@ -59,8 +59,8 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     expected_values = { "AssemblyR" => assembly_r }
     model = _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # Replace
-    expected_num_del_objects = { "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8 }
-    expected_num_new_objects = { "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8 }
+    expected_num_del_objects = { "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6 }
+    expected_num_new_objects = { "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6 }
     expected_values = { "AssemblyR" => assembly_r }
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -84,7 +84,7 @@ class ProcessConstructionsWallsGenericTest < MiniTest::Test
     args_hash["rigid_r"] = 10
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 9 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 9 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.1016 / 0.793375
     drywall_r = 0.0254 / 0.1602906
     layer1_r = 0.06985 / 0.063888325

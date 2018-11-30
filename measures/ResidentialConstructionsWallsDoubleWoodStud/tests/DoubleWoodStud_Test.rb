@@ -16,7 +16,7 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = false
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 7 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 7 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.009525 / 0.089435
     osb_r = 0.0127 / 0.1154577
     stud_cavity_r = 0.0889 / 0.074106442682155
@@ -37,7 +37,7 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 7 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 7 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.009525 / 0.089435
     osb_r = 0.0127 / 0.1154577
     stud_cavity_r = 0.0889 / 0.0923381015350972
@@ -47,8 +47,8 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     expected_values = { "AssemblyR" => assembly_r }
     model = _test_measure("SFD_2000sqft_2story_SL_UA_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # Replace
-    expected_num_del_objects = { "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8 }
-    expected_num_new_objects = { "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8 }
+    expected_num_del_objects = { "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6 }
+    expected_num_new_objects = { "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6 }
     expected_values = { "AssemblyR" => assembly_r }
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -63,7 +63,7 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     args_hash["framing_spacing"] = 24
     args_hash["is_staggered"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 6 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 6 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.009525 / 0.089435
     osb_r = 0.0127 / 0.1154577
     stud_cavity_r = 0.0889 / 0.0416689707469601
@@ -87,7 +87,7 @@ class ProcessConstructionsWallsDoubleWoodStudTest < MiniTest::Test
     args_hash["rigid_r"] = 10
     args_hash["exterior_finish"] = Material.ExtFinishBrickMedDark.name
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 7 + 4, "Construction" => 5 + 4, "InternalMass" => 4 + 8, "InternalMassDefinition" => 4 + 8, "MaterialPropertyMoisturePenetrationDepthSettings" => 4 }
+    expected_num_new_objects = { "Material" => 7 + 3, "Construction" => 5 + 3, "InternalMass" => 4 + 6, "InternalMassDefinition" => 4 + 6, "MaterialPropertyMoisturePenetrationDepthSettings" => 3 }
     ext_finish_r = 0.1016 / 0.793375
     stud_cavity_r = 0.0889 / 0.0345169239141704
     drywall_r = 0.0254 / 0.1602906

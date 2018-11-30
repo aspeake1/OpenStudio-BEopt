@@ -307,7 +307,14 @@ class ProcessConstructionsWallsGeneric < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    if not MoistureConstructions.apply(runner, model)
+    finished_spaces = Geometry.get_finished_spaces(model.getSpaces)
+    if not MoistureConstructions.apply_drywall(runner, model, finished_spaces)
+      return false
+    end
+    if not MoistureConstructions.apply_wood_trim(runner, model, finished_spaces)
+      return false
+    end
+    if not MoistureConstructions.apply_furniture(runner, model, finished_spaces)
       return false
     end
 

@@ -11,7 +11,7 @@ class ProcessConstructionsFloorsTest < MiniTest::Test
     args_hash["cavity_r"] = 0
     args_hash["joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 6, "Construction" => 4 }
+    expected_num_new_objects = { "Material" => 6 + 1, "Construction" => 4 + 1, "InternalMass" => 2, "InternalMassDefinition" => 2, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     ceiling_ins_r = 0.23495 / 2.598173704068639
     ceiling_plywood_r = 0.01905 / 0.1154577
     ceiling_mass_r = 0.015875 / 0.1154577
@@ -28,7 +28,7 @@ class ProcessConstructionsFloorsTest < MiniTest::Test
     args_hash["framing_factor"] = 0.13
     args_hash["joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 6, "Construction" => 4 }
+    expected_num_new_objects = { "Material" => 6 + 1, "Construction" => 4 + 1, "InternalMass" => 2, "InternalMassDefinition" => 2, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     ceiling_ins_r = 0.23495 / 0.1168615354327202
     ceiling_plywood_r = 0.01905 / 0.1154577
     ceiling_mass_r = 0.015875 / 0.1154577
@@ -43,7 +43,7 @@ class ProcessConstructionsFloorsTest < MiniTest::Test
     args_hash["cavity_r"] = 0
     args_hash["joist_height_in"] = 9.25
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 6, "Construction" => 4 }
+    expected_num_new_objects = { "Material" => 6 + 1, "Construction" => 4 + 1, "InternalMass" => 2, "InternalMassDefinition" => 2, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     ceiling_ins_r = 0.23495 / 2.598173704068639
     ceiling_plywood_r = 0.01905 / 0.1154577
     ceiling_mass_r = 0.015875 / 0.1154577
@@ -56,8 +56,8 @@ class ProcessConstructionsFloorsTest < MiniTest::Test
     args_hash["install_grade"] = "3"
     args_hash["framing_factor"] = 0.13
     args_hash["joist_height_in"] = 9.25
-    expected_num_del_objects = { "Material" => 1, "Construction" => 3 }
-    expected_num_new_objects = { "Material" => 1, "Construction" => 3 }
+    expected_num_del_objects = { "Material" => 1, "Construction" => 3 + 1, "InternalMass" => 2, "InternalMassDefinition" => 2 }
+    expected_num_new_objects = { "Material" => 1, "Construction" => 3 + 1, "InternalMass" => 2, "InternalMassDefinition" => 2 }
     ceiling_ins_r = 0.23495 / 0.1168615354327202
     ceiling_plywood_r = 0.01905 / 0.1154577
     ceiling_mass_r = 0.015875 / 0.1154577

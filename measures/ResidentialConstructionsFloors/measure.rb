@@ -103,6 +103,11 @@ class ProcessConstructionsFloors < OpenStudio::Measure::ModelMeasure
       return false
     end
 
+    finished_spaces = Geometry.get_finished_spaces(model.getSpaces)
+    if not MoistureConstructions.apply_carpet(runner, model, finished_spaces)
+      return false
+    end
+
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)
 
