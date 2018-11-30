@@ -586,7 +586,6 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
           corridor_space = corridor_space.get
           corridor_space_name = "corridor space"
           corridor_space.setName(corridor_space_name)
-          MoistureConstructions.apply_dummy(runner, model, 1.0, [corridor_space])
           if space_types_hash.keys.include? Constants.SpaceTypeCorridor
             corridor_space_type = space_types_hash[Constants.SpaceTypeCorridor]
           else
@@ -829,7 +828,6 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
           foundation_space.setThermalZone(foundation_zone)
           foundation_space_type_name = Constants.SpaceTypeUnfinishedBasement
         end
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space])
         if space_types_hash.keys.include? foundation_space_type_name
           foundation_space_type = space_types_hash[foundation_space_type_name]
         else
@@ -1057,6 +1055,16 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     result = Geometry.process_orientation(model, runner, orientation)
     unless result
       return false
+    end
+
+    # Apply dummy empd internal mass objects to unfinished spaces
+    all_spaces = model.getSpaces
+    finished_spaces = Geometry.get_finished_spaces(all_spaces)
+    unfinished_spaces = all_spaces - finished_spaces
+    unless unfinished_spaces.empty?
+      if not MoistureConstructions.apply_dummy(runner, model, unfinished_spaces, 1.0)
+        return false
+      end
     end
 
     # reporting final condition of model

@@ -769,7 +769,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
           foundation_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedBasement)
           foundation_space.setSpaceType(foundation_space_type)
         end
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space])
       end
 
       # set foundation walls to ground
@@ -817,7 +816,6 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       attic_space_type = OpenStudio::Model::SpaceType.new(model)
       attic_space_type.setStandardsSpaceType(Constants.SpaceTypeUnfinishedAttic)
       attic_space.setSpaceType(attic_space_type)
-      MoistureConstructions.apply_dummy(runner, model, 1.0, [attic_space])
     end
 
     unit_hash = {}
@@ -973,6 +971,16 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     result = Geometry.process_orientation(model, runner, orientation)
     unless result
       return false
+    end
+
+    # Apply dummy empd internal mass objects to unfinished spaces
+    all_spaces = model.getSpaces
+    finished_spaces = Geometry.get_finished_spaces(all_spaces)
+    unfinished_spaces = all_spaces - finished_spaces
+    unless unfinished_spaces.empty?
+      if not MoistureConstructions.apply_dummy(runner, model, unfinished_spaces, 1.0)
+        return false
+      end
     end
 
     # reporting final condition of model

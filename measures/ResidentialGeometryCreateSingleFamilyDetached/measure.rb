@@ -480,8 +480,6 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         end
         foundation_polygon_with_wrong_zs = living_polygon
 
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [garage_space])
-
       else # first floor without garage or above first floor
 
         if has_garage
@@ -654,9 +652,6 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         attic_space_type_name = Constants.SpaceTypeLiving
       end
       attic_space.setName(attic_space_name)
-      if attic_type == "unfinished attic"
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [attic_space])
-      end
       if space_types_hash.keys.include? attic_space_type_name
         attic_space_type = space_types_hash[attic_space_type_name]
       else
@@ -717,9 +712,6 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         foundation_space_type_name = Constants.SpaceTypePierBeam
       end
       foundation_space.setName(foundation_space_name)
-      if ["crawlspace", "unfinished basement", "pier and beam"].include? foundation_type
-        MoistureConstructions.apply_dummy(runner, model, 1.0, [foundation_space])
-      end
       if space_types_hash.keys.include? foundation_space_type_name
         foundation_space_type = space_types_hash[foundation_space_type_name]
       else
@@ -971,6 +963,16 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     result = Geometry.process_orientation(model, runner, orientation)
     unless result
       return false
+    end
+
+    # Apply dummy empd internal mass objects to unfinished spaces
+    all_spaces = model.getSpaces
+    finished_spaces = Geometry.get_finished_spaces(all_spaces)
+    unfinished_spaces = all_spaces - finished_spaces
+    unless unfinished_spaces.empty?
+      if not MoistureConstructions.apply_dummy(runner, model, unfinished_spaces, 1.0)
+        return false
+      end
     end
 
     # reporting final condition of model
