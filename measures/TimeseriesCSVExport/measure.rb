@@ -148,16 +148,18 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     include_enduse_subcategories = runner.getBoolArgumentValue("include_enduse_subcategories", user_arguments)
     output_vars = runner.getStringArgumentValue("output_variables", user_arguments).split(",")
 
-    # Request the output for each end use/fuel type combination
+    # Request the output for each enduse/fuel type combination
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
-        variable_name = nil
+        variable_name = "#{end_use}:#{fuel_type}"
         if end_use == "Facility"
           variable_name = "#{fuel_type}:#{end_use}"
-        else
-          variable_name = "#{end_use}:#{fuel_type}"
         end
-        result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},#{reporting_frequency};").get
+        if reporting_frequency == "Detailed"
+          result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},Timestep;").get
+        else
+          result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},#{reporting_frequency};").get
+        end
       end
     end
 
@@ -229,8 +231,6 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       return false
     end
 
-    puts sql.availableReportingFrequencies(ann_env_pd)
-
     # Create an array of arrays of variables
     variables_to_report = []
     end_uses.each do |end_use|
@@ -250,7 +250,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end
     output_vars.each do |output_var|
       sql.availableKeyValues(ann_env_pd, reporting_frequency_map[reporting_frequency], output_var.strip).each do |key_value|
-        variables_to_report << [output_var.strip, reporting_frequency, key_value]
+        variables_to_report << [output_var.strip, reporting_frequency[reporting_frequency], key_value]
       end
     end
 
@@ -263,14 +263,19 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     actual_year_timestamps = weather.actual_year_timestamps
     records_per_hour = weather.header.RecordsPerHour
 
-    date_times = []
-    cols = []
+    enduse_date_times = []
+    enduse_timeseries = []
+    output_vars_date_times = []
+    output_vars_timeseries = []
     variables_to_report.each_with_index do |var_to_report, j|
       var_name = var_to_report[0]
       freq = var_to_report[1]
       kv = var_to_report[2]
 
       # Get the y axis values
+      if not output_vars.include? var_name and freq == "HVAC System Timestep"
+        freq = "Zone Timestep"
+      end
       y_timeseries = sql.timeSeries(ann_env_pd, freq, var_name, kv)
       if y_timeseries.empty?
         next
@@ -281,7 +286,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       end
 
       old_units = y_timeseries.units
-      new_units = nil
+      new_units = old_units
       case old_units
       when "J"
         new_units = "kBtu"
@@ -293,8 +298,6 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         new_units = "gal"
       when "C"
         new_units = "F"
-      else
-        new_units = old_units
       end
       unit_conv = nil
       if ["J", "m^3"].include? old_units
@@ -307,17 +310,34 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
 
       y_vals = ["#{var_name} #{kv} [#{new_units}]"]
       y_timeseries.dateTimes.each_with_index do |date_time, i|
-        if date_times.empty?
-          date_times << "Time"
-        end
-        if cols.empty?
-          if actual_year_timestamps.empty? # weather file is a TMY (i.e., year is always 2009)
-            date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
-          else
-            if (reporting_frequency == "Hourly" and records_per_hour == 1) or (reporting_frequency == "Timestep" and records_per_hour != 1)
-              date_times << actual_year_timestamps[i] # timestamps from the epw (AMY)
+        if output_vars.include? var_name
+          if output_vars_date_times.empty?
+            output_vars_date_times << "Time"
+          end        
+          if output_vars_timeseries.empty?
+            if actual_year_timestamps.empty? # weather file is a TMY (i.e., year is always 2009)
+              output_vars_date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
             else
-              date_times << i + 1 # TODO: change from reporting integers to appropriate timestamps
+              if (freq == "Hourly" and records_per_hour == 1) or (freq == "Zone Timestep" and records_per_hour != 1)
+                output_vars_date_times << actual_year_timestamps[i] # timestamps from the epw (AMY)
+              else
+                output_vars_date_times << i + 1 # TODO: change from reporting integers to appropriate timestamps
+              end
+            end
+          end
+        else # not an output variable
+          if enduse_date_times.empty?
+            enduse_date_times << "Time"
+          end
+          if enduse_timeseries.empty?
+            if actual_year_timestamps.empty? # weather file is a TMY (i.e., year is always 2009)
+              enduse_date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
+            else
+              if (freq == "Hourly" and records_per_hour == 1) or (freq == "Zone Timestep" and records_per_hour != 1)
+                enduse_date_times << actual_year_timestamps[i] # timestamps from the epw (AMY)
+              else
+                enduse_date_times << i + 1 # TODO: change from reporting integers to appropriate timestamps
+              end
             end
           end
         end
@@ -332,22 +352,48 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         y_vals << y_val.round(3)
       end
 
-      if cols.empty?
-        cols << date_times
+      if output_vars.include? var_name
+        if output_vars_timeseries.empty?
+          output_vars_timeseries << output_vars_date_times
+        end
+        if y_vals.length == output_vars_timeseries[0].length
+          output_vars_timeseries << y_vals
+        else
+          runner.registerWarning("The length of #{y_vals[0]} is not #{output_vars_timeseries[0].length}. Not reporting this.")
+        end
+      else # not an output variable
+        if enduse_timeseries.empty?
+          enduse_timeseries << enduse_date_times
+        end
+        if y_vals.length == enduse_timeseries[0].length
+          enduse_timeseries << y_vals
+        else
+          runner.registerWarning("The length of #{y_vals[0]} is not #{enduse_timeseries[0].length}. Not reporting this.")
+        end
       end
-      cols << y_vals
     end
 
-    # Write the rows out to csv
-    rows = cols.transpose
-    csv_path = File.expand_path("../enduse_timeseries.csv")
-    CSV.open(csv_path, "wb") do |csv|
-      rows.each do |row|
-        csv << row
+    # Write the enduse timeseries rows out to csv
+    unless enduse_timeseries.empty?
+      rows = enduse_timeseries.transpose
+      csv_path = File.expand_path("../enduse_timeseries.csv")
+      CSV.open(csv_path, "wb") do |csv|
+        rows.each do |row|
+          csv << row
+        end
       end
     end
-    csv_path = File.absolute_path(csv_path)
-    runner.registerFinalCondition("CSV file saved to <a href='file:///#{csv_path}'>enduse_timeseries.csv</a>.")
+
+    # Write the output vars timeseries rows out to csv
+    unless output_vars_timeseries.empty?
+      rows = output_vars_timeseries.transpose
+      csv_path = File.expand_path("../output_variables.csv")
+      CSV.open(csv_path, "wb") do |csv|
+        rows.each do |row|
+          csv << row
+        end
+      end
+    end
 
     # close the sql file
     sql.close()
