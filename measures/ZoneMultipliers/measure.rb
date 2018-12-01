@@ -326,14 +326,16 @@ class ZoneMultipliers < OpenStudio::Measure::ModelMeasure
         water_heater = nil
         if supply_component.to_WaterHeaterMixed.is_initialized
           water_heater = supply_component.to_WaterHeaterMixed.get
+          water_heater.setpointTemperatureSchedule.get.remove
         elsif supply_component.to_WaterHeaterStratified.is_initialized
           water_heater = supply_component.to_WaterHeaterStratified.get
+          water_heater.heater1SetpointTemperatureSchedule.remove
+          water_heater.heater2SetpointTemperatureSchedule.remove
         end
         unless water_heater.nil?
           next if water_heater.ambientTemperatureThermalZone.is_initialized
 
           unless plant_loops.include? plant_loop
-            water_heater.setpointTemperatureSchedule.get.remove
             plant_loops << plant_loop
           end
         end
