@@ -422,7 +422,7 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
       daily_bath_inc = 0
       ann_int_gain = 0
       for m in 0..11
-        recovery_load_inc += Constants.MonthNumDays[m] * daily_recovery_load[m] / water_mix_to_h[m] / (365.0 * 3.0) # Split evenly across all end uses
+        # recovery_load_inc += Constants.MonthNumDays[m] * daily_recovery_load[m] / water_mix_to_h[m] / (365.0 * 3.0) # Split evenly across all end uses
         daily_shower_inc += Constants.MonthNumDays[m] * daily_shower_increase[m] / water_mix_to_h[m] / 365.0
         daily_sink_inc += Constants.MonthNumDays[m] * daily_sink_increase[m] / water_mix_to_h[m] / 365.0
         daily_bath_inc += Constants.MonthNumDays[m] * daily_bath_increase[m] / water_mix_to_h[m] / 365.0
