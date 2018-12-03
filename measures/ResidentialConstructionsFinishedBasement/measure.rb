@@ -156,6 +156,11 @@ class ProcessConstructionsFinishedBasement < OpenStudio::Measure::ModelMeasure
       end
     end
 
+    finished_spaces_below_grade = Geometry.get_finished_spaces_below_grade(model.getSpaces)
+    if not MoistureConstructions.apply_drywall(runner, model, finished_spaces_below_grade, "wall")
+      return false
+    end
+
     # Remove any constructions/materials that aren't used
     HelperMethods.remove_unused_constructions_and_materials(model, runner)
 

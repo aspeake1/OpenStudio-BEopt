@@ -16,7 +16,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
     args_hash["wall_framing_factor"] = 0
     args_hash["wall_rigid_r"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 3, "Construction" => 2, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1 }
+    expected_num_new_objects = { "Material" => 3 + 1, "Construction" => 2 + 1, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1, "InternalMass" => 1, "InternalMassDefinition" => 1, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     expected_values = { "WallRValue" => 0, "WallDepth" => 0, "ExposedPerimeter" => 109.54 }
     _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -31,7 +31,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
     args_hash["wall_framing_factor"] = 0
     args_hash["wall_rigid_r"] = 10
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 4, "Construction" => 2, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1 }
+    expected_num_new_objects = { "Material" => 4 + 1, "Construction" => 2 + 1, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1, "InternalMass" => 1, "InternalMassDefinition" => 1, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     expected_values = { "WallRValue" => 1.76, "WallDepth" => 1.22, "ExposedPerimeter" => 109.54 }
     _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -46,7 +46,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
     args_hash["wall_framing_factor"] = 0
     args_hash["wall_rigid_r"] = 10
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 4, "Construction" => 2, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1 }
+    expected_num_new_objects = { "Material" => 4 + 1, "Construction" => 2 + 1, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1, "InternalMass" => 1, "InternalMassDefinition" => 1, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     expected_values = { "WallRValue" => 1.76, "WallDepth" => 2.44, "ExposedPerimeter" => 109.54 }
     _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -61,7 +61,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
     args_hash["wall_framing_factor"] = 0.25
     args_hash["wall_rigid_r"] = 5
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 5, "Construction" => 2, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1 }
+    expected_num_new_objects = { "Material" => 5 + 1, "Construction" => 2 + 1, "FoundationKiva" => 1, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 1, "InternalMass" => 1, "InternalMassDefinition" => 1, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     expected_values = { "WallRValue" => 1.79 + 0.88, "WallDepth" => 2.44 + 2.44, "ExposedPerimeter" => 109.54 }
     _test_measure("SFD_2000sqft_2story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -69,7 +69,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
   def test_exposed_perimeter_with_garage
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 5, "Construction" => 4, "FoundationKiva" => 2, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 2 }
+    expected_num_new_objects = { "Material" => 5 + 1, "Construction" => 4 + 1, "FoundationKiva" => 2, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 2, "InternalMass" => 1, "InternalMassDefinition" => 1, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     expected_values = { "ExposedPerimeter" => 85 }
     _test_measure("SFD_2000sqft_2story_FB_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -77,7 +77,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
   def test_exposed_perimeter_with_door
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 5, "Construction" => 4, "FoundationKiva" => 2, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 2 }
+    expected_num_new_objects = { "Material" => 5 + 1, "Construction" => 4 + 1, "FoundationKiva" => 2, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => 2, "InternalMass" => 1, "InternalMassDefinition" => 1, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     expected_values = { "ExposedPerimeter" => 79.427 }
     _test_measure("SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -86,7 +86,7 @@ class ProcessConstructionsFinishedBasementTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = { "Material" => 7, "Construction" => 8, "FoundationKiva" => num_units, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => num_units }
+    expected_num_new_objects = { "Material" => 7 + 1, "Construction" => 8 + 1, "FoundationKiva" => num_units, "FoundationKivaSettings" => 1, "SurfacePropertyExposedFoundationPerimeter" => num_units, "InternalMass" => num_units, "InternalMassDefinition" => num_units, "MaterialPropertyMoisturePenetrationDepthSettings" => 1 }
     expected_values = { "ExposedPerimeter" => 180 }
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
