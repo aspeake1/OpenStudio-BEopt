@@ -6,26 +6,74 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class TimeseriesCSVExportTest < MiniTest::Test
-  def test_leap_year_and_output_vars_subhourly
+
+  def test_tmy_detailed_and_output_vars
+    num_zones = 3
+    num_output_requests = 112 + 1 # 1 additional output vars requested
     measure = TimeseriesCSVExport.new
     args_hash = {}
-    args_hash["inc_output_variables"] = "true" # are not included if reporting_frequency!=Hourly
-    args_hash["reporting_frequency"] = "Timestep"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 112, 98, 115)
+    args_hash["reporting_frequency"] = "Detailed"
+    args_hash["output_variables"] = "Zone Mean Air Temperature"
+    expected_values = {"EnduseTimeseriesLength" => 8760 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8760 * 6, "OutputVarsTimeseriesWidth" => num_zones * 1}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
   end
 
-  def test_tmy_and_subcategories_daily
+  def test_leap_year_timestep_and_output_vars
+    num_zones = 3
+    num_output_requests = 112 + 1 # 1 additional output vars requested
     measure = TimeseriesCSVExport.new
     args_hash = {}
-    args_hash["inc_end_use_subcategories"] = "true"
+    args_hash["reporting_frequency"] = "Timestep"
+    args_hash["output_variables"] = "Zone Mean Air Temperature"
+    expected_values = {"EnduseTimeseriesLength" => 8784 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8784 * 6, "OutputVarsTimeseriesWidth" => num_zones * 1}
+    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_values, __method__, "DuPage_17043_725300_880860.epw", num_output_requests)
+  end
+  
+  def test_tmy_hourly
+    num_output_requests = 112
+    measure = TimeseriesCSVExport.new
+    args_hash = {}
+    expected_values = {"EnduseTimeseriesLength" => 8760, "EndUseTimeseriesWidth" => 7}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
+  end
+
+  def test_tmy_daily_and_subcategories
+    num_output_requests = 112 + 84 # 84 additional subcategory vars requested
+    measure = TimeseriesCSVExport.new
+    args_hash = {}
+    args_hash["include_enduse_subcategories"] = "true"
     args_hash["reporting_frequency"] = "Daily"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 196, 183, 196)
+    expected_values = {"EnduseTimeseriesLength" => 365, "EndUseTimeseriesWidth" => 7 + 6}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
+  end
+
+  def test_tmy_monthly
+    num_output_requests = 112
+    measure = TimeseriesCSVExport.new
+    args_hash = {}
+    args_hash["reporting_frequency"] = "Monthly"
+    expected_values = {"EnduseTimeseriesLength" => 12, "EndUseTimeseriesWidth" => 7}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
+  end
+
+  def test_tmy_runperiod
+    num_output_requests = 112
+    measure = TimeseriesCSVExport.new
+    args_hash = {}
+    args_hash["reporting_frequency"] = "Runperiod"
+    expected_values = {"EnduseTimeseriesLength" => 1, "EndUseTimeseriesWidth" => 7}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
+  end
+
+  def test_output_vars_are_different_steps
+    num_zones = 3
+    num_output_requests = 112 + 2 # 2 additional output vars requested
+    measure = TimeseriesCSVExport.new
+    args_hash = {}
+    args_hash["reporting_frequency"] = "Detailed"
+    args_hash["output_variables"] = "Zone Mean Air Temperature, Fan Runtime Fraction" # these have different timesteps and so only the first gets reported
+    expected_values = {"EnduseTimeseriesLength" => 8760 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8760 * 6, "OutputVarsTimeseriesWidth" => num_zones * 1}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
   end
 
   private
@@ -59,8 +107,12 @@ class TimeseriesCSVExportTest < MiniTest::Test
     return "#{run_dir(test_name)}/run/eplusout.sql"
   end
 
-  def timeseries_path(test_name)
+  def enduse_timeseries_path(test_name)
     return "#{run_dir(test_name)}/../enduse_timeseries.csv"
+  end
+
+  def output_vars_timeseries_path(test_name)
+    return "#{run_dir(test_name)}/../output_variables.csv"
   end
 
   # create test files if they do not exist when the test first runs
@@ -100,7 +152,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     return model
   end
 
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos = 0, num_warnings = 0, num_output_requests = 0, debug = false)
+  def _test_measure(osm_file_or_model, args_hash, expected_values, test_name, epw_name, num_output_requests)
     # create an instance of the measure
     measure = TimeseriesCSVExport.new
 
@@ -168,14 +220,48 @@ class TimeseriesCSVExportTest < MiniTest::Test
       Dir.chdir(start_dir)
     end
 
-    # make sure the report file exists
-    assert(File.exist?(timeseries_path(test_name)))
+    # make sure the enduse report file exists
+    if expected_values.keys.include? "EnduseTimeseriesLength" and expected_values.keys.include? "EnduseTimeseriesWidth"
+      assert(File.exist?(enduse_timeseries_path(test_name)))
+
+      # make sure you're reporting at correct frequency
+      timeseries_length, timeseries_width = get_enduse_timeseries(enduse_timeseries_path(test_name))
+      assert_equal(expected_values["EnduseTimeseriesLength"], timeseries_length)
+      assert_equal(expected_values["EnduseTImeseriesWidth"], timeseries_width)
+    end
+
+    # make sure the output vars report file exists
+    if expected_values.keys.include? "OutputVarsTimeseriesLength" and expected_values.keys.include? "OutputVarsTimeseriesWidth"
+      assert(File.exist?(output_vars_timeseries_path(test_name)))
+
+      # make sure you're reporting at correct frequency
+      timeseries_length, timeseries_width = get_output_vars_timeseries(output_vars_timeseries_path(test_name))
+      assert_equal(expected_values["OutputVarsTimeseriesLength"], timeseries_length)
+      assert_equal(expected_values["OutputVarsTimeseriesWidth"], timeseries_width)
+    end
+
+
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert_equal(num_infos, result.info.size)
-    assert_equal(num_warnings, result.warnings.size)
+    assert(result.info.size > 0)
 
     return model
+  end
+
+  def get_enduse_timeseries(enduse_timeseries)
+    rows = CSV.read(File.expand_path(enduse_timeseries))
+    timeseries_length = rows.length - 1
+    cols = rows.transpose
+    timeseries_width = cols.length - 1
+    return timeseries_length, timeseries_width
+  end
+
+  def get_output_vars_timeseries(output_vars_timeseries)
+    rows = CSV.read(File.expand_path(output_vars_timeseries))
+    timeseries_length = rows.length - 1
+    cols = rows.transpose
+    timeseries_width = cols.length - 1
+    return timeseries_length, timeseries_width
   end
 end

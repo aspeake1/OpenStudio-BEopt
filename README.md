@@ -5,7 +5,7 @@ This project includes [OpenStudio measures](http://nrel.github.io/OpenStudio-use
 
 Unit Test Status: [![CircleCI](https://circleci.com/gh/NREL/OpenStudio-BEopt/tree/master.svg?style=svg)](https://circleci.com/gh/NREL/OpenStudio-BEopt/tree/master)
 
-Code Coverage: [![Coverage Status](https://coveralls.io/repos/github/NREL/OpenStudio-Beopt/badge.svg?branch=master)](https://coveralls.io/github/NREL/OpenStudio-Beopt?branch=master)
+Code Coverage: [![codecov](https://codecov.io/gh/NREL/OpenStudio-BEopt/branch/master/graph/badge.svg)](https://codecov.io/gh/NREL/OpenStudio-BEopt)
 
 ## Running the Measures
 
