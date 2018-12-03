@@ -197,7 +197,13 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     # Assign the user inputs to variables
     reporting_frequency = runner.getStringArgumentValue("reporting_frequency", user_arguments)
     include_enduse_subcategories = runner.getBoolArgumentValue("include_enduse_subcategories", user_arguments)
-    output_vars = runner.getStringArgumentValue("output_variables", user_arguments).split(",")
+    output_variables = runner.getStringArgumentValue("output_variables", user_arguments)
+
+    # Clean output variables
+    output_vars = []
+    output_variables.split(",").each do |output_var|
+      output_vars << output_var.strip
+    end
 
     # Get the last model
     model = runner.lastOpenStudioModel
