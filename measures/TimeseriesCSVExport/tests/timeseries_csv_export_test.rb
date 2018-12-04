@@ -76,6 +76,16 @@ class TimeseriesCSVExportTest < MiniTest::Test
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
   end
 
+  def test_output_vars_are_same_steps
+    num_output_requests = 112 + 2 # 2 additional output vars requested
+    measure = TimeseriesCSVExport.new
+    args_hash = {}
+    args_hash["reporting_frequency"] = "Timestep"
+    args_hash["output_variables"] = "Fan Runtime Fraction, Fan Air Mass Flow Rate"
+    expected_values = {"EnduseTimeseriesLength" => 8784 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8784 * 6, "OutputVarsTimeseriesWidth" => 2}
+    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_values, __method__, "DuPage_17043_725300_880860.epw", num_output_requests)
+  end
+
   private
 
   def model_in_path_default(osm_file_or_model)
