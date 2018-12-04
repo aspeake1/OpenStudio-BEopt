@@ -319,7 +319,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         if output_vars.include? var_name
           if output_vars_date_times.empty?
             output_vars_date_times << "Time"
-          end        
+          end
           if output_vars_timeseries.empty?
             if actual_year_timestamps.empty? # weather file is a TMY (i.e., year is always 2009)
               output_vars_date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
