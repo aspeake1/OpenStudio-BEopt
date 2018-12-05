@@ -426,6 +426,23 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
   end
 
+  def test_threestory_ufbasement_halfprotrusion_garageright_gableroof
+    num_finished_spaces = 3
+    args_hash = {}
+    args_hash["aspect_ratio"] = "1.8"
+    args_hash["foundation_height"] = "8"
+    args_hash["foundation_type"] = "unfinished basement"
+    args_hash["garage_depth"] = "24"
+    args_hash["garage_protrusion"] = "0.5"
+    args_hash["garage_width"] = "12"
+    args_hash["num_floors"] = "3"
+    args_hash["total_ffa"] = "4500"
+    expected_num_del_objects = {}
+    expected_num_new_objects = { "BuildingUnit" => 1, "Surface" => 50, "ThermalZone" => 4, "Space" => 7, "SpaceType" => 4, "PeopleDefinition" => num_finished_spaces, "People" => num_finished_spaces, "ScheduleRuleset" => 2, "ShadingSurfaceGroup" => 2, "ShadingSurface" => 12 }
+    expected_values = { "FinishedFloorArea" => 4500, "UnfinishedBasementHeight" => 8, "UnfinishedBasementFloorArea" => 1308, "UnfinishedAtticHeight" => 8.10, "UnfinishedAtticFloorArea" => 1596, "GarageAtticHeight" => 4, "GarageFloorArea" => 288, "BuildingHeight" => 8 + 8 + 8 + 8 + 8.10, "Beds" => 3.0, "Baths" => 2.0, "NumOccupants" => 2.64, "EavesDepth" => 2 }
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+  end
+
   def test_argument_error_beds_not_equal_to_baths
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0, 3.0"
