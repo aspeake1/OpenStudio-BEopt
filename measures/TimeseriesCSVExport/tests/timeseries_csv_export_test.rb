@@ -13,18 +13,18 @@ class TimeseriesCSVExportTest < MiniTest::Test
     args_hash = {}
     args_hash["reporting_frequency"] = "Detailed"
     args_hash["output_variables"] = "Zone Mean Air Temperature"
-    expected_values = { "EnduseTimeseriesLength" => 8760 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8760 * 6, "OutputVarsTimeseriesWidth" => num_zones * 1 }
+    expected_values = { "EnduseTimeseriesLength" => 8760 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8760 * 6, "OutputVarsTimeseriesWidth" => num_zones }
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
   end
 
   def test_leap_year_timestep_and_output_vars
-    num_zones = 2
+    num_zones = 4
     num_output_requests = 112 + 1 # 1 additional output vars requested
     measure = TimeseriesCSVExport.new
     args_hash = {}
     args_hash["reporting_frequency"] = "Timestep"
     args_hash["output_variables"] = "Zone Mean Air Temperature"
-    expected_values = { "EnduseTimeseriesLength" => 8784 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8784 * 6, "OutputVarsTimeseriesWidth" => num_zones * 2 }
+    expected_values = { "EnduseTimeseriesLength" => 8784 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8784 * 6, "OutputVarsTimeseriesWidth" => num_zones }
     _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_values, __method__, "DuPage_17043_725300_880860.epw", num_output_requests)
   end
 
@@ -71,7 +71,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     args_hash = {}
     args_hash["reporting_frequency"] = "Detailed"
     args_hash["output_variables"] = "Zone Mean Air Temperature, Fan Runtime Fraction" # these have different timesteps and so only the first gets reported
-    expected_values = { "EnduseTimeseriesLength" => 8760 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8760 * 6, "OutputVarsTimeseriesWidth" => num_zones * 1 }
+    expected_values = { "EnduseTimeseriesLength" => 8760 * 6, "EndUseTimeseriesWidth" => 7, "OutputVarsTimeseriesLength" => 8760 * 6, "OutputVarsTimeseriesWidth" => num_zones }
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl_PV.osm", args_hash, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", num_output_requests)
   end
 
