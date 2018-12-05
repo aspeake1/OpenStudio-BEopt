@@ -11,7 +11,6 @@ class ProcessBoilerTest < MiniTest::Test
     args_hash["system_type"] = Constants.BoilerTypeCondensing
     args_hash["oat_reset_enabled"] = "true"
     args_hash["capacity"] = "20"
-    args_hash["is_modulating"] = true
     args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = { "BoilerHotWater" => 1, "ZoneHVACBaseboardConvectiveWater" => 2, "PlantLoop" => 1, "CoilHeatingWaterBaseboard" => 2, "SetpointManagerScheduled" => 1, "PumpVariableSpeed" => 1 }
@@ -27,7 +26,6 @@ class ProcessBoilerTest < MiniTest::Test
     args_hash["oat_hwst_low"] = 180.0
     args_hash["oat_high"] = 68.0
     args_hash["oat_hwst_high"] = 95.0
-    args_hash["is_modulating"] = true
     expected_num_del_objects = {}
     expected_num_new_objects = { "BoilerHotWater" => 1, "ZoneHVACBaseboardConvectiveWater" => 2, "PlantLoop" => 1, "CoilHeatingWaterBaseboard" => 2, "SetpointManagerScheduled" => 1, "PumpVariableSpeed" => 1 }
     expected_values = { "Efficiency" => 0.76, "FuelType" => Constants.FuelTypeGas, "hvac_priority" => 1 }
@@ -125,7 +123,6 @@ class ProcessBoilerTest < MiniTest::Test
     args_hash["system_type"] = Constants.BoilerTypeCondensing
     args_hash["oat_reset_enabled"] = "true"
     args_hash["capacity"] = "20"
-    args_hash["is_modulating"] = true
     args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = { "BoilerHotWater" => 1, "ZoneHVACBaseboardConvectiveWater" => 2, "PlantLoop" => 1, "CoilHeatingWaterBaseboard" => 2, "SetpointManagerScheduled" => 1, "PumpVariableSpeed" => 1 }

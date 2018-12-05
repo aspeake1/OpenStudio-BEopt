@@ -101,13 +101,6 @@ class ProcessBoiler < OpenStudio::Measure::ModelMeasure
     design_temp.setDefaultValue(180.0)
     args << design_temp
 
-    # make an argument for whether the boiler is modulating or not
-    is_modulating = OpenStudio::Measure::OSArgument::makeBoolArgument("is_modulating", true)
-    is_modulating.setDisplayName("Modulating Boiler")
-    is_modulating.setDescription("Whether the burner on the boiler can fully modulate or not. Typically modulating boilers are higher efficiency units (such as condensing boilers). Only used for non-electric boilers.")
-    is_modulating.setDefaultValue(false)
-    args << is_modulating
-
     # make a string argument for furnace heating output capacity
     capacity = OpenStudio::Measure::OSArgument::makeStringArgument("capacity", true)
     capacity.setDisplayName("Heating Capacity")
@@ -152,7 +145,6 @@ class ProcessBoiler < OpenStudio::Measure::ModelMeasure
       capacity = UnitConversions.convert(capacity.to_f, "kBtu/hr", "Btu/hr")
     end
     design_temp = runner.getDoubleArgumentValue("design_temp", user_arguments)
-    is_modulating = runner.getBoolArgumentValue("is_modulating", user_arguments)
     dse = runner.getStringArgumentValue("dse", user_arguments)
     if dse.to_f > 0
       dse = dse.to_f
@@ -177,7 +169,7 @@ class ProcessBoiler < OpenStudio::Measure::ModelMeasure
 
       success = HVAC.apply_boiler(model, unit, runner, fuel_type, system_type, afue,
                                   oat_reset_enabled, oat_high, oat_low, oat_hwst_high, oat_hwst_low,
-                                  capacity, design_temp, is_modulating, dse)
+                                  capacity, design_temp, dse)
       return false if not success
     end
 
